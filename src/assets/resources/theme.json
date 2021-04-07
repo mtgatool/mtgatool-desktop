@@ -1,0 +1,48 @@
+{
+  "--color-w": "#e7ca8e",
+  "--color-u": "#aabedf",
+  "--color-b": "#a18e87",
+  "--color-r": "#dd8263",
+  "--color-g": "#b7c89e",
+  "--color-c": "#b6a59e",
+  "--color-m": "#ffcd70",
+
+  "--color-common": "#e6e6e6",
+  "--color-uncommon": "#bedbff",
+  "--color-rare": "#fed71d",
+  "--color-mythic": "#dd8263",
+
+  "--color-base": "#282829",
+  "--color-hover-base": "#252527",
+  "--color-dark": "#141516",
+  "--color-dark-hover": "#000000",
+
+  "--color-line-sep": "#333333",
+  "--color-section": "#202021",
+  "--color-section-hover": "#29292b",
+  "--color-section-active": "#2E3136",
+
+  "--color-text": "#CCCCCC",
+  "--color-text-hover": "#FFFFFF",
+  "--color-text-dark": "#929292",
+  "--color-text-disabled": "#505050",
+  "--color-text-link": "#94a8ca",
+
+  "--color-icon": "#FFFFFF",
+  "--color-icon-subtle": "#B9C3D9",
+
+  "--color-text-button": "#333333",
+  "--color-text-button-hover": "#111111",
+  "--color-button": "#94a8ca",
+  "--color-button-hover": "rgba(175, 205, 255, 1)",
+  "--color-button-shade-20": "rgba(175, 205, 255, 0.2)",
+  "--color-button-shade-40": "rgba(175, 205, 255, 0.4)",
+
+  "--color-shade-75": "rgba(0, 0, 0, .75)",
+  "--color-shade-50": "rgba(0, 0, 0, .5)",
+  "--color-shade-25": "rgba(0, 0, 0, .25)",
+
+  "--color-card-tile": "rgba(0, 0, 0, 0.75)",
+  "--color-card-tile-hover": "#3a424ebf",
+  "--color-card-tile-active": "#c2d9ffc0"
+}

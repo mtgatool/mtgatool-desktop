@@ -1,0 +1,111 @@
+.loading-bar {
+  background-color: var(--color-g);
+  overflow: hidden;
+  width: 100%;
+  height: 4px;
+  animation-name: color;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  z-index: 950;
+}
+
+.loading-bar-main {
+  background-color: var(--color-g);
+  overflow: hidden;
+  position: absolute;
+  top: 24px;
+  width: 100%;
+  height: 4px;
+  animation-name: color;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  z-index: 950;
+
+  .loading-color {
+    position: relative;
+    width: 200%;
+    height: 100%;
+    animation-name: grow;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: cubic-bezier(0.42, 0, 0.58, 1);
+  }
+
+  .loading-w {
+    background-color: var(--color-w);
+    animation-delay: 0s;
+    top: 0px;
+  }
+
+  .loading-u {
+    background-color: var(--color-u);
+    animation-delay: 0.4s;
+    top: -100%;
+  }
+
+  .loading-b {
+    background-color: var(--color-b);
+    animation-delay: 0.8s;
+    top: -200%;
+  }
+
+  .loading-r {
+    background-color: var(--color-r);
+    animation-delay: 1.2s;
+    top: -300%;
+  }
+
+  .loading-g {
+    background-color: var(--color-g);
+    animation-delay: 1.6s;
+    top: -400%;
+  }
+}
+
+@keyframes grow {
+  from {
+    transform: scale(0, 1) translate(0, 0);
+    z-index: 100;
+  }
+  to {
+    transform: scale(1, 1) translate(0, 0);
+    z-index: 50;
+  }
+}
+
+@keyframes color {
+  0% {
+    background-color: var(--color-w);
+  }
+  19% {
+    background-color: var(--color-w);
+  }
+
+  20% {
+    background-color: var(--color-u);
+  }
+  39% {
+    background-color: var(--color-u);
+  }
+
+  40% {
+    background-color: var(--color-b);
+  }
+  59% {
+    background-color: var(--color-b);
+  }
+
+  60% {
+    background-color: var(--color-r);
+  }
+  79% {
+    background-color: var(--color-r);
+  }
+
+  80% {
+    background-color: var(--color-g);
+  }
+  99% {
+    background-color: var(--color-g);
+  }
+}

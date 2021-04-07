@@ -1,0 +1,193 @@
+.button {
+  border-radius: 50%;
+  -webkit-app-region: no-drag;
+  cursor: pointer;
+  align-self: center;
+  position: relative;
+  left: 0px;
+  margin-right: 12px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  opacity: 0.8;
+  background-size: contain;
+  -webkit-transition: all 0.33s ease-in-out;
+}
+
+.button:hover {
+  opacity: 1;
+  -webkit-transform: rotate(-90deg);
+}
+
+.button.minimize:hover {
+  opacity: 1;
+  background-color: var(--color-section-hover);
+  -webkit-transform: rotate(0deg);
+}
+
+.button.settings:hover {
+  opacity: 1;
+  background-color: var(--color-section-hover);
+  -webkit-transform: rotate(0deg);
+}
+
+.button.back:hover {
+  opacity: 1;
+  -webkit-transform: rotate(0deg);
+  left: -8px;
+}
+
+.button.close:hover {
+  opacity: 1;
+  background-color: var(--color-r);
+  -webkit-transform: rotate(-90deg);
+}
+
+.button.back {
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-right: 0px !important;
+  width: 33%;
+  height: 64px;
+  background-position: left;
+  background-size: unset !important;
+  background-image: url(../assets/images/icon_back_light.png);
+}
+
+.icon-button {
+  cursor: pointer;
+  border-radius: 4px;
+  background-size: auto;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 32px;
+  height: 32px;
+}
+
+.svg-button {
+  cursor: pointer;
+  border-radius: 4px;
+  background-size: auto;
+  background-repeat: no-repeat;
+  background-position: center;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  width: 32px;
+  height: 32px;
+}
+
+.icon-button:hover, .svg-button:hover {
+  background-color: var(--color-section-hover) !important;
+}
+
+.button-simple {
+  align-self: center;
+  cursor: pointer;
+  width: 200px;
+  height: 30px;
+  line-height: 30px;
+  border-radius: 2px;
+  color: var(--color-text-button);
+  font-size: 16px;
+  text-align: center;
+  margin: auto 4px;
+  border: 1px solid var(--color-dark);
+  background-color: var(--color-button);
+  font-family: var(--main-font-name);
+  transform: translateY(0);
+  -webkit-transition: all .2s ease-in-out;
+}
+
+.button-simple:active {
+  border: 1px solid var(--color-dark-hover);
+  background-color: var(--color-button);
+}
+
+.button-simple:hover {
+  border: 1px solid var(--color-dark-hover);
+  color: var(--color-text-hover);
+  background-color: var(--color-button-hover);
+}
+
+.button-simple-disabled {
+  align-self: center;
+  cursor: auto;
+  width: 200px;
+  height: 30px;
+  line-height: 30px;
+  border-radius: 2px;
+  color: var(--color-text-disabled);
+  font-size: 16px;
+  text-align: center;
+  margin: auto 4px;
+  border: 1px solid var(--color-dark);
+  background-color: var(--color-button);
+  font-family: var(--main-font-name);
+  transform: translateY(0);
+  -webkit-transition: all .2s ease-in-out;
+}
+
+
+.disabled {
+  color: var(--color-text-disabled) !important; 
+}
+
+.disabled:hover {
+  box-shadow: none !important;
+  transform: translateY(0) !important;
+}
+
+.button-thin {
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+  /*width: 120px !important;*/
+  height: 24px !important;
+  line-height: 24px !important;
+  font-size: 14px !important;
+}
+
+.button-long {
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+  width: 240px !important;
+  height: 28px !important;
+  line-height: 28px !important;
+  font-size: 14px !important;
+}
+
+.button-edit {
+  height: 20px;
+  line-height: 20px;
+  margin: 6px auto;
+}
+
+.button-edit:active {
+  background-color: var(--color-text);
+  line-height: 22px;
+  box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.6);
+}
+
+.copy-button {
+  margin-left: 16px;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  opacity: 0.5;
+  background: url(../assets/images/copy.png) no-repeat center;
+  -webkit-transition: all .2s ease-in-out;
+}
+
+.open-button {
+  margin: auto 10px;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  opacity: 0.5;
+  background: url(../assets/images/open.png) no-repeat center;
+  -webkit-transition: all .2s ease-in-out;
+}
+
+.copy-button:hover, .open-button:hover {
+  opacity: 1;
+}

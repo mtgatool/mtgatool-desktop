@@ -1,0 +1,38 @@
+@mixin animated {
+  -webkit-transition: all 0.25s cubic-bezier(0, 0, 0.2, 1);
+}
+
+@mixin disable-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+@mixin soft-shadow {
+  box-shadow: 0px 4px 4px 1px #0000001a;
+}
+
+@mixin hard-shadow {
+  box-shadow: 0px 4px 8px 5px #00000070;
+}
+
+@mixin diffuse-shadow {
+  box-shadow: 0px 12px 10px 2px #00000040;
+}
+
+@mixin mid-shadow {
+  box-shadow: 0px 5px 9px 0px #0000004a;
+}
+
+@mixin media-screen-min($size) {
+  @media screen and (min-width: $size) {
+    @content;
+  }
+}
+
+@mixin media-screen-max($size) {
+  @media screen and (max-width: $size) {
+    @content;
+  }
+}

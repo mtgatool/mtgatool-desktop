@@ -1,0 +1,91 @@
+.top-artist {
+  line-height: 24px;
+  font-size: 14px;
+  margin-top: -4px;
+  font-family: var(--main-font-name-it);
+  opacity: 0.3;
+  color: var(--color-text);
+}
+
+.top {
+  -webkit-app-region: drag;
+  margin-top: 4px;
+  position: relative;
+  height: 20px;
+  background-color: var(--color-dark);
+  display: flex;
+  justify-content: space-between;
+  z-index: 1;
+}
+
+.top-buttons-container {
+  display: flex;
+  position: relative;
+  -webkit-app-region: no-drag;
+  height: 24px;
+  top: -4px;
+}
+
+.top-buttons-container-mac {
+  display: flex;
+  position: relative;
+  -webkit-app-region: no-drag;
+  top: 2px;
+  left: 4px;
+  width: 60px;
+  justify-content: space-around;
+}
+
+.top-button {
+  width: 28px;
+  opacity: 0.75;
+  display: flex;
+}
+
+.top-button:hover {
+  background-color: var(--color-section-hover);
+  opacity: 1;
+}
+
+.top-button.close:hover {
+  background-color: var(--color-r) !important;
+}
+
+.top-button-mac {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: flex;
+  border: 1px solid;
+}
+
+.top-button-mac-unfocus {
+  background-color: #E0E0E0;
+}
+
+.top-button-mac.maximize {
+  background-color: #34c749;
+  border-color: #2a9f3a;
+}
+
+.top-button-mac.maximize:active {
+  background-color: #2a9f3a;
+}
+
+.top-button-mac.minimize {
+  background-color: #fdbc40;
+  border-color: #ca9633;
+}
+
+.top-button-mac.minimize:active {
+  background-color: #ca9633;
+}
+
+.top-button-mac.close {
+  background-color: #fc615d;
+  border-color: #ca4e4a;
+}
+
+.top-button-mac.close:active {
+  background-color: #ca4e4a;
+}

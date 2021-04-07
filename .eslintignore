@@ -1,0 +1,6 @@
+node_modules*
+*.css
+*.scss
+*.svg
+*.png
+/src/info.json

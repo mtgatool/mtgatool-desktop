@@ -1,0 +1,35 @@
+.auth-pages-container-main {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+}
+
+.auth-pages-container {
+  width: 300%;
+  display: flex;
+}
+
+.auth-page {
+  position: relative;
+  width: calc(50% - 4em);
+  padding: 1em 2em;
+}
+
+.signup-link, .privacy-link, .launch-login-link {
+  color: var(--color-text-link);
+  cursor: pointer;
+}
+
+.message-small {
+  text-align: center;
+  margin-bottom: 6;
+  color: var(--color-text);
+  font-family: "Lato";
+}
+
+.message-small a {
+  cursor: pointer;
+  text-align: center;
+  margin: 4px;
+  color: var(--color-text-link);
+}

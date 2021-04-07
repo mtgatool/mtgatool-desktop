@@ -1,0 +1,150 @@
+/* eslint-disable no-param-reassign */
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Format } from "mtgatool-shared";
+import {
+  LOGIN_WAITING,
+  LOGIN_AUTH,
+  LOGIN_FAILED,
+  LOGIN_OK,
+} from "mtgatool-shared/dist/shared/constants";
+
+export const initialRendererState = {
+  archivedCache: {} as Record<string, boolean>,
+  backgroundImage: "default",
+  loading: false,
+  logCompletion: 0,
+  noLog: false,
+  offline: false,
+  loginState: LOGIN_AUTH,
+  patreon: {
+    patreon: false,
+    patreonTier: -1,
+  },
+  popup: {
+    text: "",
+    time: 0,
+    duration: 0,
+  },
+  formats: {} as Record<string, Format>,
+  rewards_daily_ends: "",
+  rewards_weekly_ends: "",
+  topArtist: "Thoughtseize by Aleksi Briclot",
+  updateState: "",
+};
+
+type RendererState = typeof initialRendererState;
+
+const rendererSlice = createSlice({
+  name: "renderer",
+  initialState: initialRendererState,
+  reducers: {
+    setLoginState: (
+      state: RendererState,
+      action: PayloadAction<
+        | typeof LOGIN_WAITING
+        | typeof LOGIN_AUTH
+        | typeof LOGIN_FAILED
+        | typeof LOGIN_OK
+      >
+    ): void => {
+      state.loginState = action.payload;
+    },
+    setLogCompletion: (
+      state: RendererState,
+      action: PayloadAction<number>
+    ): void => {
+      state.logCompletion = action.payload;
+    },
+    setBackgroundImage: (
+      state: RendererState,
+      action: PayloadAction<string>
+    ): void => {
+      state.backgroundImage = action.payload;
+    },
+    setLoading: (
+      state: RendererState,
+      action: PayloadAction<boolean>
+    ): void => {
+      state.loading = action.payload;
+    },
+    setNoLog: (state: RendererState, action: PayloadAction<boolean>): void => {
+      state.noLog = action.payload;
+    },
+    setOffline: (
+      state: RendererState,
+      action: PayloadAction<boolean>
+    ): void => {
+      state.offline = action.payload;
+    },
+    setPatreon: (
+      state: RendererState,
+      action: PayloadAction<RendererState["patreon"]>
+    ): void => {
+      state.patreon = action.payload;
+    },
+    setPopup: (
+      state: RendererState,
+      action: PayloadAction<RendererState["popup"]>
+    ): void => {
+      state.popup = action.payload;
+    },
+    setTopArtist: (
+      state: RendererState,
+      action: PayloadAction<string>
+    ): void => {
+      state.topArtist = action.payload;
+    },
+    setFormats: (
+      state: RendererState,
+      action: PayloadAction<Record<string, Format>>
+    ): void => {
+      state.formats = action.payload;
+    },
+    setUpdateState: (
+      state: RendererState,
+      action: PayloadAction<string>
+    ): void => {
+      state.updateState = action.payload;
+    },
+    setArchived: (
+      state: RendererState,
+      action: PayloadAction<{ id: string; archived: boolean }>
+    ): void => {
+      const { id, archived } = action.payload;
+      if (!id) return;
+      // update local cache (avoids round trip)
+      state.archivedCache[id] = !!archived;
+    },
+    setRewardsDailyEnds: (
+      state: RendererState,
+      action: PayloadAction<string>
+    ): void => {
+      state.rewards_daily_ends = action.payload;
+    },
+    setRewardsWeeklyEnds: (
+      state: RendererState,
+      action: PayloadAction<string>
+    ): void => {
+      state.rewards_weekly_ends = action.payload;
+    },
+  },
+});
+
+export const {
+  setLoginState,
+  setLogCompletion,
+  setBackgroundImage,
+  setLoading,
+  setNoLog,
+  setOffline,
+  setPatreon,
+  setPopup,
+  setArchived,
+  setFormats,
+  setTopArtist,
+  setUpdateState,
+  setRewardsDailyEnds,
+  setRewardsWeeklyEnds,
+} = rendererSlice.actions;
+
+export default rendererSlice;
