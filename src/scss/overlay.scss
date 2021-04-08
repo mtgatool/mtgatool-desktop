@@ -1,0 +1,554 @@
+.main-wrapper,
+.outer-wrapper {
+  padding: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+  pointer-events: all;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.overlay-master-wrapper {
+  /* Debug;
+  background-color: rgba(255, 0, 0, 0.11);
+  */
+  width: 100%;
+  height: 100%;
+}
+
+.overlay-controller {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background-size: contain;
+  background-image: url(../assets/icons/icon.png);
+  opacity: 0.8;
+  -webkit-transition: all 0.25s ease-in-out;
+}
+
+.overlay-controller-hover {
+  opacity: 1;
+  cursor: pointer;
+  -webkit-transform: rotate(360deg);
+}
+
+.overlay-container {
+  border: 1px solid gray;
+  background-position: center;
+  border-radius: 4px;
+  background-size: cover;
+  overflow: hidden;
+  position: absolute !important;
+  background-color: rgba(0, 0, 0, 0);
+  transform-origin: 20px 20px;
+}
+
+.editable {
+  border: 2px var(--color-g) dashed !important;
+  -webkit-transition: none !important;
+}
+
+.overlay-decklist {
+  overflow-x: hidden;
+  overflow-y: auto;
+  flex-grow: 2;
+}
+
+.outer-wrapper {
+  position: absolute !important;
+  z-index: 1 !important;
+}
+
+.overlay-decklist-a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.overlay-deckname {
+  background-color: rgba(0, 0, 0, 0.75);
+  padding: 4px 0 0 0;
+  min-height: 28px;
+  text-align: center;
+  color: var(--color-text);
+}
+
+.overlay-archetype {
+  font-size: 14px;
+  background-color: rgba(0, 0, 0, 0.75);
+  opacity: 1;
+  padding: 4px 0 0 0;
+  text-align: center;
+  color: var(--color-text);
+}
+
+.overlay-deckcolors {
+  background-color: rgba(0, 0, 0, 0.75);
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  margin: 0 0 1px 0;
+}
+
+.overlay-deck-type-stats {
+  margin: auto;
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--color-card-tile);
+}
+
+.overlay-deck-mana-curve {
+  padding: 8px;
+  margin-top: 1px;
+  background-color: var(--color-card-tile);
+}
+
+.hover-fade-enter {
+  opacity: 0;
+}
+
+.hover-fade-enter-active {
+  opacity: 1;
+  -webkit-transition: opacity 0.2s ease-in;
+  transition: opacity 0.2s ease-in;
+}
+
+.hover-fade-exit {
+  opacity: 1;
+}
+
+.hover-fade-exit-active {
+  opacity: 0;
+  -webkit-transition: opacity 0.2s ease-in;
+  transition: opacity 0.2s ease-in;
+}
+
+.main-hover {
+  pointer-events: none;
+  align-self: right;
+  width: 340px;
+  height: 473px;
+  opacity: 1;
+  display: block;
+  margin-right: 24px;
+  margin-bottom: 12px;
+  -webkit-border-radius: 4.75% / 3.5%;
+  box-shadow: 0px 15px 30px 0px rgba(0, 0, 0, 0.5);
+  -webkit-transition: all 0.2s ease-in;
+  margin-bottom: 0px !important;
+  margin-right: 0px !important;
+}
+
+.overlay-hover {
+  pointer-events: none;
+  width: 90%;
+  max-width: 300px;
+  opacity: 0;
+  display: block;
+  /*
+  margin-left: auto;
+  margin-right: auto;
+  */
+  -webkit-border-radius: 4.75% / 3.5%;
+  /*
+  box-shadow: 0px 15px 30px 0px rgba(0, 0, 0, 0.5);
+  */
+  -webkit-transition: opacity 0.2s ease-in;
+}
+
+.overlay-hover-container {
+  justify-content: center;
+  position: absolute;
+  border-radius: 4px;
+  display: flex;
+  float: right;
+  z-index: 50;
+}
+
+.main-hover-ratings {
+  display: flex;
+  width: 260px;
+  -webkit-transition: opacity 0.2s ease-in;
+}
+
+.rank-values-main-container {
+  width: 100%;
+  margin: 0 8px 0 8px;
+}
+
+.rank-value-container {
+  display: flex;
+  background-color: var(--color-back);
+  color: var(--color-base);
+  font-family: var(--main-font-name-it);
+  font-size: 14px;
+  line-height: 22px;
+  text-indent: 4px;
+  height: 22px;
+  margin-bottom: 2px;
+  border-radius: 3px;
+}
+
+.rank-value-title {
+  width: 24px;
+  height: 22px;
+  line-height: 22px;
+  font-family: var(--main-font-name-bold);
+}
+
+.rank-value-bar {
+  background-color: var(--color-section);
+}
+
+.overlay-clock-spacer {
+  min-height: 64px;
+}
+
+.overlay-clock-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  bottom: 0;
+  width: 100%;
+  min-height: 64px;
+  height: 64px;
+  z-index: 40;
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.overlay-draft-container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 100%;
+  height: 64px;
+  min-height: 64px;
+  top: 0;
+  z-index: 40;
+}
+
+.overlay-deck-container {
+  pointer-events: none;
+  position: absolute;
+  flex-direction: column;
+  display: flex;
+  justify-content: space-between;
+  bottom: 0;
+  width: 100%;
+  height: 64px;
+  top: 64px;
+  z-index: 40;
+}
+
+.decklist-title {
+  background-color: rgba(0, 0, 0, 0.75);
+  font-size: 14px;
+  height: 24px;
+  line-height: 24px;
+  margin: 0 auto 1px auto;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.chance-title {
+  font-size: 14px;
+  height: 20px;
+  line-height: 20px;
+  margin: 0px auto;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.clock-elapsed {
+  justify-content: space-around;
+  display: flex;
+  margin-left: 32px;
+  width: calc(100% - 64px);
+  height: 48px;
+  text-align: center;
+  line-height: 48px;
+  font-size: 25px;
+  color: rgba(255, 255, 255, 0.8);
+  z-index: 50;
+}
+
+.clock-turn {
+  justify-content: center;
+  display: flex;
+  margin-left: 32px;
+  width: calc(100% - 64px);
+  height: 16px;
+  position: relative;
+  top: 5px;
+  text-align: center;
+  line-height: 16px;
+  font-size: 15px;
+  color: #d4c6af;
+  z-index: 50;
+}
+
+.clock-priority-1,
+.clock-priority-2 {
+  margin: 6px;
+}
+
+.clock-priority-1,
+.clock-priority-2,
+.clock_pname1,
+.clock-pname2 {
+  width: 50%;
+}
+
+.pname-priority {
+  color: #bdd6ff;
+}
+
+.clock-prev,
+.draft-prev,
+.deck-prev,
+.odds-prev {
+  position: absolute;
+  cursor: pointer;
+  background: url(../assets/images/prev.png) no-repeat center;
+  z-index: 51;
+  display: block;
+  opacity: 0.5;
+  align-self: flex-start;
+  width: 32px;
+  height: 64px;
+  -webkit-transition: all 0.2s ease-in;
+}
+
+.clock-next,
+.draft-next,
+.deck-next,
+.odds-next {
+  cursor: pointer;
+  position: absolute;
+  background: url(../assets/images/next.png) no-repeat center;
+  z-index: 51;
+  opacity: 0.5;
+  align-self: flex-end;
+  display: block;
+  width: 32px;
+  height: 64px;
+  -webkit-transition: all 0.2s ease-in;
+}
+
+.clock-prev:hover,
+.clock-next:hover,
+.draft-prev:hover,
+.draft-next:hover,
+.deck-prev:hover,
+.deck-next:hover,
+.odds-prev:hover,
+.odds-next-hover {
+  opacity: 1;
+}
+
+.overlay-samplesize-container {
+  margin-top: 16px;
+  position: relative;
+  height: 32px;
+  flex-direction: column;
+  display: flex;
+  width: 100%;
+}
+
+.odds-number {
+  width: 100%;
+  margin-top: auto;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.odds-prev,
+.odds-next {
+  height: 44px;
+}
+
+.overlay-card-quantity {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  margin: 4px auto 0px auto;
+  max-width: 160px;
+}
+
+.inventory-card-quantity-blue {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  background: center no-repeat url(../assets/images/quantity_blue.png);
+}
+
+.inventory-card-quantity-green {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  background: center no-repeat url(../assets/images/quantity_green.png);
+}
+
+.inventory-card-quantity-gray {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  background: center no-repeat url(../assets/images/quantity_gray.png);
+}
+
+.inventory-card-quantity-orange {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  background: center no-repeat url(../assets/images/quantity_orange.png);
+}
+
+.lands-div {
+  width: 100px;
+  margin: 64px 0 32px 0;
+  padding: 16px;
+  border-radius: 6px;
+  background-color: rgba(0, 0, 0, 0.75);
+  opacity: 1;
+  font-family: var(--main-font-name);
+  position: fixed;
+}
+
+.mana-cont {
+  display: flex;
+  font-size: 14px;
+  line-height: 23px;
+  height: 24px;
+  color: white;
+  justify-content: space-between;
+  flex-flow: row-reverse;
+  overflow: hidden;
+}
+
+.types-container {
+  margin: 6px auto;
+  max-width: 630px;
+  padding-left: 12px;
+  padding-right: 12px;
+  width: calc(100% - 24px);
+  display: flex;
+  justify-content: space-between;
+}
+
+.type-icon {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 8px;
+}
+
+.pie {
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+}
+
+.overlay-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  background-repeat: no-repeat;
+  background-size: auto;
+  background-position: center;
+}
+
+.top-nav-wrapper {
+  z-index: 2 !important;
+  flex-direction: row !important;
+  height: 32px !important;
+  justify-content: flex-end !important;
+  display: flex;
+}
+
+.overlay-text {
+  position: absolute;
+  color: var(--color-r);
+  font-size: 20px;
+  font-family: var(--sub-font-name-it);
+  text-align: center;
+  width: 100%;
+  height: 32px;
+  line-height: 32px;
+  top: calc(50% - 16px);
+}
+
+.flex-end {
+  justify-content: flex-end;
+}
+
+.draft-title {
+  margin: 16px auto;
+  line-height: 20px;
+  vertical-align: middle;
+  text-align: center;
+  font-family: var(--main-font-name-it);
+  font-size: 20px;
+  color: var(--color-text);
+}
+
+.after-hidden-after {
+  opacity: 0;
+}
+
+.overlay-collapsed {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  display: flex;
+}
+
+.overlay-collapsed-linux {
+  width: 90px;
+  height: 90px;
+  position: absolute;
+  display: flex;
+}
+
+.overlay-collapsed-button {
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 200px;
+  margin: auto;
+  display: flex;
+  box-shadow: 0px 5px 6px 0px #00000060;
+  -webkit-transition: all 0.08s cubic-bezier(0.85, 0.07, 0.35, 1.36);
+}
+
+.overlay-collapsed-button-linux {
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 200px;
+  margin: auto;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  display: flex;
+  box-shadow: 0px 5px 6px 0px #00000060;
+  -webkit-transition: all 0.08s cubic-bezier(0.85, 0.07, 0.35, 1.36);
+}
+
+.overlay-collapsed-button-hover {
+  width: 40px;
+  height: 40px;
+}
+
+.overlay-collapsed-button-linux-hover {
+  width: 40px;
+  height: 40px;
+  top: 0;
+  left: 0;
+}

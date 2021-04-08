@@ -89,8 +89,6 @@ function createWindow() {
     title: "MTG Arena Tool",
     acceptFirstMouse: true,
     webPreferences: {
-      // webSecurity: false,
-      // nodeIntegrationInWorker: true,
       nodeIntegration: true,
     },
   });
@@ -151,7 +149,7 @@ function createWindow() {
 }
 
 function preCreateWindow() {
-  setTimeout(createWindow, 1000);
+  setTimeout(createWindow, 100);
 }
 
 app.whenReady().then(() => {

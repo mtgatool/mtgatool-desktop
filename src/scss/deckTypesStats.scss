@@ -1,0 +1,29 @@
+.types-container {
+  margin: auto;
+  max-width: 630px;
+  margin: 16px auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  width: calc(100% - 32px);
+  display: flex;
+  justify-content: space-between;
+}
+
+.type-icon-cont {
+  display: flex;
+  flex-direction: column;
+}
+
+.type-icon {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 8px;
+}
+
+.type-art { background-image: url(../assets/images/type_artifact.png); }
+.type-cre { background-image: url(../assets/images/type_creature.png); }
+.type-enc { background-image: url(../assets/images/type_enchantment.png); }
+.type-ins { background-image: url(../assets/images/type_instant.png); }
+.type-lan { background-image: url(../assets/images/type_land.png); }
+.type-pla { background-image: url(../assets/images/type_planeswalker.png); }
+.type-sor { background-image: url(../assets/images/type_sorcery.png); }

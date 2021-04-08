@@ -1,0 +1,163 @@
+.card-tile {
+  width: 100%;
+  min-width: calc(100% - 72px);
+  height: 24px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  border-style: solid;
+  border-width: 0px 8px;
+  -webkit-transition: all 0.15s ease-in;
+  cursor: pointer;
+}
+
+.card-tile-not-owned {
+  min-width: 24px;
+  left: calc(0px - 100% + 42px);
+  position: relative;
+  background: url(../assets/images/not_owned.png) center no-repeat;
+}
+
+.card-tile-container-outer {
+  width: 100%;
+  display: flex;
+}
+
+.card-tile-container-flat {
+  display: flex;
+  height: 31px;
+  margin-bottom: 1px;
+  background-color: var(--color-card-tile);
+  -webkit-transition: all 0.15s ease-in;
+  cursor: pointer;
+  width: 100%;
+  font-family: var(--main-font-name);
+}
+
+.card-tile-odds-flat {
+  font-size: 12px;
+  min-width: 32px;
+  color: white;
+  line-height: 31px;
+  text-align: center;
+}
+
+.card-tile-quantity-flat {
+  font-size: 14px;
+  min-width: 32px;
+  color: white;
+  line-height: 31px;
+  text-align: center;
+}
+
+.card-tile-odds-flat-half {
+  font-size: 12px;
+  min-width: 32px;
+  line-height: 14px;
+  color: white;
+  height: 50%;
+  text-align: center;
+}
+
+.card-tile-odds-flat-half-dark {
+  font-size: 12px;
+  min-width: 32px;
+  color: var(--color-text-dark);
+  line-height: 14px;
+  height: 50%;
+  text-align: center;
+}
+
+.card-tile-crop-flat {
+  border-width: 2px;
+  border-style: none none none solid;
+  min-width: 32px;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+.card-tile-name-flat {
+  font-size: 14px;
+  margin-left: 8px;
+  margin-right: 4px;
+  color: white;
+  text-align: left;
+  line-height: 31px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre;
+}
+
+.cart-tile-mana-flat {
+  display: flex;
+  color: white;
+  align-items: center;
+  margin: 0 6px 0 auto;
+}
+
+.not-owned-sprite-empty {
+  margin-top: 4px;
+  min-width: 24px;
+  width: 24px;
+  height: 24px;
+  position: relative;
+}
+
+.not-owned-sprite-flat {
+  margin-top: 4px;
+  min-width: 24px;
+  width: 24px;
+  height: 24px;
+  position: relative;
+  background-image: url(../assets/images/not_owned_sprite.png);
+}
+
+.not-owned-sprite {
+  margin-top: 2px;
+  min-width: 24px;
+  width: 24px;
+  height: 24px;
+  left: calc(0px - 100% + 42px);
+  position: relative;
+  background-image: url(../assets/images/not_owned_sprite.png);
+}
+
+.decklist-not-owned {
+  min-width: 24px;
+  margin-left: 8px;
+  background: url(../assets/images/not_owned.png) center no-repeat;
+}
+
+.card-tile-container {
+  width: 100%;
+  line-height: 18px;
+  color: black;
+  display: flex;
+}
+
+.card-tile-separator {
+  color: var(--color-text);
+  max-width: 800px;
+  margin: 0 auto;
+  height: 32px;
+  max-height: 32px;
+  vertical-align: middle;
+  line-height: 32px;
+  text-align: center;
+  font-family: "belerenbold";
+  align-self: center;
+}
+
+.card-tile-name {
+  padding-left: 2px;
+  overflow: hidden;
+  height: 16px;
+  font-size: 14px;
+  font-family: "belerenbold";
+  align-self: center;
+  justify-content: flex-start;
+  z-index: 15;
+  pointer-events: none;
+}

@@ -18,6 +18,16 @@
   z-index: 1;
 }
 
+.top::before {
+  content: "";
+  width: 100%;
+  height: 10px;
+  top: -4px;
+  background-color: var(--color-dark);
+  position: absolute;
+  z-index: -100;
+}
+
 .top-buttons-container {
   display: flex;
   position: relative;

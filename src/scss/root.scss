@@ -85,12 +85,19 @@ body {
   margin: 0px;
   padding: 0px;
   height: 100%;
-  background-color: var(--color-dark);
   overflow: hidden;
 }
 
 .click-on {
   pointer-events: all;
+}
+
+.click-through {
+  pointer-events: none;
+}
+
+span {
+  align-self: center;
 }
 
 label {
@@ -107,71 +114,71 @@ label {
   color: var(--color-text-hover) !important;
 }
 
-.black_bright {
+.black-bright {
   color: var(--color-b) !important;
 }
 
-.green_bright {
+.green-bright {
   color: #d3ebb0 !important;
 }
 
-.blue_bright {
+.blue-bright {
   color: #bdd6ff !important;
 }
 
-.orange_bright {
+.orange-bright {
   color: #ffba85 !important;
 }
 
-.red_bright {
+.red-bright {
   color: #ff9b78 !important;
 }
 
-.yellow_bright {
+.yellow-bright {
   color: #ffdf9e !important;
 }
 
-.white_bright {
+.white-bright {
   color: white !important;
 }
 
-.black_bright_bg {
+.black-bright-bg {
   background-color: var(--color-b) !important;
 }
 
-.green_bright_bg {
+.green-bright-bg {
   background-color: #d3ebb0 !important;
 }
 
-.blue_bright_bg {
+.blue-bright-bg {
   background-color: #bdd6ff !important;
 }
 
-.orange_bright_bg {
+.orange-bright-bg {
   background-color: #ffba85 !important;
 }
 
-.red_bright_bg {
+.red-bright-bg {
   background-color: #ff9b78 !important;
 }
 
-.yellow_bright_bg {
+.yellow-bright-bg {
   background-color: #ffdf9e !important;
 }
 
-.white_bright_bg {
+.white-bright-bg {
   background-color: white !important;
 }
 
-.back_green {
+.back-green {
   background-color: rgba(183, 200, 158, 1) !important;
 }
 
-.back_red {
+.back-red {
   background-color: rgba(221, 130, 99, 1) !important;
 }
 
-.back_blue {
+.back-blue {
   background-color: rgba(170, 190, 223, 1) !important;
 }
 

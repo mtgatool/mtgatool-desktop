@@ -2,7 +2,6 @@
 import { CSSProperties, useState } from "react";
 import { constants } from "mtgatool-shared";
 
-import { useSelector } from "react-redux";
 import { ReactComponent as MacMinimize } from "../assets/images/svg/mac-minimize.svg";
 import { ReactComponent as MacMaximize } from "../assets/images/svg/mac-maximize.svg";
 import { ReactComponent as MacClose } from "../assets/images/svg/mac-close.svg";
@@ -16,13 +15,13 @@ import { ReactComponent as Logo } from "../assets/images/svg/logo.svg";
 import minimizeWindow from "../utils/electron/minimizeWindow";
 import setMaximize from "../utils/electron/setMaximize";
 import hideWindow from "../utils/electron/hideWindow";
-import { AppState } from "../redux/stores/rendererStore";
 
 const { LOGIN_OK } = constants;
 
 interface TopBarProps {
   artist: string;
   offline: boolean;
+  loginState: number;
 }
 
 function clickMinimize(): void {
@@ -42,10 +41,9 @@ function clickClose(): void {
 }
 
 export default function TopBar(props: TopBarProps): JSX.Element {
-  const { loginState } = useSelector((state: AppState) => state.renderer);
   const [hoverControls, setHoverControls] = useState(false);
 
-  const { artist, offline } = props;
+  const { artist, offline, loginState } = props;
 
   const os = process.platform;
 

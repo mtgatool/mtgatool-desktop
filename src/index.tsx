@@ -15,7 +15,6 @@ import * as serviceWorker from "./serviceWorker";
 import defaultLocalSettings from "./utils/defaultLocalSettings";
 import backgroundChannelListeners from "./broadcastChannel/backgroundChannelListeners";
 import mainChannelListeners from "./broadcastChannel/mainChannelListeners";
-import overlayChannelListeners from "./broadcastChannel/overlayChannelListeners";
 import { loadDbFromCache } from "./utils/database-wrapper";
 
 const title = electron.remote.getCurrentWindow().getTitle();
@@ -28,7 +27,6 @@ if (title == "mtgatool-background") {
   backgroundChannelListeners();
 } else if (title == "mtgatool-overlay") {
   defaultLocalSettings();
-  overlayChannelListeners();
   ReactDOM.render(
     <React.StrictMode>
       <Overlay />

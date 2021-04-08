@@ -4,7 +4,9 @@ export type MessageType =
   | "LOG_MESSAGE_RECV"
   | "LOG_READ_FINISHED"
   | "OVERLAY_UPDATE"
-  | "GAME_STATS";
+  | "GAME_STATS"
+  | "HOVER_IN"
+  | "HOVER_OUT";
 
 export interface ChannelMessageBase {
   type: MessageType;
@@ -37,10 +39,21 @@ export interface GameStatsMessage extends ChannelMessageBase {
   value: any;
 }
 
+export interface HoverInMessage extends ChannelMessageBase {
+  type: "HOVER_IN";
+  value: number;
+}
+
+export interface HoverOutMessage extends ChannelMessageBase {
+  type: "HOVER_OUT";
+}
+
 export type ChannelMessage =
   | StartLogReadingMessage
   | StopLogReadingMessage
   | LogMessageRecvMessage
   | LogFinishedMessage
   | OverlayUpdateMessage
-  | GameStatsMessage;
+  | GameStatsMessage
+  | HoverInMessage
+  | HoverOutMessage;

@@ -33,7 +33,7 @@ function App() {
   return (
     <>
       {process.platform !== "linux" && (
-        <TopBar artist={topArtist} offline={offline} />
+        <TopBar artist={topArtist} loginState={loginState} offline={offline} />
       )}
       <div
         className={
