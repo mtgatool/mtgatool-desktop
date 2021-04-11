@@ -1,10 +1,14 @@
+import { InternalDeck, OverlaySettingsData } from "mtgatool-shared";
+
 export type MessageType =
   | "START_LOG_READING"
   | "STOP_LOG_READING"
   | "LOG_MESSAGE_RECV"
   | "LOG_READ_FINISHED"
   | "OVERLAY_UPDATE"
+  | "OVERLAY_SETTINGS"
   | "GAME_STATS"
+  | "UPSERT_GUN_DECK"
   | "HOVER_IN"
   | "HOVER_OUT";
 
@@ -34,9 +38,19 @@ export interface OverlayUpdateMessage extends ChannelMessageBase {
   value: any;
 }
 
+export interface OverlaySettingsMessage extends ChannelMessageBase {
+  type: "OVERLAY_SETTINGS";
+  value: OverlaySettingsData;
+}
+
 export interface GameStatsMessage extends ChannelMessageBase {
   type: "GAME_STATS";
   value: any;
+}
+
+export interface UpsertGunDeckMessage extends ChannelMessageBase {
+  type: "UPSERT_GUN_DECK";
+  value: InternalDeck;
 }
 
 export interface HoverInMessage extends ChannelMessageBase {
@@ -55,5 +69,7 @@ export type ChannelMessage =
   | LogFinishedMessage
   | OverlayUpdateMessage
   | GameStatsMessage
+  | UpsertGunDeckMessage
   | HoverInMessage
-  | HoverOutMessage;
+  | HoverOutMessage
+  | OverlaySettingsMessage;

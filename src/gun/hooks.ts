@@ -1,18 +1,23 @@
 import GUN from "gun";
 import Gun from "gun/gun";
 import Sea from "gun/sea";
+// eslint-disable-next-line import/no-unresolved
+import { IGunChainReference } from "gun/types/chain";
+// eslint-disable-next-line import/no-unresolved
+import { IGunStaticSEA } from "gun/types/static/sea";
 import { useMemo } from "react";
+import { GunState } from "../types/gunTypes";
 
 declare global {
   interface Window {
-    SEA: typeof GUN.SEA;
-    gun: typeof GUN.chain;
+    SEA: IGunStaticSEA;
+    gun: IGunChainReference<GunState, any, "pre_root">;
   }
 }
 
 export function useSea() {
   const sea: typeof GUN.SEA = useMemo(() => {
-    return !window.SEA ? Sea : window.SEA;
+    return window.SEA ?? Sea;
   }, []);
 
   window.SEA = sea;
@@ -21,8 +26,14 @@ export function useSea() {
 }
 
 export function useGun() {
-  const gun: typeof GUN.chain = useMemo(() => {
-    return !window.gun ? Gun("http://api.mtgatool.com:8765/gun") : window.gun;
+  const gun: IGunChainReference<GunState, any, "pre_root"> = useMemo(() => {
+    return (
+      window.gun ??
+      Gun<GunState>([
+        "http://api.mtgatool.com:8765/gun",
+        "mtgatool-gun-eqszq.ondigitalocean.app:8765/gun",
+      ])
+    );
   }, []);
 
   window.gun = gun;

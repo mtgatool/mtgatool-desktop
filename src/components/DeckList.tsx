@@ -131,9 +131,15 @@ export default function DeckList(props: DeckListProps): JSX.Element {
   });
   const landsFrame = landsColors.get();
 
-  let landsQuantity: CardTileQuantity = landsNumber;
+  // Default to lands number
+  let landsQuantity: CardTileQuantity = {
+    type: "NUMBER",
+    quantity: landsNumber,
+  };
+
   if (settings.mode === OVERLAY_MIXED) {
     landsQuantity = {
+      type: "ODDS",
       quantity: landsNumber,
       odds: ((cardOdds?.chanceLan || 0) / 100).toLocaleString([], {
         style: "percent",
@@ -141,10 +147,13 @@ export default function DeckList(props: DeckListProps): JSX.Element {
       }),
     };
   } else if (settings.mode === OVERLAY_ODDS) {
-    landsQuantity = ((cardOdds?.chanceLan || 0) / 100).toLocaleString([], {
-      style: "percent",
-      maximumSignificantDigits: 2,
-    });
+    landsQuantity = {
+      type: "TEXT",
+      quantity: ((cardOdds?.chanceLan || 0) / 100).toLocaleString([], {
+        style: "percent",
+        maximumSignificantDigits: 2,
+      }),
+    };
   }
 
   if (shouldDoGroupLandsHack) {
@@ -162,14 +171,11 @@ export default function DeckList(props: DeckListProps): JSX.Element {
         />
       );
     } else {
-      const qq = card.quantity;
-      let quantity:
-        | {
-            quantity: number;
-            odds: string;
-          }
-        | number
-        | string = qq;
+      // default number
+      let quantity: CardTileQuantity = {
+        type: "NUMBER",
+        quantity: card.quantity,
+      };
       const fullCard = database.card(card.id);
 
       if (fullCard) {
@@ -178,19 +184,26 @@ export default function DeckList(props: DeckListProps): JSX.Element {
           const q = card.quantity;
           if (!settings.lands || (settings.lands && odds !== "0%")) {
             quantity = {
+              type: "ODDS",
               quantity: q,
               odds: odds,
             };
           }
         } else if (settings.mode === OVERLAY_ODDS) {
-          quantity = ((card.chance || 0) / 100).toLocaleString([], {
-            style: "percent",
-            maximumSignificantDigits: 2,
-          });
+          quantity = {
+            type: "TEXT",
+            quantity: ((card.chance || 0) / 100).toLocaleString([], {
+              style: "percent",
+              maximumSignificantDigits: 2,
+            }),
+          };
         } else if (settings.mode === OVERLAY_DRAFT) {
           const rank = getRank(card.id);
-          quantity =
-            fullCard.source == 0 ? DRAFT_RANKS[rank] : DRAFT_RANKS_LOLA[rank];
+          quantity = {
+            type: "RANK",
+            quantity:
+              fullCard.source == 0 ? DRAFT_RANKS[rank] : DRAFT_RANKS_LOLA[rank],
+          };
         }
 
         if (settings.mode === OVERLAY_DRAFT) {

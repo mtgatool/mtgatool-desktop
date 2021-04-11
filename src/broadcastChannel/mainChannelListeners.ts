@@ -1,5 +1,6 @@
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
-import setMatch from "../gun/setMatch";
+import setGunMatch from "../gun/setGunMatch";
+import upsertGunDeck from "../gun/upsertGunDeck";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import LogEntry from "../types/logDecoder";
@@ -42,8 +43,12 @@ export default function mainChannelListeners() {
     }
 
     if (msg.data.type === "GAME_STATS") {
-      setMatch(msg.data.value);
+      setGunMatch(msg.data.value);
       console.log(msg.data.value);
+    }
+
+    if (msg.data.type === "UPSERT_GUN_DECK") {
+      upsertGunDeck(msg.data.value);
     }
   };
 }

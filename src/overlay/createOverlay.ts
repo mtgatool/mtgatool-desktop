@@ -1,8 +1,14 @@
 import { remote } from "electron";
+import { OverlaySettingsData } from "mtgatool-shared";
 import path from "path";
 import url from "url";
+import getLocalSetting from "../utils/getLocalSetting";
 
 export default function createOverlay(callback?: () => void): Promise<void> {
+  const settings = JSON.parse(
+    getLocalSetting("overlay_0")
+  ) as OverlaySettingsData;
+
   const newWindow = new remote.BrowserWindow({
     transparent: true,
     // resizable: false,
@@ -11,8 +17,10 @@ export default function createOverlay(callback?: () => void): Promise<void> {
     title: "mtgatool-overlay",
     show: false,
     frame: false,
-    width: 1,
-    height: 1,
+    width: settings.bounds.width,
+    height: settings.bounds.height,
+    x: settings.bounds.x,
+    y: settings.bounds.y,
     alwaysOnTop: true,
     acceptFirstMouse: true,
     webPreferences: {
@@ -23,13 +31,6 @@ export default function createOverlay(callback?: () => void): Promise<void> {
 
   newWindow.removeMenu();
   newWindow.setVisibleOnAllWorkspaces(true);
-
-  newWindow.setBounds({
-    width: 370,
-    height: 600,
-    x: 16,
-    y: 16,
-  });
 
   const proc: any = process;
   newWindow.loadURL(

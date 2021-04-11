@@ -1,4 +1,4 @@
-import { ArenaV3Deck } from "mtgatool-shared";
+import { ArenaV3Deck, convertDeckFromV3 } from "mtgatool-shared";
 import LogEntry from "../../types/logDecoder";
 
 interface Entry extends LogEntry {
@@ -7,5 +7,7 @@ interface Entry extends LogEntry {
 
 // REVIEW Deck.UpdateDeckV3 in the logs
 export default function InDeckUpdateDeckV3(entry: Entry): void {
-  const _json = entry.json;
+  const { json } = entry;
+
+  const _entryDeck = convertDeckFromV3(json);
 }

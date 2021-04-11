@@ -1,5 +1,6 @@
 import { useCallback, useState, CSSProperties } from "react";
 import { constants, Deck, DbCardData, Rarity } from "mtgatool-shared";
+import { LANDS_HACK } from "mtgatool-shared/dist/shared/constants";
 import getRankColorClass from "../utils/getRankColorClass";
 import openScryfallCard from "../utils/openScryfallCard";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
@@ -55,10 +56,38 @@ mana["18"] = "mana-18";
 mana["19"] = "mana-19";
 mana["20"] = "mana-20";
 
+export type CardTileQuantityTypes = "ODDS" | "NUMBER" | "RANK" | "TEXT";
+
+interface CardTileQuantityBase {
+  type: CardTileQuantityTypes;
+}
+
+interface QuantityOdds extends CardTileQuantityBase {
+  type: "ODDS";
+  quantity: number;
+  odds: string;
+}
+
+interface QuantityNumber extends CardTileQuantityBase {
+  type: "NUMBER";
+  quantity: number;
+}
+
+interface QuantityRank extends CardTileQuantityBase {
+  type: "RANK";
+  quantity: string;
+}
+
+interface QuantityText extends CardTileQuantityBase {
+  type: "TEXT";
+  quantity: string;
+}
+
 export type CardTileQuantity =
-  | { quantity: number; odds: string }
-  | number
-  | string;
+  | QuantityOdds
+  | QuantityNumber
+  | QuantityRank
+  | QuantityText;
 
 interface CardTileProps {
   card: DbCardData;
@@ -69,13 +98,6 @@ interface CardTileProps {
   isSideboard: boolean;
   quantity: CardTileQuantity;
   showWildcards: boolean;
-}
-
-function isNumber(n: number | string): boolean {
-  return (
-    !Number.isNaN(parseFloat(n as string)) &&
-    Number.isFinite(parseFloat(n as string))
-  );
 }
 
 function CostSymbols(props: {
@@ -133,7 +155,7 @@ function CardQuantityDisplay(props: {
   quantity: CardTileQuantity;
 }): JSX.Element {
   const { quantity } = props;
-  if (typeof quantity === "object") {
+  if (quantity.type == "ODDS") {
     // Mixed quantity (odds and quantity)
     return (
       <div className="card-tile-odds-flat">
@@ -142,17 +164,21 @@ function CardQuantityDisplay(props: {
       </div>
     );
   }
-  if (!isNumber(quantity)) {
+  if (quantity.type == "RANK") {
     // Text quantity, presumably rank
-    const rankClass = getRankColorClass(quantity as string);
-    return <div className={`card-tile-odds-flat ${rankClass}`}>{quantity}</div>;
+    const rankClass = getRankColorClass(quantity.quantity);
+    return (
+      <div className={`card-tile-odds-flat ${rankClass}`}>
+        {quantity.quantity}
+      </div>
+    );
   }
-  if (quantity === 9999) {
+  if (quantity.type == "NUMBER") {
     // Undefined Quantity
-    return <div className="card-tile-quantity-flat">1</div>;
+    return <div className="card-tile-quantity-flat">{quantity.quantity}</div>;
   }
-  // Normal Quantity
-  return <div className="card-tile-quantity-flat">{quantity}</div>;
+  // if (quantity.type == "TEXT") {
+  return <div className="card-tile-odds-flat">{quantity.quantity}</div>;
 }
 
 interface WildcardsNeededProps {
@@ -327,7 +353,7 @@ interface LandsTileProps {
 export function LandsTile(props: LandsTileProps): JSX.Element {
   const { quantity, frame, isHighlighted } = props;
   const [isMouseHovering, setMouseHovering] = useState(false);
-  const [hoverIn, hoverOut] = useHoverCard(0);
+  const [hoverIn, hoverOut] = useHoverCard(LANDS_HACK);
 
   const handleMouseEnter = useCallback((): void => {
     setMouseHovering(true);

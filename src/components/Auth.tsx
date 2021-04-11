@@ -107,7 +107,7 @@ export default function Auth() {
     }
   }, [loginState, username, pass, rememberme, history]);
 
-  const onSubmit = useCallback(
+  const onLogin = useCallback(
     (e): void => {
       e.preventDefault();
       if (pass.length < 8) {
@@ -149,6 +149,7 @@ export default function Auth() {
         setPass(signupPass);
         const pwd = sha1(signupPass);
         signup(signupUsername, pwd)
+          .then(() => login(signupUsername, pwd))
           .then(() => {
             postChannelMessage({
               type: "START_LOG_READING",
@@ -300,7 +301,7 @@ export default function Auth() {
                     <button
                       className="form-button"
                       type="submit"
-                      onClick={onSubmit}
+                      onClick={onLogin}
                     >
                       Login
                     </button>

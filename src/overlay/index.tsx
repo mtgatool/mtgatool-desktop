@@ -1,19 +1,37 @@
-/* eslint-disable import/no-webpack-loader-syntax */
+import { useCallback, useEffect, useState } from "react";
+import {
+  Chances,
+  compareCards,
+  Deck,
+  OverlaySettingsData,
+} from "mtgatool-shared";
+import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 
-import { Chances, compareCards, Deck } from "mtgatool-shared";
-import { LOGIN_OK, OVERLAY_MIXED } from "mtgatool-shared/dist/shared/constants";
-import { useEffect, useState } from "react";
-
-import { ChannelMessage } from "../broadcastChannel/channelMessages";
+import { remote } from "electron";
 import DeckList from "../components/DeckList";
 import TopBar from "../components/TopBar";
-// import useTransparentFix from "../hooks/useTransparentFix";
+
+import { ChannelMessage } from "../broadcastChannel/channelMessages";
 import bcConnect from "../utils/bcConnect";
+import getLocalSetting from "../utils/getLocalSetting";
+import setLocalSetting from "../utils/setLocalSetting";
+import useDebounce from "../hooks/useDebounce";
 
 export default function Overlay() {
-  // useTransparentFix();
   const [deck, setDeck] = useState<Deck>();
+  const [settings, setSettings] = useState<OverlaySettingsData>();
   const [odds, setOdds] = useState<Chances>();
+
+  const updateNewBounds = useCallback(() => {
+    const oldSettings = JSON.parse(getLocalSetting("overlay_0"));
+    const newSettings = {
+      ...oldSettings,
+      bounds: remote.getCurrentWindow().getBounds(),
+    };
+    setSettings(newSettings);
+  }, []);
+
+  const deboucer = useDebounce(500);
 
   useEffect(() => {
     const channel = bcConnect() as any;
@@ -26,11 +44,23 @@ export default function Overlay() {
 
         playerCardsLeft.sortMainboard(compareCards);
         playerCardsLeft.sortSideboard(compareCards);
+        playerCardsLeft.getMainboard().removeZeros();
+        playerCardsLeft.getSideboard().removeZeros();
         setOdds(msg.data.value.playerCardsOdds);
         setDeck(playerCardsLeft);
       }
     };
-  });
+
+    setSettings(JSON.parse(getLocalSetting("overlay_0")));
+
+    remote.getCurrentWindow().removeAllListeners();
+    remote.getCurrentWindow().on("move", () => deboucer(updateNewBounds));
+    remote.getCurrentWindow().on("resize", () => deboucer(updateNewBounds));
+  }, [deboucer]);
+
+  useEffect(() => {
+    setLocalSetting("overlay_0", JSON.stringify(settings));
+  }, [settings]);
 
   return (
     <>
@@ -38,35 +68,11 @@ export default function Overlay() {
         <TopBar artist="" loginState={LOGIN_OK} offline={false} />
       )}
       <div style={{ backgroundColor: "rgba(0,0,0,0.25)", height: "100%" }}>
-        {deck && (
+        {deck && settings && (
           <DeckList
             deck={deck}
-            settings={{
-              alpha: 1,
-              alphaBack: 1,
-              autosize: true,
-              bounds: {
-                width: 1,
-                height: 1,
-                x: 1,
-                y: 1,
-              },
-              clock: true,
-              drawOdds: true,
-              deck: true,
-              lands: true,
-              manaCurve: true,
-              mode: OVERLAY_MIXED,
-              ontop: true,
-              show: true,
-              showAlways: true,
-              sideboard: true,
-              title: true,
-              top: true,
-              typeCounts: true,
-              collapsed: true,
-            }}
-            subTitle="subTitle"
+            settings={settings}
+            subTitle={deck.getName()}
             cardOdds={odds}
             setOddsCallback={() => {
               //
