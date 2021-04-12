@@ -26,6 +26,7 @@ export default async function upsertGunDeck(internal: InternalDeck) {
 
   const newGunDeck: GunDeck = {
     playerId: getLocalSetting("playerId"),
+    name: deck.getName(),
     version: version,
     deckHash: deck.getHash(),
     deckId: deck.id,
@@ -53,6 +54,8 @@ export default async function upsertGunDeck(internal: InternalDeck) {
 
     decksRef.get(newDeckDeckKey).put(newGunDeck);
     decksIndexRef.get(deck.id).put(version);
+  } else {
+    decksRef.get(currentDeckKey).put(newGunDeck);
   }
 
   return true;

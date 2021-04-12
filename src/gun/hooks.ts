@@ -1,6 +1,7 @@
 import GUN from "gun";
 import Gun from "gun/gun";
 import Sea from "gun/sea";
+import "gun/lib/open";
 // eslint-disable-next-line import/no-unresolved
 import { IGunChainReference } from "gun/types/chain";
 // eslint-disable-next-line import/no-unresolved

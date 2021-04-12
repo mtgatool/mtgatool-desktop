@@ -9,6 +9,7 @@ export interface GunState {
 
 export interface GunDeck {
   playerId: string;
+  name: string;
   deckHash: string;
   deckId: string;
   version: number;
