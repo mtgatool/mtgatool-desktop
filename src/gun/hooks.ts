@@ -1,6 +1,7 @@
 import GUN from "gun";
 import Gun from "gun/gun";
 import Sea from "gun/sea";
+import "gun/lib/then";
 import "gun/lib/open";
 // eslint-disable-next-line import/no-unresolved
 import { IGunChainReference } from "gun/types/chain";
@@ -12,7 +13,7 @@ import { GunState } from "../types/gunTypes";
 declare global {
   interface Window {
     SEA: IGunStaticSEA;
-    gun: IGunChainReference<GunState, any, "pre_root">;
+    gun: IGunChainReference<GunState>;
   }
 }
 
@@ -27,7 +28,7 @@ export function useSea() {
 }
 
 export function useGun() {
-  const gun: IGunChainReference<GunState, any, "pre_root"> = useMemo(() => {
+  const gun: IGunChainReference<GunState> = useMemo(() => {
     return (
       window.gun ??
       Gun<GunState>([

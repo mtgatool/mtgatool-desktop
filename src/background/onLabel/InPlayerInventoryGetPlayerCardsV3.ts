@@ -1,13 +1,16 @@
+import { Cards } from "mtgatool-shared";
+import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import LogEntry from "../../types/logDecoder";
 
-interface Cards {
-  [grpId: string]: number;
-}
-
 interface Entry extends LogEntry {
-  json: () => Cards;
+  json: Cards;
 }
 
 export default function InPlayerInventoryGetPlayerCardsV3(entry: Entry): void {
-  const _json = entry.json;
+  const { json } = entry;
+
+  postChannelMessage({
+    type: "UPSERT_GUN_CARDS",
+    value: json,
+  });
 }

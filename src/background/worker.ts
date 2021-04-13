@@ -9,10 +9,11 @@ export default function start() {
     chunkSize: 268435440,
     onLogEntry: (entry) => {
       logEntrySwitch(entry);
-      postChannelMessage({
-        type: "LOG_MESSAGE_RECV",
-        value: entry,
-      });
+      // This was spammy for no reason
+      // postChannelMessage({
+      //   type: "LOG_MESSAGE_RECV",
+      //   value: entry,
+      // });
     },
     onError: console.error,
     onFinish: () => {

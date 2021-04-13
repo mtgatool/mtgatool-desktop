@@ -1,10 +1,9 @@
 // eslint-disable-next-line import/no-unresolved
 import { IGunChainReference } from "gun/types/chain";
+import { Cards } from "mtgatool-shared";
 
 export interface GunState {
-  yourapp: {
-    [Username: string]: { age: number };
-  };
+  [record: string]: any;
 }
 
 export interface GunDeck {
@@ -45,6 +44,9 @@ export interface GunUser {
   matches: Record<string, GunMatch>;
   decksIndex: Record<string, number>;
   decks: Record<string, GunDeck>;
+  cards: Cards;
+  cardsPrev: Cards;
+  cardsUpdated: number;
 }
 
-export type GunUserChain = IGunChainReference<GunUser, any, "pre_root">;
+export type GunUserChain = IGunChainReference<GunUser>;

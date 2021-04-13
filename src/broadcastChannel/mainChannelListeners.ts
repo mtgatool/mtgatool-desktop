@@ -1,5 +1,6 @@
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 import setGunMatch from "../gun/setGunMatch";
+import upsertGunCards from "../gun/upsertGunCards";
 import upsertGunDeck from "../gun/upsertGunDeck";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
@@ -49,6 +50,10 @@ export default function mainChannelListeners() {
 
     if (msg.data.type === "UPSERT_GUN_DECK") {
       upsertGunDeck(msg.data.value);
+    }
+
+    if (msg.data.type === "UPSERT_GUN_CARDS") {
+      upsertGunCards(msg.data.value);
     }
   };
 }
