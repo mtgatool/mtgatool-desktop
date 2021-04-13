@@ -1,4 +1,5 @@
 import { PlayerInventory } from "mtgatool-shared";
+import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import LogEntry from "../../types/logDecoder";
 import setLocalSetting from "../../utils/setLocalSetting";
 
@@ -12,4 +13,9 @@ export default function InPlayerInventoryGetPlayerInventory(
   const { json } = entry;
 
   setLocalSetting("playerId", json.playerId);
+
+  postChannelMessage({
+    type: "PLAYER_INVENTORY",
+    value: json,
+  });
 }

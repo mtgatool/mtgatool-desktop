@@ -1,14 +1,13 @@
+/* eslint-disable radix */
 /* eslint-disable no-console */
 import path from "path";
 import { app, remote } from "electron";
 import fs from "fs";
 import _ from "lodash";
 import { database } from "mtgatool-shared";
+import axios from "axios";
 
-import { Metadata } from "mtgatool-shared/dist/types";
-import debugLog from "./debugLog";
-
-import distributedDb from "../assets/resources/database.json";
+// import distributedDb from "../assets/resources/database.json";
 
 const cachePath: string | null =
   app || (remote && remote.app)
@@ -37,11 +36,11 @@ const scryfallDataPath = path.join(
 export function updateCache(data: string): void {
   try {
     if (cachePath) {
-      debugLog(`Saved metadata to ${cachePath}`);
+      console.log(`Saved metadata to ${cachePath}`);
       fs.writeFileSync(cachePath, data);
     }
   } catch (e) {
-    debugLog(`Error updating cache: ${e}`, "error");
+    console.log(`Error updating cache: ${e}`, "error");
   }
 }
 
@@ -52,9 +51,35 @@ export function loadDbFromCache(): void {
     console.log(`Loaded metadata from cache (${cachePath})`);
   } else {
     console.log(`Cache not found (${cachePath}), try to generate it.`);
-    database.setDatabaseUnsafely(distributedDb as Metadata);
-    updateCache(JSON.stringify(distributedDb));
+    // database.setDatabaseUnsafely(distributedDb as Metadata);
+    updateCache(JSON.stringify(database.metadata));
   }
+
+  axios
+    .get("https://mtgatool.com/database/latest/")
+    .then((latestRes) => {
+      console.log(latestRes);
+      if (parseInt(latestRes.data.latest) > database.version) {
+        axios
+          .get<any>("https://mtgatool.com/database/")
+          .then((res) => {
+            database.setDatabaseUnsafely(res.data);
+            updateCache(JSON.stringify(res.data));
+          })
+          .catch((e) => {
+            console.info(
+              "There was a problem updating cards database from https://mtgatool.com/database/"
+            );
+            console.info(e);
+          });
+      }
+    })
+    .catch((e) => {
+      console.info(
+        "There was a problem updating cards database from https://mtgatool.com/database/latest"
+      );
+      console.info(e);
+    });
 }
 
 export default database;

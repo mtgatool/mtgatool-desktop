@@ -53,7 +53,21 @@ export default function mainChannelListeners() {
     }
 
     if (msg.data.type === "UPSERT_GUN_CARDS") {
+      window.cards = msg.data.value;
       upsertGunCards(msg.data.value);
+    }
+
+    if (msg.data.type === "PLAYER_INVENTORY") {
+      const inventoryData = msg.data.value;
+      window.economy.gold = inventoryData.gold;
+      window.economy.gems = inventoryData.gems;
+      window.economy.vaultProgress = inventoryData.vaultProgress;
+      window.economy.wcTrackPosition = inventoryData.wcTrackPosition;
+      window.economy.wcCommon = inventoryData.wcCommon;
+      window.economy.wcUncommon = inventoryData.wcUncommon;
+      window.economy.wcRare = inventoryData.wcRare;
+      window.economy.wcMythic = inventoryData.wcMythic;
+      window.economy.boosters = inventoryData.boosters;
     }
   };
 }

@@ -1,3 +1,128 @@
+.wildcards-cost {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 16px auto;
+  height: 160px;
+}
+
+.wc-cost {
+  font-family: var(--sub-font-name);
+  text-indent: 48px;
+  color: var(--color-light);
+  min-width: 120px;
+  line-height: 29px;
+  height: 24px;
+  text-align: right;
+  background-position: left;
+  background-repeat: no-repeat;
+}
+
+.wc-explore-cost {
+  font-family: var(--sub-font-name);
+  color: var(--color-light);
+  width: 40px;
+  line-height: 96px;
+  height: 64px;
+  text-align: center;
+  margin: auto 4px;
+  background-position: center 4px;
+  background-repeat: no-repeat;
+}
+
+.wc-deckstab-cost {
+  font-family: var(--sub-font-name);
+  color: var(--color-light);
+  width: 30px;
+  line-height: 65px;
+  height: 40px;
+  text-align: center;
+  margin: auto 4px;
+  background-position: center -2px;
+  background-repeat: no-repeat;
+}
+
+.bo-explore-cost {
+  font-family: var(--sub-font-name);
+  color: var(--color-light);
+  width: 40px;
+  line-height: 96px;
+  height: 64px;
+  text-align: center;
+  background-position: center 2px;
+  background-repeat: no-repeat;
+  background-image: url(../assets/images/booster.png);
+}
+
+.bo-deckstab-cost {
+  font-family: var(--sub-font-name);
+  color: var(--color-light);
+  width: 40px;
+  line-height: 65px;
+  height: 40px;
+  text-align: center;
+  background-position: center -4px;
+  background-repeat: no-repeat;
+  background-image: url(../assets/images/booster.png);
+}
+
+.wc-complete {
+  width: 40px;
+  height: 64px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url(../assets/images/complete.png);
+}
+
+.wc-common {
+  background-image: var(--wc_common_png);
+}
+.wc-uncommon {
+  background-image: var(--wc_uncommon_png);
+}
+.wc-rare {
+  background-image: var(--wc_rare_png);
+}
+.wc-mythic {
+  background-image: var(--wc_mythic_png);
+}
+.wc-booster {
+  background-image: var(--booster_png);
+  height: 34px;
+  line-height: 34px;
+}
+
+.inventory-card {
+  width: 140px;
+  display: inline-block;
+  margin: 6px;
+  position: relative;
+}
+
+.inventory-card.small {
+  width: 39px;
+}
+
+.inventory-card.small img {
+  width: 39px;
+}
+
+.inventory-card img {
+  cursor: pointer;
+  -webkit-border-radius: 4.75% / 3.5%;
+  box-shadow: 0 5px 14px 2px rgba(0, 0, 0, 0.25);
+}
+
+.inventory-card-aetherized {
+  filter: brightness(0.5) grayscale(1);
+}
+
+.inventory-card-img:hover {
+  border: 2px solid var(--color-button-hover);
+  margin: -2px 0 -2px -2px;
+}
+
 .inventory-card-quantity-blue {
   width: 25%;
   height: 24px;

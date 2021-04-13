@@ -1,7 +1,6 @@
 import { constants, InternalDeck } from "mtgatool-shared";
 
 import database from "./database-wrapper";
-import debugLog from "./debugLog";
 
 const { WHITE, BLUE, BLACK, RED, GREEN } = constants;
 
@@ -47,7 +46,7 @@ export default function getDeckColors(deck: InternalDeck): number[] {
   } catch (e) {
     // FIXME: Errors shouldn't be caught silently. If this is an
     //        expected error then there should be a test to catch only that error.
-    debugLog(e, "error");
+    console.error(e);
     colorIndices = [];
   }
 

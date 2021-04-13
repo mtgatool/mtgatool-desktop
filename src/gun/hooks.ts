@@ -8,10 +8,23 @@ import { IGunChainReference } from "gun/types/chain";
 // eslint-disable-next-line import/no-unresolved
 import { IGunStaticSEA } from "gun/types/static/sea";
 import { useMemo } from "react";
+import { Cards, PlayerInventory } from "mtgatool-shared";
 import { GunState } from "../types/gunTypes";
 
 declare global {
   interface Window {
+    cards: Cards;
+    economy: {
+      gold: number;
+      gems: number;
+      vaultProgress: number;
+      wcTrackPosition: number;
+      wcCommon: number;
+      wcUncommon: number;
+      wcRare: number;
+      wcMythic: number;
+      boosters: PlayerInventory["boosters"];
+    };
     SEA: IGunStaticSEA;
     gun: IGunChainReference<GunState>;
   }

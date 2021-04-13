@@ -2,7 +2,9 @@ import {
   Cards,
   InternalDeck,
   InternalMatch,
+  InventoryUpdate,
   OverlaySettingsData,
+  PlayerInventory,
 } from "mtgatool-shared";
 
 export type MessageType =
@@ -15,6 +17,8 @@ export type MessageType =
   | "GAME_STATS"
   | "UPSERT_GUN_DECK"
   | "UPSERT_GUN_CARDS"
+  | "INVENTORY_UPDATED"
+  | "PLAYER_INVENTORY"
   | "HOVER_IN"
   | "HOVER_OUT";
 
@@ -64,6 +68,18 @@ export interface UpsertGunCardsMessage extends ChannelMessageBase {
   value: Cards;
 }
 
+export interface InventoryUpdatedMessage extends ChannelMessageBase {
+  type: "INVENTORY_UPDATED";
+  value: InventoryUpdate;
+  context: string;
+  id: string;
+}
+
+export interface PlayerInventoryMessage extends ChannelMessageBase {
+  type: "PLAYER_INVENTORY";
+  value: PlayerInventory;
+}
+
 export interface HoverInMessage extends ChannelMessageBase {
   type: "HOVER_IN";
   value: number;
@@ -82,6 +98,8 @@ export type ChannelMessage =
   | GameStatsMessage
   | UpsertGunDeckMessage
   | UpsertGunCardsMessage
+  | InventoryUpdatedMessage
+  | PlayerInventoryMessage
   | HoverInMessage
   | HoverOutMessage
   | OverlaySettingsMessage;

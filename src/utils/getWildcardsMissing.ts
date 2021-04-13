@@ -6,7 +6,7 @@ export default function getWildcardsMissing(
   isSideboard?: boolean
 ): number {
   let mainQuantity = 0;
-  const cards = { cards: {} as any }; // store.getState().playerdata.cards;
+  const { cards } = window;
   const mainMatches = deck
     .getMainboard()
     .get()
@@ -38,7 +38,7 @@ export default function getWildcardsMissing(
 
   let have = 0;
   arr.forEach((id) => {
-    const n = cards.cards[id];
+    const n = cards[id];
     if (n !== undefined) {
       have += n;
     }

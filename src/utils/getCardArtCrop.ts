@@ -2,7 +2,6 @@
 import { database, DbCardData } from "mtgatool-shared";
 import notFound from "../assets/images/notfound.png";
 import notFoundArt from "../assets/images/notFoundArt.png";
-import debugLog from "./debugLog";
 
 export function getCardImage(
   card: DbCardData | number,
@@ -27,7 +26,7 @@ export function getCardImage(
   } catch (e) {
     // eslint-disable-next-line no-console
     // debugLog(e, "error");
-    debugLog(`Cant find card image: ${cardObj}, ${typeof cardObj}`, "info");
+    console.info(`Cant find card image: ${cardObj}, ${typeof cardObj}`);
     return notFound;
   }
 }

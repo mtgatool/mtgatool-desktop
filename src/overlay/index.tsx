@@ -36,6 +36,10 @@ export default function Overlay() {
   useEffect(() => {
     const channel = bcConnect() as any;
     channel.onmessage = (msg: MessageEvent<ChannelMessage>) => {
+      if (msg.data.type === "UPSERT_GUN_CARDS") {
+        window.cards = msg.data.value;
+      }
+
       if (msg.data.type === "OVERLAY_UPDATE") {
         // const oppCards = new Deck(msg.data.type.oppCards);
         const playerCardsLeft = new Deck(msg.data.value.playerCardsLeft);
