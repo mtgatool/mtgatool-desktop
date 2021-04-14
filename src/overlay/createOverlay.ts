@@ -1,15 +1,16 @@
-import { remote } from "electron";
 import { OverlaySettingsData } from "mtgatool-shared";
 import path from "path";
 import url from "url";
+import electron from "../utils/electron/electronWrapper";
 import getLocalSetting from "../utils/getLocalSetting";
 
 export default function createOverlay(callback?: () => void): Promise<void> {
+  if (!electron) return new Promise((a, r) => r());
   const settings = JSON.parse(
     getLocalSetting("overlay_0")
   ) as OverlaySettingsData;
 
-  const newWindow = new remote.BrowserWindow({
+  const newWindow = new electron.remote.BrowserWindow({
     transparent: true,
     // resizable: false,
     // skipTaskbar: true,
@@ -34,7 +35,7 @@ export default function createOverlay(callback?: () => void): Promise<void> {
 
   const proc: any = process;
   newWindow.loadURL(
-    remote.app.isPackaged
+    electron.remote.app.isPackaged
       ? url.format({
           pathname: path.join(
             proc.resourcesPath,
@@ -52,20 +53,22 @@ export default function createOverlay(callback?: () => void): Promise<void> {
     newWindow.webContents.once("dom-ready", () => {
       // eslint-disable-next-line func-names
       setTimeout(function () {
-        const overlayDevtools = new remote.BrowserWindow({
-          title: "MTG Arena Tool - overlay debug",
-          icon: path.join(__dirname, "logo512.png"),
-        });
-        overlayDevtools.removeMenu();
-        newWindow.webContents.setDevToolsWebContents(
-          overlayDevtools.webContents
-        );
-        newWindow.webContents.openDevTools({ mode: "detach" });
+        if (electron) {
+          const overlayDevtools = new electron.remote.BrowserWindow({
+            title: "MTG Arena Tool - overlay debug",
+            icon: path.join(__dirname, "logo512.png"),
+          });
+          overlayDevtools.removeMenu();
+          newWindow.webContents.setDevToolsWebContents(
+            overlayDevtools.webContents
+          );
+          newWindow.webContents.openDevTools({ mode: "detach" });
 
-        newWindow.setAlwaysOnTop(true, "floating");
-        newWindow.setFocusable(false);
-        newWindow.moveTop();
-        newWindow.show();
+          newWindow.setAlwaysOnTop(true, "floating");
+          newWindow.setFocusable(false);
+          newWindow.moveTop();
+          newWindow.show();
+        }
       }, 500);
     });
 

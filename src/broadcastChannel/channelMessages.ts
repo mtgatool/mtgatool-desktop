@@ -12,6 +12,7 @@ export type MessageType =
   | "STOP_LOG_READING"
   | "LOG_MESSAGE_RECV"
   | "LOG_READ_FINISHED"
+  | "SET_UUID"
   | "OVERLAY_UPDATE"
   | "OVERLAY_SETTINGS"
   | "GAME_STATS"
@@ -41,6 +42,11 @@ export interface LogMessageRecvMessage extends ChannelMessageBase {
 
 export interface LogFinishedMessage extends ChannelMessageBase {
   type: "LOG_READ_FINISHED";
+}
+
+export interface SetUUIDMessage extends ChannelMessageBase {
+  type: "SET_UUID";
+  value: string;
 }
 
 export interface OverlayUpdateMessage extends ChannelMessageBase {
@@ -94,6 +100,7 @@ export type ChannelMessage =
   | StopLogReadingMessage
   | LogMessageRecvMessage
   | LogFinishedMessage
+  | SetUUIDMessage
   | OverlayUpdateMessage
   | GameStatsMessage
   | UpsertGunDeckMessage

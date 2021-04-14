@@ -55,7 +55,8 @@ export default function DecksArtViewRow(
     winrateInterval = formatPercent(winrate);
   }
 
-  const lastTouch = new Date(internalDeck.lastUpdated);
+  const lastTouch =
+    deck.lastUsed || new Date(internalDeck.lastUpdated).getTime();
   const missingWildcards = getDeckMissing(deckObj);
   const totalMissing =
     missingWildcards.common +
@@ -98,9 +99,7 @@ export default function DecksArtViewRow(
           )}
         </div>
         {totalMissing == 0 ? (
-          <div className="decks-table-deck-item time">
-            {timeAgo(lastTouch.getTime())}
-          </div>
+          <div className="decks-table-deck-item time">{timeAgo(lastTouch)}</div>
         ) : (
           <></>
         )}

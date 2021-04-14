@@ -7,7 +7,6 @@ import {
 } from "mtgatool-shared";
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 
-import { remote } from "electron";
 import DeckList from "../components/DeckList";
 import TopBar from "../components/TopBar";
 
@@ -16,6 +15,7 @@ import bcConnect from "../utils/bcConnect";
 import getLocalSetting from "../utils/getLocalSetting";
 import setLocalSetting from "../utils/setLocalSetting";
 import useDebounce from "../hooks/useDebounce";
+import electron from "../utils/electron/electronWrapper";
 
 export default function Overlay() {
   const [deck, setDeck] = useState<Deck>();
@@ -24,10 +24,12 @@ export default function Overlay() {
 
   const updateNewBounds = useCallback(() => {
     const oldSettings = JSON.parse(getLocalSetting("overlay_0"));
-    const newSettings = {
-      ...oldSettings,
-      bounds: remote.getCurrentWindow().getBounds(),
-    };
+    const newSettings = electron
+      ? {
+          ...oldSettings,
+          bounds: electron.remote.getCurrentWindow().getBounds(),
+        }
+      : {};
     setSettings(newSettings);
   }, []);
 
@@ -57,9 +59,15 @@ export default function Overlay() {
 
     setSettings(JSON.parse(getLocalSetting("overlay_0")));
 
-    remote.getCurrentWindow().removeAllListeners();
-    remote.getCurrentWindow().on("move", () => deboucer(updateNewBounds));
-    remote.getCurrentWindow().on("resize", () => deboucer(updateNewBounds));
+    if (electron) {
+      electron.remote.getCurrentWindow().removeAllListeners();
+      electron.remote
+        .getCurrentWindow()
+        .on("move", () => deboucer(updateNewBounds));
+      electron.remote
+        .getCurrentWindow()
+        .on("resize", () => deboucer(updateNewBounds));
+    }
   }, [deboucer]);
 
   useEffect(() => {

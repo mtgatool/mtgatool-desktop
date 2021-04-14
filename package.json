@@ -38,6 +38,8 @@
     "cm": "git-cz",
     "react-start": "node generateInfo.js && craco start",
     "react-build": "craco build",
+    "start:web": "craco start --config craco.web.config.js",
+    "build:web": "craco build --config craco.web.config.js",
     "jest-server": "http-server ./build -p 3000",
     "jest:watch": "craco test --env=jsdom",
     "jest:ci": "react-scripts test --env=jsdom --watchAll=false --testPathIgnorePatterns \"src/__tests__/\"",

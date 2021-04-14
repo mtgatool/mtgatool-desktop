@@ -1,8 +1,10 @@
-import { remote } from "electron";
+import electron from "./electronWrapper";
 
 export default function setFocusable(set: boolean) {
-  remote.getCurrentWindow().setFocusable(set);
-  if (set) {
-    remote.getCurrentWindow().focus();
+  if (electron) {
+    electron.remote.getCurrentWindow().setFocusable(set);
+    if (set) {
+      electron.remote.getCurrentWindow().focus();
+    }
   }
 }

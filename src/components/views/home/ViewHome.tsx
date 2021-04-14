@@ -11,7 +11,7 @@ export default function ViewHome() {
   const closePopup = useRef<() => void>(voiFn);
 
   return (
-    <>
+    <div className="section">
       <PopupComponent
         open={false}
         width="1000px"
@@ -47,6 +47,6 @@ export default function ViewHome() {
         onClick={() => createOverlay().then(() => console.log("closeddd!"))}
         text="Test overaly"
       />
-    </>
+    </div>
   );
 }

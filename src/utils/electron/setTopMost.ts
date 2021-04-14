@@ -1,9 +1,12 @@
-import { remote } from "electron";
+import electron from "./electronWrapper";
 
 export default function setTopMost(set: boolean) {
-  if (set) remote.getCurrentWindow().setAlwaysOnTop(true, "floating");
-  else {
-    remote.getCurrentWindow().setAlwaysOnTop(false);
-    remote.getCurrentWindow().focus();
+  if (electron) {
+    if (set)
+      electron.remote.getCurrentWindow().setAlwaysOnTop(true, "floating");
+    else {
+      electron.remote.getCurrentWindow().setAlwaysOnTop(false);
+      electron.remote.getCurrentWindow().focus();
+    }
   }
 }

@@ -1,6 +1,5 @@
 .app-wrapper {
   z-index: auto;
-  height: calc(100% - 24px);
   background-color: var(--color-base);
 }
 
@@ -16,6 +15,7 @@
   background-image: url(../assets/images/main-background.jpg);
   background-position: center;
   background-size: cover;
+  height: 100%;
 }
 
 .app-wrapper-back:after {
@@ -43,21 +43,27 @@
 .wrapper {
   width: 100%;
   height: calc(100% - 49px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.wrapper-inner {
+  margin: 0 auto;
+  flex-grow: 2;
+  width: 100%;
+  max-width: 1200px;
+  height: auto;
 }
 
 .overflow-ux {
   width: calc(100%);
-  height: 100%;
-  overflow: hidden;
   position: relative;
 }
 
 .view-container {
   width: 100%;
-  height: 100%;
-  overflow: auto;
-  position: absolute;
   display: flex;
+  position: absolute;
 }
 
 .version-number {
@@ -69,8 +75,8 @@
   font-size: 14px;
   height: 24px;
   position: absolute;
-  left: calc(100% - 84px);
-  top: calc(100% - 28px);
+  right: 12px;
+  bottom: 4px;
   background-color: var(--color-section);
   z-index: 100;
   border-radius: 4px;

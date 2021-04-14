@@ -1,25 +1,34 @@
 import { Cards } from "mtgatool-shared";
+import getLocalSetting from "../utils/getLocalSetting";
 import getGunUser from "./getGunUser";
 import gunRefExists from "./gunRefExists";
 
 export default async function upsertGunCards(cards: Cards) {
+  const uuid = getLocalSetting("playerId");
   const userRef = getGunUser();
   if (userRef) {
-    const cardsUpdatedExists = await gunRefExists(userRef.get("cardsUpdated"));
+    const uuidDataRef = userRef.get("uuidData").get(uuid);
+    const cardsUpdatedExists = await gunRefExists(
+      uuidDataRef.get("cardsUpdated")
+    );
 
     if (cardsUpdatedExists) {
-      const lastUpdated = await userRef.get("cardsUpdated").then();
+      const lastUpdated = await uuidDataRef.get("cardsUpdated").then();
       if (new Date().getTime() < lastUpdated - 1000 * 60 * 24) {
-        userRef.get("cards").open((data) => {
-          userRef.get("cardsPrev").put(data);
-          userRef.get("cards").put(cards);
-          userRef.get("cardsUpdated").put(new Date().getTime());
+        uuidDataRef.get("cards").open((data) => {
+          window.cardsPrev = data;
+          window.cards = cards;
+          uuidDataRef.get("cardsPrev").put(data);
+          uuidDataRef.get("cards").put(cards);
+          uuidDataRef.get("cardsUpdated").put(new Date().getTime());
         });
       }
     } else {
-      userRef.get("cardsPrev").put(cards);
-      userRef.get("cards").put(cards);
-      userRef.get("cardsUpdated").put(new Date().getTime());
+      window.cardsPrev = cards;
+      window.cards = cards;
+      uuidDataRef.get("cardsPrev").put(cards);
+      uuidDataRef.get("cards").put(cards);
+      uuidDataRef.get("cardsUpdated").put(new Date().getTime());
     }
   }
 }

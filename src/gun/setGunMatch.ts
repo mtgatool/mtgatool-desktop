@@ -32,6 +32,7 @@ export default async function setGunMatch(match: InternalMatch) {
         stats.matchWins += hasWon ? 1 : 0;
         stats.matchLosses += hasWon ? 0 : 1;
         currentDeckRef.get("stats").put(stats);
+        currentDeckRef.get("lastUsed").put(new Date().getTime());
         currentDeckRef.get("matches").get(match.id).put(hasWon);
       }
     }

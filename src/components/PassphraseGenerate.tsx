@@ -1,7 +1,7 @@
-import { remote } from "electron";
 import { ChangeEvent, useCallback, useState } from "react";
 import { ReactComponent as Close } from "../assets/images/svg/close.svg";
 import newResetPassphrase from "../gun/newResetPassphrase";
+import copyToClipboard from "../utils/copyToClipboard";
 import Button from "./ui/Button";
 
 interface PassphraseGenerateProps {
@@ -61,9 +61,7 @@ export default function PassphraseGenerate(
           <div
             className="copy-button"
             style={{ margin: "auto 8px" }}
-            onClick={() => {
-              remote.clipboard.writeText(phrase);
-            }}
+            onClick={() => copyToClipboard(phrase)}
           />
         </div>
         <div className="form-input-container">

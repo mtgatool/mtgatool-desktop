@@ -2,10 +2,12 @@ import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 import setGunMatch from "../gun/setGunMatch";
 import upsertGunCards from "../gun/upsertGunCards";
 import upsertGunDeck from "../gun/upsertGunDeck";
+import upsertGunInventory from "../gun/upsertGunInventory";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import LogEntry from "../types/logDecoder";
 import bcConnect from "../utils/bcConnect";
+import switchPlayerUUID from "../utils/switchPlayerUUID";
 import { ChannelMessage } from "./channelMessages";
 
 export default function mainChannelListeners() {
@@ -43,9 +45,12 @@ export default function mainChannelListeners() {
       }
     }
 
+    if (msg.data.type === "SET_UUID") {
+      switchPlayerUUID(msg.data.value);
+    }
+
     if (msg.data.type === "GAME_STATS") {
       setGunMatch(msg.data.value);
-      console.log(msg.data.value);
     }
 
     if (msg.data.type === "UPSERT_GUN_DECK") {
@@ -53,21 +58,12 @@ export default function mainChannelListeners() {
     }
 
     if (msg.data.type === "UPSERT_GUN_CARDS") {
-      window.cards = msg.data.value;
       upsertGunCards(msg.data.value);
     }
 
     if (msg.data.type === "PLAYER_INVENTORY") {
       const inventoryData = msg.data.value;
-      window.economy.gold = inventoryData.gold;
-      window.economy.gems = inventoryData.gems;
-      window.economy.vaultProgress = inventoryData.vaultProgress;
-      window.economy.wcTrackPosition = inventoryData.wcTrackPosition;
-      window.economy.wcCommon = inventoryData.wcCommon;
-      window.economy.wcUncommon = inventoryData.wcUncommon;
-      window.economy.wcRare = inventoryData.wcRare;
-      window.economy.wcMythic = inventoryData.wcMythic;
-      window.economy.boosters = inventoryData.boosters;
+      upsertGunInventory(inventoryData);
     }
   };
 }

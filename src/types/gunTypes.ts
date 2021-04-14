@@ -17,6 +17,7 @@ export interface GunDeck {
   format: string;
   internalDeck: string;
   matches: Record<string, boolean>;
+  lastUsed: number;
   stats: {
     gameWins: number;
     gameLosses: number;
@@ -40,13 +41,31 @@ export interface GunMatch {
   timestamp: number;
 }
 
+export interface GunUUIDData {
+  gold: number;
+  gems: number;
+  vaultProgress: number;
+  wcTrackPosition: number;
+  wcCommon: number;
+  wcUncommon: number;
+  wcRare: number;
+  wcMythic: number;
+  cards: Cards;
+  cardsPrev: Cards;
+  cardsUpdated: number;
+  boosters: {
+    [collationId: string]: number;
+  };
+}
+
 export interface GunUser {
   matches: Record<string, GunMatch>;
   decksIndex: Record<string, number>;
   decks: Record<string, GunDeck>;
-  cards: Cards;
-  cardsPrev: Cards;
-  cardsUpdated: number;
+  defaultUUID: string;
+  uuidData: {
+    [uuid: string]: GunUUIDData;
+  };
 }
 
 export type GunUserChain = IGunChainReference<GunUser>;

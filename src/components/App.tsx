@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 import { Switch, Route, useHistory } from "react-router-dom";
 
-import { remote } from "electron";
 import Auth from "./Auth";
 import CardHover from "./CardHover";
 import ErrorBoundary from "./ErrorBoundary";
@@ -16,6 +15,7 @@ import TopNav from "./TopNav";
 import { AppState } from "../redux/stores/rendererStore";
 import { useGun, useSea } from "../gun/hooks";
 import ContentWrapper from "./ContentWrapper";
+import electron from "../utils/electron/electronWrapper";
 
 function App() {
   useGun();
@@ -32,26 +32,31 @@ function App() {
 
   return (
     <>
-      {process.platform !== "linux" && (
+      {electron && process.platform !== "linux" && (
         <TopBar artist={topArtist} loginState={loginState} offline={offline} />
       )}
       <div
         className={
-          process.platform == "linux"
+          process.platform == "linux" || electron
             ? loginState == LOGIN_OK
-              ? "app-wrapper-no-frame"
+              ? "app-wrapper-back-no-frame"
               : "app-wrapper-back-no-frame"
             : loginState == LOGIN_OK
-            ? "app-wrapper"
+            ? "app-wrapper-back"
             : "app-wrapper-back"
         }
+        style={{
+          height: `calc(100% - ${electron ? 24 : 0}px)`,
+        }}
       >
         <CardHover />
         {loading ? (
           <LoadingBar
             style={
               loginState == LOGIN_OK || process.platform == "linux"
-                ? { top: process.platform !== "linux" ? "72px" : "0px" }
+                ? {
+                    top: process.platform !== "linux" ? "72px" : "0px",
+                  }
                 : {}
             }
           />
@@ -69,7 +74,13 @@ function App() {
             </Route>
           </Switch>
         </ErrorBoundary>
-        <div className="version-number">v{remote.app.getVersion()}</div>
+        {electron ? (
+          <div className="version-number">
+            v{electron.remote.app.getVersion()}
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
     </>
   );

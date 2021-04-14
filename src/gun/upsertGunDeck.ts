@@ -36,6 +36,7 @@ export default async function upsertGunDeck(internal: InternalDeck) {
       tile: deck.tile,
       format: deck.format,
       internalDeck: JSON.stringify(deck.getSave()),
+      lastUsed: new Date().getTime(),
       matches: {},
       stats: {
         gameWins: 0,
@@ -57,7 +58,7 @@ export default async function upsertGunDeck(internal: InternalDeck) {
       decksRef.get(newDeckDeckKey).put(newGunDeck);
       decksIndexRef.get(deck.id).put(version);
     } else {
-      decksRef.get(currentDeckKey).put(newGunDeck);
+      // decksRef.get(currentDeckKey).put(newGunDeck);
     }
   }
   return true;

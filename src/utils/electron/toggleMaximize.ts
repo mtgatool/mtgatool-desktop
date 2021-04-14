@@ -1,7 +1,9 @@
-import { remote } from "electron";
+import electron from "./electronWrapper";
 
 export default function toggleMaximize() {
-  if (remote.getCurrentWindow().isMaximized())
-    remote.getCurrentWindow().unmaximize();
-  else remote.getCurrentWindow().maximize();
+  if (electron) {
+    if (electron.remote.getCurrentWindow().isMaximized())
+      electron.remote.getCurrentWindow().unmaximize();
+    else electron.remote.getCurrentWindow().maximize();
+  }
 }

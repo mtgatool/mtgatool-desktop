@@ -1,18 +1,24 @@
 /* eslint-disable radix */
 /* eslint-disable no-console */
 import path from "path";
-import { app, remote } from "electron";
 import fs from "fs";
 import _ from "lodash";
 import { database } from "mtgatool-shared";
 import axios from "axios";
+import electron from "./electron/electronWrapper";
 
 // import distributedDb from "../assets/resources/database.json";
 
-const cachePath: string | null =
-  app || (remote && remote.app)
-    ? path.join((app || remote.app).getPath("userData"), "database.json")
-    : null;
+let cachePath: string | null = null;
+if (electron) {
+  cachePath =
+    electron.app || (electron.remote && electron.remote.app)
+      ? path.join(
+          (electron.app || electron.remote.app).getPath("userData"),
+          "database.json"
+        )
+      : null;
+}
 
 /*
  This is cool for debugging the metadata files, so we can

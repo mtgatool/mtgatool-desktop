@@ -20,6 +20,7 @@ import signup from "../gun/signup";
 import checkPassphrase from "../gun/checkPassphrase";
 import voiFn from "../utils/voidfn";
 import PopupComponent from "./PopupComponent";
+import electron from "../utils/electron/electronWrapper";
 
 type InputChange = ChangeEvent<HTMLInputElement>;
 
@@ -117,17 +118,29 @@ export default function Auth() {
           getLocalSetting("savedPassword") == pass ? pass : sha1(pass);
         login(username, pwd)
           .then(() => {
-            postChannelMessage({
-              type: "START_LOG_READING",
-            });
-            reduxAction(dispatch, {
-              type: "SET_LOADING",
-              arg: true,
-            });
-            reduxAction(dispatch, {
-              type: "SET_LOGIN_STATE",
-              arg: LOGIN_WAITING,
-            });
+            if (electron) {
+              postChannelMessage({
+                type: "START_LOG_READING",
+              });
+              reduxAction(dispatch, {
+                type: "SET_LOADING",
+                arg: true,
+              });
+              reduxAction(dispatch, {
+                type: "SET_LOGIN_STATE",
+                arg: LOGIN_WAITING,
+              });
+            } else {
+              console.log("DUUDE");
+              reduxAction(dispatch, {
+                type: "SET_LOGIN_STATE",
+                arg: LOGIN_OK,
+              });
+              reduxAction(dispatch, {
+                type: "SET_LOADING",
+                arg: false,
+              });
+            }
           })
           .catch(setErrorMessage);
       }
@@ -151,17 +164,29 @@ export default function Auth() {
         signup(signupUsername, pwd)
           .then(() => login(signupUsername, pwd))
           .then(() => {
-            postChannelMessage({
-              type: "START_LOG_READING",
-            });
-            reduxAction(dispatch, {
-              type: "SET_LOADING",
-              arg: true,
-            });
-            reduxAction(dispatch, {
-              type: "SET_LOGIN_STATE",
-              arg: LOGIN_WAITING,
-            });
+            if (electron) {
+              postChannelMessage({
+                type: "START_LOG_READING",
+              });
+              reduxAction(dispatch, {
+                type: "SET_LOADING",
+                arg: true,
+              });
+              reduxAction(dispatch, {
+                type: "SET_LOGIN_STATE",
+                arg: LOGIN_WAITING,
+              });
+            } else {
+              console.log("DUUDE");
+              reduxAction(dispatch, {
+                type: "SET_LOGIN_STATE",
+                arg: LOGIN_OK,
+              });
+              reduxAction(dispatch, {
+                type: "SET_LOADING",
+                arg: false,
+              });
+            }
           })
           .catch(setErrorMessage);
       }
@@ -201,7 +226,7 @@ export default function Auth() {
       >
         <AuthSettings onClose={closePopup.current} />
       </PopupComponent>
-      <form>
+      <form style={{ height: "100%" }}>
         <div className="form-container">
           <div className="form-authenticate">
             <div
@@ -376,13 +401,15 @@ export default function Auth() {
           </div>
         </div>
       </form>
-      <div className="app-settings">
-        <IconButton
-          style={{ margin: "auto" }}
-          icon={settingsIcon}
-          onClick={openPopup.current}
-        />
-      </div>
+      {electron && (
+        <div className="app-settings">
+          <IconButton
+            style={{ margin: "auto" }}
+            icon={settingsIcon}
+            onClick={openPopup.current}
+          />
+        </div>
+      )}
     </>
   );
 }

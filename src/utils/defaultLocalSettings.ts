@@ -11,7 +11,7 @@ export default function defaultLocalSettings() {
     wcUncommon: 0,
     wcRare: 0,
     wcMythic: 0,
-    boosters: [],
+    boosters: {},
   };
   settingKeys.forEach((key) => {
     if (window.localStorage.getItem(key) === null) {

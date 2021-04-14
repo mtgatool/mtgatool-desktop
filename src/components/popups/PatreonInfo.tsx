@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { shell } from "electron";
+import openExternal from "../../utils/openExternal";
 
 interface DialogProps {
   closeCallback?: () => void;
@@ -74,9 +74,9 @@ export default function PatreonInfo(props: DialogProps): JSX.Element {
           <div
             className="patreon-link-thin"
             title="Open on browser"
-            onClick={(): void => {
-              shell.openExternal("https://www.patreon.com/mtgatool");
-            }}
+            onClick={(): void =>
+              openExternal("https://www.patreon.com/mtgatool")
+            }
           />
         </div>
       </div>

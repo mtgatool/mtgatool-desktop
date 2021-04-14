@@ -1,7 +1,6 @@
 /* eslint-disable no-alert */
 /* eslint-disable no-restricted-globals */
 import { useCallback } from "react";
-import { OpenDialogReturnValue, remote, shell } from "electron";
 import { format, fromUnixTime } from "date-fns";
 import { database } from "mtgatool-shared";
 
@@ -12,6 +11,7 @@ import Toggle from "./ui/Toggle";
 import showOpenLogDialog from "../utils/showOpenLogDialog";
 import setLocalSetting from "../utils/setLocalSetting";
 import getLocalSetting from "../utils/getLocalSetting";
+import openExternal from "../utils/openExternal";
 
 function clickBetaChannel(value: boolean): void {
   setLocalSetting("betaChannel", value ? "true" : "false");
@@ -36,14 +36,13 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
   }, []);
 
   const openPathDialog = useCallback(() => {
-    showOpenLogDialog(getLocalSetting("logPath")).then(
-      (value: OpenDialogReturnValue): void => {
-        const paths = value.filePaths;
-        if (paths && paths.length && paths[0]) {
-          arenaLogCallback(paths[0]);
-        }
+    showOpenLogDialog(getLocalSetting("logPath")).then((value: any): void => {
+      // OpenDialogReturnValue
+      const paths = value.filePaths;
+      if (paths && paths.length && paths[0]) {
+        arenaLogCallback(paths[0]);
       }
-    );
+    });
   }, [arenaLogCallback]);
 
   return (
@@ -84,11 +83,11 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
           <div
             style={{ margin: "4px", textDecoration: "underline" }}
             className="link"
-            onClick={(): void => {
-              shell.openExternal("https://mtgatool.com/release-notes/");
-            }}
+            onClick={(): void =>
+              openExternal("https://mtgatool.com/release-notes/")
+            }
           >
-            {`Version ${remote.app.getVersion()}`}
+            {`Version ${process.env.REACT_APP_VERSION}`}
           </div>
           {database.metadata ? (
             <div style={{ margin: "4px" }}>

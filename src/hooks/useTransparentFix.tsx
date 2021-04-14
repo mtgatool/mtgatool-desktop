@@ -1,5 +1,5 @@
-import { remote } from "electron";
 import { useCallback, useLayoutEffect, useRef } from "react";
+import electron from "../utils/electron/electronWrapper";
 import globalData from "../utils/globalData";
 
 export default function useTransparentFix(debug?: boolean) {
@@ -7,20 +7,26 @@ export default function useTransparentFix(debug?: boolean) {
 
   const doMouseFix = useCallback((event) => {
     // eslint-disable-next-line global-require
-    const { setIgnoreMouseEvents } = remote.getCurrentWindow();
+    if (electron) {
+      const { setIgnoreMouseEvents } = electron.remote.getCurrentWindow();
 
-    const target = event.target as HTMLElement;
-    if (debug) console.log(target.classList, event);
-    globalData.mouseX = event.clientX;
-    globalData.mouseY = event.clientY;
-    if (target?.classList?.contains("click-through") || target?.id == "root") {
-      setIgnoreMouseEvents(true, { forward: true });
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      // timeoutRef.current = setTimeout(() => {
-      //  setIgnoreMouseEvents(false);
-      // }, 500);
-    } else {
-      setIgnoreMouseEvents(false);
+      const target = event.target as HTMLElement;
+      if (debug) console.log(target.classList, event);
+      globalData.mouseX = event.clientX;
+      globalData.mouseY = event.clientY;
+      if (
+        target?.classList?.contains("click-through") ||
+        target?.id == "root"
+      ) {
+        setIgnoreMouseEvents(true, { forward: true });
+
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        // timeoutRef.current = setTimeout(() => {
+        //  setIgnoreMouseEvents(false);
+        // }, 500);
+      } else {
+        setIgnoreMouseEvents(false);
+      }
     }
   }, []);
 

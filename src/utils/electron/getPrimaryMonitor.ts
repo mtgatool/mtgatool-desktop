@@ -1,5 +1,6 @@
-import { Display, remote } from "electron";
+import electron from "./electronWrapper";
 
-export default function getPrimaryMonitor(): Display {
-  return remote.screen.getPrimaryDisplay();
+export default function getPrimaryMonitor() {
+  if (electron) return electron.remote.screen.getPrimaryDisplay();
+  return undefined;
 }

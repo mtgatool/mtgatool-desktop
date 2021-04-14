@@ -26,15 +26,15 @@ export default function ContentWrapper() {
   const viewIndex = Object.keys(views).findIndex((k) => k == location.pathname);
 
   const leftAnim = {
-    from: { opacity: 1, transform: "translate3d(100%, 0, 0)" },
+    from: { opacity: 0, transform: "translate3d(100%, 0, 0)" },
     enter: { opacity: 1, transform: "translate3d(0%, 0, 0)" },
-    leave: { opacity: 1, transform: "translate3d(-100%, 0, 0)" },
+    leave: { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
   };
 
   const rightAnim = {
-    from: { opacity: 1, transform: "translate3d(-100%, 0, 0)" },
+    from: { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
     enter: { opacity: 1, transform: "translate3d(0%, 0, 0)" },
-    leave: { opacity: 1, transform: "translate3d(100%, 0, 0)" },
+    leave: { opacity: 0, transform: "translate3d(100%, 0, 0)" },
   };
 
   const transitions = useTransition(
@@ -49,21 +49,23 @@ export default function ContentWrapper() {
 
   return (
     <div className="wrapper">
-      <div className="overflow-ux">
-        {transitions.map(({ item, props }) => {
-          const Page = Object.values(views)[item];
-          return (
-            <animated.div
-              className="view-container"
-              key={Object.keys(views)[item]}
-              style={{
-                ...props,
-              }}
-            >
-              <Page />
-            </animated.div>
-          );
-        })}
+      <div className="wrapper-inner">
+        <div className="overflow-ux">
+          {transitions.map(({ item, props }) => {
+            const Page = Object.values(views)[item];
+            return (
+              <animated.div
+                className="view-container"
+                key={Object.keys(views)[item]}
+                style={{
+                  ...props,
+                }}
+              >
+                <Page />
+              </animated.div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

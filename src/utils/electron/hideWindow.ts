@@ -1,5 +1,7 @@
-import { remote } from "electron";
+import electron from "./electronWrapper";
 
 export default function hideWindow() {
-  if (remote.getCurrentWindow().isVisible()) remote.getCurrentWindow().hide();
+  if (electron && electron.remote.getCurrentWindow().isVisible()) {
+    electron.remote.getCurrentWindow().hide();
+  }
 }
