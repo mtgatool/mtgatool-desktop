@@ -94,3 +94,23 @@
   z-index: 100;
   border-radius: 4px;
 }
+
+.flex-end {
+  justify-content: flex-end;
+}
+
+.flex-bottom {
+  height: 50%;
+  display: flex;
+}
+
+
+.flex-top {
+  height: 50%;
+  display: flex;
+  line-height: 32px;
+}
+
+.flex-left {
+  flex-direction: column;
+}

@@ -8,9 +8,10 @@ import getGraphKeys from "./getGraphKeys";
  * @returns Object as Record<string, any>
  */
 export default async function getGraphObject<T>(
-  ref: IGunChainReference<T>
+  ref: IGunChainReference<T>,
+  keysFilter?: string[]
 ): Promise<T> {
-  const keys = await getGraphKeys(ref);
+  const keys = keysFilter || (await getGraphKeys(ref));
 
   const newObject: any = {};
   await Promise.all(

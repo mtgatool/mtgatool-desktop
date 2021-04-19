@@ -1,13 +1,14 @@
 import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { animated, useTransition } from "react-spring";
-import ViewDecks from "./views/decks/ViewDecks";
 import ViewHome from "./views/home/ViewHome";
+import ViewDecks from "./views/decks/ViewDecks";
+import ViewHistory from "./views/history/ViewHistory";
 
 const views = {
   "/home": ViewHome,
   "/decks": ViewDecks,
-  "/history": ViewHome,
+  "/history": ViewHistory,
   "/timeline": ViewHome,
   "/events": ViewHome,
   "/explore": ViewHome,

@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { constants, Deck, MissingWildcards } from "mtgatool-shared";
+import { constants, Deck } from "mtgatool-shared";
 import getBoosterCountEstimate from "../utils/getBoosterCountEstimate";
 import getDeckMissing from "../utils/getDeckMissing";
 
@@ -33,12 +33,12 @@ export default function WildcardsCost(props: {
     missingWildcards.mythic;
   const drawCost = totalMissing > 0;
 
-  const ownedWildcards: MissingWildcards = {
-    common: window.economy.wcCommon,
-    uncommon: window.economy.wcUncommon,
-    rare: window.economy.wcRare,
-    mythic: window.economy.wcMythic,
-  };
+  // const ownedWildcards: MissingWildcards = {
+  //   common: window.economy.wcCommon,
+  //   uncommon: window.economy.wcUncommon,
+  //   rare: window.economy.wcRare,
+  //   mythic: window.economy.wcMythic,
+  // };
 
   return (
     <div
@@ -50,15 +50,16 @@ export default function WildcardsCost(props: {
     >
       {CARD_RARITIES.filter(
         (rarity) => rarity !== "land" && rarity !== "token"
-      ).map((cardRarity: string) => {
+      ).map((cardRarity: string, index) => {
         const key = getRarityKey(cardRarity);
         if (key) {
-          const owned = ownedWildcards[key];
+          // const owned = ownedWildcards[key];
           const missing = missingWildcards[key];
           if (missing) {
             return (
               <div
-                key={`${deck.id}-${cardRarity}-${owned}-${missing}`}
+                // eslint-disable-next-line react/no-array-index-key
+                key={`${deck.id}-${index}-${cardRarity}`}
                 className={`${
                   shrink ? "wc-deckstab-cost" : "wc-explore-cost"
                 } ${wcIcon[cardRarity]}`}

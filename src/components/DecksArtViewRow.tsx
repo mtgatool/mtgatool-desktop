@@ -11,6 +11,7 @@ import { getCardArtCrop } from "../utils/getCardArtCrop";
 import getWinrateClass from "../utils/getWinrateClass";
 import { GunDeck } from "../types/gunTypes";
 import timeAgo from "../utils/timeAgo";
+import baseToObj from "../utils/baseToObj";
 
 interface DecksArtViewRowProps {
   deck: GunDeck;
@@ -21,7 +22,7 @@ export default function DecksArtViewRow(
 ): JSX.Element {
   const { deck } = props;
 
-  const internalDeck = JSON.parse(deck.internalDeck) as InternalDeck;
+  const internalDeck = baseToObj<InternalDeck>(deck.internalDeck);
   const deckObj = new Deck(internalDeck);
   const onDeckClick = (): void => {
     // openDeckCallback(deck);

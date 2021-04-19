@@ -47,7 +47,7 @@ export function useGun() {
       window.gun ??
       Gun<GunState>([
         "http://api.mtgatool.com:8765/gun",
-        "mtgatool-gun-eqszq.ondigitalocean.app:8765/gun",
+        // "mtgatool-gun-eqszq.ondigitalocean.app:8765/gun",
       ])
     );
   }, []);

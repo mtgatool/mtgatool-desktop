@@ -1,6 +1,5 @@
 // eslint-disable-next-line import/no-unresolved
 import { IGunChainReference } from "gun/types/chain";
-import { Cards } from "mtgatool-shared";
 
 export interface GunState {
   [record: string]: any;
@@ -50,8 +49,8 @@ export interface GunUUIDData {
   wcUncommon: number;
   wcRare: number;
   wcMythic: number;
-  cards: Cards;
-  cardsPrev: Cards;
+  cards: string;
+  cardsPrev: string;
   cardsUpdated: number;
   boosters: {
     [collationId: string]: number;

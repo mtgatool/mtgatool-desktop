@@ -21,6 +21,7 @@ import checkPassphrase from "../gun/checkPassphrase";
 import voiFn from "../utils/voidfn";
 import PopupComponent from "./PopupComponent";
 import electron from "../utils/electron/electronWrapper";
+import doWebLogin from "../gun/doWebLogin";
 
 type InputChange = ChangeEvent<HTMLInputElement>;
 
@@ -131,7 +132,7 @@ export default function Auth() {
                 arg: LOGIN_WAITING,
               });
             } else {
-              console.log("DUUDE");
+              doWebLogin();
               reduxAction(dispatch, {
                 type: "SET_LOGIN_STATE",
                 arg: LOGIN_OK,
@@ -177,7 +178,6 @@ export default function Auth() {
                 arg: LOGIN_WAITING,
               });
             } else {
-              console.log("DUUDE");
               reduxAction(dispatch, {
                 type: "SET_LOGIN_STATE",
                 arg: LOGIN_OK,

@@ -1,7 +1,7 @@
 /* eslint-disable import/no-webpack-loader-syntax */
 /* eslint-disable no-nested-ternary */
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 import { Switch, Route, useHistory } from "react-router-dom";
 
@@ -16,19 +16,41 @@ import { AppState } from "../redux/stores/rendererStore";
 import { useGun, useSea } from "../gun/hooks";
 import ContentWrapper from "./ContentWrapper";
 import electron from "../utils/electron/electronWrapper";
+import getLocalSetting from "../utils/getLocalSetting";
+import login from "../gun/login";
+import reduxAction from "../redux/reduxAction";
+import doWebLogin from "../gun/doWebLogin";
 
 function App() {
   useGun();
   useSea();
   const history = useHistory();
+  const dispatch = useDispatch();
 
   const { loginState, topArtist, offline, loading } = useSelector(
     (state: AppState) => state.renderer
   );
 
   useEffect(() => {
-    history.push("/auth");
-  }, []);
+    if (!electron) {
+      const pwd = getLocalSetting("savedPassword");
+      const user = getLocalSetting("username");
+
+      login(user, pwd)
+        .then(async () => {
+          await doWebLogin();
+          reduxAction(dispatch, {
+            type: "SET_LOGIN_STATE",
+            arg: LOGIN_OK,
+          });
+        })
+        .catch(() => {
+          history.push("/auth");
+        });
+    } else {
+      history.push("/auth");
+    }
+  }, [history, dispatch]);
 
   return (
     <>
@@ -69,7 +91,7 @@ function App() {
             <Route path="/:page">
               <>
                 <TopNav />
-                <ContentWrapper />
+                {loginState == LOGIN_OK ? <ContentWrapper /> : <></>}
               </>
             </Route>
           </Switch>

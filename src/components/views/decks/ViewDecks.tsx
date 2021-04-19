@@ -1,9 +1,12 @@
+import { Fragment } from "react";
 import useGunSelectorObject from "../../../hooks/useGunSelectorObject";
-import { GunUser, GunUserChain } from "../../../types/gunTypes";
+import useGunUser from "../../../hooks/useGunUser";
+import { GunUser } from "../../../types/gunTypes";
 import DecksArtViewRow from "../../DecksArtViewRow";
 
 export default function ViewDecks() {
-  const userRef = window.gun.user() as GunUserChain;
+  const [userRef, loggedIn] = useGunUser();
+
   const decksIndexRef = userRef.get("decksIndex");
   const decksIndex = useGunSelectorObject<GunUser["decksIndex"]>(
     decksIndexRef,
@@ -16,15 +19,23 @@ export default function ViewDecks() {
   return (
     <div className="section">
       <div className="decks-table-wrapper">
-        {decksIndex &&
+        {loggedIn &&
+          decksIndex &&
           decks &&
-          Object.keys(decksIndex).map((deckId) => {
-            const deckKey = `${deckId}-v${decksIndex[deckId]}`;
-            if (decks[deckKey] && decks[deckKey].internalDeck) {
-              return <DecksArtViewRow key={deckId} deck={decks[deckKey]} />;
-            }
-            return <></>;
-          })}
+          Object.keys(decksIndex)
+            .map((key) => decks[`${key}-v${decksIndex[key]}`])
+            .filter((d) => d)
+            .sort((a, b) => {
+              if (a.lastUsed > b.lastUsed) return -1;
+              if (a.lastUsed < b.lastUsed) return 1;
+              return 0;
+            })
+            .map((deck) => {
+              if (deck && deck.internalDeck) {
+                return <DecksArtViewRow key={deck.deckId} deck={deck} />;
+              }
+              return <Fragment key={deck.deckId} />;
+            })}
       </div>
     </div>
   );

@@ -34,7 +34,9 @@ export default function onLabelMatchGameRoomStateChangedEvent(
   // Now only when a match begins
   if (gameRoom.stateType == "MatchGameRoomStateType_Playing") {
     gameRoom.gameRoomConfig.reservedPlayers.forEach((player) => {
+      const { currentMatch } = globalStore;
       if (player.userId == getLocalSetting("playerId")) {
+        currentMatch.player.name = player.playerName;
         setPlayer({
           name: player.playerName,
           userid: player.userId,
@@ -45,6 +47,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
           userid: player.userId,
         });
       } else {
+        currentMatch.opponent.name = player.playerName;
         setOpponent({
           name: player.playerName,
           userid: player.userId,
@@ -80,9 +83,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
     });
 
     // clearDeck();
-
     // globals.matchCompletedOnGameNumber = gameRoom.finalMatchResult.resultList.length - 1;
-
     saveMatch(`${gameRoom.finalMatchResult.matchId}`);
   }
   // Only update if needed

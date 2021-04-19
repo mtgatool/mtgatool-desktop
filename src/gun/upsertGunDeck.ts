@@ -7,6 +7,7 @@ import getGunUser from "./getGunUser";
 export default async function upsertGunDeck(internal: InternalDeck) {
   const deck = new Deck(internal);
   const userRef = getGunUser();
+  console.log("Upsert deck: ", deck);
   if (userRef) {
     const decksIndexRef = userRef.get("decksIndex");
     const decksRef = userRef.get("decks");

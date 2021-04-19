@@ -10,10 +10,10 @@ export default function start() {
     onLogEntry: (entry) => {
       logEntrySwitch(entry);
       // This was spammy for no reason
-      // postChannelMessage({
-      //   type: "LOG_MESSAGE_RECV",
-      //   value: entry,
-      // });
+      postChannelMessage({
+        type: "LOG_MESSAGE_RECV",
+        value: { ...entry, json: {} },
+      });
     },
     onError: console.error,
     onFinish: () => {
