@@ -4,6 +4,7 @@ import { animated, useTransition } from "react-spring";
 import ViewHome from "./views/home/ViewHome";
 import ViewDecks from "./views/decks/ViewDecks";
 import ViewHistory from "./views/history/ViewHistory";
+import linkGunToRedux from "../redux/linkGunToRedux";
 
 const views = {
   "/home": ViewHome,
@@ -47,6 +48,10 @@ export default function ContentWrapper() {
   useEffect(() => {
     paths.current.push(location.pathname);
   }, [location]);
+
+  useEffect(() => {
+    linkGunToRedux();
+  }, []);
 
   return (
     <div className="wrapper">

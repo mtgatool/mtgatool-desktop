@@ -2,14 +2,15 @@ import { Deck, InternalMatch } from "mtgatool-shared";
 import { GunDeck, GunMatch } from "../types/gunTypes";
 import getLocalSetting from "../utils/getLocalSetting";
 import objToBase from "../utils/objToBase";
-import getGraphKeys from "./getGraphKeys";
-import getGraphObject from "./getGraphObject";
 import getGunUser from "./getGunUser";
 
 export default async function setGunMatch(match: InternalMatch) {
+  console.log("> Set match", match);
+
   const userRef = getGunUser();
   if (userRef) {
     const newGunMatch: GunMatch = {
+      matchId: match.id,
       playerId: getLocalSetting("playerId"),
       playerDeckId: match.playerDeck.id,
       playerDeckHash: match.playerDeckHash,
@@ -24,37 +25,42 @@ export default async function setGunMatch(match: InternalMatch) {
       timestamp: new Date().getTime(),
     };
 
-    console.log(newGunMatch);
     userRef.get("matches").get(match.id).put(newGunMatch);
 
     const decksIndexRef = userRef.get("decksIndex");
     const decksRef = userRef.get("decks");
-    const indexKeys = await getGraphKeys(decksIndexRef);
+    const indexKeys = await decksIndexRef.then();
 
     const hasWon = match.player.wins > match.opponent.wins;
 
-    if (indexKeys.includes(match.playerDeck.id)) {
+    if (Object.keys(indexKeys).includes(match.playerDeck.id)) {
       const deckIdRef = decksIndexRef.get(match.playerDeck.id);
-      const version = deckIdRef.then ? await deckIdRef.then() : 0;
-      const currentDeckKey = `${match.playerDeck.id}-v${version}`;
-      const currentDeckRef = decksRef.get(currentDeckKey);
-      const deckMatchesRef = currentDeckRef.get("matches");
-      const matchesList = await getGraphKeys(deckMatchesRef);
-
-      if (!matchesList.includes(match.id)) {
-        // Upsert new stats and add match to the deck's list of matches
-        const stats = await getGraphObject<GunDeck["stats"]>(
-          currentDeckRef.get("stats")
-        );
-        stats.gameWins += match.player.wins;
-        stats.gameLosses += match.opponent.wins;
-        stats.matchWins += hasWon ? 1 : 0;
-        stats.matchLosses += hasWon ? 0 : 1;
-        console.log("stats", stats);
-        currentDeckRef.get("stats").put(stats);
-        currentDeckRef.get("lastUsed").put(new Date().getTime());
-        currentDeckRef.get("matches").get(match.id).put(hasWon);
-      }
+      const version = await deckIdRef.then();
+      const currentDeckKey = `${match.playerDeck.id}-v${version || 0}`;
+      (decksRef as any).get(currentDeckKey).open(
+        (currentDeck: GunDeck) => {
+          console.log(currentDeck);
+          console.log(Object.keys(currentDeck.matches));
+          if (!Object.keys(currentDeck.matches).includes(match.id)) {
+            const stats = { ...currentDeck.stats };
+            stats.gameWins += match.player.wins;
+            stats.gameLosses += match.opponent.wins;
+            stats.matchWins += hasWon ? 1 : 0;
+            stats.matchLosses += hasWon ? 0 : 1;
+            console.log("stats", stats);
+            decksRef.get(currentDeckKey).put({
+              stats: stats,
+              lastUsed: new Date().getTime(),
+            });
+            decksRef
+              .get(currentDeckKey)
+              .get("matches")
+              .get(match.id)
+              .put(hasWon);
+          }
+        },
+        { off: true }
+      );
     }
   }
 }

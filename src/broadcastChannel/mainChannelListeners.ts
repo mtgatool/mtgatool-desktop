@@ -3,6 +3,7 @@ import setGunMatch from "../gun/setGunMatch";
 import upsertGunCards from "../gun/upsertGunCards";
 import upsertGunDeck from "../gun/upsertGunDeck";
 import upsertGunInventory from "../gun/upsertGunInventory";
+import upsertGunRank from "../gun/upsertGunRank";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import LogEntry from "../types/logDecoder";
@@ -59,6 +60,10 @@ export default function mainChannelListeners() {
 
     if (msg.data.type === "UPSERT_GUN_CARDS") {
       upsertGunCards(msg.data.value);
+    }
+
+    if (msg.data.type === "UPSERT_GUN_RANK") {
+      upsertGunRank(msg.data.value, msg.data.uuid);
     }
 
     if (msg.data.type === "PLAYER_INVENTORY") {

@@ -17,5 +17,5 @@ export default function reduxAction<K extends ActionKeys>(
   dispatch: Dispatch<AnyAction>,
   action: DispatchParameter<K>
 ): void {
-  dispatch(actions[action.type](action.arg));
+  dispatch(actions[action.type](action.arg as never));
 }

@@ -15,17 +15,6 @@ declare global {
   interface Window {
     cards: Cards;
     cardsPrev: Cards;
-    economy: {
-      gold: number;
-      gems: number;
-      vaultProgress: number;
-      wcTrackPosition: number;
-      wcCommon: number;
-      wcUncommon: number;
-      wcRare: number;
-      wcMythic: number;
-      boosters: Record<string, number>;
-    };
     SEA: IGunStaticSEA;
     gun: IGunChainReference<GunState>;
   }

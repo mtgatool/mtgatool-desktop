@@ -20,9 +20,9 @@ export default function useGunSelectorObject<T>(
   const [object, setObject] = useState<ArrayAsRecord<T>>();
 
   useEffect((): any => {
-    if (ref.open) {
-      ref.open((data) => setObject(data));
-    }
+    (ref as any).open((data: ArrayAsRecord<T>) => setObject(data), {
+      off: true,
+    });
 
     if (offOnDismount) {
       return () => ref.off();

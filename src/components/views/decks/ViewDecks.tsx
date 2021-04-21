@@ -1,20 +1,15 @@
 import { Fragment } from "react";
-import useGunSelectorObject from "../../../hooks/useGunSelectorObject";
+import { useSelector } from "react-redux";
 import useGunUser from "../../../hooks/useGunUser";
-import { GunUser } from "../../../types/gunTypes";
+import { AppState } from "../../../redux/stores/rendererStore";
 import DecksArtViewRow from "../../DecksArtViewRow";
 
 export default function ViewDecks() {
-  const [userRef, loggedIn] = useGunUser();
+  const [, loggedIn] = useGunUser();
 
-  const decksIndexRef = userRef.get("decksIndex");
-  const decksIndex = useGunSelectorObject<GunUser["decksIndex"]>(
-    decksIndexRef,
-    true
+  const { decksIndex, decks } = useSelector(
+    (state: AppState) => state.mainData
   );
-
-  const decksRef = userRef.get("decks");
-  const decks = useGunSelectorObject<GunUser["decks"]>(decksRef, true);
 
   return (
     <div className="section">

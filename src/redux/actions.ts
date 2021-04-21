@@ -1,25 +1,17 @@
-import * as PlayerDataSlice from "./slices/playerDataSlice";
 import * as HoverSlice from "./slices/hoverSlice";
+import * as MainDataSlice from "./slices/mainDataSlice";
 import * as RendererSlice from "./slices/rendererSlice";
 
 export const actions = {
   SET_HOVER_IN: HoverSlice.setHoverIn,
   SET_HOVER_OUT: HoverSlice.setHoverOut,
-  SET_PLAYER_ID: PlayerDataSlice.setPlayerId,
-  SET_PLAYER_NAME: PlayerDataSlice.setPlayerName,
-  SET_ARENA_VERSION: PlayerDataSlice.setArenaVersion,
-  SET_PLAYER_ECONOMY: PlayerDataSlice.setEconomy,
-  SET_TAG_COLORS: PlayerDataSlice.setTagColors,
-  EDIT_TAG_COLOR: PlayerDataSlice.editTagColor,
-  SET_RANK: PlayerDataSlice.setRank,
-  ADD_CARD: PlayerDataSlice.addCard,
-  ADD_CARDS_LIST: PlayerDataSlice.addCardsList,
-  ADD_CARDS_KEYS: PlayerDataSlice.addCardsKeys,
-  ADD_CARDS_FROM_STORE: PlayerDataSlice.addCardsFromStore,
-  SET_CARDS_TIME: PlayerDataSlice.setCardsTime,
-  REMOVE_DECK_TAG: PlayerDataSlice.removeDeckTag,
-  ADD_DECK_TAG: PlayerDataSlice.addDeckTag,
-  SET_DECK_TAGS: PlayerDataSlice.setDeckTags,
+  SET_UUID: MainDataSlice.setUUID,
+  SET_UUID_DATA: MainDataSlice.setUUIDData,
+  SET_MATCHES: MainDataSlice.setMatches,
+  SET_MATCH: MainDataSlice.setMatch,
+  SET_DECKS: MainDataSlice.setDecks,
+  SET_DECK: MainDataSlice.setDeck,
+  SET_DECKS_INDEX: MainDataSlice.setDecksIndex,
   SET_LOGIN_STATE: RendererSlice.setLoginState,
   SET_LOG_COMPLETION: RendererSlice.setLogCompletion,
   SET_ARCHIVED: RendererSlice.setArchived,

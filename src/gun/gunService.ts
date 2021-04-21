@@ -9,6 +9,16 @@ import { IGunStaticSEA } from "gun/types/static/sea";
 
 import { GunState } from "../types/gunTypes";
 
+/**
+ * This is a base for a central service to handle all Gun's stuff.
+ * This is preliminary and not really meant to be actually used, but if it
+ * simplifies the work of using Gun's graph, it should be implemented everywhere :)
+ *
+ * Currently making gun queries takes a lot of lines to get the user, check if a key exists, etc.
+ * This should handle all of that in a structured way, maybe using promises and proper error codes.
+ *
+ * This could also handle writing to the user namespace without having to provide the epub, for example.
+ */
 export default class GunService {
   _gun: IGunChainReference<GunState> | undefined;
 

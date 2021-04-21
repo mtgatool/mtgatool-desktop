@@ -2,6 +2,7 @@ import _ from "lodash";
 import {
   Colors,
   constants,
+  database,
   getEventPrettyName,
   InternalMatch,
 } from "mtgatool-shared";
@@ -21,6 +22,7 @@ import ResultDetails from "../../ResultDetails";
 import { GunMatch } from "../../../types/gunTypes";
 import baseToObj from "../../../utils/baseToObj";
 import timeAgo from "../../../utils/timeAgo";
+import RankIcon from "../../RankIcon";
 
 const { DEFAULT_TILE } = constants;
 
@@ -46,7 +48,7 @@ export default function ListItemMatch({
     dateTime = new Date();
   }
 
-  // const isLimited = database.limited_ranked_events.includes(match.eventId);
+  const isLimited = database.limited_ranked_events.includes(match.eventId);
 
   return (
     <ListItem click={onRowClick}>
@@ -60,13 +62,17 @@ export default function ListItemMatch({
         }}
       />
       <HoverTile grpId={internalMatch.playerDeck.deckTileId || DEFAULT_TILE}>
-        {/* <RankIcon
-          rank={match.player.rank}
-          tier={match.player.tier}
-          percentile={match.player.percentile || 0}
-          leaderboardPlace={match.player.leaderboardPlace || 0}
-          format={isLimited ? "limited" : "constructed"}
-        /> */}
+        {internalMatch.player.rank ? (
+          <RankIcon
+            rank={internalMatch.player.rank}
+            tier={internalMatch.player.tier}
+            percentile={internalMatch.player.percentile || 0}
+            leaderboardPlace={internalMatch.player.leaderboardPlace || 0}
+            format={isLimited ? "limited" : "constructed"}
+          />
+        ) : (
+          <></>
+        )}
       </HoverTile>
 
       <Column className="list-item-left">

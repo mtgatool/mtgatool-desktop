@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-unresolved
 import { IGunChainReference } from "gun/types/chain";
+import { InternalRank } from "mtgatool-shared";
 
 export interface GunState {
   [record: string]: any;
@@ -17,6 +18,7 @@ export interface GunDeck {
   internalDeck: string;
   matches: Record<string, boolean>;
   lastUsed: number;
+  lastModified: number;
   stats: {
     gameWins: number;
     gameLosses: number;
@@ -27,6 +29,7 @@ export interface GunDeck {
 
 export interface GunMatch {
   playerId: string;
+  matchId: string;
   playerDeckId: string;
   playerDeckHash: string;
   playerDeckColors: number;
@@ -52,6 +55,7 @@ export interface GunUUIDData {
   cards: string;
   cardsPrev: string;
   cardsUpdated: number;
+  rank: InternalRank;
   boosters: {
     [collationId: string]: number;
   };

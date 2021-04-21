@@ -11,15 +11,7 @@ export default async function upsertGunInventory(inventory: PlayerInventory) {
     boosters[b.collationId] = b.count;
   });
 
-  window.economy.gold = inventory.gold;
-  window.economy.gems = inventory.gems;
-  window.economy.vaultProgress = inventory.vaultProgress;
-  window.economy.wcTrackPosition = inventory.wcTrackPosition;
-  window.economy.wcCommon = inventory.wcCommon;
-  window.economy.wcUncommon = inventory.wcUncommon;
-  window.economy.wcRare = inventory.wcRare;
-  window.economy.wcMythic = inventory.wcMythic;
-  window.economy.boosters = boosters;
+  console.log("> Upsert inventory", inventory);
 
   if (userRef) {
     userRef

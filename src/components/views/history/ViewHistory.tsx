@@ -1,14 +1,12 @@
 import { Fragment } from "react";
-import useGunSelectorObject from "../../../hooks/useGunSelectorObject";
+import { useSelector } from "react-redux";
 import useGunUser from "../../../hooks/useGunUser";
-import { GunUser } from "../../../types/gunTypes";
+import { AppState } from "../../../redux/stores/rendererStore";
 import ListItemMatch from "./ListItemMatch";
 
 export default function ViewHistory() {
-  const [userRef, loggedIn] = useGunUser();
-
-  const matchesRef = userRef.get("matches");
-  const matches = useGunSelectorObject<GunUser["matches"]>(matchesRef, true);
+  const [, loggedIn] = useGunUser();
+  const matches = useSelector((state: AppState) => state.mainData.matches);
 
   return (
     <div className="section">

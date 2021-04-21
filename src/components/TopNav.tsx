@@ -3,17 +3,17 @@ import _ from "lodash";
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getRankIndex } from "mtgatool-shared";
+import { getRankIndex, InternalRank } from "mtgatool-shared";
 
 import formatRank from "../utils/formatRank";
 
 import useWindowSize from "../hooks/useWindowSize";
 
-import { AppState } from "../redux/stores/rendererStore";
-
 import settingsIcon from "../assets/images/cog.png";
 
 import IconButton from "./ui/IconButton";
+import getLocalSetting from "../utils/getLocalSetting";
+import { AppState } from "../redux/stores/rendererStore";
 
 interface TopNavItemProps {
   compact: boolean;
@@ -55,7 +55,7 @@ function TopNavItem(props: TopNavItemProps): JSX.Element {
 
 interface TopRankProps {
   uri: string;
-  rank: any | null;
+  rank: InternalRank["constructed"] | InternalRank["limited"] | null;
   rankClass: string;
 }
 
@@ -96,8 +96,10 @@ function TopRankIcon(props: TopRankProps): JSX.Element {
 
 export default function TopNav(): JSX.Element {
   const [compact, setCompact] = useState(false);
+  const { currentUUID, uuidData } = useSelector(
+    (state: AppState) => state.mainData
+  );
 
-  const playerData = useSelector((state: AppState) => state.playerdata);
   const topNavIconsRef: any = useRef(null);
   const dispatcher = useDispatch();
   const windowSize = useWindowSize();
@@ -159,13 +161,13 @@ export default function TopNav(): JSX.Element {
 
   const contructedNav = {
     uri: "/history",
-    rank: playerData.rank ? playerData.rank.constructed : null,
+    rank: uuidData[currentUUID]?.rank?.constructed ?? null,
     rankClass: "top-constructed-rank",
   };
 
   const limitedNav = {
     uri: "/history",
-    rank: playerData.rank ? playerData.rank.limited : null,
+    rank: uuidData[currentUUID]?.rank?.limited ?? null,
     rankClass: "top-limited-rank",
   };
 
@@ -179,8 +181,8 @@ export default function TopNav(): JSX.Element {
     }
   }, [windowSize, compact]);
 
-  const userName = playerData.playerName.slice(0, -6);
-  const userNumerical = playerData.playerName.slice(-6);
+  const userName = getLocalSetting("username"); // playerData.playerName.slice(0, -6);
+  const userNumerical = ""; // playerData.playerName.slice(-6);
 
   return (
     <div className="top-nav-container">

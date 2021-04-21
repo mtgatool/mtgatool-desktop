@@ -207,16 +207,6 @@
   }
 
   .top-constructed-rank,
-  .constructed-rank {
-    background: url(../assets/images/ranks_constructed_48.png);
-  }
-
-  .top-limited-rank,
-  .limited-rank {
-    background: url(../assets/images/ranks_limited_48.png);
-  }
-
-  .top-constructed-rank,
   .top-limited-rank {
     /* Align leaderboard indicator to center and add text border*/
     display: flex;
@@ -230,4 +220,14 @@
     background-position: 0px 0px;
     text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
   }
+}
+
+.top-constructed-rank,
+.constructed-rank {
+  background: url(../assets/images/ranks_constructed_48.png);
+}
+
+.top-limited-rank,
+.limited-rank {
+  background: url(../assets/images/ranks_limited_48.png);
 }

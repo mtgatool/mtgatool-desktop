@@ -2,6 +2,7 @@ import {
   Cards,
   InternalDeck,
   InternalMatch,
+  InternalRank,
   InventoryUpdate,
   OverlaySettingsData,
   PlayerInventory,
@@ -18,6 +19,7 @@ export type MessageType =
   | "GAME_STATS"
   | "UPSERT_GUN_DECK"
   | "UPSERT_GUN_CARDS"
+  | "UPSERT_GUN_RANK"
   | "INVENTORY_UPDATED"
   | "PLAYER_INVENTORY"
   | "HOVER_IN"
@@ -74,6 +76,12 @@ export interface UpsertGunCardsMessage extends ChannelMessageBase {
   value: Cards;
 }
 
+export interface UpsertGunRankMessage extends ChannelMessageBase {
+  type: "UPSERT_GUN_RANK";
+  value: InternalRank;
+  uuid: string;
+}
+
 export interface InventoryUpdatedMessage extends ChannelMessageBase {
   type: "INVENTORY_UPDATED";
   value: InventoryUpdate;
@@ -105,6 +113,7 @@ export type ChannelMessage =
   | GameStatsMessage
   | UpsertGunDeckMessage
   | UpsertGunCardsMessage
+  | UpsertGunRankMessage
   | InventoryUpdatedMessage
   | PlayerInventoryMessage
   | HoverInMessage

@@ -1,5 +1,6 @@
 import { MissingWildcards } from "mtgatool-shared";
 import { CARD_RARITIES } from "mtgatool-shared/dist/shared/constants";
+import store from "../redux/stores/rendererStore";
 
 export default function getBoosterCountEstimate(
   neededWildcards: MissingWildcards
@@ -12,13 +13,14 @@ export default function getBoosterCountEstimate(
     mythic: 13.24,
   };
 
-  // const playerEconomy = store.getState().playerdata.economy;
+  const { mainData } = store.getState();
+  const uuid = mainData.currentUUID;
 
   const ownedWildcards = {
-    common: window.economy.wcCommon,
-    uncommon: window.economy.wcUncommon,
-    rare: window.economy.wcRare,
-    mythic: window.economy.wcMythic,
+    common: mainData.uuidData[uuid].wcCommon,
+    uncommon: mainData.uuidData[uuid].wcUncommon,
+    rare: mainData.uuidData[uuid].wcRare,
+    mythic: mainData.uuidData[uuid].wcMythic,
   };
 
   CARD_RARITIES.forEach((rarity) => {

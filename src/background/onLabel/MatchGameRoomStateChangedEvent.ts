@@ -61,20 +61,20 @@ export default function onLabelMatchGameRoomStateChangedEvent(
   // When the match ends (but not the last message)
   if (gameRoom.stateType == "MatchGameRoomStateType_MatchCompleted") {
     const { currentMatch } = globalStore;
-    // const format =
-    //   currentMatch.gameInfo.superFormat == "SuperFormat_Constructed"
-    //     ? "constructed"
-    //     : "limited";
+    const playerRank = globalStore.rank;
+    const format =
+      currentMatch.gameInfo.superFormat == "SuperFormat_Constructed"
+        ? "constructed"
+        : "limited";
 
     const player = {
       seat: currentMatch.playerSeat,
+      tier: playerRank[format].tier,
+      rank: playerRank[format].rank,
+      percentile: playerRank[format].percentile,
+      leaderboardPlace: playerRank[format].leaderboardPlace,
     };
     setPlayer(player);
-
-    const opponent = {
-      seat: currentMatch.oppSeat,
-    };
-    setOpponent(opponent);
 
     gameRoom.finalMatchResult.resultList.forEach((res) => {
       if (res.scope == "MatchScope_Match") {

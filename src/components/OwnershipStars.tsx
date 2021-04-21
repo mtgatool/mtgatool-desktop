@@ -85,12 +85,12 @@ export default function OwnershipStars(props: {
   wanted?: number;
 }): JSX.Element {
   const { card, wanted } = props;
-  const playerData = useSelector((state: AppState) => state.playerdata);
+  const { cards, cardsNew } = useSelector((state: AppState) => state.mainData);
   if (!card || !card.type) {
     return <></>;
   }
-  const owned = playerData.cards.cards[card.id] ?? 0;
-  const acquired = playerData.cardsNew[card.id] ?? 0;
+  const owned = cards[card.id] ?? 0;
+  const acquired = cardsNew[card.id] ?? 0;
   const isWanted = wanted ?? 0;
   // TODO add custom logic to handle rats and petitioners
   const isbasic =

@@ -1,6 +1,6 @@
 export default function baseToObj<T>(data: string): T {
   const buff = Buffer.from(data, "base64");
-  const str = buff.toString("ascii");
+  const str = buff.toString("utf8");
   let obj;
   try {
     obj = JSON.parse(str);

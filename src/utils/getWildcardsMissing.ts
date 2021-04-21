@@ -1,4 +1,5 @@
 import { database, Deck } from "mtgatool-shared";
+import store from "../redux/stores/rendererStore";
 
 export default function getWildcardsMissing(
   deck: Deck,
@@ -6,7 +7,7 @@ export default function getWildcardsMissing(
   isSideboard?: boolean
 ): number {
   let mainQuantity = 0;
-  const { cards } = window;
+  const { cards } = store.getState().mainData;
   const mainMatches = deck
     .getMainboard()
     .get()

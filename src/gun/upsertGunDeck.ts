@@ -1,31 +1,26 @@
 import { Deck, InternalDeck } from "mtgatool-shared";
 import { GunDeck } from "../types/gunTypes";
 import getLocalSetting from "../utils/getLocalSetting";
-import getGraphKeys from "./getGraphKeys";
+import objToBase from "../utils/objToBase";
 import getGunUser from "./getGunUser";
 
 export default async function upsertGunDeck(internal: InternalDeck) {
   const deck = new Deck(internal);
   const userRef = getGunUser();
-  console.log("Upsert deck: ", deck);
+  console.log("> Upsert deck: ", deck);
   if (userRef) {
     const decksIndexRef = userRef.get("decksIndex");
     const decksRef = userRef.get("decks");
-    const indexKeys = await getGraphKeys(decksIndexRef);
+    const indexKeys = await decksIndexRef.then();
 
     let existsInDb = false;
     let version = 0;
-    if (indexKeys.includes(deck.id)) {
+    console.log(indexKeys, deck.id);
+    if (Object.keys(indexKeys || {}).includes(deck.id)) {
       existsInDb = true;
-      const deckIdRef = decksIndexRef.get(deck.id);
-      version = deckIdRef.then ? await deckIdRef.then() : 0;
+      const decksIndex = await decksIndexRef.then();
+      version = decksIndex[deck.id] || 0;
     }
-
-    const currentDeckKey = `${deck.id}-v${version}`;
-    const currentDeckHash: string = await (decksRef as any)
-      .get(currentDeckKey)
-      .get("deckHash")
-      .then();
 
     const newGunDeck: GunDeck = {
       playerId: getLocalSetting("playerId"),
@@ -36,8 +31,9 @@ export default async function upsertGunDeck(internal: InternalDeck) {
       colors: deck.colors.getBits(),
       tile: deck.tile,
       format: deck.format,
-      internalDeck: JSON.stringify(deck.getSave()),
-      lastUsed: new Date().getTime(),
+      internalDeck: objToBase(deck.getSave()),
+      lastUsed: 0,
+      lastModified: new Date().getTime(),
       matches: {},
       stats: {
         gameWins: 0,
@@ -47,19 +43,37 @@ export default async function upsertGunDeck(internal: InternalDeck) {
       },
     };
 
+    const currentDeckKey = `${deck.id}-v${version}`;
+
     if (!existsInDb) {
+      console.log(`Putting ${deck.id} to db`);
       decksRef.get(currentDeckKey).put(newGunDeck);
       decksIndexRef.get(deck.id).put(version);
-    } else if (currentDeckHash !== deck.getHash()) {
-      // this is a new deck, update the version
-      version += 1;
-      newGunDeck.version = version;
-      const newDeckDeckKey = `${deck.id}-v${version}`;
-
-      decksRef.get(newDeckDeckKey).put(newGunDeck);
-      decksIndexRef.get(deck.id).put(version);
     } else {
-      // decksRef.get(currentDeckKey).put(newGunDeck);
+      (decksRef as any)
+        .get(currentDeckKey)
+        .on((currentDeck: GunDeck, k: string, a: any, ev: any) => {
+          if (!currentDeck.deckHash) return;
+          ev.off();
+          // console.log(currentDeckKey);
+          // console.log("Exists? ", existsInDb);
+          // console.log(currentDeck);
+          // console.log(currentDeck.deckHash, deck.getHash());
+
+          if (currentDeck.deckHash !== deck.getHash()) {
+            console.log(`${deck.id} bump version to ${version + 1}`);
+            // this is a new deck, update the version
+            version += 1;
+            newGunDeck.version = version;
+            const newDeckDeckKey = `${deck.id}-v${version}`;
+
+            decksRef.get(newDeckDeckKey).put(newGunDeck);
+            decksIndexRef.get(deck.id).put(version);
+          } else {
+            console.log(`${deck.id} up to date! `);
+            // decksRef.get(currentDeckKey).put(newGunDeck);
+          }
+        });
     }
   }
   return true;
