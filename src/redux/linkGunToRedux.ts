@@ -5,7 +5,7 @@ import globalData from "../utils/globalData";
 import reduxAction from "./reduxAction";
 import store from "./stores/rendererStore";
 
-function listenCRDT(
+function _listenCRDT(
   graphRef: IGunChainReference,
   callback: (arg: any, key: string) => void
 ) {
@@ -42,11 +42,12 @@ function listenCRDT(
   );
 }
 
-function _listenFullCRDT(
+function listenFullCRDT(
   graphRef: IGunChainReference,
   callback: (arg: any) => void
 ) {
   graphRef.open((data: any) => {
+    console.log(`listenFullCRDT`, data);
     callback(data);
   });
 }
@@ -58,20 +59,16 @@ export default function linkGunToRedux() {
     // Create listeners for Gun's Graph api
     // These will check against the internal Graph data for new data and push directly to redux
     // This is done so we minimioze queries to the graph, so its Superfast!
-    listenCRDT(userRef.get("matches"), (openData: any, key: string) => {
-      if (!openData.matchId) {
-        // eslint-disable-next-line no-param-reassign
-        openData.matchId = key;
-      }
+    listenFullCRDT(userRef.get("matches"), (openData: any) => {
       reduxAction(dispatch, {
-        type: "SET_MATCH",
+        type: "SET_MATCHES",
         arg: openData,
       });
     });
 
-    listenCRDT(userRef.get("decks"), (openData: any) => {
+    listenFullCRDT(userRef.get("decks"), (openData: any) => {
       reduxAction(dispatch, {
-        type: "SET_DECK",
+        type: "SET_DECKS",
         arg: openData,
       });
     });
