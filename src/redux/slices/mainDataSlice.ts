@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Cards } from "mtgatool-shared";
-import { GunDeck, GunMatch, GunUUIDData } from "../../types/gunTypes";
+import { GunDeck, GunMatch, GunUser, GunUUIDData } from "../../types/gunTypes";
 import baseToObj from "../../utils/baseToObj";
 
 const mainState = {
@@ -40,6 +40,15 @@ const mainDataSlice = createSlice({
         state.cardsPrev = baseToObj(action.payload.cardsPrev);
       }
     },
+    setAllUUIDData: (
+      state: PlayerData,
+      action: PayloadAction<GunUser["uuidData"]>
+    ): void => {
+      state.uuidData = {
+        ...state.uuidData,
+        ...action.payload,
+      };
+    },
     setMatches: (
       state: PlayerData,
       action: PayloadAction<Record<string, GunMatch>>
@@ -75,6 +84,7 @@ const mainDataSlice = createSlice({
 
 export const {
   setUUID,
+  setAllUUIDData,
   setUUIDData,
   setMatches,
   setMatch,

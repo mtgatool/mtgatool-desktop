@@ -15,7 +15,7 @@ export default async function upsertGunDeck(internal: InternalDeck) {
 
     let existsInDb = false;
     let version = 0;
-    console.log(indexKeys, deck.id);
+    // console.log(indexKeys, deck.id);
     if (Object.keys(indexKeys || {}).includes(deck.id)) {
       existsInDb = true;
       const decksIndex = await decksIndexRef.then();

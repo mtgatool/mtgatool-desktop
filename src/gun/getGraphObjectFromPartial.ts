@@ -1,15 +1,13 @@
+import getGraphObject from "./getGraphObject";
+
 /**
  * Returns an object containing all keys and their inmediate given values in the form of an object.
- * @param path Gun chain path
+ * @param base Gun chain object
  * @returns Object
  */
-export default async function getGraphObject<T>(
-  path: string
+export default async function getGraphObjectFromPartial<T>(
+  base: Record<string, any>
 ): Promise<T | undefined> {
-  const base = (await window.gun.get(path).then()) as any;
-  if (!base) return undefined;
-  // console.log(path, base);
-
   const newObject: any = {};
   await Promise.all(
     Object.keys(base).map(async (k) => {

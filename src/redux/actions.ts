@@ -7,6 +7,7 @@ export const actions = {
   SET_HOVER_OUT: HoverSlice.setHoverOut,
   SET_UUID: MainDataSlice.setUUID,
   SET_UUID_DATA: MainDataSlice.setUUIDData,
+  SET_ALL_UUID_DATA: MainDataSlice.setAllUUIDData,
   SET_MATCHES: MainDataSlice.setMatches,
   SET_MATCH: MainDataSlice.setMatch,
   SET_DECKS: MainDataSlice.setDecks,

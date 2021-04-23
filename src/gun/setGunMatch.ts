@@ -41,8 +41,9 @@ export default async function setGunMatch(match: InternalMatch) {
         (currentDeck: GunDeck) => {
           console.log(currentDeck);
           console.log(Object.keys(currentDeck.matches));
+          const stats = { ...currentDeck.stats };
+
           if (!Object.keys(currentDeck.matches).includes(match.id)) {
-            const stats = { ...currentDeck.stats };
             stats.gameWins += match.player.wins;
             stats.gameLosses += match.opponent.wins;
             stats.matchWins += hasWon ? 1 : 0;

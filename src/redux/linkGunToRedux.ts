@@ -1,56 +1,9 @@
 // eslint-disable-next-line import/no-unresolved
-import { IGunChainReference } from "gun/types/chain";
+import getGraphObjectFromPartial from "../gun/getGraphObjectFromPartial";
 import getGunUser from "../gun/getGunUser";
-import globalData from "../utils/globalData";
+import { GunDeck, GunMatch, GunUser } from "../types/gunTypes";
 import reduxAction from "./reduxAction";
 import store from "./stores/rendererStore";
-
-function _listenCRDT(
-  graphRef: IGunChainReference,
-  callback: (arg: any, key: string) => void
-) {
-  graphRef.on(
-    (data: any, k) => {
-      // console.log(`Check on: ${k}`);
-      const crdt = data._[">"];
-      const { CRDTList } = globalData;
-
-      const updatedKeys = Object.keys(crdt).filter(
-        (key) => CRDTList[key] == undefined || CRDTList[key] > crdt[key]
-      );
-      if (updatedKeys.length > 0) {
-        console.log(`Filtered keys (${k})`, updatedKeys);
-      }
-      globalData.CRDTList = { ...globalData.CRDTList, ...crdt };
-
-      updatedKeys.forEach((key) => {
-        const getRef = data[key]["#"] as string;
-        (window as any).gun.get(getRef).open(
-          (dd: any) => {
-            // console.info("Open:");
-            // console.log(key);
-            // console.log(dd);
-            callback(dd, key);
-          },
-          {
-            off: true,
-          }
-        );
-      });
-    },
-    { change: true }
-  );
-}
-
-function listenFullCRDT(
-  graphRef: IGunChainReference,
-  callback: (arg: any) => void
-) {
-  graphRef.open((data: any) => {
-    console.log(`listenFullCRDT`, data);
-    callback(data);
-  });
-}
 
 export default function linkGunToRedux() {
   const { dispatch } = store;
@@ -59,19 +12,62 @@ export default function linkGunToRedux() {
     // Create listeners for Gun's Graph api
     // These will check against the internal Graph data for new data and push directly to redux
     // This is done so we minimioze queries to the graph, so its Superfast!
-    listenFullCRDT(userRef.get("matches"), (openData: any) => {
-      reduxAction(dispatch, {
-        type: "SET_MATCHES",
-        arg: openData,
-      });
-    });
+    userRef.get("decks").on(
+      async (data: any) => {
+        const object = await getGraphObjectFromPartial<Record<string, GunDeck>>(
+          data
+        );
+        // console.log("on decks", data, object);
 
-    listenFullCRDT(userRef.get("decks"), (openData: any) => {
-      reduxAction(dispatch, {
-        type: "SET_DECKS",
-        arg: openData,
-      });
-    });
+        if (object) {
+          reduxAction(dispatch, {
+            type: "SET_DECKS",
+            arg: object,
+          });
+        }
+      },
+      {
+        change: true,
+      }
+    );
+
+    userRef.get("matches").on(
+      async (data: any) => {
+        const object = await getGraphObjectFromPartial<
+          Record<string, GunMatch>
+        >(data);
+        // console.log("on matches", data, object);
+
+        if (object) {
+          reduxAction(dispatch, {
+            type: "SET_MATCHES",
+            arg: object,
+          });
+        }
+      },
+      {
+        change: true,
+      }
+    );
+
+    userRef.get("uuidData").on(
+      async (data: any) => {
+        const object = await getGraphObjectFromPartial<GunUser["uuidData"]>(
+          data
+        );
+        // console.log("on uuid data", data, object);
+
+        if (object) {
+          reduxAction(dispatch, {
+            type: "SET_ALL_UUID_DATA",
+            arg: object,
+          });
+        }
+      },
+      {
+        change: true,
+      }
+    );
 
     userRef.get("decksIndex").on((d: any) => {
       // eslint-disable-next-line no-param-reassign

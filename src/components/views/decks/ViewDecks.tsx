@@ -21,6 +21,11 @@ export default function ViewDecks() {
             .map((key) => decks[`${key}-v${decksIndex[key]}`])
             .filter((d) => d)
             .sort((a, b) => {
+              if (a.lastModified > b.lastModified) return -1;
+              if (a.lastModified < b.lastModified) return 1;
+              return 0;
+            })
+            .sort((a, b) => {
               if (a.lastUsed > b.lastUsed) return -1;
               if (a.lastUsed < b.lastUsed) return 1;
               return 0;
