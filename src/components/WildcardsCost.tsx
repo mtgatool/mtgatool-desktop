@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { constants, Deck } from "mtgatool-shared";
+import { Fragment } from "react";
 import getBoosterCountEstimate from "../utils/getBoosterCountEstimate";
 import getDeckMissing from "../utils/getDeckMissing";
 
@@ -18,6 +19,7 @@ const getRarityKey = (
     return rarity as any;
   return undefined;
 };
+
 export default function WildcardsCost(props: {
   deck: Deck;
   shrink?: boolean;
@@ -70,7 +72,8 @@ export default function WildcardsCost(props: {
             );
           }
         }
-        return <></>;
+        // eslint-disable-next-line react/no-array-index-key
+        return <Fragment key={`${deck.id}-${index}-${cardRarity}`} />;
       })}
       {drawCost && (
         <div

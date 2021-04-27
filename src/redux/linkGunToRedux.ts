@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import getGraphObjectFromPartial from "../gun/getGraphObjectFromPartial";
 import getGunUser from "../gun/getGunUser";
 import { GunDeck, GunMatch, GunUser } from "../types/gunTypes";

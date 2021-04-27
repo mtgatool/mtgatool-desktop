@@ -1,318 +1,176 @@
-/* eslint-disable radix */
 /* eslint-disable react/no-array-index-key */
-/* eslint-disable no-nested-ternary */
-import {
-  constants,
-  Colors,
-  compareCards,
-  Deck,
-  Chances,
-  CardObject,
-  OverlaySettingsData,
-  database,
-} from "mtgatool-shared";
+import _ from "lodash";
+import { cardType, Deck, DbCardData, database } from "mtgatool-shared";
+import CardTile from "./CardTile";
+import Separator from "./Separator";
 
-import getCardTypeSort from "../utils/getCardTypeSort";
-import CardTile, { LandsTile, CardTileQuantity } from "./CardTile";
-
-import DeckManaCurve from "./DeckManaCurve";
-import DeckTypesStats from "./DeckTypesStats";
-import OwnershipStars from "./OwnershipStars";
-import SampleSizePanel from "./SampleSizePanel";
-
-const {
-  DRAFT_RANKS,
-  DRAFT_RANKS_LOLA,
-  OVERLAY_DRAFT,
-  OVERLAY_FULL,
-  OVERLAY_LEFT,
-  OVERLAY_MIXED,
-  OVERLAY_ODDS,
-  LANDS_HACK,
-} = constants;
-
-function getRank(cardId: number): number {
-  const cardObj = database.card(cardId);
-  return cardObj?.rank || 0;
-}
-
-function compareQuantity(a: CardObject, b: CardObject): -1 | 0 | 1 {
-  if (b.quantity - a.quantity < 0) return -1;
-  if (b.quantity - a.quantity > 0) return 1;
-  return 0;
-}
-
-function compareDraftPicks(a: CardObject, b: CardObject): -1 | 0 | 1 {
-  const aCard = database.card(a.id);
-  const bCard = database.card(b.id);
-  if (bCard === undefined) {
-    return -1;
+function getDeckComponents(deck: Deck, showWildcards = false): JSX.Element[] {
+  const components = [];
+  const comp = deck.getCompanion();
+  if (comp) {
+    const companionGrpId = comp;
+    components.push(<Separator key="sep_commander">Companion</Separator>);
+    const cardObj = database.card(companionGrpId || 0);
+    if (cardObj) {
+      components.push(
+        <CardTile
+          indent="a"
+          isHighlighted={false}
+          isSideboard={false}
+          showWildcards={showWildcards}
+          deck={deck}
+          card={cardObj}
+          key={`companioncardtile-${companionGrpId}`}
+          quantity={{
+            type: "NUMBER",
+            quantity: 1,
+          }}
+        />
+      );
+    }
   }
-  if (aCard === undefined) {
-    return 1;
-  }
-  const aColors = new Colors();
-  if (aCard.cost) {
-    aColors.addFromCost(aCard.cost);
-  }
-  const bColors = new Colors();
-  if (bCard.cost) {
-    bColors.addFromCost(bCard.cost);
-  }
-  const aType = getCardTypeSort(aCard.type);
-  const bType = getCardTypeSort(bCard.type);
 
-  const rankDiff =
-    aCard.source == 0 ? bCard.rank - aCard.rank : aCard.rank - bCard.rank;
-  const colorsLengthDiff = aColors.length - bColors.length;
-  const cmcDiff = aCard.cmc - bCard.cmc;
-  const typeDiff = aType - bType;
-  const localeCompare = aCard.name.localeCompare(bCard.name);
-  const compare =
-    rankDiff || colorsLengthDiff || cmcDiff || typeDiff || localeCompare;
+  if (deck.getCommanders() && deck.getCommanders().length > 0) {
+    components.push(<Separator key="sep_commander">Commander</Separator>);
 
-  if (compare < 0) {
-    return -1;
+    deck.getCommanders().forEach((id: number, index: number) => {
+      if (index % 2 == 0) {
+        const card = database.card(id);
+        if (card) {
+          components.push(
+            <CardTile
+              indent="a"
+              isHighlighted={false}
+              isSideboard={false}
+              showWildcards={showWildcards}
+              deck={deck}
+              card={card}
+              key={`commandercardtile${index}_${id}`}
+              quantity={{
+                type: "NUMBER",
+                quantity: 1,
+              }}
+            />
+          );
+        }
+      }
+    });
   }
-  if (compare > 0) {
-    return 1;
+
+  // draw maindeck grouped by cardType
+  const cardsByGroup = _(deck.getMainboard().get())
+    .map((card) => ({ data: database.card(card.id), ...card }))
+    .filter((card) => card.data !== undefined)
+    .groupBy((card) => {
+      const type = cardType(card.data as DbCardData);
+      switch (type) {
+        case "Creature":
+          return "Creatures";
+        case "Planeswalker":
+          return "Planeswalkers";
+        case "Instant":
+        case "Sorcery":
+          return "Spells";
+        case "Enchantment":
+          return "Enchantments";
+        case "Artifact":
+          return "Artifacts";
+        case "Land":
+        case "Basic Land":
+        case "Basic Snow Land":
+          return "Lands";
+        default:
+          throw new Error(`Unexpected card type: ${type}`);
+      }
+    })
+    .value();
+
+  _([
+    "Creatures",
+    "Planeswalkers",
+    "Spells",
+    "Enchantments",
+    "Artifacts",
+    "Lands",
+  ])
+    .filter((group) => !_.isEmpty(cardsByGroup[group]))
+    .forEach((group) => {
+      // draw a separator for the group
+      const cards = cardsByGroup[group];
+      const count = _.sumBy(cards, "quantity");
+      components.push(
+        <Separator key={`sepm_${group}`}>{`${group} (${count})`}</Separator>
+      );
+
+      // draw the cards
+      _(cards)
+        .filter((card) => card.quantity > 0)
+        .orderBy(["data.cmc", "data.name"])
+        .forEach((card, index) => {
+          components.push(
+            <CardTile
+              indent="b"
+              isHighlighted={false}
+              isSideboard={false}
+              showWildcards={showWildcards}
+              deck={deck}
+              card={card.data as DbCardData}
+              key={`mainboardcardtile${index}_${card.id}`}
+              quantity={{
+                type: "NUMBER",
+                quantity: card.quantity,
+              }}
+            />
+          );
+        });
+    });
+
+  let sideboardSize = _.sumBy(deck.getSideboard().get(), "quantity");
+  if (sideboardSize) {
+    // draw a separator for the sideboard
+    components.push(
+      <Separator key="sep_side">{`Sideboard (${sideboardSize})`}</Separator>
+    );
+
+    if (comp) {
+      sideboardSize -= 1;
+      deck.getSideboard().remove(comp);
+    }
+
+    // draw the cards
+    _(deck.getSideboard().get())
+      .map((card) => ({ data: database.card(card.id), ...card }))
+      .filter((card) => card.quantity > 0)
+      .orderBy(["data.cmc", "data.name"])
+      .forEach((card, index) => {
+        components.push(
+          <CardTile
+            indent="a"
+            isHighlighted={false}
+            isSideboard
+            showWildcards={showWildcards}
+            deck={deck}
+            card={card.data as DbCardData}
+            key={`sideboardcardtile${index}_${card.id}`}
+            quantity={{
+              type: "NUMBER",
+              quantity: card.quantity,
+            }}
+          />
+        );
+      });
   }
-  return 0;
+
+  return components;
 }
 
 interface DeckListProps {
   deck: Deck;
-  subTitle: string;
-  highlightCardId?: number;
-  settings: OverlaySettingsData;
-  cardOdds?: Chances;
-  setOddsCallback?: (sampleSize: number) => void;
+  showWildcards?: boolean;
 }
 
 export default function DeckList(props: DeckListProps): JSX.Element {
-  const {
-    deck,
-    subTitle,
-    settings,
-    highlightCardId,
-    cardOdds,
-    setOddsCallback,
-  } = props;
-  if (!deck) return <></>;
-  const deckClone = deck.clone();
-
-  let sortFunc = compareCards;
-  if (settings.mode === OVERLAY_ODDS || settings.mode == OVERLAY_MIXED) {
-    sortFunc = compareQuantity;
-  } else if (settings.mode === OVERLAY_DRAFT) {
-    sortFunc = compareDraftPicks;
-  }
-
-  const mainCardTiles: JSX.Element[] = [];
-  const mainCards = deckClone.getMainboard();
-  mainCards.removeDuplicates();
-
-  const shouldDoGroupLandsHack =
-    settings.lands &&
-    [OVERLAY_FULL, OVERLAY_LEFT, OVERLAY_ODDS, OVERLAY_MIXED].includes(
-      settings.mode
-    );
-
-  let landsNumber = 0;
-  const landsColors = new Colors();
-  mainCards.get().forEach((card: CardObject) => {
-    const cardObj = database.card(card.id);
-    if (cardObj && cardObj.type.includes("Land", 0)) {
-      landsNumber += card.quantity;
-      if (cardObj.frame) {
-        landsColors.addFromArray(cardObj.frame);
-      }
-    }
-  });
-  const landsFrame = landsColors.get();
-
-  // Default to lands number
-  let landsQuantity: CardTileQuantity = {
-    type: "NUMBER",
-    quantity: landsNumber,
-  };
-
-  if (settings.mode === OVERLAY_MIXED) {
-    landsQuantity = {
-      type: "ODDS",
-      quantity: landsNumber,
-      odds: ((cardOdds?.chanceLan || 0) / 100).toLocaleString([], {
-        style: "percent",
-        maximumSignificantDigits: 2,
-      }),
-    };
-  } else if (settings.mode === OVERLAY_ODDS) {
-    landsQuantity = {
-      type: "TEXT",
-      quantity: ((cardOdds?.chanceLan || 0) / 100).toLocaleString([], {
-        style: "percent",
-        maximumSignificantDigits: 2,
-      }),
-    };
-  }
-
-  if (shouldDoGroupLandsHack) {
-    mainCards.add(LANDS_HACK, 1, true);
-  }
-  mainCards.get().sort(sortFunc);
-  mainCards.get().forEach((card: CardObject, index: number) => {
-    if (card.id === LANDS_HACK) {
-      mainCardTiles.push(
-        <LandsTile
-          // eslint-disable-next-line react/no-array-index-key
-          key={`maincardtile_${index}_lands`}
-          quantity={landsQuantity}
-          frame={landsFrame}
-        />
-      );
-    } else {
-      // default number
-      let quantity: CardTileQuantity = {
-        type: "NUMBER",
-        quantity: card.quantity,
-      };
-      const fullCard = database.card(card.id);
-
-      if (fullCard) {
-        if (settings.mode === OVERLAY_MIXED) {
-          const odds = `${card.chance || 0}%`;
-          const q = card.quantity;
-          if (!settings.lands || (settings.lands && odds !== "0%")) {
-            quantity = {
-              type: "ODDS",
-              quantity: q,
-              odds: odds,
-            };
-          }
-        } else if (settings.mode === OVERLAY_ODDS) {
-          quantity = {
-            type: "TEXT",
-            quantity: ((card.chance || 0) / 100).toLocaleString([], {
-              style: "percent",
-              maximumSignificantDigits: 2,
-            }),
-          };
-        } else if (settings.mode === OVERLAY_DRAFT) {
-          const rank = getRank(card.id);
-          quantity = {
-            type: "RANK",
-            quantity:
-              fullCard.source == 0 ? DRAFT_RANKS[rank] : DRAFT_RANKS_LOLA[rank],
-          };
-        }
-
-        if (settings.mode === OVERLAY_DRAFT) {
-          mainCardTiles.push(
-            <div
-              className="overlay-card-quantity"
-              key={`maincardtile_owned_${index}_${card.id}`}
-            >
-              <OwnershipStars card={fullCard} />
-            </div>
-          );
-        } else if (
-          shouldDoGroupLandsHack &&
-          fullCard &&
-          fullCard.type &&
-          fullCard.type.includes("Land", 0)
-        ) {
-          // skip land cards while doing group lands hack
-          return;
-        }
-
-        const dfcCard = card?.dfcId
-          ? database.card(parseInt(card.dfcId))
-          : undefined;
-        mainCardTiles.push(
-          <CardTile
-            card={fullCard}
-            dfcCard={dfcCard}
-            key={`maincardtile_${card.id}`}
-            indent="a"
-            isSideboard={false}
-            quantity={quantity}
-            showWildcards={false}
-            deck={deck}
-            isHighlighted={card.id === highlightCardId}
-          />
-        );
-      }
-    }
-  });
-
-  const sideboardCardTiles: JSX.Element[] = [];
-  const sideboardCards = deckClone.getSideboard().count();
-  if (settings.sideboard && sideboardCards > 0) {
-    const sideCards = deckClone.getSideboard();
-    sideCards.removeDuplicates();
-    sideCards.get().sort(sortFunc);
-    sideCards.get().forEach((card: any, index: number) => {
-      const quantity =
-        settings.mode === OVERLAY_ODDS || settings.mode === OVERLAY_MIXED
-          ? settings.mode === OVERLAY_ODDS
-            ? "0%"
-            : {
-                quantity: card.quantity,
-                odds: "0%",
-              }
-          : card.quantity;
-      let fullCard = card;
-      if (card?.id) {
-        fullCard = database.card(card.id);
-      }
-      let dfcCard;
-      if (card?.dfcId) {
-        dfcCard = database.card(card.dfcId);
-      }
-      sideboardCardTiles.push(
-        <CardTile
-          card={fullCard}
-          dfcCard={dfcCard}
-          key={`sideboardcardtile_${index}_${card.id}`}
-          indent="a"
-          isSideboard
-          quantity={quantity}
-          showWildcards={false}
-          deck={deck}
-          isHighlighted={false}
-        />
-      );
-    });
-  }
-
-  return (
-    <div className="overlay-decklist click-on">
-      <div className="decklist-title">{subTitle}</div>
-      {!!settings.deck && mainCardTiles}
-      {!!settings.sideboard && sideboardCardTiles.length > 0 && (
-        <div className="decklist-title">Sideboard ({sideboardCards} cards)</div>
-      )}
-      {!!settings.sideboard &&
-        sideboardCardTiles.length > 0 &&
-        sideboardCardTiles}
-      {!!settings.typeCounts && (
-        <DeckTypesStats className="overlay-deck-type-stats" deck={deck} />
-      )}
-      {!!settings.manaCurve && (
-        <DeckManaCurve className="overlay-deck-mana-curve" deck={deck} />
-      )}
-      {!!settings.drawOdds &&
-      (settings.mode === OVERLAY_ODDS || settings.mode === OVERLAY_MIXED) &&
-      cardOdds &&
-      setOddsCallback ? (
-        <SampleSizePanel
-          cardOdds={cardOdds}
-          cardsLeft={deck.getMainboard().count()}
-          setOddsCallback={setOddsCallback}
-        />
-      ) : (
-        <></>
-      )}
-    </div>
-  );
+  const { deck, showWildcards } = props;
+  if (!deck || database.version == 0) return <></>;
+  return <>{getDeckComponents(deck, showWildcards)}</>;
 }

@@ -1,10 +1,13 @@
 import { Fragment } from "react";
 import { useSelector } from "react-redux";
+import { Route, Switch, useRouteMatch } from "react-router-dom";
 import useGunUser from "../../../hooks/useGunUser";
 import { AppState } from "../../../redux/stores/rendererStore";
-import DecksArtViewRow from "../../DecksArtViewRow";
+import DecksList from "./DecksList";
+import DeckView from "./DeckView";
 
 export default function ViewDecks() {
+  const { url } = useRouteMatch();
   const [, loggedIn] = useGunUser();
 
   const { decksIndex, decks } = useSelector(
@@ -12,31 +15,15 @@ export default function ViewDecks() {
   );
 
   return (
-    <div className="section">
-      <div className="decks-table-wrapper">
-        {loggedIn &&
-          decksIndex &&
-          decks &&
-          Object.keys(decksIndex)
-            .map((key) => decks[`${key}-v${decksIndex[key]}`])
-            .filter((d) => d)
-            .sort((a, b) => {
-              if (a.lastModified > b.lastModified) return -1;
-              if (a.lastModified < b.lastModified) return 1;
-              return 0;
-            })
-            .sort((a, b) => {
-              if (a.lastUsed > b.lastUsed) return -1;
-              if (a.lastUsed < b.lastUsed) return 1;
-              return 0;
-            })
-            .map((deck) => {
-              if (deck && deck.internalDeck) {
-                return <DecksArtViewRow key={deck.deckId} deck={deck} />;
-              }
-              return <Fragment key={deck.deckId} />;
-            })}
-      </div>
-    </div>
+    <>
+      {loggedIn && decksIndex && decks ? (
+        <Switch>
+          <Route exact path={`${url}/:id`} component={DeckView} />
+          <Route exact path={`${url}/`} component={DecksList} />
+        </Switch>
+      ) : (
+        <></>
+      )}
+    </>
   );
 }

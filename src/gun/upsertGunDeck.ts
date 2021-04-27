@@ -5,6 +5,7 @@ import objToBase from "../utils/objToBase";
 import getGunUser from "./getGunUser";
 
 export default async function upsertGunDeck(internal: InternalDeck) {
+  console.log(internal);
   const deck = new Deck(internal);
   const userRef = getGunUser();
   console.log("> Upsert deck: ", deck);
@@ -55,10 +56,10 @@ export default async function upsertGunDeck(internal: InternalDeck) {
         .on((currentDeck: GunDeck, k: string, a: any, ev: any) => {
           if (!currentDeck.deckHash) return;
           ev.off();
-          // console.log(currentDeckKey);
-          // console.log("Exists? ", existsInDb);
-          // console.log(currentDeck);
-          // console.log(currentDeck.deckHash, deck.getHash());
+          console.log(currentDeckKey);
+          console.log("Exists? ", existsInDb);
+          console.log(currentDeck);
+          console.log(currentDeck.deckHash, deck.getHash());
 
           if (currentDeck.deckHash !== deck.getHash()) {
             console.log(`${deck.id} bump version to ${version + 1}`);

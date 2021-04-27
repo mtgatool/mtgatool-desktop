@@ -48,12 +48,24 @@ const mainDataSlice = createSlice({
         ...state.uuidData,
         ...action.payload,
       };
+
+      if (state.uuidData[state.currentUUID]?.cards) {
+        state.cards = baseToObj(state.uuidData[state.currentUUID].cards);
+      }
+      if (state.uuidData[state.currentUUID]?.cardsPrev) {
+        state.cardsPrev = baseToObj(
+          state.uuidData[state.currentUUID].cardsPrev
+        );
+      }
     },
     setMatches: (
       state: PlayerData,
       action: PayloadAction<Record<string, GunMatch>>
     ): void => {
-      state.matches = action.payload;
+      state.matches = {
+        ...state.matches,
+        ...action.payload,
+      };
     },
     setMatch: (state: PlayerData, action: PayloadAction<GunMatch>): void => {
       state.matches = {
@@ -65,7 +77,7 @@ const mainDataSlice = createSlice({
       state: PlayerData,
       action: PayloadAction<Record<string, GunDeck>>
     ): void => {
-      state.decks = action.payload;
+      state.decks = { ...state.decks, ...action.payload };
     },
     setDeck: (state: PlayerData, action: PayloadAction<GunDeck>): void => {
       state.decks = {

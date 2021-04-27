@@ -1,0 +1,125 @@
+@import "./misc.scss";
+
+.select-container {
+  width: inherit;
+  height: 27px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin: auto 0;
+  border-radius: 5px;
+  @include disable-select;
+
+  .select-title {
+    white-space: nowrap;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    height: 33px;
+    font-size: 100%;
+    padding: 0 12px;
+    justify-content: center;
+    line-height: 33px;
+  }
+
+  .select-button {
+    font-family: 'Segoe UI';
+    display: flex;
+    color: var(--color-text);
+    overflow: hidden;
+    text-indent: 10px;
+    cursor: pointer;
+    width: inherit;
+    height: 27px;
+    border-radius: 5px;
+    background-color: var(--color-background-dark) !important;
+    border: 1px solid var(--color-dark);
+    -webkit-transition: all 0.1s cubic-bezier(0.2, 0.5, 0.35, 1);
+    justify-content: space-between;
+    align-items: center;
+    white-space: nowrap;
+    margin: 0;
+    padding: 0;
+    @include animated;
+    @include disable-select;
+  
+    &.dark {
+      background-color: var(--color-background) !important;
+    }
+  
+    &:after {
+      content: "";
+      width: 12px;
+      height: 7px;
+      background-repeat: no-repeat;
+      background-image: url("../assets/images/icon_show.png");
+      transform: rotate(0deg);
+      position: absolute;
+      top: 9px;
+      right: 8px;
+      -webkit-transition: all 0.2s cubic-bezier(0.2, 0.5, 0.35, 1);
+    }
+  
+    &:hover:enabled {
+      // border: 1px solid var(--color-section-hover);
+    }
+  
+    &:hover:after {
+      opacity: 1;
+    }
+  
+    &.active {
+      border-radius: 5px 5px 0px 0px;
+      // border: 1px solid var(--color-section-hover);
+    }
+  
+    &.active:after {
+      transform: rotate(180deg);
+      opacity: 1;
+    }
+  }
+
+  .select-options-container {
+    color: var(--color-text);
+    cursor: pointer;
+    position: absolute;
+    max-height: 348px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    top: calc(100% + 0px);
+    right: 0px;
+    left: 0px;
+    z-index: 12;
+    border-radius: 0 0 5px 5px;
+    background-color: var(--color-background);
+    // border: 1px solid var(--color-section-hover);
+    border-top: 0px;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 6px 8px 4px;
+  }
+
+  .select-option {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    white-space: nowrap;
+    color: var(--color-text);
+    margin: 0;
+    height: 25px;
+    padding: 0 12px;
+    -webkit-transition: all 0.1s cubic-bezier(0.2, 0.5, 0.35, 1);
+    width: 100%;
+    background-color: var(--color-button) !important;
+    @include animated;
+    @include disable-select;
+
+    &.disabled {
+      color: var(--color-text-disabled);
+    }
+  
+    &:enabled {
+      &:hover {
+        background-color: var(--color-button-hover) !important;
+      }
+    }
+  }
+}

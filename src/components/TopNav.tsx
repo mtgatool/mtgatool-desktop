@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import _ from "lodash";
 import { useState, useRef, useEffect } from "react";
-import { useLocation, useHistory } from "react-router-dom";
+import { useLocation, useHistory, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getRankIndex, InternalRank } from "mtgatool-shared";
 
@@ -25,24 +25,24 @@ interface TopNavItemProps {
 function TopNavItem(props: TopNavItemProps): JSX.Element {
   const { compact, icon, uri, title } = props;
 
-  const { pathname } = useLocation();
+  const params = useParams<{ page: string }>();
   const history = useHistory();
 
   return compact ? (
     <div
       className={`${
-        pathname === uri ? "item-selected" : ""
+        params.page === uri ? "item-selected" : ""
       } item-no-label item`}
-      onClick={() => history.push(uri)}
+      onClick={() => history.push(`/${uri}`)}
     >
       <div className={`icon ${icon}`} title={_.camelCase(title)} />
     </div>
   ) : (
     <div
-      className={`${pathname === uri ? "item-selected" : ""} item ${
+      className={`${params.page === uri ? "item-selected" : ""} item ${
         title == "" ? ` ${"item-no-label"}` : ""
       }`}
-      onClick={() => history.push(uri)}
+      onClick={() => history.push(`/${uri}`)}
     >
       {title !== "" ? (
         <span className="item-text">{title}</span>
@@ -109,64 +109,64 @@ export default function TopNav(): JSX.Element {
     compact: compact,
   };
 
-  const homeTab = { ...defaultTab, uri: "/home", icon: "icon-home", title: "" };
+  const homeTab = { ...defaultTab, uri: "home", icon: "icon-home", title: "" };
   const myDecksTab = {
     ...defaultTab,
-    uri: "/decks",
+    uri: "decks",
     icon: "icon-my-decks",
     title: "MY DECKS",
   };
   const historyTab = {
     ...defaultTab,
-    uri: "/history",
+    uri: "history",
     icon: "icon-history",
     title: "HISTORY",
   };
   const timelineTab = {
     ...defaultTab,
-    uri: "/timeline",
+    uri: "timeline",
     icon: "icon-timeline",
     title: "TIMELINE",
   };
   const eventsTab = {
     ...defaultTab,
-    uri: "/events",
+    uri: "events",
     icon: "icon-events",
     title: "EVENTS",
   };
   const exploreTab = {
     ...defaultTab,
-    uri: "/explore",
+    uri: "explore",
     icon: "icon-explore",
     title: "EXPLORE",
   };
   const cardsTab = {
     ...defaultTab,
-    uri: "/cards",
+    uri: "cards",
     icon: "icon-collection",
     title: "CARDS",
   };
   const economyTab = {
     ...defaultTab,
-    uri: "/economy",
+    uri: "economy",
     icon: "icon-economy",
     title: "ECONOMY",
   };
   const collectionTab = {
     ...defaultTab,
-    uri: "/collection",
+    uri: "collection",
     icon: "icon-collection",
     title: "COLLECTION",
   };
 
   const contructedNav = {
-    uri: "/history",
+    uri: "history",
     rank: uuidData[currentUUID]?.rank?.constructed ?? null,
     rankClass: "top-constructed-rank",
   };
 
   const limitedNav = {
-    uri: "/history",
+    uri: "history",
     rank: uuidData[currentUUID]?.rank?.limited ?? null,
     rankClass: "top-limited-rank",
   };

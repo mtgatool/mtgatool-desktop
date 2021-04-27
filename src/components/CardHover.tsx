@@ -54,7 +54,7 @@ export default function CardHover(): JSX.Element {
     (_state: AppState) => "normal" // state.settings.cards_quality
   );
   const hoverSize = useSelector(
-    (_state: AppState) => 0 // state.settings.cards_size_hover_card
+    (_state: AppState) => 12 // state.settings.cards_size_hover_card
   );
   const card = database.card(grpId);
   const [frontLoaded, setFrontLoaded] = useState(0);

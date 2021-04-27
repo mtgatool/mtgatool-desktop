@@ -7,7 +7,7 @@ import {
 } from "mtgatool-shared";
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 
-import DeckList from "../components/DeckList";
+import DeckList from "../components/OverlayDeckList";
 import TopBar from "../components/TopBar";
 
 import { ChannelMessage } from "../broadcastChannel/channelMessages";

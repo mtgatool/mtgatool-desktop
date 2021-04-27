@@ -9,31 +9,34 @@ export default function ViewHistory() {
   const matches = useSelector((state: AppState) => state.mainData.matches);
 
   return (
-    <div className="section">
-      <div className="history-table-wrapper">
-        {loggedIn &&
-          matches &&
-          Object.keys(matches)
-            .sort((a, b) => {
-              if (matches[a].timestamp > matches[b].timestamp) return -1;
-              if (matches[a].timestamp < matches[b].timestamp) return 1;
-              return 0;
-            })
-            .map((matchId) => {
-              if (matches[matchId] && matches[matchId].internalMatch) {
-                return (
-                  <ListItemMatch
-                    key={matchId}
-                    match={matches[matchId]}
-                    openMatchCallback={() => {
-                      //
-                    }}
-                  />
-                );
-              }
-              return <Fragment key={matchId} />;
-            })}
+    <>
+      <div className="section" />
+      <div className="section">
+        <div className="history-table-wrapper">
+          {loggedIn &&
+            matches &&
+            Object.keys(matches)
+              .sort((a, b) => {
+                if (matches[a].timestamp > matches[b].timestamp) return -1;
+                if (matches[a].timestamp < matches[b].timestamp) return 1;
+                return 0;
+              })
+              .map((matchId) => {
+                if (matches[matchId] && matches[matchId].internalMatch) {
+                  return (
+                    <ListItemMatch
+                      key={matchId}
+                      match={matches[matchId]}
+                      openMatchCallback={() => {
+                        //
+                      }}
+                    />
+                  );
+                }
+                return <Fragment key={matchId} />;
+              })}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

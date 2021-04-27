@@ -1,0 +1,114 @@
+.regular-view-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  grid-template-rows: auto auto auto auto auto;
+  grid-template-areas: "controls controls" "deck types" "deck curves" "deck pies" "deck rarities" "deck hand" "deck .";
+}
+
+.decks-top {
+  height: 96px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 16px 0;
+
+  .top-inner {
+    height: 32px;
+    display: flex;
+    margin: auto 16px;
+    justify-content: space-between;
+  }
+}
+
+
+.pie-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 16px auto;
+  height: 160px;
+}
+
+.pie-container-outer {
+  width: 100%;
+  display: flex;
+  flex-direction: initial;
+  align-items: center;
+  margin: 16px auto;
+  height: 160px;
+}
+
+.pie-container span,
+.wildcards-cost span,
+.types-container span {
+  text-align: center;
+  display: block;
+  margin-bottom: 12px;
+  font-family: var(--main-font-name);
+  font-size: 16px;
+  color: var(--color-text);
+}
+
+.visual-sideboard {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: 32px;
+  align-content: start;
+}
+
+.visual-mainboard {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+}
+
+.deck-visual-stats {
+  padding: 0 !important;
+  margin: 32px !important;
+  width: 0px !important;
+  flex-grow: 1;
+}
+
+.deck-visual-tile {
+  display: inline-table;
+  padding: 3px;
+  margin-bottom: 64px;
+}
+
+.deck-visual-card {
+  height: 22px;
+}
+
+.deck-visual-card-img {
+  cursor: pointer;
+  -webkit-border-radius: 4.75% / 3.5%;
+  -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+}
+
+.deck-visual-card-img:hover {
+  box-shadow: 0 5px 14px 2px rgba(0, 0, 0, 0.25);
+  margin: -24px 0 -2px 0px;
+}
+
+
+.deck-visual-tile-side {
+  display: grid;
+  margin-bottom: 180px;
+}
+
+.deck-visual-card-side {
+  height: 22px;
+}
+
+.visual-view-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  grid-template-rows: auto auto auto;
+  grid-template-areas: "controls controls" "types types" "main side";
+}

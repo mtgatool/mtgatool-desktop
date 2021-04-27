@@ -10,7 +10,7 @@ interface Entry extends LogEntry {
 export default function onLabelInEventDeckSubmitV3(entry: Entry): void {
   const { json } = entry;
   if (!json.CourseDeck) return;
-
+  console.log("CourseDeck", json.CourseDeck);
   const selectedDeck = convertDeckFromV3(json.CourseDeck);
 
   if (selectedDeck.id == "00000000-0000-0000-0000-000000000000" && json.Id) {

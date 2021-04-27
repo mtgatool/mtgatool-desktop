@@ -18,7 +18,7 @@ import IconButton from "./ui/IconButton";
 import settingsIcon from "../assets/images/cog.png";
 import signup from "../gun/signup";
 import checkPassphrase from "../gun/checkPassphrase";
-import voiFn from "../utils/voidfn";
+import voidFn from "../utils/voidfn";
 import PopupComponent from "./PopupComponent";
 import electron from "../utils/electron/electronWrapper";
 import doWebLogin from "../gun/doWebLogin";
@@ -208,8 +208,8 @@ export default function Auth() {
     [passphrase, usernameRecover]
   );
 
-  const openPopup = useRef<() => void>(voiFn);
-  const closePopup = useRef<() => void>(voiFn);
+  const openPopup = useRef<() => void>(voidFn);
+  const closePopup = useRef<() => void>(voidFn);
 
   const pageProps = useSpring({
     left: `${0 - page * 33.33}%`,
@@ -402,11 +402,11 @@ export default function Auth() {
         </div>
       </form>
       {electron && (
-        <div className="app-settings">
+        <div className="app-settings" onClick={openPopup.current}>
           <IconButton
             style={{ margin: "auto" }}
             icon={settingsIcon}
-            onClick={openPopup.current}
+            onClick={voidFn}
           />
         </div>
       )}

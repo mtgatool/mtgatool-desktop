@@ -14,19 +14,17 @@ import timeAgo from "../utils/timeAgo";
 import baseToObj from "../utils/baseToObj";
 
 interface DecksArtViewRowProps {
+  clickDeck: (id: string) => void;
   deck: GunDeck;
 }
 
 export default function DecksArtViewRow(
   props: DecksArtViewRowProps
 ): JSX.Element {
-  const { deck } = props;
+  const { clickDeck, deck } = props;
 
   const internalDeck = baseToObj<InternalDeck>(deck.internalDeck);
   const deckObj = new Deck(internalDeck);
-  const onDeckClick = (): void => {
-    // openDeckCallback(deck);
-  };
 
   const deckColors = new Colors().addFromBits(deck.colors);
 
@@ -68,7 +66,7 @@ export default function DecksArtViewRow(
   return (
     <animated.div
       className="decks-table-deck-tile"
-      onClick={onDeckClick}
+      onClick={() => clickDeck(deck.deckId)}
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
       style={
