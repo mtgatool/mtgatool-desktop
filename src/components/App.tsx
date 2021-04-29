@@ -20,6 +20,7 @@ import getLocalSetting from "../utils/getLocalSetting";
 import login from "../gun/login";
 import reduxAction from "../redux/reduxAction";
 import doWebLogin from "../gun/doWebLogin";
+import DataStatus from "./DataStatus";
 
 function App() {
   useGun();
@@ -96,6 +97,7 @@ function App() {
             </Route>
           </Switch>
         </ErrorBoundary>
+        {loginState == LOGIN_OK ? <DataStatus /> : <></>}
         {electron ? (
           <div className="version-number">
             v{electron.remote.app.getVersion()}

@@ -30,7 +30,9 @@ if (title == "mtgatool-background") {
   defaultLocalSettings();
   ReactDOM.render(
     <React.StrictMode>
-      <Overlay />
+      <Provider store={store}>
+        <Overlay />
+      </Provider>
     </React.StrictMode>,
     document.getElementById("root")
   );
@@ -41,7 +43,9 @@ if (title == "mtgatool-background") {
     const NextOverlay = require("./overlay/index").default;
     ReactDOM.render(
       <React.StrictMode>
-        <NextOverlay />
+        <Provider store={store}>
+          <NextOverlay />
+        </Provider>
       </React.StrictMode>,
       document.getElementById("root")
     );

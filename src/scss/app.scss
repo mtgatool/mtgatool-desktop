@@ -9,7 +9,8 @@
   background-color: var(--color-base);
 }
 
-.app-wrapper-back, .app-wrapper-back-no-frame {
+.app-wrapper-back,
+.app-wrapper-back-no-frame {
   flex: 1 1 auto;
   z-index: auto;
   background-image: url(../assets/images/main-background.jpg);
@@ -19,7 +20,7 @@
 
   &:after {
     background: url(../assets/images/background_overlay.png);
-    content: ' ';
+    content: " ";
     top: 0;
     left: 0;
     width: calc(100% - 0px);
@@ -96,7 +97,6 @@
   display: flex;
 }
 
-
 .flex-top {
   height: 50%;
   display: flex;
@@ -105,4 +105,65 @@
 
 .flex-left {
   flex-direction: column;
+}
+
+.data-status {
+  background-color: var(--color-section);
+  border-radius: 2px;
+  margin: auto;
+  display: flex;
+  position: absolute;
+  z-index: 100;
+  width: 32px;
+  height: 32px;
+  left: 4px;
+  bottom: 4px;
+  overflow: hidden;
+}
+
+.data-status-container {
+  display: flex;
+  flex-direction: column;
+  margin: 16px 8px;
+
+  .data-status-line {
+    display: flex;
+    height: 20px;
+    font-family: var(--main-font-name-it);
+    font-size: 16px;
+    margin-bottom: 8px;
+
+    .status-ok {
+      margin: auto 4px;
+      width: 16px;
+      height: 16px;
+      background-position: center;
+      background-image: url(../assets/images/status_green.png);
+    }
+    .status-err {
+      margin: auto 4px;
+      width: 16px;
+      height: 16px;
+      background-position: center;
+      background-image: url(../assets/images/status_red.png);
+    }
+    .status-loading {
+      margin: auto 4px;
+      width: 16px;
+      height: 16px;
+      background-position: center;
+      background-image: url(../assets/images/status_black.png);
+    }
+  }
+}
+
+.alt-base {
+  z-index: 100;
+  position: absolute;
+  border-radius: 4px;
+  background: var(--color-dark);
+  background: linear-gradient(59deg, var(--color-dark) 0%, var(--color-section) 100%);
+  box-shadow: 0px 8px 15px 5px #00000060;
+  display: flex;
+  pointer-events: none;
 }

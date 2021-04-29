@@ -10,7 +10,7 @@ export default function ViewHistory() {
 
   return (
     <>
-      <div className="section" />
+      <div className="section" style={{ marginBottom: "0px" }} />
       <div className="section">
         <div className="history-table-wrapper">
           {loggedIn &&

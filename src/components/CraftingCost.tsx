@@ -23,6 +23,8 @@ export default function CraftingCost(props: CraftingCostProps): JSX.Element {
   const { mainData } = useSelector((state: AppState) => state);
   const uuid = mainData.currentUUID;
 
+  if (!mainData?.uuidData[uuid]?.wcCommon) return <></>;
+
   const ownedWildcards: IndexableObject = {
     common: mainData.uuidData[uuid].wcCommon,
     uncommon: mainData.uuidData[uuid].wcUncommon,

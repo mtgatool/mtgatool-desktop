@@ -2,7 +2,8 @@ import { settingKeys, defaultSettings } from "../types/localSettings";
 
 export default function defaultLocalSettings() {
   settingKeys.forEach((key) => {
-    if (window.localStorage.getItem(key) === null) {
+    const value = window.localStorage.getItem(key);
+    if (value === null || value === undefined) {
       window.localStorage.setItem(key, defaultSettings[key]);
     }
   });

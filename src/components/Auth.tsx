@@ -26,7 +26,7 @@ import doWebLogin from "../gun/doWebLogin";
 type InputChange = ChangeEvent<HTMLInputElement>;
 
 export default function Auth() {
-  const [page, sePage] = useState(1);
+  const [page, sePage] = useState(0);
 
   const history = useHistory();
   const dispatch = useDispatch();
@@ -208,8 +208,12 @@ export default function Auth() {
     [passphrase, usernameRecover]
   );
 
-  const openPopup = useRef<() => void>(voidFn);
-  const closePopup = useRef<() => void>(voidFn);
+  const openPopup = useRef<() => void>(() => console.log("openPopup"));
+  const closePopup = useRef<() => void>(() => console.log("closePopup"));
+
+  useEffect(() => {
+    sePage(1);
+  }, []);
 
   const pageProps = useSpring({
     left: `${0 - page * 33.33}%`,

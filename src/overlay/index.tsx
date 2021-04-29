@@ -71,7 +71,9 @@ export default function Overlay() {
   }, [deboucer]);
 
   useEffect(() => {
-    setLocalSetting("overlay_0", JSON.stringify(settings));
+    if (settings) {
+      setLocalSetting("overlay_0", JSON.stringify(settings));
+    }
   }, [settings]);
 
   return (
