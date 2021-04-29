@@ -13,6 +13,7 @@ interface AltProps {
   height: number;
   xOffset?: number;
   yOffset?: number;
+  tip?: boolean;
   doHide: MutableRefObject<() => void>;
   doOpen: MutableRefObject<() => void>;
   positionRef: React.RefObject<HTMLDivElement>;
@@ -26,6 +27,7 @@ export default function Alt(props: PropsWithChildren<AltProps>) {
     height,
     xOffset,
     yOffset,
+    tip,
     children,
     doHide,
     doOpen,
@@ -44,10 +46,10 @@ export default function Alt(props: PropsWithChildren<AltProps>) {
   doHide.current = hideFn;
   doOpen.current = openFn;
 
-  const springConfig = { mass: 3, tension: 800, friction: 50 };
+  const springConfig = { mass: 3, tension: 600, friction: 40 };
   const spring = useSpring({
     opacity: open ? 1 : 0,
-    transform: `scale(${open ? 1 : 0.8})`,
+    transform: `scale(${open ? 1 : 0.9})`,
     config: springConfig,
   });
 
@@ -55,21 +57,25 @@ export default function Alt(props: PropsWithChildren<AltProps>) {
   let top = (positionRef.current?.offsetTop || 0) + (yOffset || 0);
 
   if (direction === "LEFT") {
-    left += (positionRef.current?.offsetWidth || 0) + 8;
+    top += (positionRef.current?.offsetHeight || 0) / 2 - height / 2;
+    left += (positionRef.current?.offsetWidth || 0) + 12;
   }
   if (direction === "RIGHT") {
-    left -= width - 8;
-  }
-  if (direction === "DOWN") {
-    top += (positionRef.current?.offsetHeight || 0) + 8;
+    top += (positionRef.current?.offsetHeight || 0) / 2 - height / 2;
+    left -= width + 12;
   }
   if (direction === "UP") {
-    top -= height - 8;
+    top += (positionRef.current?.offsetHeight || 0) + 12;
+    left += (positionRef.current?.offsetWidth || 0) / 2 - width / 2;
+  }
+  if (direction === "DOWN") {
+    top -= height + 12;
+    left += (positionRef.current?.offsetWidth || 0) / 2 - width / 2;
   }
 
   return (
     <animated.div
-      className="alt-base"
+      className={`alt-base ${tip ? `tip-${direction.toLowerCase()}` : ""}`}
       style={{
         ...spring,
         left,

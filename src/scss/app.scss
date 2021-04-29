@@ -28,7 +28,7 @@
     position: absolute;
     background-size: 100% 100%;
     z-index: 0;
-    opacity: 0.75;
+    opacity: 0.5;
   }
 }
 
@@ -162,8 +162,47 @@
   position: absolute;
   border-radius: 4px;
   background: var(--color-dark);
-  background: linear-gradient(59deg, var(--color-dark) 0%, var(--color-section) 100%);
   box-shadow: 0px 8px 15px 5px #00000060;
   display: flex;
   pointer-events: none;
+
+  &.tip-left::after {
+    content: "";
+    position: absolute;
+    top: calc(50% - 8px);
+    left: -8px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid var(--color-dark);
+  }
+
+  &.tip-right::after {
+    content: "";
+    position: absolute;
+    top: calc(50% - 8px);
+    right: -8px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 8px solid var(--color-dark);
+  }
+
+  &.tip-down::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: calc(50% - 8px);
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid var(--color-dark);
+  }
+
+  &.tip-up::after {
+    content: "";
+    position: absolute;
+    top: -8px;
+    left: calc(50% - 8px);
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid var(--color-dark);
+  }
 }

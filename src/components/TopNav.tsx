@@ -14,6 +14,8 @@ import settingsIcon from "../assets/images/cog.png";
 import IconButton from "./ui/IconButton";
 import getLocalSetting from "../utils/getLocalSetting";
 import { AppState } from "../redux/stores/rendererStore";
+import Alt from "./Alt";
+import voiFn from "../utils/voidfn";
 
 interface TopNavItemProps {
   compact: boolean;
@@ -60,6 +62,10 @@ interface TopRankProps {
 }
 
 function TopRankIcon(props: TopRankProps): JSX.Element {
+  const closeAltRef = useRef<() => void>(voiFn);
+  const openAltRef = useRef<() => void>(voiFn);
+  const positionRef = useRef<HTMLDivElement>(null);
+
   const { uri, rank, rankClass } = props;
 
   const { pathname } = useLocation();
@@ -85,12 +91,40 @@ function TopRankIcon(props: TopRankProps): JSX.Element {
   };
 
   return (
-    <div
-      className={`${selected ? "item-selected" : ""} item`}
-      onClick={() => history.push(uri)}
-    >
-      <div style={rankStyle} title={propTitle} className={rankClass} />
-    </div>
+    <>
+      <Alt
+        defaultOpen={false}
+        width={120}
+        height={32}
+        yOffset={0}
+        direction="UP"
+        tip
+        doOpen={openAltRef}
+        doHide={closeAltRef}
+        positionRef={positionRef}
+      >
+        <div
+          style={{
+            textAlign: "center",
+            lineHeight: "32px",
+            width: "100%",
+            height: "100%",
+          }}
+        >
+          {propTitle}
+        </div>
+      </Alt>
+
+      <div
+        onMouseEnter={openAltRef.current}
+        onMouseLeave={closeAltRef.current}
+        ref={positionRef}
+        className={`${selected ? "item-selected" : ""} item`}
+        onClick={() => history.push(uri)}
+      >
+        <div style={rankStyle} className={rankClass} />
+      </div>
+    </>
   );
 }
 

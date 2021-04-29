@@ -39,7 +39,7 @@ export default function DataStatus() {
         defaultOpen={false}
         width={200}
         height={160}
-        yOffset={-160 + 32}
+        yOffset={-67}
         direction="LEFT"
         doOpen={openAltRef}
         doHide={closeAltRef}

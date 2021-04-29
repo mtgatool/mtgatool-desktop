@@ -1,0 +1,26 @@
+.mana-filters {
+  display: flex;
+  margin: auto 8px;
+
+  .mana-filter {
+    align-self: center;
+    opacity: 0.4;
+    background-repeat: no-repeat;
+    margin: 0 4px;
+    cursor: pointer;
+    background-position: center;
+    background-size: contain;
+    -webkit-transition: all .1s ease-in-out;
+    width: 20px;
+    height: 20px;
+    
+    &:hover {
+      opacity: 0.9;
+    }
+
+    &.filter-on {
+      opacity: 1;
+    }
+  }
+}
+
