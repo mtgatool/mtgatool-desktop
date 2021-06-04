@@ -80,6 +80,7 @@ function generateInternalMatch(): InternalMatch {
     toolRunFromSource: !electron.remote.app.isPackaged,
     arenaId: currentMatch.player.name,
     playerDeckHash: globalStore.currentMatch.originalDeck.getHash(),
+    actionLog: globalStore.currentActionLog,
     type: "match",
   };
 

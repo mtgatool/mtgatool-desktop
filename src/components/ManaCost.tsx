@@ -1,4 +1,6 @@
+/* eslint-disable react/no-array-index-key */
 import { constants } from "mtgatool-shared";
+import { Fragment } from "react";
 
 const { WHITE, BLUE, BLACK, RED, GREEN, COLORLESS } = constants;
 
@@ -25,9 +27,11 @@ export default function ManaCost(props: ManaCostProps): JSX.Element {
   return (
     <>
       {colors.map((mana, index) => {
+        if (colors.length > 1 && mana === COLORLESS) {
+          return <Fragment key={`${mana}-${index}-${colors.join("-")}`} />;
+        }
         return (
           <div
-            // eslint-disable-next-line react/no-array-index-key
             key={`${mana}-${index}-${colors.join("-")}`}
             className={`${newclass} flex-end ${manaClasses[mana]}`}
           />

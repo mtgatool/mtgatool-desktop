@@ -6,6 +6,7 @@ import { matchStateObject } from "./currentMatchStore";
 const globalStore = {
   currentMatch: matchStateObject,
   currentDraft: draftStateObject,
+  currentActionLog: "",
   rank: {
     constructed: {
       rank: "",

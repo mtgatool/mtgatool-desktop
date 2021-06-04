@@ -2,7 +2,6 @@ import _ from "lodash";
 import {
   Colors,
   constants,
-  database,
   getEventPrettyName,
   InternalMatch,
 } from "mtgatool-shared";
@@ -23,12 +22,13 @@ import { GunMatch } from "../../../types/gunTypes";
 import baseToObj from "../../../utils/baseToObj";
 import timeAgo from "../../../utils/timeAgo";
 import RankIcon from "../../RankIcon";
+import isLimitedEventId from "../../../utils/isLimitedEventId";
 
 const { DEFAULT_TILE } = constants;
 
 interface ListItemMatchProps {
   match: GunMatch;
-  openMatchCallback: (match: InternalMatch) => void;
+  openMatchCallback: (match: GunMatch) => void;
 }
 
 export default function ListItemMatch({
@@ -38,7 +38,7 @@ export default function ListItemMatch({
   const internalMatch = baseToObj<InternalMatch>(match.internalMatch);
 
   const onRowClick = (): void => {
-    openMatchCallback(internalMatch);
+    openMatchCallback(match);
   };
 
   let dateTime = new Date(match.timestamp);
@@ -48,7 +48,7 @@ export default function ListItemMatch({
     dateTime = new Date();
   }
 
-  const isLimited = database.limited_ranked_events.includes(match.eventId);
+  const isLimited = isLimitedEventId(match.eventId);
 
   return (
     <ListItem click={onRowClick}>

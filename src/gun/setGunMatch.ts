@@ -23,6 +23,7 @@ export default async function setGunMatch(match: InternalMatch) {
       duration: match.duration,
       internalMatch: objToBase(match),
       timestamp: new Date().getTime(),
+      actionLog: match.actionLog,
     };
 
     userRef.get("matches").get(match.id).put(newGunMatch);
@@ -39,8 +40,8 @@ export default async function setGunMatch(match: InternalMatch) {
       const currentDeckKey = `${match.playerDeck.id}-v${version || 0}`;
       (decksRef as any).get(currentDeckKey).open(
         (currentDeck: GunDeck) => {
-          console.log(currentDeck);
-          console.log(Object.keys(currentDeck.matches));
+          // console.log(currentDeck);
+          // console.log(Object.keys(currentDeck.matches));
           const stats = { ...currentDeck.stats };
 
           if (!Object.keys(currentDeck.matches).includes(match.id)) {
@@ -48,7 +49,7 @@ export default async function setGunMatch(match: InternalMatch) {
             stats.gameLosses += match.opponent.wins;
             stats.matchWins += hasWon ? 1 : 0;
             stats.matchLosses += hasWon ? 0 : 1;
-            console.log("stats", stats);
+            console.log("Deck's match new stats: ", stats);
             decksRef.get(currentDeckKey).put({
               stats: stats,
               lastUsed: new Date().getTime(),

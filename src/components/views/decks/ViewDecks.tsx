@@ -1,10 +1,12 @@
-import { Fragment } from "react";
 import { useSelector } from "react-redux";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
-import useGunUser from "../../../hooks/useGunUser";
-import { AppState } from "../../../redux/stores/rendererStore";
+
 import DecksList from "./DecksList";
 import DeckView from "./DeckView";
+
+import useGunUser from "../../../hooks/useGunUser";
+
+import { AppState } from "../../../redux/stores/rendererStore";
 
 export default function ViewDecks() {
   const { url } = useRouteMatch();

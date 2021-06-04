@@ -14,7 +14,7 @@ import timeAgo from "../utils/timeAgo";
 import baseToObj from "../utils/baseToObj";
 
 interface DecksArtViewRowProps {
-  clickDeck: (id: string) => void;
+  clickDeck: (deck: GunDeck) => void;
   deck: GunDeck;
 }
 
@@ -66,7 +66,7 @@ export default function DecksArtViewRow(
   return (
     <animated.div
       className="decks-table-deck-tile"
-      onClick={() => clickDeck(deck.deckId)}
+      onClick={() => clickDeck(deck)}
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
       style={

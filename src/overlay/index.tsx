@@ -5,7 +5,6 @@ import {
   Deck,
   OverlaySettingsData,
 } from "mtgatool-shared";
-import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 
 import DeckList from "../components/OverlayDeckList";
 import TopBar from "../components/TopBar";
@@ -78,9 +77,7 @@ export default function Overlay() {
 
   return (
     <>
-      {process.platform !== "linux" && (
-        <TopBar artist="" loginState={LOGIN_OK} offline={false} />
-      )}
+      {process.platform !== "linux" && <TopBar />}
       <div style={{ backgroundColor: "rgba(0,0,0,0.25)", height: "100%" }}>
         {deck && settings && (
           <DeckList

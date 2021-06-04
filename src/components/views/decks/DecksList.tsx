@@ -1,13 +1,15 @@
 /* eslint-disable no-bitwise */
 import { Fragment, useCallback, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { GunDeck } from "../../../types/gunTypes";
+import getLocalSetting from "../../../utils/getLocalSetting";
 import DecksArtViewRow from "../../DecksArtViewRow";
 import ManaFilter from "../../ManaFilter";
 
 export default function DecksList() {
+  const dispatch = useDispatch();
   const history = useHistory();
   const [colorFilter, setColorFilter] = useState(63);
 
@@ -16,14 +18,16 @@ export default function DecksList() {
   );
 
   const openDeck = useCallback(
-    (id: string) => {
-      history.push(`/decks/${id}`);
+    (deck: GunDeck) => {
+      // reduxAction(dispatch, { type: "SET_BACK_GRPID", arg: deck.tile });
+      history.push(`/decks/${deck.deckId}`);
     },
-    [history]
+    [dispatch, history]
   );
 
   const decksFilter = useCallback(
     (deck: GunDeck): boolean => {
+      if (deck.playerId !== getLocalSetting("playerId")) return false;
       // Filter colors
       if ((deck.colors & ~colorFilter) == 0) return true;
       return false;

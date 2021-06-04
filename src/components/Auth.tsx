@@ -6,22 +6,27 @@ import { useDispatch, useSelector } from "react-redux";
 import { animated, useSpring } from "react-spring";
 import { LOGIN_OK, LOGIN_WAITING } from "mtgatool-shared/dist/shared/constants";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
-import login from "../gun/login";
-import reduxAction from "../redux/reduxAction";
-import { AppState } from "../redux/stores/rendererStore";
-import getLocalSetting from "../utils/getLocalSetting";
-import setLocalSetting from "../utils/setLocalSetting";
-import Checkbox from "./ui/Checkbox";
+
 import AuthSettings from "./AuthSettings";
+import PopupComponent from "./PopupComponent";
+
 import IconButton from "./ui/IconButton";
+import Checkbox from "./ui/Checkbox";
 
 import settingsIcon from "../assets/images/cog.png";
-import signup from "../gun/signup";
+
 import checkPassphrase from "../gun/checkPassphrase";
-import voidFn from "../utils/voidfn";
-import PopupComponent from "./PopupComponent";
-import electron from "../utils/electron/electronWrapper";
 import doWebLogin from "../gun/doWebLogin";
+import signup from "../gun/signup";
+import login from "../gun/login";
+
+import voidFn from "../utils/voidfn";
+import getLocalSetting from "../utils/getLocalSetting";
+import setLocalSetting from "../utils/setLocalSetting";
+import electron from "../utils/electron/electronWrapper";
+
+import reduxAction from "../redux/reduxAction";
+import { AppState } from "../redux/stores/rendererStore";
 
 type InputChange = ChangeEvent<HTMLInputElement>;
 

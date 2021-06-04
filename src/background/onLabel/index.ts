@@ -1,5 +1,6 @@
 export { default as GreToClient } from "./GreToClient";
 export { default as ClientToMatchServiceMessageTypeClientToGREMessage } from "./ClientToMatchServiceMessageTypeClientToGREMessage";
+export { default as InEventGetPlayerCourseV2 } from "./InEventGetPlayerCourseV2";
 export { default as InEventJoin } from "./InEventJoin";
 export { default as InEventGetCombinedRankInfo } from "./InEventGetCombinedRankInfo";
 export { default as RankUpdated } from "./RankUpdated";

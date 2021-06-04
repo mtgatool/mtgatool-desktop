@@ -7,20 +7,22 @@ import { Switch, Route, useHistory } from "react-router-dom";
 
 import Auth from "./Auth";
 import CardHover from "./CardHover";
+import ContentWrapper from "./ContentWrapper";
+import DataStatus from "./DataStatus";
 import ErrorBoundary from "./ErrorBoundary";
 import LoadingBar from "./LoadingBar";
 import TopBar from "./TopBar";
 import TopNav from "./TopNav";
 
 import { AppState } from "../redux/stores/rendererStore";
-import { useGun, useSea } from "../gun/hooks";
-import ContentWrapper from "./ContentWrapper";
 import electron from "../utils/electron/electronWrapper";
 import getLocalSetting from "../utils/getLocalSetting";
+import { getCardArtCrop } from "../utils/getCardArtCrop";
+
+import { useGun, useSea } from "../gun/hooks";
+import doWebLogin from "../gun/doWebLogin";
 import login from "../gun/login";
 import reduxAction from "../redux/reduxAction";
-import doWebLogin from "../gun/doWebLogin";
-import DataStatus from "./DataStatus";
 
 function App() {
   useGun();
@@ -28,7 +30,7 @@ function App() {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const { loginState, topArtist, offline, loading } = useSelector(
+  const { loginState, loading, backgroundGrpid } = useSelector(
     (state: AppState) => state.renderer
   );
 
@@ -53,23 +55,25 @@ function App() {
     }
   }, [history, dispatch]);
 
+  let wrapperClass = "app-wrapper-back";
+  if (process.platform == "linux" || electron) {
+    if (loginState == LOGIN_OK) {
+      wrapperClass = "app-wrapper-back-no-frame";
+    }
+  }
+
+  const backgroundImage = backgroundGrpid
+    ? `url(${getCardArtCrop(backgroundGrpid)})`
+    : undefined;
+
   return (
     <>
-      {electron && process.platform !== "linux" && (
-        <TopBar artist={topArtist} loginState={loginState} offline={offline} />
-      )}
+      {electron && process.platform !== "linux" && <TopBar />}
       <div
-        className={
-          process.platform == "linux" || electron
-            ? loginState == LOGIN_OK
-              ? "app-wrapper-back-no-frame"
-              : "app-wrapper-back-no-frame"
-            : loginState == LOGIN_OK
-            ? "app-wrapper-back"
-            : "app-wrapper-back"
-        }
+        className={wrapperClass}
         style={{
           height: `calc(100% - ${electron ? 24 : 0}px)`,
+          backgroundImage: backgroundImage,
         }}
       >
         <CardHover />

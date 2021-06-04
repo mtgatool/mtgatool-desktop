@@ -5,10 +5,11 @@ import objToBase from "../utils/objToBase";
 import getGunUser from "./getGunUser";
 
 export default async function upsertGunDeck(internal: InternalDeck) {
-  console.log(internal);
   const deck = new Deck(internal);
   const userRef = getGunUser();
-  console.log("> Upsert deck: ", deck);
+
+  // console.log(internal);
+  // console.log("> Upsert deck: ", deck);
   if (userRef) {
     const decksIndexRef = userRef.get("decksIndex");
     const decksRef = userRef.get("decks");
@@ -56,13 +57,13 @@ export default async function upsertGunDeck(internal: InternalDeck) {
         .on((currentDeck: GunDeck, k: string, a: any, ev: any) => {
           if (!currentDeck.deckHash) return;
           ev.off();
-          console.log(currentDeckKey);
-          console.log("Exists? ", existsInDb);
-          console.log(currentDeck);
-          console.log(currentDeck.deckHash, deck.getHash());
+          // console.log(currentDeckKey);
+          // console.log("Exists? ", existsInDb);
+          // console.log(currentDeck);
+          // console.log(currentDeck.deckHash, deck.getHash());
 
           if (currentDeck.deckHash !== deck.getHash()) {
-            console.log(`${deck.id} bump version to ${version + 1}`);
+            // console.log(`${deck.id} bump version to ${version + 1}`);
             // this is a new deck, update the version
             version += 1;
             newGunDeck.version = version;
@@ -71,7 +72,7 @@ export default async function upsertGunDeck(internal: InternalDeck) {
             decksRef.get(newDeckDeckKey).put(newGunDeck);
             decksIndexRef.get(deck.id).put(version);
           } else {
-            console.log(`${deck.id} up to date! `);
+            // console.log(`${deck.id} up to date! `);
             // decksRef.get(currentDeckKey).put(newGunDeck);
           }
         });

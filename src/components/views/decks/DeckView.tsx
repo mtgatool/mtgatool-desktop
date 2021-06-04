@@ -12,7 +12,7 @@ import {
 import { useState, useEffect } from "react";
 import ReactSvgPieChart from "react-svg-piechart";
 import { useHistory, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { getCardArtCrop } from "../../../utils/getCardArtCrop";
 import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
@@ -34,6 +34,7 @@ import CardTile from "../../CardTile";
 import { AppState } from "../../../redux/stores/rendererStore";
 import baseToObj from "../../../utils/baseToObj";
 import DeckList from "../../DeckList";
+import reduxAction from "../../../redux/reduxAction";
 
 const { MANA_COLORS } = constants;
 
@@ -42,8 +43,8 @@ const VIEW_REGULAR = 1;
 const VIEW_CHANGES = 2;
 const VIEW_WINRATES = 3;
 
-export default function DeckView(props: any): JSX.Element {
-  console.log(props);
+export default function DeckView(): JSX.Element {
+  const dispatch = useDispatch();
   const history = useHistory();
   const params = useParams<{ page: string; id: string }>();
 
@@ -125,7 +126,13 @@ export default function DeckView(props: any): JSX.Element {
                 backgroundColor: "var(--color-section)",
               }}
               svg={BackIcon}
-              onClick={history.goBack}
+              onClick={() => {
+                history.goBack();
+                reduxAction(dispatch, {
+                  type: "SET_BACK_GRPID",
+                  arg: null,
+                });
+              }}
             />
             <div
               style={{

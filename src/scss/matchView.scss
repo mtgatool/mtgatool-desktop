@@ -1,0 +1,90 @@
+.matches-top {
+  height: 96px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 16px 0;
+
+  .top-inner {
+    height: 32px;
+    display: flex;
+    margin: auto 16px;
+    justify-content: space-between;
+  }
+}
+
+.game-prev {
+  cursor: pointer;
+  background: url(../assets/images/prev.png) no-repeat center;
+  opacity: 0.5;
+  width: 24px;
+  height: 24px;
+  -webkit-transition: all .2s ease-in;
+}
+
+.game-swap {
+  color: var(--color-text);
+  display: flex;
+  justify-content: space-around;
+  margin: 4px 0;
+}
+
+.game-next {
+  cursor: pointer;
+  background: url(../assets/images/next.png) no-repeat center;
+  opacity: 0.5;
+  width: 24px;
+  height: 24px;
+  -webkit-transition: all .2s ease-in;
+}
+
+.game-prev:hover, .game-next:hover {
+  opacity: 1;
+}
+
+.match-player-win {
+  -webkit-user-select: none;
+  align-self: center;
+  margin-right: 16px;
+  font-family:  var(--main-font-name-it);
+  color: var(--color-g);
+}
+
+.match-player-name {
+  -webkit-user-select: none;
+  align-self: center;
+  margin-right: 4px;
+  font-family:  var(--main-font-name);
+  color: var(--color-text);
+}
+
+.gamestats-side {
+  margin: 0 0 16px 0;
+  max-width: 360px;
+  width: calc(50% - 8px);
+}
+
+.gamestats-subtitle {
+  margin: 4px auto 10px auto;
+  color: var(--color-text);
+  font-size: 16px;
+  font-family: var(--main-font-name-bold-it);
+  text-align: center;
+}
+
+.match-view-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 50% 50%;
+  grid-auto-rows: auto max-content max-content;
+  grid-template-areas: "controls controls" "name right" "buttons right" "deck right";
+}
+
+.match-top-result {
+  font-family: var(--main-font-name);
+  font-size: 20px;
+  margin-right: 8px;
+}

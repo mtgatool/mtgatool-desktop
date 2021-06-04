@@ -54,7 +54,7 @@ export default function linkGunToRedux() {
         const object = await getGraphObjectFromPartial<GunUser["uuidData"]>(
           data
         );
-        // console.log("on uuid data", data, object);
+        console.log("on uuid data", data, object);
 
         if (object) {
           reduxAction(dispatch, {

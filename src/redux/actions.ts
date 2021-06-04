@@ -16,7 +16,7 @@ export const actions = {
   SET_LOGIN_STATE: RendererSlice.setLoginState,
   SET_LOG_COMPLETION: RendererSlice.setLogCompletion,
   SET_ARCHIVED: RendererSlice.setArchived,
-  SET_BACK_IMAGE: RendererSlice.setBackgroundImage,
+  SET_BACK_GRPID: RendererSlice.setBackgroundGrpid,
   SET_LOADING: RendererSlice.setLoading,
   SET_NO_LOG: RendererSlice.setNoLog,
   SET_OFFLINE: RendererSlice.setOffline,

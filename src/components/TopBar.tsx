@@ -2,12 +2,14 @@
 import { CSSProperties, useState } from "react";
 import { constants } from "mtgatool-shared";
 
+import { useSelector } from "react-redux";
 import { ReactComponent as MacMinimize } from "../assets/images/svg/mac-minimize.svg";
 import { ReactComponent as MacMaximize } from "../assets/images/svg/mac-maximize.svg";
 import { ReactComponent as MacClose } from "../assets/images/svg/mac-close.svg";
 
 import { ReactComponent as WinMinimize } from "../assets/images/svg/win-minimize.svg";
 import { ReactComponent as WinMaximize } from "../assets/images/svg/win-maximize.svg";
+import { ReactComponent as WinRestore } from "../assets/images/svg/win-restore.svg";
 import { ReactComponent as WinClose } from "../assets/images/svg/win-close.svg";
 
 import { ReactComponent as Logo } from "../assets/images/svg/logo.svg";
@@ -15,14 +17,10 @@ import { ReactComponent as Logo } from "../assets/images/svg/logo.svg";
 import minimizeWindow from "../utils/electron/minimizeWindow";
 import setMaximize from "../utils/electron/setMaximize";
 import hideWindow from "../utils/electron/hideWindow";
+import isMaximized from "../utils/electron/isMaximized";
+import { AppState } from "../redux/stores/rendererStore";
 
 const { LOGIN_OK } = constants;
-
-interface TopBarProps {
-  artist: string;
-  offline: boolean;
-  loginState: number;
-}
 
 function clickMinimize(): void {
   minimizeWindow();
@@ -40,10 +38,12 @@ function clickClose(): void {
   // }
 }
 
-export default function TopBar(props: TopBarProps): JSX.Element {
+export default function TopBar(): JSX.Element {
   const [hoverControls, setHoverControls] = useState(false);
 
-  const { artist, offline, loginState } = props;
+  const { topArtist, offline, loginState } = useSelector(
+    (state: AppState) => state.renderer
+  );
 
   const os = process.platform;
 
@@ -80,7 +80,11 @@ export default function TopBar(props: TopBarProps): JSX.Element {
       key="top-maximize"
       className={`${"maximize"} ${topButtonClass}`}
     >
-      <MaximizeSVG style={iconStyle} />
+      {isMaximized() ? (
+        <WinRestore style={iconStyle} />
+      ) : (
+        <MaximizeSVG style={iconStyle} />
+      )}
     </div>
   );
 
@@ -110,7 +114,7 @@ export default function TopBar(props: TopBarProps): JSX.Element {
       >
         <Logo fill="#FFF" style={{ margin: "2px 8px", opacity: 0.6 }} />
         {loginState !== LOGIN_OK ? (
-          <div className="top-artist">{artist}</div>
+          <div className="top-artist">{topArtist}</div>
         ) : (
           <></>
         )}

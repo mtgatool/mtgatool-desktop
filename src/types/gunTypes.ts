@@ -40,6 +40,7 @@ export interface GunMatch {
   eventId: string;
   duration: number;
   internalMatch: string;
+  actionLog: string;
   timestamp: number;
 }
 

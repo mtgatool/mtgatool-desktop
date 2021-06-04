@@ -1,0 +1,75 @@
+
+.actionlog-div {
+  font-family: var(--main-font-name);
+  width: calc(50% - 48px);
+  max-width: 700px;
+  margin: auto;
+}
+
+.actionlog-div .actionlog {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.actionlog {
+  color: white;
+  text-shadow: 2px 2px 2px rgb(0, 0, 0);
+  white-space: nowrap;
+  overflow: hidden;
+  height: 24px;
+  line-height: 24px;
+  width: 100%;
+  display: flex;
+  font-size: 14px;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0));
+}
+
+.log-player0 {
+  color: rgba(200, 255, 200, 1);
+}
+
+.log-player1 {
+  color: rgba(255, 200, 200, 1);
+}
+
+.log-player2 {
+  color: rgba(200, 200, 255, 1);
+}
+
+.log-p-1 {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: bold;
+}
+
+.log-p-2 {
+  margin-top: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: bold;
+}
+
+.actionlog-time {
+  margin-left: 8px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.actionlog-text {
+  display: flex;
+  margin-left: 8px;
+}
+
+.log-text {
+  margin-right: 3px;
+}
+
+.log-card {
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-right: 3px;
+}
+
+.log-ability {
+  text-decoration: underline !important;
+  cursor: pointer;
+  margin-right: 3px;
+}

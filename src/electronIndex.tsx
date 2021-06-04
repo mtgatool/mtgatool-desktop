@@ -17,11 +17,13 @@ import backgroundChannelListeners from "./broadcastChannel/backgroundChannelList
 import mainChannelListeners from "./broadcastChannel/mainChannelListeners";
 import { loadDbFromCache } from "./utils/database-wrapper";
 import electron from "./utils/electron/electronWrapper";
+import initDirectories from "./utils/initDirectories";
 
 const title = electron?.remote.getCurrentWindow().getTitle() || "";
 loadDbFromCache();
 
 if (title == "mtgatool-background") {
+  initDirectories();
   if (module.hot && process.env.NODE_ENV === "development") {
     module.hot.accept();
   }

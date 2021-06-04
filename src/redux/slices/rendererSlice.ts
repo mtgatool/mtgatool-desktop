@@ -10,7 +10,7 @@ import {
 
 export const initialRendererState = {
   archivedCache: {} as Record<string, boolean>,
-  backgroundImage: "default",
+  backgroundGrpid: null as number | null,
   loading: false,
   logCompletion: 0,
   noLog: false,
@@ -55,11 +55,12 @@ const rendererSlice = createSlice({
     ): void => {
       state.logCompletion = action.payload;
     },
-    setBackgroundImage: (
+    setBackgroundGrpid: (
       state: RendererState,
-      action: PayloadAction<string>
+      action: PayloadAction<number | null>
     ): void => {
-      state.backgroundImage = action.payload;
+      state.backgroundGrpid = action.payload;
+      state.topArtist = action.payload ? "" : "Thoughtseize by Aleksi Briclot";
     },
     setLoading: (
       state: RendererState,
@@ -133,7 +134,7 @@ const rendererSlice = createSlice({
 export const {
   setLoginState,
   setLogCompletion,
-  setBackgroundImage,
+  setBackgroundGrpid,
   setLoading,
   setNoLog,
   setOffline,

@@ -13,6 +13,12 @@ export default function logEntrySwitch(entry: LogEntry): void {
       Labels.ClientToMatchServiceMessageTypeClientToGREMessage(entry);
       break;
 
+    case "Event.GetPlayerCourseV2":
+      if (entry.arrow == "<==") {
+        Labels.InEventGetPlayerCourseV2(entry);
+      }
+      break;
+
     case "Event.Join":
       if (entry.arrow == "<==") {
         Labels.InEventJoin(entry);

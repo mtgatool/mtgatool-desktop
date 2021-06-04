@@ -1,5 +1,11 @@
 import { useCallback, useState, CSSProperties } from "react";
-import { constants, Deck, DbCardData, Rarity } from "mtgatool-shared";
+import {
+  constants,
+  Deck,
+  DbCardData,
+  Rarity,
+  cardHasType,
+} from "mtgatool-shared";
 import { LANDS_HACK } from "mtgatool-shared/dist/shared/constants";
 import getRankColorClass from "../utils/getRankColorClass";
 import openScryfallCard from "../utils/openScryfallCard";
@@ -34,6 +40,11 @@ mana.gu = "mana-gu";
 mana.rw = "mana-rw";
 mana.rg = "mana-rg";
 mana.x = "mana-x";
+mana.wp = "mana-wp";
+mana.up = "mana-up";
+mana.bp = "mana-bp";
+mana.rp = "mana-rp";
+mana.gp = "mana-gp";
 mana["0"] = "mana-0";
 mana["1"] = "mana-1";
 mana["2"] = "mana-2";
@@ -111,6 +122,18 @@ function CostSymbols(props: {
 
   const dfcSeparator = "//";
   if (card.cost) {
+    if (!cardHasType(card, "Land") && card.cost.length === 0) {
+      costSymbols.push(
+        <div
+          style={{
+            justifyContent: "flex-end",
+          }}
+          // eslint-disable-next-line react/no-array-index-key
+          key={`${card.id}_0`}
+          className={`mana-s16 ${mana["0"]}`}
+        />
+      );
+    }
     card.cost.forEach((cost: string, index: number) => {
       if (hasSplitCost) {
         if (/^(x|\d)+$/.test(cost) && prevc === false) {
