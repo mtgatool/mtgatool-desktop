@@ -1,5 +1,5 @@
 import { Fragment, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { GunMatch } from "../../../types/gunTypes";
@@ -7,14 +7,13 @@ import ListItemMatch from "./ListItemMatch";
 
 export default function HistoryList() {
   const history = useHistory();
-  const dispatch = useDispatch();
   const matches = useSelector((state: AppState) => state.mainData.matches);
 
   const openMatch = useCallback(
     (match: GunMatch) => {
       history.push(`/history/${match.matchId}`);
     },
-    [dispatch, history]
+    [history]
   );
 
   return (

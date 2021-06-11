@@ -1,8 +1,8 @@
 /* eslint-disable no-nested-ternary */
 import { CSSProperties, useState } from "react";
-import { constants } from "mtgatool-shared";
 
 import { useSelector } from "react-redux";
+import { COLORS_ALL } from "mtgatool-shared/dist/shared/constants";
 import { ReactComponent as MacMinimize } from "../assets/images/svg/mac-minimize.svg";
 import { ReactComponent as MacMaximize } from "../assets/images/svg/mac-maximize.svg";
 import { ReactComponent as MacClose } from "../assets/images/svg/mac-close.svg";
@@ -19,8 +19,10 @@ import setMaximize from "../utils/electron/setMaximize";
 import hideWindow from "../utils/electron/hideWindow";
 import isMaximized from "../utils/electron/isMaximized";
 import { AppState } from "../redux/stores/rendererStore";
-
-const { LOGIN_OK } = constants;
+import getWindowTitle from "../utils/electron/getWindowTitle";
+import { ALL_OVERLAYS, WINDOW_MAIN } from "../types/app";
+import electron from "../utils/electron/electronWrapper";
+import { overlayTitleToId } from "../common/maps";
 
 function clickMinimize(): void {
   minimizeWindow();
@@ -38,14 +40,28 @@ function clickClose(): void {
   // }
 }
 
+function clickCloseOverlay(): void {
+  if (electron) {
+    const thisWindowTitle = electron.remote.getCurrentWindow().getTitle();
+    electron.remote.BrowserWindow.getAllWindows().forEach((w) => {
+      if (w.getTitle() == thisWindowTitle) {
+        w.close();
+        w.destroy();
+      }
+    });
+  }
+}
+
 export default function TopBar(): JSX.Element {
   const [hoverControls, setHoverControls] = useState(false);
 
-  const { topArtist, offline, loginState } = useSelector(
+  const { topArtist, offline } = useSelector(
     (state: AppState) => state.renderer
   );
 
   const os = process.platform;
+
+  const isOverlay = ALL_OVERLAYS.includes(getWindowTitle());
 
   const topButtonClass = os == "darwin" ? "top-button-mac" : "top-button";
 
@@ -56,6 +72,7 @@ export default function TopBar(): JSX.Element {
 
   const MinimizeSVG = os == "darwin" ? MacMinimize : WinMinimize;
   const MaximizeSVG = os == "darwin" ? MacMaximize : WinMaximize;
+  const RestoreSVG = os == "darwin" ? MacMaximize : WinRestore;
   const CloseSVG = os == "darwin" ? MacClose : WinClose;
 
   // Define components for simple ordering later
@@ -64,7 +81,9 @@ export default function TopBar(): JSX.Element {
     margin: "auto",
   };
 
-  const minimize = (
+  const minimize = isOverlay ? (
+    <></>
+  ) : (
     <div
       onClick={clickMinimize}
       key="top-minimize"
@@ -74,14 +93,16 @@ export default function TopBar(): JSX.Element {
     </div>
   );
 
-  const maximize = (
+  const maximize = isOverlay ? (
+    <></>
+  ) : (
     <div
       onClick={clickMaximize}
       key="top-maximize"
       className={`${"maximize"} ${topButtonClass}`}
     >
       {isMaximized() ? (
-        <WinRestore style={iconStyle} />
+        <RestoreSVG style={iconStyle} />
       ) : (
         <MaximizeSVG style={iconStyle} />
       )}
@@ -90,7 +111,7 @@ export default function TopBar(): JSX.Element {
 
   const close = (
     <div
-      onClick={clickClose}
+      onClick={isOverlay ? clickCloseOverlay : clickClose}
       key="top-close"
       className={`${"close"} ${topButtonClass}`}
     >
@@ -105,6 +126,16 @@ export default function TopBar(): JSX.Element {
       className="top"
       style={{ flexDirection: isReverse ? "row-reverse" : "row" }}
     >
+      {isOverlay && (
+        <div
+          className="overlay-icon"
+          style={{
+            backgroundColor: `var(--color-${
+              COLORS_ALL[overlayTitleToId[getWindowTitle()]]
+            })`,
+          }}
+        />
+      )}
       <div
         style={{
           display: "flex",
@@ -113,7 +144,7 @@ export default function TopBar(): JSX.Element {
         }}
       >
         <Logo fill="#FFF" style={{ margin: "2px 8px", opacity: 0.6 }} />
-        {loginState !== LOGIN_OK ? (
+        {getWindowTitle() == WINDOW_MAIN ? (
           <div className="top-artist">{topArtist}</div>
         ) : (
           <></>

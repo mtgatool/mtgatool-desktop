@@ -78,7 +78,7 @@
 .match-view-grid {
   display: grid;
   gap: 16px;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: calc(50% - 8px) calc(50% - 8px);
   grid-auto-rows: auto max-content max-content;
   grid-template-areas: "controls controls" "name right" "buttons right" "deck right";
 }

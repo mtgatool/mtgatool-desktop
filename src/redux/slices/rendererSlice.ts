@@ -60,7 +60,7 @@ const rendererSlice = createSlice({
       action: PayloadAction<number | null>
     ): void => {
       state.backgroundGrpid = action.payload;
-      state.topArtist = action.payload ? "" : "Thoughtseize by Aleksi Briclot";
+      state.topArtist = action.payload ? "" : initialRendererState.topArtist;
     },
     setLoading: (
       state: RendererState,
@@ -88,12 +88,6 @@ const rendererSlice = createSlice({
       action: PayloadAction<RendererState["popup"]>
     ): void => {
       state.popup = action.payload;
-    },
-    setTopArtist: (
-      state: RendererState,
-      action: PayloadAction<string>
-    ): void => {
-      state.topArtist = action.payload;
     },
     setFormats: (
       state: RendererState,
@@ -142,7 +136,6 @@ export const {
   setPopup,
   setArchived,
   setFormats,
-  setTopArtist,
   setUpdateState,
   setRewardsDailyEnds,
   setRewardsWeeklyEnds,

@@ -33,7 +33,7 @@ export default function SampleSizePanel(
   }, [cardOdds.cardsLeft, sampleSize, setOddsCallback]);
 
   return (
-    <>
+    <div className="odds-container">
       <div className="overlay-samplesize-container">
         <div className="odds-prev click-on" onClick={handleOddsPrev} />
         <div className="odds-number">Sample size: {sampleSize}</div>
@@ -88,6 +88,6 @@ export default function SampleSizePanel(
           </div>
         );
       })}
-    </>
+    </div>
   );
 }

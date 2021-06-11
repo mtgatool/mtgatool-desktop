@@ -1,6 +1,7 @@
 import * as HoverSlice from "./slices/hoverSlice";
 import * as MainDataSlice from "./slices/mainDataSlice";
 import * as RendererSlice from "./slices/rendererSlice";
+import * as SettingsSlice from "./slices/settingsSlice";
 
 export const actions = {
   SET_HOVER_IN: HoverSlice.setHoverIn,
@@ -22,11 +23,12 @@ export const actions = {
   SET_OFFLINE: RendererSlice.setOffline,
   SET_PATREON: RendererSlice.setPatreon,
   SET_POPUP: RendererSlice.setPopup,
-  SET_TOPARTIST: RendererSlice.setTopArtist,
   SET_FORMATS: RendererSlice.setFormats,
   SET_UPDATE_STATE: RendererSlice.setUpdateState,
   SET_DAILY_ENDS: RendererSlice.setRewardsDailyEnds,
   SET_WEEKLY_ENDS: RendererSlice.setRewardsWeeklyEnds,
+  SET_SETTINGS: SettingsSlice.setSettings,
+  SET_OVERLAY_SETTINGS: SettingsSlice.setOverlaySettings,
 };
 
 export type ActionKeys = keyof typeof actions;

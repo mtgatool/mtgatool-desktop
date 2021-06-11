@@ -51,6 +51,46 @@ function quit() {
   app.exit();
 }
 
+function createCardHoverWindow() {
+  mainGlobals.cardHoverWindow = new BrowserWindow({
+    transparent: true,
+    focusable: false,
+    title: "mtgatool-hover",
+    show: false,
+    frame: false,
+    width: 400,
+    height: 600,
+    x: 0,
+    y: 0,
+    alwaysOnTop: true,
+    acceptFirstMouse: true,
+    webPreferences: {
+      webSecurity: false,
+      nodeIntegration: true,
+    },
+  });
+
+  mainGlobals.cardHoverWindow.removeMenu();
+  mainGlobals.cardHoverWindow.loadURL(
+    process.env.ELECTRON_START_URL ||
+      url.format({
+        pathname: path.join(__dirname, "..", "build", "index.html"),
+        protocol: "file:",
+        slashes: true,
+      })
+  );
+
+  mainGlobals.cardHoverWindow.once("dom-ready", () => {
+    // eslint-disable-next-line func-names
+    setTimeout(function () {
+      mainGlobals.cardHoverWindow.setAlwaysOnTop(true, "floating");
+      mainGlobals.cardHoverWindow.setFocusable(false);
+      mainGlobals.cardHoverWindow.moveTop();
+      mainGlobals.cardHoverWindow.show();
+    }, 500);
+  });
+}
+
 function createWindow() {
   mainGlobals.backgroundWindow = new BrowserWindow({
     show: false,
@@ -103,13 +143,16 @@ function createWindow() {
   );
 
   mainGlobals.mainWindow.removeMenu();
+
+  createCardHoverWindow();
+
   globalShortcut.register("Alt+Shift+D", openDevTools);
 
   const iconPath = "icon-256.png";
 
   tray = new Tray(path.join(__dirname, "icons", iconPath));
   tray.on("double-click", toggleWindow);
-  tray.setToolTip("Super Reality");
+  tray.setToolTip("MTG Arena Tool");
   const contextMenu = Menu.buildFromTemplate([
     {
       label: "Show",

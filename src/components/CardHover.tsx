@@ -1,60 +1,20 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, CSSProperties } from "react";
 import { useSelector } from "react-redux";
-import { constants, database } from "mtgatool-shared";
-import notFound from "../assets/images/notfound.png";
+import { database } from "mtgatool-shared";
 import NoCard from "../assets/images/nocard.png";
 import { AppState } from "../redux/stores/rendererStore";
 import OwnershipStars from "./OwnershipStars";
-
-const {
-  FACE_DFC_FRONT,
-  FACE_DFC_BACK,
-  FACE_MODAL_BACK,
-  FACE_MODAL_FRONT,
-} = constants;
-
-function getFrontUrl(hoverGrpId: number, quality: string): string {
-  const cardObj = database.card(hoverGrpId);
-  let newImg;
-  try {
-    newImg = cardObj?.images[quality] || notFound;
-  } catch (e) {
-    newImg = notFound;
-  }
-  return newImg;
-}
-
-function getBackUrl(hoverGrpId: number, quality: string): string {
-  let cardObj = database.card(hoverGrpId);
-  let newImg;
-  if (
-    cardObj &&
-    (cardObj.dfc == FACE_DFC_BACK ||
-      cardObj.dfc == FACE_DFC_FRONT ||
-      cardObj.dfc == FACE_MODAL_BACK ||
-      cardObj.dfc == FACE_MODAL_FRONT) &&
-    cardObj.dfcId &&
-    cardObj.dfcId !== true
-  ) {
-    cardObj = database.card(cardObj.dfcId);
-    try {
-      newImg = cardObj?.images[quality];
-    } catch (e) {
-      newImg = notFound;
-    }
-  }
-  return newImg || notFound;
-}
+import getFrontUrl from "../utils/getFrontUrl";
+import getBackUrl from "../utils/getBackUrl";
+import isCardDfc from "../utils/isCardDfc";
 
 export default function CardHover(): JSX.Element {
   const { grpId, opacity } = useSelector((state: AppState) => state.hover);
 
-  const quality = useSelector(
-    (_state: AppState) => "normal" // state.settings.cards_quality
-  );
+  const quality = useSelector((state: AppState) => state.settings.cardsQuality);
   const hoverSize = useSelector(
-    (_state: AppState) => 12 // state.settings.cards_size_hover_card
+    (state: AppState) => state.settings.cardsSizeHoverCard
   );
   const card = database.card(grpId);
   const [frontLoaded, setFrontLoaded] = useState(0);
@@ -64,7 +24,7 @@ export default function CardHover(): JSX.Element {
 
   const size = 100 + hoverSize * 15;
 
-  const styleFront = useMemo((): React.CSSProperties => {
+  const styleFront = useMemo((): CSSProperties => {
     return {
       width: `${size}px`,
       height: `${size / 0.71808510638}px`,
@@ -74,19 +34,10 @@ export default function CardHover(): JSX.Element {
     };
   }, [frontUrl, opacity, grpId, frontLoaded, size]);
 
-  const styleDfc = useMemo((): React.CSSProperties => {
+  const styleDfc = useMemo((): CSSProperties => {
     const cardObj = database.card(grpId);
     let op = opacity;
-    if (
-      !(
-        cardObj &&
-        (cardObj.dfc == FACE_DFC_BACK ||
-          cardObj.dfc == FACE_DFC_FRONT ||
-          cardObj.dfc == FACE_MODAL_BACK ||
-          cardObj.dfc == FACE_MODAL_FRONT) &&
-        cardObj.dfcId
-      )
-    ) {
+    if (!(cardObj?.dfcId && isCardDfc(grpId))) {
       op = 0;
     }
 

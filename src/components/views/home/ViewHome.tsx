@@ -34,7 +34,7 @@ export default function ViewHome(props: ViewHomeProps) {
           style={{
             margin: "auto",
           }}
-          onClick={() => createOverlay().then(() => console.log("closeddd!"))}
+          onClick={() => createOverlay(0).then(() => console.log("closeddd!"))}
           text="Test overaly"
         />
       </div>

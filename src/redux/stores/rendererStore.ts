@@ -2,11 +2,13 @@ import { combineReducers } from "redux";
 import { configureStore } from "@reduxjs/toolkit";
 import mainDataSlice from "../slices/mainDataSlice";
 import rendererSlice from "../slices/rendererSlice";
+import settingsSlice from "../slices/settingsSlice";
 import hoverSlice from "../slices/hoverSlice";
 
 const rootReducer = combineReducers({
   mainData: mainDataSlice.reducer,
   renderer: rendererSlice.reducer,
+  settings: settingsSlice.reducer,
   hover: hoverSlice.reducer,
 });
 

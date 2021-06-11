@@ -102,12 +102,6 @@
   background-color: var(--color-card-tile);
 }
 
-.overlay-deck-mana-curve {
-  padding: 8px;
-  margin-top: 1px;
-  background-color: var(--color-card-tile);
-}
-
 .hover-fade-enter {
   opacity: 0;
 }
@@ -348,29 +342,35 @@
 .deck-prev:hover,
 .deck-next:hover,
 .odds-prev:hover,
-.odds-next-hover {
+.odds-next:hover {
   opacity: 1;
 }
 
-.overlay-samplesize-container {
-  margin-top: 16px;
-  position: relative;
-  height: 32px;
-  flex-direction: column;
-  display: flex;
-  width: 100%;
-}
+.odds-container {
+  margin-top: 1px;
+  padding-bottom: 16px;
+  margin-bottom: 1px;
+  background-color: var(--color-card-tile);
 
-.odds-number {
-  width: 100%;
-  margin-top: auto;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.85);
-}
+  .overlay-samplesize-container {
+    position: relative;
+    height: 32px;
+    flex-direction: column;
+    display: flex;
+    width: 100%;
+  }
 
-.odds-prev,
-.odds-next {
-  height: 44px;
+  .odds-number {
+    width: 100%;
+    margin-top: auto;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .odds-prev,
+  .odds-next {
+    height: 44px;
+  }
 }
 
 .overlay-card-quantity {
@@ -455,8 +455,9 @@
 }
 
 .overlay-icon {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
+  margin: auto 5px 5px 6px;
   border-radius: 50%;
   cursor: pointer;
   background-repeat: no-repeat;

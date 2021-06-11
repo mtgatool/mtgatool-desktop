@@ -1,6 +1,6 @@
 /* eslint-disable import/no-webpack-loader-syntax */
 /* eslint-disable no-nested-ternary */
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 import { Switch, Route, useHistory } from "react-router-dom";
@@ -23,6 +23,13 @@ import { useGun, useSea } from "../gun/hooks";
 import doWebLogin from "../gun/doWebLogin";
 import login from "../gun/login";
 import reduxAction from "../redux/reduxAction";
+import PopupComponent from "./PopupComponent";
+import vodiFn from "../utils/voidfn";
+import ViewSettings from "./views/settings/ViewSettings";
+import SettingsPersistor from "./SettingsPersistor";
+import isElectron from "../utils/electron/isElectron";
+
+import info from "../info.json";
 
 function App() {
   useGun();
@@ -46,6 +53,8 @@ function App() {
             type: "SET_LOGIN_STATE",
             arg: LOGIN_OK,
           });
+
+          history.push("/auth");
         })
         .catch(() => {
           history.push("/auth");
@@ -66,8 +75,23 @@ function App() {
     ? `url(${getCardArtCrop(backgroundGrpid)})`
     : undefined;
 
+  const openSettings = useRef<() => void>(vodiFn);
+  const closeSettings = useRef<() => void>(vodiFn);
+
   return (
     <>
+      <SettingsPersistor />
+      <PopupComponent
+        open={false}
+        className={isElectron() ? "settings-popup" : ""}
+        width="100%"
+        height="100%"
+        openFnRef={openSettings}
+        closeFnRef={closeSettings}
+        persistent={false}
+      >
+        <ViewSettings onClose={closeSettings.current} />
+      </PopupComponent>
       {electron && process.platform !== "linux" && <TopBar />}
       <div
         className={wrapperClass}
@@ -95,7 +119,7 @@ function App() {
             <Route exact path="/auth" component={Auth} />
             <Route path="/:page">
               <>
-                <TopNav />
+                <TopNav openSettings={openSettings.current} />
                 {loginState == LOGIN_OK ? <ContentWrapper /> : <></>}
               </>
             </Route>
@@ -103,9 +127,7 @@ function App() {
         </ErrorBoundary>
         {loginState == LOGIN_OK ? <DataStatus /> : <></>}
         {electron ? (
-          <div className="version-number">
-            v{electron.remote.app.getVersion()}
-          </div>
+          <div className="version-number">v{info.version}</div>
         ) : (
           <></>
         )}

@@ -1,4 +1,5 @@
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
+import { overlayTitleToId } from "../common/maps";
 import setGunMatch from "../gun/setGunMatch";
 import upsertGunCards from "../gun/upsertGunCards";
 import upsertGunDeck from "../gun/upsertGunDeck";
@@ -52,6 +53,16 @@ export default function mainChannelListeners() {
 
     if (msg.data.type === "GAME_STATS") {
       setGunMatch(msg.data.value);
+    }
+
+    if (msg.data.type == "OVERLAY_UPDATE_BOUNDS") {
+      const id = overlayTitleToId[msg.data.value.window];
+      if (id !== undefined) {
+        reduxAction(store.dispatch, {
+          type: "SET_OVERLAY_SETTINGS",
+          arg: { settings: { bounds: msg.data.value.bounds }, id: id },
+        });
+      }
     }
 
     if (msg.data.type === "UPSERT_GUN_DECK") {

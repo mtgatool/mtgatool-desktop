@@ -7,6 +7,7 @@ import {
   Heat,
   InternalPlayer,
   MatchGameStats,
+  InternalDeck,
 } from "mtgatool-shared";
 import {
   AnnotationInfo,
@@ -67,4 +68,20 @@ export interface MatchState {
   handsDrawn: number[][];
   matchGameStats: MatchGameStats[];
   cardsOdds: Chances;
+}
+
+export interface OverlayUpdateMatchState
+  extends Omit<
+    MatchState,
+    "GREtoClient" | "annotations" | "processedAnnotations" | "zones"
+  > {
+  oppCards: InternalDeck;
+  playerCardsLeft: InternalDeck;
+  playerCardsOdds: Chances;
+  playerDeck: InternalDeck;
+  playerOriginalDeck: InternalDeck;
+  GREtoClient?: MatchState["GREtoClient"];
+  annotations?: MatchState["annotations"];
+  processedAnnotations?: MatchState["processedAnnotations"];
+  zones?: MatchState["zones"];
 }

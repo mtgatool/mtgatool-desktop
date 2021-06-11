@@ -8,6 +8,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { Provider } from "react-redux";
 import App from "./components/App";
 import Overlay from "./overlay";
+import Hover from "./hover";
 import store from "./redux/stores/rendererStore";
 import "./index.scss";
 
@@ -16,19 +17,44 @@ import defaultLocalSettings from "./utils/defaultLocalSettings";
 import backgroundChannelListeners from "./broadcastChannel/backgroundChannelListeners";
 import mainChannelListeners from "./broadcastChannel/mainChannelListeners";
 import { loadDbFromCache } from "./utils/database-wrapper";
-import electron from "./utils/electron/electronWrapper";
 import initDirectories from "./utils/initDirectories";
+import getWindowTitle from "./utils/electron/getWindowTitle";
+import { ALL_OVERLAYS, WINDOW_BACKGROUND, WINDOW_HOVER } from "./types/app";
 
-const title = electron?.remote.getCurrentWindow().getTitle() || "";
+const title = getWindowTitle();
 loadDbFromCache();
 
-if (title == "mtgatool-background") {
+if (title == WINDOW_BACKGROUND) {
   initDirectories();
   if (module.hot && process.env.NODE_ENV === "development") {
     module.hot.accept();
   }
   backgroundChannelListeners();
-} else if (title == "mtgatool-overlay") {
+} else if (title == WINDOW_HOVER) {
+  defaultLocalSettings();
+  ReactDOM.render(
+    <React.StrictMode>
+      <Provider store={store}>
+        <Hover />
+      </Provider>
+    </React.StrictMode>,
+    document.getElementById("root")
+  );
+
+  if (module.hot && process.env.NODE_ENV === "development") {
+    module.hot.accept();
+    // eslint-disable-next-line global-require
+    const NextHover = require("./hover/index").default;
+    ReactDOM.render(
+      <React.StrictMode>
+        <Provider store={store}>
+          <NextHover />
+        </Provider>
+      </React.StrictMode>,
+      document.getElementById("root")
+    );
+  }
+} else if (ALL_OVERLAYS.includes(title)) {
   defaultLocalSettings();
   ReactDOM.render(
     <React.StrictMode>

@@ -1,4 +1,7 @@
+@import "./misc.scss";
+
 .decks-table-deck-tile {
+  @include animated;
   overflow: hidden;
   border-radius: 4px;
   margin: auto;
@@ -12,6 +15,13 @@
   justify-content: space-between;
   background-position: center;
   background-repeat: no-repeat;
+  filter: brightness(1.0);
+  background-size: auto 175px;
+
+  &:hover {
+    filter: brightness(1.1);
+    background-size: auto 210px;
+  }
 
   .decks-table-deck-inner {
     display: flex;

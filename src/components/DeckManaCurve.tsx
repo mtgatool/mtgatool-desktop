@@ -73,7 +73,7 @@ export default function DeckManaCurve(props: {
   // debugLog("deckManaCurve", manaCounts, curveMax);
 
   return (
-    <div className={className || "mana-curve-container"}>
+    <div className={`${className} mana-curve-container`}>
       <div className="mana-curve">
         {!!manaCounts &&
           manaCounts.map((cost, i) => {

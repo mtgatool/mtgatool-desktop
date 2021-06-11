@@ -15,6 +15,10 @@ function openDevTools() {
       w.close();
       closedDevtools = true;
     }
+    if (title == "MTG Arena Tool - hover") {
+      w.close();
+      closedDevtools = true;
+    }
   });
 
   if (!closedDevtools) {
@@ -37,6 +41,16 @@ function openDevTools() {
       backDevtools.webContents
     );
     mainGlobals.backgroundWindow.webContents.openDevTools({ mode: "detach" });
+
+    const hoverDevTools = new BrowserWindow({
+      title: "MTG Arena Tool - hover",
+      icon: path.join(__dirname, "logo512.png"),
+    });
+    hoverDevTools.removeMenu();
+    mainGlobals.cardHoverWindow.webContents.setDevToolsWebContents(
+      hoverDevTools.webContents
+    );
+    mainGlobals.cardHoverWindow.webContents.openDevTools({ mode: "detach" });
   }
 }
 

@@ -42,7 +42,7 @@
   -webkit-app-region: no-drag;
   top: 2px;
   left: 4px;
-  width: 60px;
+  width: fit-content;
   justify-content: space-around;
 }
 
@@ -67,6 +67,7 @@
   border-radius: 50%;
   display: flex;
   border: 1px solid;
+  margin: 0 4px;
 }
 
 .top-button-mac-unfocus {

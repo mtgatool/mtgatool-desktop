@@ -6,7 +6,9 @@ const getNameBySeat = (seat: number): string => {
   const { currentMatch } = globalStore;
   try {
     if (seat === currentMatch.playerSeat) {
-      return getPlayerNameWithoutSuffix("aaaaaaaaaaaaaaa");
+      return getPlayerNameWithoutSuffix(
+        currentMatch.player.name || "???#00000"
+      );
     }
 
     const oppName = currentMatch.opponent.name;

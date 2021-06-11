@@ -1,10 +1,10 @@
-import { useSelector } from "react-redux";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
+
+import { useSelector } from "react-redux";
+import useGunUser from "../../../hooks/useGunUser";
 
 import DecksList from "./DecksList";
 import DeckView from "./DeckView";
-
-import useGunUser from "../../../hooks/useGunUser";
 
 import { AppState } from "../../../redux/stores/rendererStore";
 

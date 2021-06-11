@@ -2,10 +2,6 @@
 import { IGunChainReference } from "gun/types/chain";
 import { InternalRank } from "mtgatool-shared";
 
-export interface GunState {
-  [record: string]: any;
-}
-
 export interface GunDeck {
   playerId: string;
   name: string;
@@ -73,3 +69,7 @@ export interface GunUser {
 }
 
 export type GunUserChain = IGunChainReference<GunUser>;
+
+export interface GunState {
+  [record: string]: any;
+}

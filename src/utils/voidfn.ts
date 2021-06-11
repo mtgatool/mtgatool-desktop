@@ -1,3 +1,3 @@
-export default function voiFn() {
+export default function vodiFn() {
   //
 }

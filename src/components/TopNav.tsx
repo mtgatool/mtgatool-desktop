@@ -15,7 +15,7 @@ import IconButton from "./ui/IconButton";
 import getLocalSetting from "../utils/getLocalSetting";
 import { AppState } from "../redux/stores/rendererStore";
 import Alt from "./Alt";
-import voiFn from "../utils/voidfn";
+import vodiFn from "../utils/voidfn";
 
 interface TopNavItemProps {
   compact: boolean;
@@ -62,8 +62,8 @@ interface TopRankProps {
 }
 
 function TopRankIcon(props: TopRankProps): JSX.Element {
-  const closeAltRef = useRef<() => void>(voiFn);
-  const openAltRef = useRef<() => void>(voiFn);
+  const closeAltRef = useRef<() => void>(vodiFn);
+  const openAltRef = useRef<() => void>(vodiFn);
   const positionRef = useRef<HTMLDivElement>(null);
 
   const { uri, rank, rankClass } = props;
@@ -128,7 +128,13 @@ function TopRankIcon(props: TopRankProps): JSX.Element {
   );
 }
 
-export default function TopNav(): JSX.Element {
+interface TopNavProps {
+  openSettings: () => void;
+}
+
+export default function TopNav(props: TopNavProps): JSX.Element {
+  const { openSettings } = props;
+
   const [compact, setCompact] = useState(false);
   const { currentUUID, uuidData } = useSelector(
     (state: AppState) => state.mainData
@@ -243,9 +249,7 @@ export default function TopNav(): JSX.Element {
           </div>
           <IconButton
             style={{ margin: `auto 8px` }}
-            onClick={(): void => {
-              // open settings
-            }}
+            onClick={openSettings}
             icon={settingsIcon}
           />
         </div>

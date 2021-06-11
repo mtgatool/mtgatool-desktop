@@ -1,6 +1,4 @@
 /* eslint-disable no-nested-ternary */
-import { useCallback, useState } from "react";
-import { useSpring, animated } from "react-spring";
 import { Colors, Deck, formatPercent, InternalDeck } from "mtgatool-shared";
 import ManaCost from "./ManaCost";
 
@@ -28,21 +26,6 @@ export default function DecksArtViewRow(
 
   const deckColors = new Colors().addFromBits(deck.colors);
 
-  const [hover, setHover] = useState(0);
-  const springProps = useSpring({
-    filter: `brightness(${hover ? "1.1" : "1.0"})`,
-    backgroundSize: `auto ${Math.round(hover ? 210 : 175)}px`,
-    config: { mass: 5, tension: 2000, friction: 150 },
-  });
-
-  const mouseEnter = useCallback(() => {
-    setHover(1);
-  }, []);
-
-  const mouseLeave = useCallback(() => {
-    setHover(0);
-  }, []);
-
   const totalMatches = deck.stats.matchLosses + deck.stats.matchWins;
   const winrate = totalMatches > 0 ? deck.stats.matchWins / totalMatches : 0;
 
@@ -64,17 +47,12 @@ export default function DecksArtViewRow(
     missingWildcards.mythic;
 
   return (
-    <animated.div
+    <div
       className="decks-table-deck-tile"
       onClick={() => clickDeck(deck)}
-      onMouseEnter={mouseEnter}
-      onMouseLeave={mouseLeave}
-      style={
-        {
-          ...springProps,
-          backgroundImage: `url(${getCardArtCrop(deck.tile)})`,
-        } as any
-      }
+      style={{
+        backgroundImage: `url(${getCardArtCrop(deck.tile)})`,
+      }}
     >
       <DeckColorsBar deck={deckObj} />
       <div className="decks-table-deck-inner">
@@ -103,6 +81,6 @@ export default function DecksArtViewRow(
           <></>
         )}
       </div>
-    </animated.div>
+    </div>
   );
 }

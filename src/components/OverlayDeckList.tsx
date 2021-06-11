@@ -8,9 +8,9 @@ import {
   Deck,
   Chances,
   CardObject,
-  OverlaySettingsData,
   database,
 } from "mtgatool-shared";
+import { OverlaySettings } from "../common/defaultConfig";
 
 import getCardTypeSort from "../utils/getCardTypeSort";
 import CardTile, { LandsTile, CardTileQuantity } from "./CardTile";
@@ -84,12 +84,12 @@ interface DeckListProps {
   deck: Deck;
   subTitle: string;
   highlightCardId?: number;
-  settings: OverlaySettingsData;
+  settings: OverlaySettings;
   cardOdds?: Chances;
   setOddsCallback?: (sampleSize: number) => void;
 }
 
-export default function DeckList(props: DeckListProps): JSX.Element {
+export default function OverlayDeckList(props: DeckListProps): JSX.Element {
   const {
     deck,
     subTitle,
@@ -287,7 +287,7 @@ export default function DeckList(props: DeckListProps): JSX.Element {
 
   return (
     <div className="overlay-decklist click-on">
-      <div className="decklist-title">{subTitle}</div>
+      {!!settings.title && <div className="decklist-title">{subTitle}</div>}
       {!!settings.deck && mainCardTiles}
       {!!settings.sideboard && sideboardCardTiles.length > 0 && (
         <div className="decklist-title">Sideboard ({sideboardCards} cards)</div>

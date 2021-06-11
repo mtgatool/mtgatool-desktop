@@ -1,6 +1,6 @@
 /* eslint-disable no-bitwise */
 import { Fragment, useCallback, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { GunDeck } from "../../../types/gunTypes";
@@ -9,9 +9,8 @@ import DecksArtViewRow from "../../DecksArtViewRow";
 import ManaFilter from "../../ManaFilter";
 
 export default function DecksList() {
-  const dispatch = useDispatch();
   const history = useHistory();
-  const [colorFilter, setColorFilter] = useState(63);
+  const [colorFilter, setColorFilter] = useState(63); // Binary for "all colors"
 
   const { decksIndex, decks } = useSelector(
     (state: AppState) => state.mainData
@@ -22,7 +21,7 @@ export default function DecksList() {
       // reduxAction(dispatch, { type: "SET_BACK_GRPID", arg: deck.tile });
       history.push(`/decks/${deck.deckId}`);
     },
-    [dispatch, history]
+    [history]
   );
 
   const decksFilter = useCallback(

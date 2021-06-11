@@ -7,6 +7,7 @@ import {
   OverlaySettingsData,
   PlayerInventory,
 } from "mtgatool-shared";
+import { OverlayUpdateMatchState } from "../background/store/types";
 
 export type MessageType =
   | "START_LOG_READING"
@@ -15,6 +16,8 @@ export type MessageType =
   | "LOG_READ_FINISHED"
   | "SET_UUID"
   | "OVERLAY_UPDATE"
+  | "OVERLAY_UPDATE_SETTINGS"
+  | "OVERLAY_UPDATE_BOUNDS"
   | "OVERLAY_SETTINGS"
   | "GAME_STATS"
   | "UPSERT_GUN_DECK"
@@ -53,7 +56,16 @@ export interface SetUUIDMessage extends ChannelMessageBase {
 
 export interface OverlayUpdateMessage extends ChannelMessageBase {
   type: "OVERLAY_UPDATE";
-  value: any;
+  value: OverlayUpdateMatchState;
+}
+
+export interface OverlayUpdateSettingsMessage extends ChannelMessageBase {
+  type: "OVERLAY_UPDATE_SETTINGS";
+}
+
+export interface OverlayUpdateBoundsMessage extends ChannelMessageBase {
+  type: "OVERLAY_UPDATE_BOUNDS";
+  value: { bounds: OverlaySettingsData["bounds"]; window: string };
 }
 
 export interface OverlaySettingsMessage extends ChannelMessageBase {
@@ -110,6 +122,8 @@ export type ChannelMessage =
   | LogFinishedMessage
   | SetUUIDMessage
   | OverlayUpdateMessage
+  | OverlayUpdateSettingsMessage
+  | OverlayUpdateBoundsMessage
   | GameStatsMessage
   | UpsertGunDeckMessage
   | UpsertGunCardsMessage

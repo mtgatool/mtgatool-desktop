@@ -10,6 +10,7 @@ import { animated, useSpring } from "react-spring";
 
 type PopupComponentProps = PropsWithChildren<{
   open: boolean;
+  className?: string;
   width: string;
   height: string;
   style?: CSSProperties;
@@ -25,6 +26,7 @@ export default function PopupComponent(props: PopupComponentProps) {
     height,
     style,
     open,
+    className,
     children,
     openFnRef,
     closeFnRef,
@@ -69,7 +71,7 @@ export default function PopupComponent(props: PopupComponentProps) {
   return state.display ? (
     <animated.div
       style={alphaSpring}
-      className="popup-container"
+      className={`popup-container ${className}`}
       onClick={persistent ? undefined : beginClose}
     >
       <animated.div

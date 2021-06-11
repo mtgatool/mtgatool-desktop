@@ -1,21 +1,40 @@
-import { OverlaySettingsData } from "mtgatool-shared";
 import path from "path";
 import url from "url";
+import { OverlaySettings, Settings } from "../common/defaultConfig";
+import {
+  WINDOW_OVERLAY_0,
+  WINDOW_OVERLAY_1,
+  WINDOW_OVERLAY_2,
+  WINDOW_OVERLAY_3,
+  WINDOW_OVERLAY_4,
+} from "../types/app";
 import electron from "../utils/electron/electronWrapper";
 import getLocalSetting from "../utils/getLocalSetting";
 
-export default function createOverlay(callback?: () => void): Promise<void> {
+const overlayIdToTitle = [
+  WINDOW_OVERLAY_0,
+  WINDOW_OVERLAY_1,
+  WINDOW_OVERLAY_2,
+  WINDOW_OVERLAY_3,
+  WINDOW_OVERLAY_4,
+];
+
+export default function createOverlay(
+  id: number,
+  callback?: () => void
+): Promise<void> {
   if (!electron) return new Promise((a, r) => r());
-  const settings = JSON.parse(
-    getLocalSetting("overlay_0")
-  ) as OverlaySettingsData;
+
+  const settings: OverlaySettings = (JSON.parse(
+    getLocalSetting("settings")
+  ) as Settings).overlays[id];
 
   const newWindow = new electron.remote.BrowserWindow({
     transparent: true,
     // resizable: false,
     // skipTaskbar: true,
     focusable: false,
-    title: "mtgatool-overlay",
+    title: overlayIdToTitle[id],
     show: false,
     frame: false,
     width: settings.bounds.width,
@@ -53,16 +72,16 @@ export default function createOverlay(callback?: () => void): Promise<void> {
     newWindow.webContents.once("dom-ready", () => {
       // eslint-disable-next-line func-names
       setTimeout(function () {
-        if (electron) {
-          const overlayDevtools = new electron.remote.BrowserWindow({
-            title: "MTG Arena Tool - overlay debug",
-            icon: path.join(__dirname, "logo512.png"),
-          });
-          overlayDevtools.removeMenu();
-          newWindow.webContents.setDevToolsWebContents(
-            overlayDevtools.webContents
-          );
-          newWindow.webContents.openDevTools({ mode: "detach" });
+        if (electron && process.env.NODE_ENV === "development") {
+          // const overlayDevtools = new electron.remote.BrowserWindow({
+          // title: "MTG Arena Tool - overlay debug",
+          // icon: path.join(__dirname, "logo512.png"),
+          // });
+          // overlayDevtools.removeMenu();
+          // newWindow.webContents.setDevToolsWebContents(
+          // overlayDevtools.webContents
+          // );
+          // newWindow.webContents.openDevTools({ mode: "detach" });
 
           newWindow.setAlwaysOnTop(true, "floating");
           newWindow.setFocusable(false);
@@ -72,8 +91,7 @@ export default function createOverlay(callback?: () => void): Promise<void> {
       }, 500);
     });
 
-    newWindow.on("hide", () => {
-      newWindow.destroy();
+    newWindow.on("close", () => {
       if (callback) callback();
       resolve();
     });

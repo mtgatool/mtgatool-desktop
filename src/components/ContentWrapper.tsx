@@ -7,7 +7,7 @@ import ViewHistory from "./views/history/ViewHistory";
 import linkGunToRedux from "../redux/linkGunToRedux";
 import PopupComponent from "./PopupComponent";
 import PassphraseGenerate from "./PassphraseGenerate";
-import voiFn from "../utils/voidfn";
+import vodiFn from "../utils/voidfn";
 
 const views = {
   home: ViewHome,
@@ -34,12 +34,14 @@ export default function ContentWrapper() {
     from: { opacity: 0, transform: "translate3d(100%, 0, 0)" },
     enter: { opacity: 1, transform: "translate3d(0%, 0, 0)" },
     leave: { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
+    delay: 100,
   };
 
   const rightAnim = {
     from: { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
     enter: { opacity: 1, transform: "translate3d(0%, 0, 0)" },
     leave: { opacity: 0, transform: "translate3d(100%, 0, 0)" },
+    delay: 100,
   };
 
   const transitions = useTransition(
@@ -56,8 +58,8 @@ export default function ContentWrapper() {
     linkGunToRedux();
   }, []);
 
-  const openPopup = useRef<() => void>(voiFn);
-  const closePopup = useRef<() => void>(voiFn);
+  const openPopup = useRef<() => void>(vodiFn);
+  const closePopup = useRef<() => void>(vodiFn);
 
   return (
     <>

@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { useSelector } from "react-redux";
 import { ReactComponent as DataIcon } from "../assets/images/svg/data.svg";
 import { AppState } from "../redux/stores/rendererStore";
-import voiFn from "../utils/voidfn";
+import vodiFn from "../utils/voidfn";
 import Alt from "./Alt";
 import SvgButton from "./SvgButton";
 
@@ -25,8 +25,8 @@ function StatusLine(props: StatusLineProps) {
 }
 
 export default function DataStatus() {
-  const closeAltRef = useRef<() => void>(voiFn);
-  const openAltRef = useRef<() => void>(voiFn);
+  const closeAltRef = useRef<() => void>(vodiFn);
+  const openAltRef = useRef<() => void>(vodiFn);
   const positionRef = useRef<HTMLDivElement>(null);
 
   const { cards, currentUUID, uuidData, matches, decks } = useSelector(
