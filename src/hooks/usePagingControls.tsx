@@ -17,7 +17,7 @@ export default function usePagingControls(
   dataSize: number,
   defaultPageSize = 10
 ): PagingControls {
-  const [pageIndex, gotoPage] = useState(1);
+  const [pageIndex, gotoPage] = useState(0);
   const [pageSize, setPageSize] = useState(defaultPageSize);
 
   const pageCount = useMemo(() => Math.ceil(dataSize / pageSize), [

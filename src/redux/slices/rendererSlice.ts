@@ -31,6 +31,7 @@ export const initialRendererState = {
   topArtist: "Thoughtseize by Aleksi Briclot",
   updateState: "",
   collectionQuery: "",
+  forceQuery: 0,
 };
 
 type RendererState = typeof initialRendererState;
@@ -125,9 +126,12 @@ const rendererSlice = createSlice({
     },
     setCollectionQuery: (
       state: RendererState,
-      action: PayloadAction<string>
+      action: PayloadAction<{ query: string; forceQuery: boolean }>
     ): void => {
-      state.collectionQuery = action.payload;
+      state.collectionQuery = action.payload.query;
+      if (action.payload.forceQuery) {
+        state.forceQuery = new Date().getTime();
+      }
     },
   },
 });

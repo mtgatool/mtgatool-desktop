@@ -54,7 +54,9 @@ function App() {
             arg: LOGIN_OK,
           });
 
-          history.push("/auth");
+          if (history.location.pathname === "") {
+            history.push("/auth");
+          }
         })
         .catch(() => {
           history.push("/auth");

@@ -8,11 +8,12 @@ import { IGunChainReference } from "gun/types/chain";
 // eslint-disable-next-line import/no-unresolved
 import { IGunStaticSEA } from "gun/types/static/sea";
 import { useMemo } from "react";
-import { Cards } from "mtgatool-shared";
+import { Cards, DatabaseClass } from "mtgatool-shared";
 import { GunState } from "../types/gunTypes";
 
 declare global {
   interface Window {
+    database: DatabaseClass;
     globalStore: any;
     cards: Cards;
     cardsPrev: Cards;

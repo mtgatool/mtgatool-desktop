@@ -1,8 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import reduxAction from "../../../redux/reduxAction";
-import { AppState } from "../../../redux/stores/rendererStore";
+import store, { AppState } from "../../../redux/stores/rendererStore";
 
 import InputContainer from "../../InputContainer";
 import Button from "../../ui/Button";
@@ -15,6 +16,7 @@ import doCollectionFilter from "./doCollectionFilter";
 import CardCollection from "./CardCollection";
 import PagingControls from "../../PagingControls";
 import usePagingControls from "../../../hooks/usePagingControls";
+import SortControls from "../../SortControls";
 
 interface ViewCollectionProps {
   collectionData: CardsData[];
@@ -22,11 +24,16 @@ interface ViewCollectionProps {
 }
 
 export default function ViewCollection(props: ViewCollectionProps) {
+  const match = useRouteMatch<{ query: string }>("/collection/:query");
+  const history = useHistory();
+
   const { collectionData, openAdvancedCollectionSearch } = props;
   const dispatch = useDispatch();
   const [filters, setFilters] = useState<CollectionFilters>();
 
-  const { collectionQuery } = useSelector((state: AppState) => state.renderer);
+  const { collectionQuery, forceQuery } = useSelector(
+    (state: AppState) => state.renderer
+  );
 
   const { cardsSize } = useSelector((state: AppState) => state.settings);
 
@@ -35,13 +42,30 @@ export default function ViewCollection(props: ViewCollectionProps) {
     [filters, collectionData]
   );
 
-  const pagingControlProps = usePagingControls(filteredData.length, 25);
+  const pagingControlProps = usePagingControls(filteredData.length, 24);
+
+  useEffect(() => {
+    const newFilters = getFiltersFromQuery(
+      store.getState().renderer.collectionQuery
+    );
+    setFilters(newFilters);
+  }, [forceQuery]);
+
+  useEffect(() => {
+    if (match) {
+      const { query } = match.params;
+      reduxAction(dispatch, {
+        type: "SET_COLLECTION_QUERY",
+        arg: { query, forceQuery: true },
+      });
+    }
+  }, []);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>): void => {
       reduxAction(dispatch, {
         type: "SET_COLLECTION_QUERY",
-        arg: e.currentTarget.value,
+        arg: { query: e.currentTarget.value, forceQuery: false },
       });
     },
     [dispatch]
@@ -52,9 +76,10 @@ export default function ViewCollection(props: ViewCollectionProps) {
       if (e.key === "Enter") {
         const newFilters = getFiltersFromQuery(e.currentTarget.value);
         setFilters(newFilters);
+        history.push(`/collection/${e.currentTarget.value}`);
       }
     },
-    []
+    [history]
   );
 
   return (
@@ -74,6 +99,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
         </InputContainer>
       </div>
       <div className="section" style={{ flexDirection: "column" }}>
+        <SortControls />
         <div
           style={{
             gridTemplateColumns: `repeat(auto-fit, minmax(${

@@ -5,6 +5,7 @@ import { useState, useCallback, useEffect } from "react";
 import { constants, Colors } from "mtgatool-shared";
 
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { ReactComponent as Close } from "../../../assets/images/svg/close.svg";
 
 import {
@@ -90,6 +91,7 @@ export default function AdvancedSearch(
   props: AdvancedSearchProps
 ): JSX.Element {
   const { closeCallback } = props;
+  const history = useHistory();
   const dispatch = useDispatch();
   const { collectionQuery } = useSelector((state: AppState) => state.renderer);
   const defaultFilters = getFiltersFromQuery(collectionQuery);
@@ -241,12 +243,13 @@ export default function AdvancedSearch(
   }, [closeOnEscape]);
 
   const handleSearch = useCallback(() => {
+    history.push(`/collection/${query}`);
     reduxAction(dispatch, {
       type: "SET_COLLECTION_QUERY",
-      arg: query,
+      arg: { query, forceQuery: true },
     });
     handleClose();
-  }, [handleClose, dispatch, query]);
+  }, [history, handleClose, dispatch, query]);
 
   useEffect(() => {
     // React doesnt give css time to know there was a change

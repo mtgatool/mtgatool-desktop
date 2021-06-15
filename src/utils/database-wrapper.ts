@@ -3,7 +3,7 @@
 import path from "path";
 import fs from "fs";
 import _ from "lodash";
-import { database } from "mtgatool-shared";
+import { database, loadDbFromCache as loadDbFromShared } from "mtgatool-shared";
 import axios from "axios";
 import electron from "./electron/electronWrapper";
 
@@ -51,24 +51,28 @@ export function updateCache(data: string): void {
 }
 
 export function loadDbFromCache(): void {
-  if (cachePath && fs.existsSync(cachePath)) {
-    const dbString = fs.readFileSync(cachePath, "utf8");
-    database.setDatabase(dbString);
-    console.log(`Loaded metadata from cache (${cachePath})`);
-  } else {
-    console.log(`Cache not found (${cachePath}), try to generate it.`);
-    // database.setDatabaseUnsafely(distributedDb as Metadata);
-    updateCache(JSON.stringify(database.metadata));
+  loadDbFromShared();
+  if (electron) {
+    if (cachePath && fs.existsSync(cachePath)) {
+      const dbString = fs.readFileSync(cachePath, "utf8");
+      database.setDatabase(dbString);
+      console.log(`Loaded metadata from cache (${cachePath})`);
+    } else {
+      console.log(`Cache not found (${cachePath}), try to generate it.`);
+      // database.setDatabaseUnsafely(distributedDb as Metadata);
+      updateCache(JSON.stringify(database.metadata));
+    }
   }
 
   axios
     .get("https://mtgatool.com/database/latest/")
     .then((latestRes) => {
-      console.log(latestRes);
       if (parseInt(latestRes.data.latest) > database.version) {
         axios
           .get<any>("https://mtgatool.com/database/")
           .then((res) => {
+            console.log("Updated cards database OK");
+            console.log("New DB version: ", latestRes.data.latest);
             database.setDatabaseUnsafely(res.data);
             updateCache(JSON.stringify(res.data));
           })
@@ -78,6 +82,8 @@ export function loadDbFromCache(): void {
             );
             console.info(e);
           });
+      } else {
+        console.log(`Database up to date. (v${latestRes.data.latest})`);
       }
     })
     .catch((e) => {
@@ -87,5 +93,7 @@ export function loadDbFromCache(): void {
       console.info(e);
     });
 }
+
+window.database = database;
 
 export default database;
