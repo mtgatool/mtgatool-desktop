@@ -4,7 +4,7 @@
   position: relative;
   width: 100%;
   height: 32px;
-  margin: auto;
+  margin: auto 4px;
 }
 
 .input-container > input {
@@ -27,6 +27,7 @@
   user-select: none;
   padding-left: 8px;
 }
+
 .input-container > .select > div {
   background-color: var(--color-section);
   border: 1px solid var(--color-dark);

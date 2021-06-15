@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 
+import { constants } from "mtgatool-shared";
 import { ChannelMessage } from "../broadcastChannel/channelMessages";
 import NoCard from "../assets/images/nocard.png";
 import { Settings } from "../common/defaultConfig";
@@ -28,8 +29,14 @@ import {
   WINDOW_OVERLAY_4,
 } from "../types/app";
 
+import { Chances } from "../../../mtgatool-shared/dist";
+import GroupedLandsDetails from "../overlay/GroupedLandsDetails";
+
+const { LANDS_HACK } = constants;
+
 export default function Hover() {
   const [hovering, setHovering] = useState(false);
+  const [cardOdds, setCardOdds] = useState<Chances>();
   const [grpId, setGrpId] = useState<number>();
   const [settings, setSettings] = useState<Settings>(
     JSON.parse(getLocalSetting("settings")) as Settings
@@ -112,8 +119,13 @@ export default function Hover() {
         setGrpId(msg.data.value);
         setHovering(true);
       }
+
       if (msg.data.type == "HOVER_OUT") {
         setHovering(false);
+      }
+
+      if (msg.data.type === "OVERLAY_UPDATE") {
+        setCardOdds(msg.data.value.playerCardsOdds);
       }
     },
     []
@@ -193,8 +205,15 @@ export default function Hover() {
   return (
     <div className="hover-root">
       <div ref={wrapperRef} className="hover-cards-wrapper">
-        <div style={styleDfc} className="hover-overlay-dfc" />
-        <div style={styleFront} className="hover-overlay-main" />
+        {grpId == LANDS_HACK && cardOdds ? (
+          // eslint-disable-next-line react/jsx-props-no-spreading
+          <GroupedLandsDetails {...cardOdds} />
+        ) : (
+          <>
+            <div style={styleDfc} className="hover-overlay-dfc" />
+            <div style={styleFront} className="hover-overlay-main" />
+          </>
+        )}
       </div>
     </div>
   );

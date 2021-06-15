@@ -1,0 +1,57 @@
+.paging-container {
+  /*margin: 8px;*/
+  display: flex;
+  width: 100%;
+  /*height: 24px;*/
+  justify-content: center;
+  align-items: center;
+}
+
+.paging-text {
+  color: var(--color-light);
+  white-space: nowrap;
+}
+
+.paging-button {
+  cursor: pointer;
+  margin: auto 4px;
+  width: 24px;
+  height: 32px;
+  text-align: center;
+  line-height: 29px;
+  border-radius: 2px;
+  color: var(--color-light-50);
+  border: 1px solid var(--color-dark);
+  background-color: var(--color-section);
+  -webkit-transition: all .2s ease-in;
+}
+
+.paging-button-disabled {
+  margin: auto 4px;
+  width: 24px;
+  height: 32px;
+  text-align: center;
+  line-height: 29px;
+  border-radius: 2px;
+  border: none !important;
+  color: var(--color-text-disabled) !important;
+  background-color: var(--color-section) !important;
+}
+
+.paging-button:hover {
+  background-color: var(--color-section-hover);
+  border: 1px solid var(--color-dark-hover);
+  color: var(--color-text-hover);
+  outline: none;
+}
+
+.paging-button:active {
+  color: var(--color-text-hover);
+  outline: none;
+}
+
+.paging-active {
+  background-color: var(--color-section);
+  border: 1px solid var(--color-dark);
+  color: var(--color-light);
+}

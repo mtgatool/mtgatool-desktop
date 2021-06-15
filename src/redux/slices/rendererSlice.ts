@@ -30,6 +30,7 @@ export const initialRendererState = {
   rewards_weekly_ends: "",
   topArtist: "Thoughtseize by Aleksi Briclot",
   updateState: "",
+  collectionQuery: "",
 };
 
 type RendererState = typeof initialRendererState;
@@ -122,6 +123,12 @@ const rendererSlice = createSlice({
     ): void => {
       state.rewards_weekly_ends = action.payload;
     },
+    setCollectionQuery: (
+      state: RendererState,
+      action: PayloadAction<string>
+    ): void => {
+      state.collectionQuery = action.payload;
+    },
   },
 });
 
@@ -139,6 +146,7 @@ export const {
   setUpdateState,
   setRewardsDailyEnds,
   setRewardsWeeklyEnds,
+  setCollectionQuery,
 } = rendererSlice.actions;
 
 export default rendererSlice;

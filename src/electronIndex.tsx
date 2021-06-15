@@ -20,6 +20,7 @@ import { loadDbFromCache } from "./utils/database-wrapper";
 import initDirectories from "./utils/initDirectories";
 import getWindowTitle from "./utils/electron/getWindowTitle";
 import { ALL_OVERLAYS, WINDOW_BACKGROUND, WINDOW_HOVER } from "./types/app";
+import createOverlay from "./overlay/createOverlay";
 
 const title = getWindowTitle();
 loadDbFromCache();
@@ -81,6 +82,7 @@ if (title == WINDOW_BACKGROUND) {
 } else {
   defaultLocalSettings();
   mainChannelListeners();
+  createOverlay(0);
   ReactDOM.render(
     <React.StrictMode>
       <Provider store={store}>

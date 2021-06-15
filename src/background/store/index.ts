@@ -33,4 +33,6 @@ const globalStore = {
   },
 };
 
+window.globalStore = globalStore;
+
 export default globalStore;

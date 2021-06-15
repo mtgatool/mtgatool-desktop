@@ -74,12 +74,12 @@ export default function createOverlay(
       setTimeout(function () {
         if (electron && process.env.NODE_ENV === "development") {
           // const overlayDevtools = new electron.remote.BrowserWindow({
-          // title: "MTG Arena Tool - overlay debug",
-          // icon: path.join(__dirname, "logo512.png"),
+          //   title: "MTG Arena Tool - overlay debug",
+          //   icon: path.join(__dirname, "logo512.png"),
           // });
           // overlayDevtools.removeMenu();
           // newWindow.webContents.setDevToolsWebContents(
-          // overlayDevtools.webContents
+          //   overlayDevtools.webContents
           // );
           // newWindow.webContents.openDevTools({ mode: "detach" });
 

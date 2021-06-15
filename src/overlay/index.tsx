@@ -140,7 +140,7 @@ export default function Overlay() {
       <div
         style={{
           backgroundColor: `rgba(0,0,0, ${settings?.alphaBack || 0})`,
-          height: "100%",
+          height: "-webkit-fill-available",
         }}
       >
         <div ref={heightDivAdjustRef} style={{ opacity: settings?.alpha || 0 }}>

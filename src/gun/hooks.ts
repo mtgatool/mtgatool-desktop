@@ -13,6 +13,7 @@ import { GunState } from "../types/gunTypes";
 
 declare global {
   interface Window {
+    globalStore: any;
     cards: Cards;
     cardsPrev: Cards;
     SEA: IGunStaticSEA;

@@ -27,6 +27,7 @@ export const actions = {
   SET_UPDATE_STATE: RendererSlice.setUpdateState,
   SET_DAILY_ENDS: RendererSlice.setRewardsDailyEnds,
   SET_WEEKLY_ENDS: RendererSlice.setRewardsWeeklyEnds,
+  SET_COLLECTION_QUERY: RendererSlice.setCollectionQuery,
   SET_SETTINGS: SettingsSlice.setSettings,
   SET_OVERLAY_SETTINGS: SettingsSlice.setOverlaySettings,
 };

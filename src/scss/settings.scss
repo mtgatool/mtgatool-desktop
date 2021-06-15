@@ -263,3 +263,28 @@ input#flat.color-picker {
   background: url(../assets/images/github_logo.png) no-repeat center;
   background-size: contain;
 }
+
+.message-sub {
+  font-size: 20px;
+  opacity: 0.9;
+  font-family:  var(--main-font-name-it);
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.message-sub-15 {
+  font-size: 15px;
+  opacity: 0.9;
+  font-family:  var(--main-font-name-it);
+  text-align: center;
+  margin-bottom: 6;
+}
+
+.message-updates {
+  font-size: 18px;
+  opacity: 0.9;
+  font-family:  var(--main-font-name-it);
+  text-align: center;
+  margin-top: 6;
+  margin-bottom: 6;
+}

@@ -70,6 +70,8 @@ const forceDeckUpdate = (removeUsed = true): void => {
   });
   cardsleft -= playerCardsBottom.length;
 
+  if (cardsleft < oddsSampleSize) cardsleft = oddsSampleSize;
+
   const main = playerCardsLeft.getMainboard();
   main.removeDuplicates();
   main.addChance((card: CardObject) =>

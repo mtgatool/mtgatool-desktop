@@ -1,0 +1,12 @@
+.set-filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  justify-content: center;
+
+  .set-filter {
+    margin: 6px;
+    width: 24px;
+    height: 24px;
+  }
+}
