@@ -1,16 +1,17 @@
 /* eslint-disable no-bitwise */
 import _ from "lodash";
+import { MinMaxFilter } from "../../../types/filterTypes";
+import { FilterKeys } from "../../../types/utility";
 
-import { MinMaxFilter, CardsData } from "../../../../types/collectionTypes";
-
-export default function minMaxFilterFn(
-  rows: CardsData[],
+export default function minMaxFilterFn<D>(
+  rows: D[],
   filterValue: MinMaxFilter,
-  key: "rarityVal" | "owned" | "acquired" | "cmc"
-): CardsData[] {
+  key: FilterKeys<D, number>
+): D[] {
   const F = filterValue.value;
   return rows.filter((row) => {
-    const R = row[key];
+    const R = (row[key] as unknown) as number;
+
     let ret: number | boolean = true;
     if (filterValue.mode == "=") ret = R === F;
     if (filterValue.mode == ":") ret = R & F;

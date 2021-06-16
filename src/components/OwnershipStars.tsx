@@ -86,15 +86,25 @@ export default function OwnershipStars(props: {
 }): JSX.Element {
   const { card, wanted } = props;
   const { cards, cardsNew } = useSelector((state: AppState) => state.mainData);
-  if (!card || !card.type) {
+  if (!card) {
     return <></>;
   }
-  const owned = cards[card.id] ?? 0;
+  let owned = cards[card.id] ?? 0;
   const acquired = cardsNew[card.id] ?? 0;
   const isWanted = wanted ?? 0;
-  // TODO add custom logic to handle rats and petitioners
+
+  const infinitePlaysetCards = [69172, 67306, 76490];
+
   const isbasic =
     cardHasType(card, "Basic Land") || cardHasType(card, "Basic Snow Land");
-  const Renderer = isbasic ? OwnershipInfinity : MultiCardOwnership;
+  let Renderer = isbasic ? OwnershipInfinity : MultiCardOwnership;
+
+  if (infinitePlaysetCards.includes(card.id) && owned == 4) {
+    Renderer = OwnershipInfinity;
+  }
+  if (card.rarity == "token") {
+    owned = 4;
+    Renderer = OwnershipInfinity;
+  }
   return <Renderer owned={owned} acquired={acquired} wanted={isWanted} />;
 }

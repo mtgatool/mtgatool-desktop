@@ -1,4 +1,13 @@
 import { DbCardData } from "mtgatool-shared";
+import {
+  ColorBitsFilter,
+  ArrayFilter,
+  InBoolFilter,
+  MinMaxFilter,
+  RarityBitsFilter,
+  StringFilter,
+  QuerySeparators,
+} from "./filterTypes";
 
 export interface CardsData extends DbCardData {
   colors: number;
@@ -14,8 +23,6 @@ export interface CardsData extends DbCardData {
   suspended: string[];
   craftable: boolean;
 }
-
-export type QuerySeparators = ">=" | "<=" | ":" | "=" | "!=" | "<" | ">";
 
 export type QueryKeys =
   | "artist"
@@ -38,59 +45,12 @@ export type QueryKeys =
 
 export type ParsedToken = [string, QuerySeparators, string];
 
-type FilterModes =
-  | "strict"
-  | "and"
-  | "or"
-  | "not"
-  | "strictNot"
-  | "subset"
-  | "superset"
-  | "strictSubset"
-  | "strictSuperset";
-
 export const RARITY_TOKEN = 1;
 export const RARITY_LAND = 2;
 export const RARITY_COMMON = 4;
 export const RARITY_UNCOMMON = 8;
 export const RARITY_RARE = 16;
 export const RARITY_MYTHIC = 32;
-
-export interface StringFilter {
-  string: string;
-  not: boolean;
-}
-
-export type ColorBitsFilter = {
-  color: number;
-  not: boolean;
-  mode: FilterModes;
-};
-
-export type RarityBitsFilter = {
-  not: boolean;
-  mode: QuerySeparators;
-  rarity: number;
-};
-
-export type ArrayFilter = {
-  not: boolean;
-  mode: QuerySeparators;
-  arr: string[];
-};
-
-export type MinMaxFilter = {
-  not: boolean;
-  mode: QuerySeparators;
-  value: number;
-};
-
-export type InBoolFilter = {
-  not: boolean;
-  mode: QuerySeparators;
-  type: string;
-  value: boolean;
-};
 
 export interface BaseCollectionFilter {
   id: QueryKeys;

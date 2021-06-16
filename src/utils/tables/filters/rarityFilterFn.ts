@@ -1,16 +1,18 @@
 /* eslint-disable no-bitwise */
 import _ from "lodash";
 
-import { RarityBitsFilter, CardsData } from "../../../../types/collectionTypes";
+import { RarityBitsFilter } from "../../../types/filterTypes";
+import { FilterKeys } from "../../../types/utility";
 
-export default function rarityFilterFn(
-  rows: CardsData[],
+export default function rarityFilterFn<D>(
+  rows: D[],
   filterValue: RarityBitsFilter,
-  _key: "rarityVal"
-): CardsData[] {
+  key: FilterKeys<D, number>
+): D[] {
   const F = filterValue.rarity;
   return rows.filter((row) => {
-    const R = row.rarityVal;
+    const R = (row[key] as unknown) as number;
+
     let ret: number | boolean = true;
     if (filterValue.mode == "=") ret = R === F;
     if (filterValue.mode == ":") ret = R & F;

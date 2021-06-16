@@ -9,18 +9,12 @@ import { useHistory } from "react-router-dom";
 import { ReactComponent as Close } from "../../../assets/images/svg/close.svg";
 
 import {
-  ColorBitsFilter,
-  ArrayFilter,
-  RarityBitsFilter,
   RARITY_COMMON,
   RARITY_TOKEN,
   RARITY_LAND,
   RARITY_UNCOMMON,
   RARITY_RARE,
   RARITY_MYTHIC,
-  MinMaxFilter,
-  InBoolFilter,
-  StringFilter,
 } from "../../../types/collectionTypes";
 
 import getFiltersFromQuery from "./collectionQuery";
@@ -32,6 +26,14 @@ import SetsFilter from "../../SetsFilter";
 import InputContainer from "../../InputContainer";
 import { AppState } from "../../../redux/stores/rendererStore";
 import reduxAction from "../../../redux/reduxAction";
+import {
+  ArrayFilter,
+  ColorBitsFilter,
+  InBoolFilter,
+  MinMaxFilter,
+  RarityBitsFilter,
+  StringFilter,
+} from "../../../types/filterTypes";
 
 const { WHITE, BLUE, BLACK, RED, GREEN, COLORLESS } = constants;
 

@@ -18,17 +18,17 @@ import ManaCost from "../../ManaCost";
 import { toMMSS } from "../../../utils/dateTo";
 import RankSmall from "../../RankSmall";
 import ResultDetails from "../../ResultDetails";
-import { GunMatch } from "../../../types/gunTypes";
 import baseToObj from "../../../utils/baseToObj";
 import timeAgo from "../../../utils/timeAgo";
 import RankIcon from "../../RankIcon";
 import isLimitedEventId from "../../../utils/isLimitedEventId";
+import { MatchData } from "./getMatchesData";
 
 const { DEFAULT_TILE } = constants;
 
 interface ListItemMatchProps {
-  match: GunMatch;
-  openMatchCallback: (match: GunMatch) => void;
+  match: MatchData;
+  openMatchCallback: (match: MatchData) => void;
 }
 
 export default function ListItemMatch({

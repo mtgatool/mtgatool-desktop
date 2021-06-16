@@ -1,0 +1,38 @@
+.table-head {
+  display: grid;
+  min-height: 48px;
+  line-height: 32px;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-line-sep);
+  background-color: var(--color-section);
+  margin: 0 0 8px 0;
+  width: 100%;
+}
+
+.table-head-container {
+  display: flex;
+  justify-content: center;
+  position: relative;
+
+  .text {
+  }
+
+  .sort-asc,
+  .sort-desc {
+    background-image: url(../assets/images/icon_sort.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 16px;
+    height: 32px;
+    position: absolute;
+    right: 24px;
+  }
+
+  .sort-asc {
+  }
+
+  .sort-desc {
+    transform: rotate(180deg);
+  }
+}

@@ -7,23 +7,25 @@ import { constants, Colors } from "mtgatool-shared";
 
 import {
   CollectionFilters,
-  ArrayFilter,
-  ColorBitsFilter,
-  InBoolFilter,
-  MinMaxFilter,
   ParsedToken,
   QueryKeys,
-  QuerySeparators,
-  RarityBitsFilter,
   RARITY_COMMON,
   RARITY_LAND,
   RARITY_MYTHIC,
   RARITY_RARE,
   RARITY_TOKEN,
   RARITY_UNCOMMON,
-  StringFilter,
   AllCollectionFilterFunctions,
 } from "../../../types/collectionTypes";
+import {
+  ArrayFilter,
+  ColorBitsFilter,
+  InBoolFilter,
+  MinMaxFilter,
+  QuerySeparators,
+  RarityBitsFilter,
+  StringFilter,
+} from "../../../types/filterTypes";
 
 const { WHITE, BLUE, RED, BLACK, GREEN, COLORLESS } = constants;
 

@@ -1,7 +1,8 @@
 /* eslint-disable no-bitwise */
 import _ from "lodash";
+import { CardsData } from "../../../types/collectionTypes";
 
-import { CardsData, ArrayFilter } from "../../../../types/collectionTypes";
+import { ArrayFilter } from "../../../types/filterTypes";
 
 export default function setFilterFn(
   rows: CardsData[],

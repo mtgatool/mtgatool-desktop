@@ -11,12 +11,12 @@ import Button from "../../ui/Button";
 import getFiltersFromQuery from "./collectionQuery";
 
 import { CardsData, CollectionFilters } from "../../../types/collectionTypes";
-import doCollectionFilter from "./doCollectionFilter";
+import doCollectionFilter from "../../../utils/tables/doCollectionFilter";
 
 import CardCollection from "./CardCollection";
 import PagingControls from "../../PagingControls";
 import usePagingControls from "../../../hooks/usePagingControls";
-import SortControls from "../../SortControls";
+import SortControls, { Sort } from "../../SortControls";
 
 interface ViewCollectionProps {
   collectionData: CardsData[];
@@ -30,6 +30,10 @@ export default function ViewCollection(props: ViewCollectionProps) {
   const { collectionData, openAdvancedCollectionSearch } = props;
   const dispatch = useDispatch();
   const [filters, setFilters] = useState<CollectionFilters>();
+  const [sortValue, setSortValue] = useState<Sort<CardsData>>({
+    key: "name",
+    sort: 1,
+  });
 
   const { collectionQuery, forceQuery } = useSelector(
     (state: AppState) => state.renderer
@@ -38,8 +42,9 @@ export default function ViewCollection(props: ViewCollectionProps) {
   const { cardsSize } = useSelector((state: AppState) => state.settings);
 
   const filteredData = useMemo(
-    () => (filters ? doCollectionFilter(collectionData, filters) : []),
-    [filters, collectionData]
+    () =>
+      filters ? doCollectionFilter(collectionData, filters, sortValue) : [],
+    [filters, sortValue, collectionData]
   );
 
   const pagingControlProps = usePagingControls(filteredData.length, 24);
@@ -98,8 +103,15 @@ export default function ViewCollection(props: ViewCollectionProps) {
           />
         </InputContainer>
       </div>
-      <div className="section" style={{ flexDirection: "column" }}>
-        <SortControls />
+      <div
+        className="section"
+        style={{ marginTop: "0px", flexDirection: "column" }}
+      >
+        <SortControls<CardsData>
+          setSortCallback={setSortValue}
+          columnKeys={["name", "rarityVal", "cmc", "cid", "set"]}
+          columnNames={["Name", "Rarity", "CMC", "Collector ID", "Set"]}
+        />
         <div
           style={{
             gridTemplateColumns: `repeat(auto-fit, minmax(${

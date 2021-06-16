@@ -1,8 +1,9 @@
 /* eslint-disable no-bitwise */
 import _ from "lodash";
-import allFormats from "../../../../common/allFormats";
+import allFormats from "../../../common/allFormats";
 
-import { CardsData, StringFilter } from "../../../../types/collectionTypes";
+import { CardsData } from "../../../types/collectionTypes";
+import { StringFilter } from "../../../types/filterTypes";
 
 export default function formatFilterFn(
   rows: CardsData[],
