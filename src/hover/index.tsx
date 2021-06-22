@@ -31,6 +31,7 @@ import {
 
 import { Chances } from "../../../mtgatool-shared/dist";
 import GroupedLandsDetails from "../overlay/GroupedLandsDetails";
+import { CARD_SIZE_RATIO } from "../common/static";
 
 const { LANDS_HACK } = constants;
 
@@ -98,7 +99,7 @@ export default function Hover() {
   useEffect(() => {
     const size = 100 + hoverSize * 15;
     const cardWidth = size;
-    const cardHeight = size / 0.71808510638;
+    const cardHeight = size / CARD_SIZE_RATIO;
 
     const width = Math.round(cardWidth * 2 + 64);
     const height = Math.round(cardHeight + 48);
@@ -141,7 +142,7 @@ export default function Hover() {
 
     return {
       width: `${size}px`,
-      height: `${size / 0.71808510638}px`,
+      height: `${size / CARD_SIZE_RATIO}px`,
       backgroundImage: `url(${frontLoaded == grpId ? frontUrl : NoCard})`,
     };
   }, [frontUrl, grpId, frontLoaded, hoverSize]);
@@ -156,7 +157,7 @@ export default function Hover() {
 
     return {
       width: `${size}px`,
-      height: `${size / 0.71808510638}px`,
+      height: `${size / CARD_SIZE_RATIO}px`,
       backgroundImage: `url(${backLoaded == grpId ? backUrl : NoCard})`,
       display: op,
     };

@@ -2,7 +2,7 @@ import { SeasonAndRankDetail } from "mtgatool-shared";
 import LogEntry from "../../types/logDecoder";
 
 interface Entry extends LogEntry {
-  json: () => SeasonAndRankDetail;
+  json: SeasonAndRankDetail;
 }
 
 export default function onLabelInEventGetSeasonAndRankDetail(

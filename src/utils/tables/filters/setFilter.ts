@@ -13,7 +13,7 @@ export default function setFilter<D>(
     }
   });
 
-  if (setToIndex) {
+  if (setToIndex !== undefined) {
     newFilters[setToIndex] = newFilter;
   } else {
     newFilters.push(newFilter);

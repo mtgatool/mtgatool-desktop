@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { CardsData, CollectionFilters } from "../../types/collectionTypes";
+import { CardsData } from "../../types/collectionTypes";
 import { Sort } from "../../components/SortControls";
 import applySort from "./applySort";
 import colorsBitsFilterFn from "./filters/colorsBitsFilterFn";
@@ -9,68 +9,90 @@ import minMaxFilterFn from "./filters/minMaxFilterFn";
 import rarityFilterFn from "./filters/rarityFilterFn";
 import setFilterFn from "./filters/setFilterFn";
 import stringFilterFn from "./filters/stringFilterFn";
+import { Filters } from "../../types/genericFilterTypes";
 
 export default function doCollectionFilter(
   data: CardsData[],
-  filters: CollectionFilters,
+  filters: Filters<CardsData>,
   sort: Sort<CardsData> = { key: "", sort: 1 }
 ): CardsData[] {
   let filteredData = data;
 
   filters.forEach((element) => {
-    switch (element.id) {
-      case "name":
-        filteredData = stringFilterFn(filteredData, element.value, element.id);
-        break;
-      case "type":
-        filteredData = stringFilterFn(filteredData, element.value, element.id);
-        break;
-      case "artist":
-        filteredData = stringFilterFn(filteredData, element.value, element.id);
+    switch (element.type) {
+      case "string":
+        if (
+          element.id === "name" ||
+          element.id === "type" ||
+          element.id === "artist"
+        ) {
+          filteredData = stringFilterFn(
+            filteredData,
+            element.value,
+            element.id
+          );
+        }
         break;
       case "format":
-        filteredData = formatFilterFn(filteredData, element.value, element.id);
+        if (
+          element.id === "format" ||
+          element.id === "banned" ||
+          element.id === "legal" ||
+          element.id === "suspended"
+        ) {
+          filteredData = formatFilterFn(
+            filteredData,
+            element.value,
+            element.id
+          );
+        }
         break;
-      case "banned":
-        filteredData = formatFilterFn(filteredData, element.value, element.id);
+      case "inbool":
+        if (element.id === "craftable" || element.id === "booster") {
+          filteredData = inBoolFilterFn(
+            filteredData,
+            element.value,
+            element.id
+          );
+        }
         break;
-      case "legal":
-        filteredData = formatFilterFn(filteredData, element.value, element.id);
+
+      case "minmax":
+        if (element.id === "cmc" || element.id === "owned") {
+          filteredData = minMaxFilterFn(
+            filteredData,
+            element.value,
+            element.id
+          );
+        }
         break;
-      case "suspended":
-        filteredData = formatFilterFn(filteredData, element.value, element.id);
-        break;
-      case "is":
-        filteredData = inBoolFilterFn(filteredData, element.value, "craftable");
-        break;
-      case "in":
-        filteredData = inBoolFilterFn(filteredData, element.value, "booster");
-        break;
-      case "boosters":
-        filteredData = inBoolFilterFn(filteredData, element.value, "booster");
-        break;
-      case "craftable":
-        filteredData = inBoolFilterFn(filteredData, element.value, "craftable");
-        break;
-      case "cmc":
-        filteredData = minMaxFilterFn(filteredData, element.value, element.id);
-        break;
-      case "owned":
-        filteredData = minMaxFilterFn(filteredData, element.value, element.id);
-        break;
+
       case "colors":
-        filteredData = colorsBitsFilterFn(
-          filteredData,
-          element.value,
-          element.id
-        );
+        if (element.id === "colors") {
+          filteredData = colorsBitsFilterFn(
+            filteredData,
+            element.value,
+            element.id
+          );
+        }
         break;
+
       case "rarity":
-        filteredData = rarityFilterFn(filteredData, element.value, "rarityVal");
+        if (element.id === "rarityVal") {
+          filteredData = rarityFilterFn(
+            filteredData,
+            element.value,
+            element.id
+          );
+        }
         break;
-      case "set":
-        filteredData = setFilterFn(filteredData, element.value, element.id);
+
+      case "array":
+        if (element.id === "setCodes") {
+          filteredData = setFilterFn(filteredData, element.value, element.id);
+        }
         break;
+
       default:
         console.error("Unkown filter: ", element);
         break;

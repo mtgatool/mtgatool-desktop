@@ -8,6 +8,7 @@ import OwnershipStars from "./OwnershipStars";
 import getFrontUrl from "../utils/getFrontUrl";
 import getBackUrl from "../utils/getBackUrl";
 import isCardDfc from "../utils/isCardDfc";
+import { CARD_SIZE_RATIO } from "../common/static";
 
 export default function CardHover(): JSX.Element {
   const { grpId, opacity } = useSelector((state: AppState) => state.hover);
@@ -27,8 +28,8 @@ export default function CardHover(): JSX.Element {
   const styleFront = useMemo((): CSSProperties => {
     return {
       width: `${size}px`,
-      height: `${size / 0.71808510638}px`,
-      top: `calc(100% - ${size / 0.71808510638 + 32}px)`,
+      height: `${size / CARD_SIZE_RATIO}px`,
+      top: `calc(100% - ${size / CARD_SIZE_RATIO + 32}px)`,
       opacity: opacity,
       backgroundImage: `url(${frontLoaded == grpId ? frontUrl : NoCard})`,
     };
@@ -44,8 +45,8 @@ export default function CardHover(): JSX.Element {
     return {
       width: `${size}px`,
       right: `${size + 48}px`,
-      height: `${size / 0.71808510638}px`,
-      top: `calc(100% - ${size / 0.71808510638 + 32}px)`,
+      height: `${size / CARD_SIZE_RATIO}px`,
+      top: `calc(100% - ${size / CARD_SIZE_RATIO + 32}px)`,
       opacity: op,
       backgroundImage: `url(${backLoaded == grpId ? backUrl : NoCard})`,
     };

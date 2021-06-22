@@ -10,13 +10,16 @@ import Button from "../../ui/Button";
 
 import getFiltersFromQuery from "./collectionQuery";
 
-import { CardsData, CollectionFilters } from "../../../types/collectionTypes";
+import { CardsData } from "../../../types/collectionTypes";
 import doCollectionFilter from "../../../utils/tables/doCollectionFilter";
 
 import CardCollection from "./CardCollection";
 import PagingControls from "../../PagingControls";
 import usePagingControls from "../../../hooks/usePagingControls";
 import SortControls, { Sort } from "../../SortControls";
+import SetsFilter from "../../SetsFilter";
+import setFilter from "../../../utils/tables/filters/setFilter";
+import { Filters } from "../../../types/genericFilterTypes";
 
 interface ViewCollectionProps {
   collectionData: CardsData[];
@@ -29,7 +32,10 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
   const { collectionData, openAdvancedCollectionSearch } = props;
   const dispatch = useDispatch();
-  const [filters, setFilters] = useState<CollectionFilters>();
+
+  const [filterSets, setFilterSets] = useState<string[]>([]);
+
+  const [filters, setFilters] = useState<Filters<CardsData>>();
   const [sortValue, setSortValue] = useState<Sort<CardsData>>({
     key: "name",
     sort: 1,
@@ -66,6 +72,25 @@ export default function ViewCollection(props: ViewCollectionProps) {
     }
   }, []);
 
+  const setFilterSetsPre = useCallback(
+    (sets: string[]) => {
+      setFilterSets(sets);
+      if (filters) {
+        const newFilters = setFilter(filters, {
+          type: "array",
+          id: "setCodes",
+          value: {
+            mode: ":",
+            arr: sets,
+            not: false,
+          },
+        });
+        setFilters(newFilters);
+      }
+    },
+    [filters]
+  );
+
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>): void => {
       reduxAction(dispatch, {
@@ -89,25 +114,32 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
   return (
     <>
-      <div className="section">
-        <Button
-          onClick={openAdvancedCollectionSearch}
-          text="Advanced Filters"
-        />
-        <InputContainer title="Search">
-          <input
-            value={collectionQuery}
-            placeholder="Search.."
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
+      <div className="section" style={{ flexDirection: "column" }}>
+        <div style={{ display: "flex" }}>
+          <Button
+            onClick={openAdvancedCollectionSearch}
+            text="Advanced Filters"
           />
-        </InputContainer>
+          <InputContainer title="Search">
+            <input
+              value={collectionQuery}
+              placeholder="Search.."
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+            />
+          </InputContainer>
+        </div>
+
+        <div>
+          <SetsFilter callback={setFilterSetsPre} filtered={filterSets} />
+        </div>
       </div>
       <div
         className="section"
         style={{ marginTop: "0px", flexDirection: "column" }}
       >
         <SortControls<CardsData>
+          defaultSort={sortValue}
           setSortCallback={setSortValue}
           columnKeys={["name", "rarityVal", "cmc", "cid", "set"]}
           columnNames={["Name", "Rarity", "CMC", "Collector ID", "Set"]}

@@ -1,10 +1,19 @@
 import electron from "electron";
-import { InternalMatch } from "mtgatool-shared";
+import {
+  getJumpstartThemes,
+  InternalMatch,
+  JumpstartThemes,
+  themeCards,
+  constants,
+} from "mtgatool-shared";
+
 import { ResultSpec } from "mtgatool-shared/dist/types/greTypes";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import getToolVersion from "../utils/getToolVersion";
 import getOpponentDeck from "./getOpponentDeck";
 import globalStore from "./store";
+
+const { DEFAULT_TILE } = constants;
 
 function matchResults(results: ResultSpec[]): number[] {
   let playerWins = 0;
@@ -84,14 +93,13 @@ function generateInternalMatch(): InternalMatch {
     type: "match",
   };
 
-  // if (currentMatch.eventId.indexOf("Jumpstart") !== -1) {
-  //   const themes = getJumpstartThemes(globalStore.currentMatch.originalDeck);
-  //   newMatch.jumpstartTheme = themes.join(" ");
-  //   newMatch.playerDeck.name = newMatch.jumpstartTheme;
-  //   const themeTile = themeCards[themes[0] as JumpstartThemes];
-  //   newMatch.playerDeck.deckTileId = themeTile || DEFAULT_TILE;
-  //   newMatch.jumpstartTheme = themes.join(" ");
-  // }
+  if (currentMatch.eventId.indexOf("Jumpstart") !== -1) {
+    const themes = getJumpstartThemes(globalStore.currentMatch.originalDeck);
+    // newMatch.jumpstartTheme = themes.join(" ");
+    newMatch.playerDeck.name = themes.join(" ");
+    const themeTile = themeCards[themes[0] as JumpstartThemes];
+    newMatch.playerDeck.deckTileId = themeTile || DEFAULT_TILE;
+  }
 
   newMatch.oppDeck.commandZoneGRPIds = currentMatch.opponent.commanderGrpIds;
   newMatch.oppDeck.companionGRPId = currentMatch.opponent.companionGrpId;

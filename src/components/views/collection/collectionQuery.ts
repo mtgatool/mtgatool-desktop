@@ -6,7 +6,6 @@ import _ from "lodash";
 import { constants, Colors } from "mtgatool-shared";
 
 import {
-  CollectionFilters,
   ParsedToken,
   QueryKeys,
   RARITY_COMMON,
@@ -15,17 +14,20 @@ import {
   RARITY_RARE,
   RARITY_TOKEN,
   RARITY_UNCOMMON,
-  AllCollectionFilterFunctions,
+  CardsData,
 } from "../../../types/collectionTypes";
+import { FilterModes, QuerySeparators } from "../../../types/filterTypes";
 import {
-  ArrayFilter,
-  ColorBitsFilter,
-  InBoolFilter,
-  MinMaxFilter,
-  QuerySeparators,
-  RarityBitsFilter,
-  StringFilter,
-} from "../../../types/filterTypes";
+  AllFilters,
+  ArrayFilterType,
+  ColorBitsFilterType,
+  Filters,
+  InBoolFilterType,
+  MinMaxFilterType,
+  RarityBitsFilterType,
+  StringFilterType,
+} from "../../../types/genericFilterTypes";
+import setFilter from "../../../utils/tables/filters/setFilter";
 
 const { WHITE, BLUE, RED, BLACK, GREEN, COLORLESS } = constants;
 
@@ -68,105 +70,6 @@ function parseFilterValue(filterValue: string): ParsedToken[] {
   return results;
 }
 
-const defaultStringFilter: StringFilter = {
-  string: "",
-  not: false,
-};
-
-const defaultInBoolFilter: InBoolFilter = {
-  not: false,
-  mode: ":",
-  type: "",
-  value: true,
-};
-
-const defaultMinMaxFilter: MinMaxFilter = {
-  not: false,
-  mode: ":",
-  value: 0,
-};
-
-interface DefaultFilters
-  extends Record<QueryKeys, AllCollectionFilterFunctions> {
-  name: StringFilter;
-  type: StringFilter;
-  artist: StringFilter;
-  format: StringFilter;
-  banned: StringFilter;
-  legal: StringFilter;
-  suspended: StringFilter;
-  is: InBoolFilter;
-  in: InBoolFilter;
-  boosters: InBoolFilter;
-  craftable: InBoolFilter;
-  cmc: MinMaxFilter;
-  owned: MinMaxFilter;
-  wanted: MinMaxFilter;
-  colors: ColorBitsFilter;
-  rarity: RarityBitsFilter;
-  set: ArrayFilter;
-}
-
-const defaultFilters: DefaultFilters = {
-  name: { ...defaultStringFilter },
-  type: { ...defaultStringFilter },
-  artist: { ...defaultStringFilter },
-  format: { ...defaultStringFilter },
-  banned: { ...defaultStringFilter },
-  legal: { ...defaultStringFilter },
-  suspended: { ...defaultStringFilter },
-  is: { ...defaultInBoolFilter },
-  in: { ...defaultInBoolFilter },
-  boosters: { ...defaultInBoolFilter },
-  craftable: { ...defaultInBoolFilter },
-  cmc: { ...defaultMinMaxFilter },
-  owned: { ...defaultMinMaxFilter },
-  wanted: { ...defaultMinMaxFilter },
-  colors: {
-    color: 0,
-    not: false,
-    mode: "or",
-  },
-  rarity: {
-    not: false,
-    mode: ":",
-    rarity: 0,
-  },
-  set: {
-    arr: [],
-    not: false,
-    mode: ":",
-  },
-};
-
-const tokenToKeys: Record<string, QueryKeys | undefined> = {
-  name: "name",
-  t: "type",
-  type: "type",
-  m: "colors",
-  c: "colors",
-  mana: "colors",
-  cmc: "cmc",
-  owned: "owned",
-  q: "owned",
-  wanted: "wanted",
-  r: "rarity",
-  rarity: "rarity",
-  a: "artist",
-  artist: "artist",
-  s: "set",
-  set: "set",
-  f: "format",
-  is: "is",
-  in: "in",
-  boosters: "boosters",
-  craftable: "craftable",
-  legal: "legal",
-  format: "format",
-  banned: "banned",
-  suspended: "suspended",
-};
-
 /**
  * Returns the default filters modified with the current query such as key + separator + value
  * @param key accessor in the table
@@ -179,135 +82,171 @@ function getTokenVal(
   isNegative: boolean,
   separator: QuerySeparators,
   val: string
-): DefaultFilters {
-  const filters = _.cloneDeep(defaultFilters);
+): AllFilters<CardsData> | undefined {
   switch (key) {
     case "name":
-      if (separator === "=" || separator === ":") filters.name.string = val;
-      filters.name.not = isNegative;
+      if (separator === "=" || separator === ":") {
+        const newFilter: StringFilterType<CardsData> = {
+          type: "string",
+          id: "name",
+          value: { string: val, not: isNegative },
+        };
+        return newFilter;
+      }
       break;
     case "type":
-      if (separator === "=" || separator === ":") filters.type.string = val;
-      filters.type.not = isNegative;
+      if (separator === "=" || separator === ":") {
+        const newFilter: StringFilterType<CardsData> = {
+          type: "string",
+          id: "type",
+          value: { string: val, not: isNegative },
+        };
+        return newFilter;
+      }
       break;
     case "artist":
-      if (separator === "=" || separator === ":") filters.artist.string = val;
-      filters.artist.not = isNegative;
+      if (separator === "=" || separator === ":") {
+        const newFilter: StringFilterType<CardsData> = {
+          type: "string",
+          id: "artist",
+          value: { string: val, not: isNegative },
+        };
+        return newFilter;
+      }
       break;
     case "format":
-      if (separator === "=" || separator === ":") filters.format.string = val;
-      filters.format.not = isNegative;
+      if (separator === "=" || separator === ":") {
+        const newFilter: ArrayFilterType<CardsData> = {
+          type: "array",
+          id: "format",
+          value: { arr: val.split(","), not: isNegative, mode: ":" },
+        };
+        return newFilter;
+      }
       break;
     case "banned":
-      if (separator === "=" || separator === ":") filters.banned.string = val;
-      filters.banned.not = isNegative;
+      if (separator === "=" || separator === ":") {
+        const newFilter: ArrayFilterType<CardsData> = {
+          type: "array",
+          id: "banned",
+          value: { arr: val.split(","), not: isNegative, mode: ":" },
+        };
+        return newFilter;
+      }
       break;
     case "suspended":
-      if (separator === "=" || separator === ":")
-        filters.suspended.string = val;
-      filters.suspended.not = isNegative;
+      if (separator === "=" || separator === ":") {
+        const newFilter: ArrayFilterType<CardsData> = {
+          type: "array",
+          id: "suspended",
+          value: { arr: val.split(","), not: isNegative, mode: ":" },
+        };
+        return newFilter;
+      }
       break;
     case "is":
       if (separator === "=" || separator === ":") {
         if (val == "craftable") {
-          filters.craftable.type = val;
-          filters.craftable.value = !!val;
-          filters.craftable.not = isNegative;
+          const newFilter: InBoolFilterType<CardsData> = {
+            type: "inbool",
+            id: "craftable",
+            value: { value: !!val, type: val, mode: ":", not: isNegative },
+          };
+          return newFilter;
         }
       }
       break;
     case "in":
       if (separator === "=" || separator === ":") {
         if (val == "boosters" || val == "booster") {
-          filters.boosters.type = "booster";
-          filters.boosters.value = !!val;
-          filters.boosters.not = isNegative;
+          const newFilter: InBoolFilterType<CardsData> = {
+            type: "inbool",
+            id: "booster",
+            value: { value: !!val, type: val, mode: ":", not: isNegative },
+          };
+          return newFilter;
         }
       }
       break;
     case "set":
-      filters.set.arr = val.split(",");
-      filters.set.mode = separator;
-      filters.set.not = isNegative;
+      const newSetFilter: ArrayFilterType<CardsData> = {
+        type: "array",
+        id: "setCodes",
+        value: { arr: val.split(","), mode: separator, not: isNegative },
+      };
+      return newSetFilter;
       break;
     case "legal":
       if (separator === "=" || separator === ":") {
-        filters.legal.string = val;
-        filters.legal.not = isNegative;
-        // filters.format.string = val;
-        // filters.suspended.string = val;
-        // filters.suspended.not = true;
-        // filters.banned.string = val;
-        // filters.banned.not = true;
+        const newFilter: ArrayFilterType<CardsData> = {
+          type: "array",
+          id: "legal",
+          value: { arr: val.split(","), not: isNegative, mode: ":" },
+        };
+        return newFilter;
       }
       break;
     case "rarity":
-      filters.rarity.not = isNegative;
       let rarity = 0;
       switch (val) {
         case "token":
+        case "t":
           rarity = RARITY_TOKEN;
           break;
         case "land":
+        case "l":
           rarity = RARITY_LAND;
           break;
         case "common":
+        case "comon":
+        case "c":
           rarity = RARITY_COMMON;
           break;
         case "uncommon":
+        case "uncomon":
+        case "u":
           rarity = RARITY_UNCOMMON;
           break;
         case "rare":
+        case "r":
           rarity = RARITY_RARE;
           break;
         case "mythic":
+        case "m":
           rarity = RARITY_MYTHIC;
           break;
         default:
-          rarity = parseInt(val);
           break;
       }
-      filters.rarity.mode = separator;
-      filters.rarity.rarity = rarity;
+
+      const newFilter: RarityBitsFilterType<CardsData> = {
+        type: "rarity",
+        id: "rarityVal",
+        value: { rarity, not: isNegative, mode: separator },
+      };
+      return newFilter;
       break;
     case "cmc":
-      const intVal = parseInt(val);
-      if (separator === "=" || separator === ":") {
-        filters.cmc.value = intVal;
-        filters.cmc.value = intVal;
-      }
-      if (separator === ">") filters.cmc.value = intVal + 1;
-      if (separator === "<") filters.cmc.value = intVal - 1;
-      if (separator === ">=") filters.cmc.value = intVal;
-      if (separator === "<=") filters.cmc.value = intVal;
-      filters.cmc.not = isNegative;
-      filters.cmc.mode = separator;
-      break;
     case "owned":
-      const ownedVal = parseInt(val);
+      const intVal = parseInt(val);
+      let value: number | undefined;
       if (separator === "=" || separator === ":") {
-        filters.owned.value = ownedVal;
-        filters.owned.value = ownedVal;
+        value = intVal;
+        value = intVal;
       }
-      if (separator === ">") filters.owned.value = ownedVal + 1;
-      if (separator === "<") filters.owned.value = ownedVal - 1;
-      if (separator === ">=") filters.owned.value = ownedVal;
-      if (separator === "<=") filters.owned.value = ownedVal;
-      filters.owned.not = isNegative;
-      filters.owned.mode = separator;
-      break;
-    case "wanted":
-      const wantedVal = parseInt(val);
-      if (separator === "=" || separator === ":") {
-        filters.wanted.value = wantedVal;
-        filters.wanted.value = wantedVal;
+      if (separator === ">") value = intVal + 1;
+      if (separator === "<") value = intVal - 1;
+      if (separator === ">=") value = intVal;
+      if (separator === "<=") value = intVal;
+
+      if (value) {
+        const minmaxFilter: MinMaxFilterType<CardsData> = {
+          type: "minmax",
+          id: key,
+          value: { value, not: isNegative, mode: separator },
+        };
+        return minmaxFilter;
       }
-      if (separator === ">") filters.wanted.value = wantedVal + 1;
-      if (separator === "<") filters.wanted.value = wantedVal - 1;
-      if (separator === ">=") filters.wanted.value = wantedVal;
-      if (separator === "<=") filters.wanted.value = wantedVal;
-      filters.wanted.not = isNegative;
-      filters.wanted.mode = separator;
       break;
     case "colors":
       const str = val;
@@ -412,22 +351,57 @@ function getTokenVal(
       addG && arr.push(GREEN);
       addC && arr.push(COLORLESS);
       col.addFromArray(arr);
-      filters.colors.color = col.getBits();
-      filters.colors.not = isNegative;
-      if (separator == "=") filters.colors.mode = "strict";
-      if (separator == "!=") filters.colors.mode = "strictNot";
-      if (separator == ":") filters.colors.mode = "and";
-      if (separator == "<") filters.colors.mode = "strictSubset";
-      if (separator == "<=") filters.colors.mode = "subset";
-      if (separator == ">") filters.colors.mode = "strictSuperset";
-      if (separator == ">=") filters.colors.mode = "superset";
+
+      let colorMode: FilterModes = "strict";
+      if (separator == "=") colorMode = "strict";
+      if (separator == "!=") colorMode = "strictNot";
+      if (separator == ":") colorMode = "and";
+      if (separator == "<") colorMode = "strictSubset";
+      if (separator == "<=") colorMode = "subset";
+      if (separator == ">") colorMode = "strictSuperset";
+      if (separator == ">=") colorMode = "superset";
+
+      const minmaxFilter: ColorBitsFilterType<CardsData> = {
+        type: "colors",
+        id: key,
+        value: { color: col.getBits(), not: isNegative, mode: colorMode },
+      };
+      return minmaxFilter;
       break;
     default:
       break;
   }
 
-  return filters;
+  return undefined;
 }
+
+const tokenToKeys: Record<string, QueryKeys | undefined> = {
+  name: "name",
+  t: "type",
+  type: "type",
+  m: "colors",
+  c: "colors",
+  mana: "colors",
+  cmc: "cmc",
+  owned: "owned",
+  q: "owned",
+  wanted: "wanted",
+  r: "rarity",
+  rarity: "rarity",
+  a: "artist",
+  artist: "artist",
+  s: "set",
+  set: "set",
+  f: "format",
+  is: "is",
+  in: "in",
+  boosters: "boosters",
+  craftable: "craftable",
+  legal: "legal",
+  format: "format",
+  banned: "banned",
+  suspended: "suspended",
+};
 
 /**
  * Returns an array of filters to be used in the table based on a query string.
@@ -435,8 +409,8 @@ function getTokenVal(
  * https://scryfall.com/docs/syntax
  * @param query query string
  */
-export default function getFiltersFromQuery(query: string): CollectionFilters {
-  const filters: CollectionFilters = [];
+export default function getFiltersFromQuery(query: string): Filters<CardsData> {
+  let filters: Filters<CardsData> = [];
   const results = parseFilterValue(query);
   let keysAdded = 0;
   results.forEach((match: any) => {
@@ -445,53 +419,28 @@ export default function getFiltersFromQuery(query: string): CollectionFilters {
     const nKey = tokenKey.startsWith("-") ? tokenKey.slice(1) : tokenKey;
     const key = tokenToKeys[nKey] || undefined;
     if (key) {
-      const defaultModified = getTokenVal(
+      const newFilter = getTokenVal(
         key,
         isNeg,
         separator,
         tokenVal.toLowerCase()
       );
-      // console.log(defaultModified);
-      Object.keys(defaultModified)
-        .filter((id) => {
-          return !_.isEqual(
-            defaultModified[id as QueryKeys],
-            defaultFilters[id as QueryKeys]
-          );
-        })
-        .forEach((id) => {
-          const typedId = id as QueryKeys;
-          const newValue = defaultModified[typedId];
-          keysAdded += 1;
-          filters.push({ id: typedId, value: newValue } as any);
-        });
+
+      if (newFilter) {
+        filters = setFilter(filters, newFilter);
+        keysAdded += 1;
+      }
     }
   });
 
   if (keysAdded == 0) {
-    filters.push({ id: "name", value: { string: query, not: false } });
+    filters.push({
+      type: "string",
+      id: "name",
+      value: { string: query, not: false },
+    });
   }
 
   console.log(filters);
   return filters;
-}
-
-/**
- * Takes a query string and removes all key:value pairs matching the keys
- * @param query query string
- * @param key keys to remove from query
- */
-export function removeFilterFromQuery(query: string, keys: string[]): string {
-  const results = parseFilterValue(query);
-  const newQuery: string[] = [];
-  results.forEach((match: any) => {
-    const [tokenKey, separator, tokenVal] = match;
-    const nKey = tokenKey.startsWith("-") ? tokenKey.slice(1) : tokenKey;
-    if (!keys.includes(nKey)) {
-      const keyVal = `${tokenKey}${separator}${tokenVal}`;
-      newQuery.push(keyVal);
-    }
-  });
-
-  return newQuery.join(" ");
 }

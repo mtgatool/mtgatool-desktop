@@ -2,20 +2,24 @@
 import _ from "lodash";
 import allFormats from "../../../common/allFormats";
 
-import { CardsData } from "../../../types/collectionTypes";
 import { StringFilter } from "../../../types/filterTypes";
+import { FilterKeys } from "../../../types/utility";
 
-export default function formatFilterFn(
-  rows: CardsData[],
+export default function formatFilterFn<D>(
+  rows: D[],
   filterValue: StringFilter,
-  key: "format" | "banned" | "suspended" | "legal"
-): CardsData[] {
+  key: FilterKeys<D, string[]>
+): D[] {
   const F: string = Object.keys(allFormats).filter(
     (f) => f.toLowerCase() == filterValue.string.toLowerCase()
   )[0];
 
-  return rows.filter((row) => {
-    const ret = row[key].includes(F);
-    return filterValue.not ? !ret : ret;
-  });
+  if (F) {
+    return rows.filter((row) => {
+      const keyVal = (row[key] as unknown) as string[];
+      const ret = keyVal.includes(F);
+      return filterValue.not ? !ret : ret;
+    });
+  }
+  return rows;
 }

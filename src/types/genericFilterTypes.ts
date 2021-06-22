@@ -11,10 +11,13 @@ import { FilterKeys } from "./utility";
 
 export type filterType =
   | "string"
+  | "format"
   | "colors"
   | "rarity"
+  | "bits"
   | "rank"
   | "array"
+  | "set"
   | "minmax"
   | "inbool";
 
@@ -25,6 +28,12 @@ export type FilterTypeBase = {
 export interface StringFilterType<D> extends FilterTypeBase {
   type: "string";
   id: FilterKeys<D, string>;
+  value: StringFilter;
+}
+
+export interface FormatFilterType<D> extends FilterTypeBase {
+  type: "format";
+  id: FilterKeys<D, string[]>;
   value: StringFilter;
 }
 
@@ -46,8 +55,20 @@ export interface RankBitsFilterType<D> extends FilterTypeBase {
   value: BitsFilter;
 }
 
+export interface BitsFilterType<D> extends FilterTypeBase {
+  type: "bits";
+  id: FilterKeys<D, number>;
+  value: BitsFilter;
+}
+
 export interface ArrayFilterType<D> extends FilterTypeBase {
   type: "array";
+  id: FilterKeys<D, string[]>;
+  value: ArrayFilter;
+}
+
+export interface SetFilterType<D> extends FilterTypeBase {
+  type: "set";
   id: FilterKeys<D, string[]>;
   value: ArrayFilter;
 }
@@ -75,10 +96,13 @@ export type AllFilterFunctions =
 
 export type AllFilters<D> =
   | StringFilterType<D>
+  | FormatFilterType<D>
   | ColorBitsFilterType<D>
   | RarityBitsFilterType<D>
   | RankBitsFilterType<D>
+  | BitsFilterType<D>
   | ArrayFilterType<D>
+  | SetFilterType<D>
   | MinMaxFilterType<D>
   | InBoolFilterType<D>;
 

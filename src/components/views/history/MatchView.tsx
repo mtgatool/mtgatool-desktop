@@ -26,7 +26,7 @@ import copyToClipboard from "../../../utils/copyToClipboard";
 import DeckColorsBar from "../../DeckColorsBar";
 import SvgButton from "../../SvgButton";
 import ManaCost from "../../ManaCost";
-import Section from "../../Section";
+import Section from "../../ui/Section";
 import Flex from "../../Flex";
 import ResultDetails from "../../ResultDetails";
 import Button from "../../ui/Button";

@@ -22,7 +22,7 @@ import SvgButton from "../../SvgButton";
 import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
 import ManaCost from "../../ManaCost";
 import VisualDeckView from "./VisualDeckView";
-import Section from "../../Section";
+import Section from "../../ui/Section";
 import Button from "../../ui/Button";
 import Separator from "../../Separator";
 import DeckTypesStats from "../../DeckTypesStats";

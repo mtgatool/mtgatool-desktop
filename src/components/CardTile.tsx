@@ -1,4 +1,4 @@
-import { useCallback, useState, CSSProperties } from "react";
+import { useCallback, useState, CSSProperties, useEffect } from "react";
 import {
   constants,
   Deck,
@@ -6,7 +6,10 @@ import {
   Rarity,
   cardHasType,
 } from "mtgatool-shared";
-import { LANDS_HACK } from "mtgatool-shared/dist/shared/constants";
+import {
+  DEFAULT_TILE,
+  LANDS_HACK,
+} from "mtgatool-shared/dist/shared/constants";
 import getRankColorClass from "../utils/getRankColorClass";
 import openScryfallCard from "../utils/openScryfallCard";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
@@ -14,6 +17,8 @@ import useHoverCard from "../hooks/useHoverCard";
 
 import typeLand from "../assets/images/type_land.png";
 import getWildcardsMissing from "../utils/getWildcardsMissing";
+
+// import gray from "../assets/images/gray.png";
 
 const {
   CARD_RARITIES,
@@ -274,6 +279,7 @@ export default function CardTile(props: CardTileProps): JSX.Element {
   } = props;
   const [isMouseHovering, setMouseHovering] = useState(false);
   const [hoverIn, hoverOut] = useHoverCard(card.id);
+  const [cardUrl, setCardUrl] = useState<string | undefined>();
 
   const handleMouseEnter = useCallback((): void => {
     setMouseHovering(true);
@@ -293,15 +299,7 @@ export default function CardTile(props: CardTileProps): JSX.Element {
   }, [card, dfcCard]);
 
   const cardTileStyle = { backgroundImage: "", borderImage: "" };
-  try {
-    if (card.type == "Special") {
-      cardTileStyle.backgroundImage = `url(${card.images.art_crop})`;
-    } else {
-      cardTileStyle.backgroundImage = `url(${getCardArtCrop(card)})`;
-    }
-  } catch (e) {
-    console.error(e);
-  }
+  cardTileStyle.backgroundImage = `url(${cardUrl || DEFAULT_TILE})`;
 
   let colorA = "c";
   let colorB = "c";
@@ -330,6 +328,18 @@ export default function CardTile(props: CardTileProps): JSX.Element {
 
   const phyrexianName = `|Ceghm.`; // Swamp
   const isPhyrexian = card.id == 72578;
+
+  useEffect(() => {
+    const img = new Image();
+    let imageUrl = getCardArtCrop(card);
+    if (card.type == "Special") {
+      imageUrl = card.images.art_crop;
+    }
+    img.src = imageUrl;
+    img.onload = (): void => {
+      setCardUrl(imageUrl);
+    };
+  }, [deck]);
 
   return (
     <div className="card-tile-container-outer">

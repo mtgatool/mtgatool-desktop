@@ -7,7 +7,7 @@ import {
   historicAnthology3,
   historicAnthology4,
   historicAnthology5,
-} from "../customSets";
+} from "../../../../common/customSets";
 import getCardBanned from "./getCardBanned";
 import getCardFormats from "./getCardFormats";
 import getCardInBoosters from "./getCardInBoosters";

@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import reduxAction from "../../../redux/reduxAction";
 import { getCardImage } from "../../../utils/getCardArtCrop";
 import DeckTypesStats from "../../DeckTypesStats";
-import Section from "../../Section";
+import Section from "../../ui/Section";
 import Button from "../../ui/Button";
 
 interface VisualDeckViewProps {

@@ -1,5 +1,14 @@
-import { useCallback, useRef } from "react";
+import {
+  CSSProperties,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useSelector } from "react-redux";
+import LoadingCard from "../../../assets/images/loadingcard.png";
+import { CARD_SIZE_RATIO } from "../../../common/static";
 import useHoverCard from "../../../hooks/useHoverCard";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { CardsData } from "../../../types/collectionTypes";
@@ -19,12 +28,28 @@ export default function CardCollection(props: CardCollectionProps) {
   const containerEl = useRef<HTMLDivElement>(null);
 
   const [hoverIn, hoverOut] = useHoverCard(card.id);
+  const [cardUrl, setCardUrl] = useState<string>();
 
   const cardSize =
     100 + useSelector((state: AppState) => state.settings.cardsSize) * 15;
   const cardsQuality = useSelector(
     (state: AppState) => state.settings.cardsQuality
   );
+
+  const style = useMemo((): CSSProperties => {
+    return {
+      backgroundImage: `url(${cardUrl || LoadingCard})`,
+    };
+  }, [cardUrl]);
+
+  useEffect(() => {
+    const img = new Image();
+    const imageUrl = getCardImage(card, cardsQuality);
+    img.src = imageUrl;
+    img.onload = (): void => {
+      setCardUrl(imageUrl);
+    };
+  }, []);
 
   return (
     <div
@@ -40,13 +65,12 @@ export default function CardCollection(props: CardCollectionProps) {
         className="inventory-card"
         onMouseEnter={hoverIn}
         onMouseLeave={hoverOut}
-        style={{ width: `${cardSize}px` }}
+        style={{
+          width: `${cardSize}px`,
+          height: `${Math.round(cardSize / CARD_SIZE_RATIO)}px`,
+        }}
       >
-        <img
-          className="inventory-card-img"
-          style={{ width: `${cardSize}px` }}
-          src={getCardImage(card, cardsQuality)}
-        />
+        <div className="inventory-card-img" style={{ ...style }} />
       </div>
     </div>
   );

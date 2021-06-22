@@ -11,8 +11,8 @@ export default function unsetFilter<D>(
     }
   });
 
-  if (sliceIndex) {
-    return filters.splice(sliceIndex, 1);
+  if (sliceIndex !== undefined) {
+    filters.splice(sliceIndex, 1);
   }
 
   return filters;

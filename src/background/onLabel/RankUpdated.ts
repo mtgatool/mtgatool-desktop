@@ -5,11 +5,11 @@ import LogEntry from "../../types/logDecoder";
 import globalStore from "../store";
 
 interface Entry extends LogEntry {
-  json: () => RankUpdate;
+  json: RankUpdate;
 }
 
 export default function RankUpdated(entry: Entry): void {
-  const json = entry.json();
+  const { json } = entry;
   if (json.newClass == "Mythic" && json.oldClass == "Mythic") return;
 
   const { rank } = globalStore;

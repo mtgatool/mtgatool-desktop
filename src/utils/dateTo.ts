@@ -1,5 +1,5 @@
 function getTwoDigitString(val: number): string {
-  return (val < 10 ? "0" : "") + val;
+  return `${val}`.padStart(2, "0");
 }
 
 export function toMMSS(secNum: number): string {
@@ -11,7 +11,7 @@ export function toMMSS(secNum: number): string {
   if (hours > 0) {
     return `${hours}:${minutesStr}:${secondsStr}`;
   }
-  return `${minutes}:${secondsStr}`;
+  return `${minutesStr}:${secondsStr}`;
 }
 
 export function toDDHHMMSS(secNum: number): string {

@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import { Colors, Deck, formatPercent, InternalDeck } from "mtgatool-shared";
+import { useEffect, useState } from "react";
 import ManaCost from "./ManaCost";
 
 import WildcardsCost from "./WildcardsCost";
@@ -10,16 +11,29 @@ import getWinrateClass from "../utils/getWinrateClass";
 import { GunDeck } from "../types/gunTypes";
 import timeAgo from "../utils/timeAgo";
 import baseToObj from "../utils/baseToObj";
+import getPreconDeckName from "../utils/getPreconDeckName";
+
+import squirrels from "../assets/images/squirrels.png";
 
 interface DecksArtViewRowProps {
   clickDeck: (deck: GunDeck) => void;
   deck: GunDeck;
 }
 
+function isCached(src: string) {
+  const image = new Image();
+  image.src = src;
+  return image.width + image.height > 0 || image.complete;
+}
+
 export default function DecksArtViewRow(
   props: DecksArtViewRowProps
 ): JSX.Element {
   const { clickDeck, deck } = props;
+  const imageUrl = getCardArtCrop(deck.tile);
+  const [cardUrl, setCardUrl] = useState<string | undefined>(
+    isCached(imageUrl) ? imageUrl : undefined
+  );
 
   const internalDeck = baseToObj<InternalDeck>(deck.internalDeck);
   const deckObj = new Deck(internalDeck);
@@ -46,17 +60,27 @@ export default function DecksArtViewRow(
     missingWildcards.rare +
     missingWildcards.mythic;
 
+  useEffect(() => {
+    const img = new Image();
+    img.src = imageUrl;
+    img.onload = (): void => {
+      setTimeout(() => setCardUrl(imageUrl), 250);
+    };
+  }, [deck]);
+
   return (
     <div
       className="decks-table-deck-tile"
       onClick={() => clickDeck(deck)}
       style={{
-        backgroundImage: `url(${getCardArtCrop(deck.tile)})`,
+        backgroundImage: `url(${cardUrl || squirrels})`,
       }}
     >
       <DeckColorsBar deck={deckObj} />
       <div className="decks-table-deck-inner">
-        <div className="decks-table-deck-item">{deck.name}</div>
+        <div className="decks-table-deck-item">
+          {getPreconDeckName(deck.name)}
+        </div>
         <div className="decks-table-deck-item">
           <ManaCost colors={deckColors.get()} />
         </div>

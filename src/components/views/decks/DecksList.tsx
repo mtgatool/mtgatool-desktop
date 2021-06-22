@@ -33,7 +33,7 @@ export default function DecksList() {
   ]);
 
   const [sortValue, setSortValue] = useState<Sort<GunDeck>>({
-    key: "lastUsed",
+    key: "lastModified",
     sort: -1,
   });
 
@@ -48,7 +48,7 @@ export default function DecksList() {
       .map((d) => {
         return {
           ...d,
-          colors: d.colors > 31 ? d.colors - 31 : d.colors,
+          colors: d.colors > 32 ? d.colors - 32 : d.colors,
         };
       });
     return doDecksFilter(decksForFiltering, filters, sortValue);
@@ -95,6 +95,7 @@ export default function DecksList() {
           setSortCallback={setSortValue}
           defaultSort={sortValue}
           columnKeys={["lastModified", "lastUsed", "colors", "format"]}
+          columnNames={["Last Modified", "Last Used", "Colors", "Format"]}
         />
         <div className="decks-table-wrapper">
           {filteredData

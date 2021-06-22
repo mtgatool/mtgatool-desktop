@@ -2,7 +2,7 @@ export type QuerySeparators = ">=" | "<=" | ":" | "=" | "!=" | "<" | ">";
 
 export type ParsedToken = [string, QuerySeparators, string];
 
-type FilterModes =
+export type FilterModes =
   | "strict"
   | "and"
   | "or"

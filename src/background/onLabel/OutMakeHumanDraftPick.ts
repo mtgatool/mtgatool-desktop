@@ -4,11 +4,11 @@ import LogEntry from "../../types/logDecoder";
 import { addDraftPick } from "../store/currentDraftStore";
 
 interface Entry extends LogEntry {
-  json: () => OutMakeHumanDraftPick;
+  json: OutMakeHumanDraftPick;
 }
 
 export default function onLabelOutMakeHumanDraftPick(entry: Entry): void {
-  const json = entry.json();
+  const { json } = entry;
 
   if (!json || !json.params) return;
   const { packNumber, pickNumber, cardId } = json.params;

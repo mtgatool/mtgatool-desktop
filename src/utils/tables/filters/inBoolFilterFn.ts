@@ -12,9 +12,6 @@ export default function inBoolFilterFn<D>(
   return rows.filter((row) => {
     const R = (row[key] as unknown) as boolean;
 
-    // move this logic to master filter
-    // R = key == "is" ? row.craftable : row.booster;
-
     let ret: number | boolean = true;
     if (filterValue.mode == "=") ret = R === F;
     if (filterValue.mode == ":") ret = R === F;
