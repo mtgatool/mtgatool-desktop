@@ -105,8 +105,8 @@ export type CardTileQuantity =
   | QuantityRank
   | QuantityText;
 
-interface CardTileProps {
-  card: DbCardData;
+export interface CardTileProps {
+  card: DbCardData | undefined;
   deck?: Deck;
   dfcCard?: DbCardData;
   indent: string;
@@ -278,7 +278,7 @@ export default function CardTile(props: CardTileProps): JSX.Element {
     showWildcards,
   } = props;
   const [isMouseHovering, setMouseHovering] = useState(false);
-  const [hoverIn, hoverOut] = useHoverCard(card.id);
+  const [hoverIn, hoverOut] = useHoverCard(card?.id || 0);
   const [cardUrl, setCardUrl] = useState<string | undefined>();
 
   const handleMouseEnter = useCallback((): void => {
@@ -292,7 +292,7 @@ export default function CardTile(props: CardTileProps): JSX.Element {
 
   const handleMouseClick = useCallback((): void => {
     let _card = card;
-    if (card.dfc === FACE_SPLIT_FULL) {
+    if (card?.dfc === FACE_SPLIT_FULL) {
       _card = dfcCard || card;
     }
     openScryfallCard(_card);
@@ -303,7 +303,7 @@ export default function CardTile(props: CardTileProps): JSX.Element {
 
   let colorA = "c";
   let colorB = "c";
-  if (card.frame) {
+  if (card?.frame) {
     if (card.frame.length == 1) {
       colorA = COLORS_ALL[card.frame[0] - 1];
       colorB = COLORS_ALL[card.frame[0] - 1];
@@ -327,12 +327,12 @@ export default function CardTile(props: CardTileProps): JSX.Element {
   }
 
   const phyrexianName = `|Ceghm.`; // Swamp
-  const isPhyrexian = card.id == 72578;
+  const isPhyrexian = card?.id == 72578;
 
   useEffect(() => {
     const img = new Image();
-    let imageUrl = getCardArtCrop(card);
-    if (card.type == "Special") {
+    let imageUrl = getCardArtCrop(card || 0);
+    if (card?.type == "Special") {
       imageUrl = card.images.art_crop;
     }
     img.src = imageUrl;
@@ -345,7 +345,7 @@ export default function CardTile(props: CardTileProps): JSX.Element {
     <div className="card-tile-container-outer">
       <div
         className="card-tile-container-flat click-on"
-        data-grp-id={card.id}
+        data-grp-id={card?.id || 0}
         data-id={indent}
         data-quantity={quantity}
         style={tileStyle}
@@ -359,13 +359,13 @@ export default function CardTile(props: CardTileProps): JSX.Element {
           className="card-tile-name-flat"
           style={isPhyrexian ? { fontFamily: "PhyrexianHorizontal" } : {}}
         >
-          {isPhyrexian ? phyrexianName : card.name || "Unknown"}
+          {isPhyrexian ? phyrexianName : card?.name || "Unknown Card"}
         </div>
         <div className="cart-tile-mana-flat">
-          <CostSymbols card={card} dfcCard={dfcCard} />
+          {card ? <CostSymbols card={card} dfcCard={dfcCard} /> : <></>}
         </div>
       </div>
-      {showWildcards && deck && (
+      {showWildcards && deck && card && (
         <WildcardsNeeded
           card={card}
           deck={deck}

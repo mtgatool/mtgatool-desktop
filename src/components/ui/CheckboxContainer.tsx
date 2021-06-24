@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 
 interface CheckboxContainerProps {
-  className: string;
+  className?: string;
 }
 
 export default function CheckboxContainer(
@@ -12,7 +12,7 @@ export default function CheckboxContainer(
   return (
     <label
       style={{ cursor: "pointer", display: "inline-flex" }}
-      className={`${className} check-container`}
+      className={`${className || ""} check-container`}
     >
       {children}
     </label>

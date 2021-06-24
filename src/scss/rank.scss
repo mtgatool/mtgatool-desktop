@@ -1,0 +1,37 @@
+.ranks-16 {
+  -webkit-app-region: no-drag;
+  margin-right: 4px;
+  align-self: center;
+  width: 16px;
+  height: 16px;
+  background: url(../assets/images/ranks_16.png);
+  background-position: 16px 0px;
+}
+
+.rank {
+  -webkit-app-region: no-drag;
+  align-self: center;
+  margin-left: 16px;
+  width: 48px;
+  height: 48px;
+  background: url(../assets/images/ranks_constructed_48.png);
+  background-position: 0px 0px;
+}
+
+.rank-bullets {
+  height: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.rank-bullet-light {
+  background-image: url(../assets/images/rank_bullet_light.png);
+  width: 8px;
+  height: 8px;
+}
+
+.rank-bullet-dark {
+  background-image: url(../assets/images/rank_bullet_dark.png);
+  width: 8px;
+  height: 8px;
+}

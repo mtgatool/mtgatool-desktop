@@ -1,4 +1,4 @@
-interface ButtonProps {
+export interface ButtonProps {
   onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   text: string;
   style?: React.CSSProperties;

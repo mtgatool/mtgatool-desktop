@@ -12,7 +12,7 @@ manaClasses[RED] = "mana-r";
 manaClasses[GREEN] = "mana-g";
 manaClasses[COLORLESS] = "mana-c";
 
-interface ManaCostProps {
+export interface ManaCostProps {
   colors: number[];
   className?: string;
 }

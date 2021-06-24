@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-interface CheckboxProps {
+export interface CheckboxProps {
   text: string | JSX.Element;
   value: boolean;
   callback: (value: boolean) => void;

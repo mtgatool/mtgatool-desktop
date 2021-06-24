@@ -38,6 +38,8 @@ export function useGun() {
       window.gun ??
       Gun<GunState>([
         "http://api.mtgatool.com:8765/gun",
+        "https://kmm-gun.herokuapp.com:8765/gun",
+        "https://gun-us.herokuapp.com/:8765/gun",
         // "mtgatool-gun-eqszq.ondigitalocean.app:8765/gun",
       ])
     );

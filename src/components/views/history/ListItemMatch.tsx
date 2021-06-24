@@ -120,7 +120,19 @@ export default function ListItemMatch({
             }}
             className="copy-button"
           />
-          <RankSmall rank={internalMatch.opponent} />
+          <RankSmall
+            rank={{
+              rank: internalMatch.opponent.rank,
+              tier: internalMatch.opponent.tier,
+              step: internalMatch.opponent.step || 0,
+              won: 0,
+              lost: 0,
+              drawn: 0,
+              seasonOrdinal: 0,
+              percentile: internalMatch.opponent.percentile || 0,
+              leaderboardPlace: internalMatch.opponent.leaderboardPlace || 0,
+            }}
+          />
         </FlexTop>
         <FlexBottom
           style={{

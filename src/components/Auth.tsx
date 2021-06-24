@@ -30,8 +30,13 @@ import { AppState } from "../redux/stores/rendererStore";
 
 type InputChange = ChangeEvent<HTMLInputElement>;
 
-export default function Auth() {
-  const [page, sePage] = useState(0);
+export interface AuthProps {
+  defaultPage?: number;
+}
+
+export default function Auth(props: AuthProps) {
+  const { defaultPage } = props;
+  const [page, setPage] = useState(defaultPage || 1);
 
   const history = useHistory();
   const dispatch = useDispatch();
@@ -217,8 +222,8 @@ export default function Auth() {
   const closePopup = useRef<() => void>(() => console.log("closePopup"));
 
   useEffect(() => {
-    sePage(1);
-  }, []);
+    setPage(defaultPage || 1);
+  }, [defaultPage]);
 
   const pageProps = useSpring({
     left: `${0 - page * 33.33}%`,
@@ -294,7 +299,7 @@ export default function Auth() {
                     </button>
                     <div className="form-error">{errorMessage}</div>
                     <div className="message-small">
-                      <a onClick={() => sePage(1)} className="signup-link">
+                      <a onClick={() => setPage(1)} className="signup-link">
                         Log in!
                       </a>
                     </div>
@@ -326,7 +331,7 @@ export default function Auth() {
                       }}
                     >
                       <a
-                        onClick={(): void => sePage(0)}
+                        onClick={(): void => setPage(0)}
                         className="forgot_link"
                       >
                         Forgot your password?
@@ -352,7 +357,7 @@ export default function Auth() {
                       />
                       <div className="message-small">
                         Dont have an account?{" "}
-                        <a onClick={() => sePage(2)} className="signup-link">
+                        <a onClick={() => setPage(2)} className="signup-link">
                           Sign up!
                         </a>
                       </div>
@@ -399,7 +404,7 @@ export default function Auth() {
                     <div className="form-error">{errorMessage}</div>
                     <div className="message-small">
                       Already have an account?{" "}
-                      <a onClick={() => sePage(1)} className="signup-link">
+                      <a onClick={() => setPage(1)} className="signup-link">
                         Log in!
                       </a>
                     </div>

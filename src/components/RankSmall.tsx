@@ -1,8 +1,8 @@
-import { getRankIndex16 } from "mtgatool-shared";
+import { getRankIndex16, InternalRankData } from "mtgatool-shared";
 import formatRank from "../utils/formatRank";
 
-interface RankSmallProps {
-  rank?: any | string;
+export interface RankSmallProps {
+  rank?: InternalRankData;
   rankTier?: string;
   style?: React.CSSProperties;
 }
@@ -15,7 +15,7 @@ export default function RankSmall(props: RankSmallProps): JSX.Element {
       ...(style || {}),
       marginRight: "0px",
       backgroundPosition: `${
-        getRankIndex16(rankTier || rank.rank) * -16
+        getRankIndex16(rank?.rank || rankTier || "Unranked") * -16
       }px 0px`,
     };
   };
@@ -23,8 +23,8 @@ export default function RankSmall(props: RankSmallProps): JSX.Element {
   return (
     <div
       style={getRankStyle()}
-      title={rankTier || formatRank(rank)}
-      className="ranks16"
+      title={(rank ? formatRank(rank) : rankTier) || "Unranked"}
+      className="ranks-16"
     />
   );
 }

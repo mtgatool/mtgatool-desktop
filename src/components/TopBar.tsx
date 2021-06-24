@@ -52,14 +52,19 @@ function clickCloseOverlay(): void {
   }
 }
 
-export default function TopBar(): JSX.Element {
+interface TopBarProps {
+  forceOs?: string;
+}
+
+export default function TopBar(props: TopBarProps): JSX.Element {
+  const { forceOs } = props;
   const [hoverControls, setHoverControls] = useState(false);
 
   const { topArtist, offline } = useSelector(
     (state: AppState) => state.renderer
   );
 
-  const os = process.platform;
+  const os = forceOs || process.platform;
 
   const isOverlay = ALL_OVERLAYS.includes(getWindowTitle());
 

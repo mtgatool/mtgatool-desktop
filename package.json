@@ -10,6 +10,7 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "@storybook/react": "^6.2.9",
     "axios": "^0.21.1",
     "date-fns": "^2.19.0",
     "electron-devtools-installer": "^3.1.1",
@@ -58,7 +59,10 @@
     "release": "npm run react-build && electron-builder --publish=always",
     "build": "npm run electron-rebuild && npm run react-build && npm run electron-build",
     "electron-rebuild": "electron-rebuild",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "storybook": "start-storybook -p 6006 -s public",
+    "build-storybook": "build-storybook -s public",
+    "chromatic": "npx chromatic --project-token=62e160e30516"
   },
   "build": {
     "appId": "com.mtgatool.desktop",
@@ -107,6 +111,16 @@
     "extends": [
       "react-app",
       "react-app/jest"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "**/*.stories.*"
+        ],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
+      }
     ]
   },
   "browserslist": {
@@ -122,6 +136,11 @@
     ]
   },
   "devDependencies": {
+    "@storybook/addon-actions": "^6.2.9",
+    "@storybook/addon-essentials": "^6.2.9",
+    "@storybook/addon-links": "^6.2.9",
+    "@storybook/node-logger": "^6.2.9",
+    "@storybook/preset-create-react-app": "^3.1.7",
     "@types/gun": "^0.9.2",
     "@types/jest": "^26.0.15",
     "@types/leveldown": "^4.0.2",
@@ -138,6 +157,7 @@
     "@types/react-table": "^7.0.29",
     "@types/secp256k1": "^4.0.1",
     "@types/webpack-env": "^1.16.0",
+    "chromatic": "^5.9.2",
     "craco": "0.0.3",
     "electron": "^8.4.0",
     "electron-builder": "^22.10.5",

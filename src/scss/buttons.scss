@@ -12,11 +12,12 @@
   opacity: 0.8;
   background-size: contain;
   -webkit-transition: all 0.33s ease-in-out;
-}
 
-.button:hover {
-  opacity: 1;
-  -webkit-transform: rotate(-90deg);
+  
+  &:hover {
+    opacity: 1;
+    -webkit-transform: rotate(-90deg);
+  }
 }
 
 .button.minimize:hover {
@@ -62,6 +63,10 @@
   background-position: center;
   width: 32px;
   height: 32px;
+
+  &:hover, &.__hover {   
+    background-color: var(--color-section-hover) !important;
+  }
 }
 
 .svg-button {
@@ -75,10 +80,10 @@
   display: flex;
   width: 32px;
   height: 32px;
-}
 
-.icon-button:hover, .svg-button:hover {
-  background-color: var(--color-section-hover) !important;
+  &:hover, &.__hover {   
+    background-color: var(--color-section-hover) !important;
+  }
 }
 
 .button-simple {
@@ -97,17 +102,17 @@
   font-family: var(--main-font-name);
   transform: translateY(0);
   -webkit-transition: all .2s ease-in-out;
-}
 
-.button-simple:active {
-  border: 1px solid var(--color-dark-hover);
-  background-color: var(--color-button);
-}
-
-.button-simple:hover {
-  border: 1px solid var(--color-dark-hover);
-  color: var(--color-text-hover);
-  background-color: var(--color-button-hover);
+  &:active {
+    border: 1px solid var(--color-dark-hover);
+    background-color: var(--color-button);
+  }
+  
+  &:hover {
+    border: 1px solid var(--color-dark-hover);
+    color: var(--color-text-hover);
+    background-color: var(--color-button-hover);
+  }
 }
 
 .button-simple-disabled {
@@ -128,14 +133,13 @@
   -webkit-transition: all .2s ease-in-out;
 }
 
-
 .disabled {
   color: var(--color-text-disabled) !important; 
-}
 
-.disabled:hover {
-  box-shadow: none !important;
-  transform: translateY(0) !important;
+  &:hover {
+    box-shadow: none !important;
+    transform: translateY(0) !important;
+  }
 }
 
 .button-thin {
@@ -160,12 +164,12 @@
   height: 20px;
   line-height: 20px;
   margin: 6px auto;
-}
 
-.button-edit:active {
-  background-color: var(--color-text);
-  line-height: 22px;
-  box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.6);
+  &:active {
+    background-color: var(--color-text);
+    line-height: 22px;
+    box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.6);
+  }
 }
 
 .copy-button {
@@ -176,6 +180,10 @@
   opacity: 0.5;
   background: url(../assets/images/copy.png) no-repeat center;
   -webkit-transition: all .2s ease-in-out;
+  
+  &:hover {
+    opacity: 1;
+  }
 }
 
 .open-button {
@@ -186,8 +194,8 @@
   opacity: 0.5;
   background: url(../assets/images/open.png) no-repeat center;
   -webkit-transition: all .2s ease-in-out;
-}
 
-.copy-button:hover, .open-button:hover {
-  opacity: 1;
+  &:hover {
+    opacity: 1;
+  }
 }

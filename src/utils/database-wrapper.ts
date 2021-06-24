@@ -1,7 +1,5 @@
 /* eslint-disable radix */
 /* eslint-disable no-console */
-import path from "path";
-import fs from "fs";
 import _ from "lodash";
 import { database, loadDbFromCache as loadDbFromShared } from "mtgatool-shared";
 import axios from "axios";
@@ -11,6 +9,8 @@ import electron from "./electron/electronWrapper";
 
 let cachePath: string | null = null;
 if (electron) {
+  // eslint-disable-next-line no-undef
+  const path = __non_webpack_require__("path");
   cachePath =
     electron.app || (electron.remote && electron.remote.app)
       ? path.join(
@@ -41,6 +41,8 @@ const scryfallDataPath = path.join(
 
 export function updateCache(data: string): void {
   try {
+    // eslint-disable-next-line no-undef
+    const fs = __non_webpack_require__("fs");
     if (cachePath) {
       console.log(`Saved metadata to ${cachePath}`);
       fs.writeFileSync(cachePath, data);
@@ -53,6 +55,8 @@ export function updateCache(data: string): void {
 export function loadDbFromCache(): void {
   loadDbFromShared();
   if (electron) {
+    // eslint-disable-next-line no-undef
+    const fs = __non_webpack_require__("fs");
     if (cachePath && fs.existsSync(cachePath)) {
       const dbString = fs.readFileSync(cachePath, "utf8");
       database.setDatabase(dbString);

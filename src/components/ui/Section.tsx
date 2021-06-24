@@ -1,8 +1,8 @@
 import { CSSProperties } from "react";
 
-export default function Section(
-  props: React.PropsWithChildren<{ style?: CSSProperties }>
-): JSX.Element {
+export type SectionProps = React.PropsWithChildren<{ style?: CSSProperties }>;
+
+export default function Section(props: SectionProps): JSX.Element {
   const { children, style } = props;
 
   return (
