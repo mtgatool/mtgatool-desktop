@@ -31,6 +31,7 @@ interface Heat {
 }
 
 export const matchStateObject = {
+  matchStarted: false,
   matchId: "",
   eventId: "",
   onThePlay: 0,
@@ -173,6 +174,10 @@ export function resetCurrentGame(): void {
 
 export function setGameBeginTime(arg: Date): void {
   globalStore.currentMatch.beginTime = arg;
+}
+
+export function setMatchStarted(arg: boolean): void {
+  globalStore.currentMatch.matchStarted = arg;
 }
 
 export function setOnThePlay(arg: number): void {

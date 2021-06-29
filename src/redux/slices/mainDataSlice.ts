@@ -40,6 +40,10 @@ const mainDataSlice = createSlice({
         state.cardsPrev = baseToObj(action.payload.cardsPrev);
       }
     },
+    setCards: (state: PlayerData, action: PayloadAction<Cards>): void => {
+      state.cardsPrev = { ...state.cards };
+      state.cards = action.payload;
+    },
     setAllUUIDData: (
       state: PlayerData,
       action: PayloadAction<GunUser["uuidData"]>
@@ -96,6 +100,7 @@ const mainDataSlice = createSlice({
 
 export const {
   setUUID,
+  setCards,
   setAllUUIDData,
   setUUIDData,
   setMatches,

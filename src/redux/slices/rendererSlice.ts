@@ -32,6 +32,8 @@ export const initialRendererState = {
   updateState: "",
   collectionQuery: "",
   forceQuery: 0,
+  matchInProgress: false,
+  currentScene: "",
 };
 
 type RendererState = typeof initialRendererState;
@@ -133,6 +135,15 @@ const rendererSlice = createSlice({
         state.forceQuery = new Date().getTime();
       }
     },
+    setMatchInProgress: (
+      state: RendererState,
+      action: PayloadAction<boolean>
+    ): void => {
+      state.matchInProgress = action.payload;
+    },
+    setScene: (state: RendererState, action: PayloadAction<string>): void => {
+      state.currentScene = action.payload;
+    },
   },
 });
 
@@ -151,6 +162,8 @@ export const {
   setRewardsDailyEnds,
   setRewardsWeeklyEnds,
   setCollectionQuery,
+  setMatchInProgress,
+  setScene,
 } = rendererSlice.actions;
 
 export default rendererSlice;

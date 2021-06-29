@@ -56,6 +56,7 @@ import {
   setGameWinner,
   setCardsBottom,
   addCardFromSideboard,
+  setMatchStarted,
 } from "./store/currentMatchStore";
 
 function changePriority(previous: number, current: number, time: number): void {
@@ -1064,11 +1065,11 @@ const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
 
   const gameState = msg.gameStateMessage;
   if (gameState) {
-    // (gameState) {
     if (gameState.gameInfo) {
       setGameInfo(gameState.gameInfo);
       if (gameState.gameInfo.matchID) {
         setMatchId(gameState.gameInfo.matchID);
+        setMatchStarted(true);
       }
       if (gameState.gameInfo.stage == "GameStage_GameOver") {
         getMatchGameStats();

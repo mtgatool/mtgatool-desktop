@@ -16,26 +16,14 @@ import useDebounce from "../hooks/useDebounce";
 import electron from "../utils/electron/electronWrapper";
 import { OverlayUpdateMatchState } from "../background/store/types";
 import { OverlaySettings, Settings } from "../common/defaultConfig";
-import {
-  WINDOW_OVERLAY_0,
-  WINDOW_OVERLAY_1,
-  WINDOW_OVERLAY_2,
-  WINDOW_OVERLAY_3,
-  WINDOW_OVERLAY_4,
-} from "../types/app";
-import postChannelMessage from "../broadcastChannel/postChannelMessage";
 
-const titleToId: Record<string, number> = {
-  [WINDOW_OVERLAY_0]: 0,
-  [WINDOW_OVERLAY_1]: 1,
-  [WINDOW_OVERLAY_2]: 2,
-  [WINDOW_OVERLAY_3]: 3,
-  [WINDOW_OVERLAY_4]: 4,
-};
+import postChannelMessage from "../broadcastChannel/postChannelMessage";
+import Clock from "./Clock";
+import { overlayTitleToId } from "../common/maps";
 
 function getCurrentOverlayId(): number {
   const title = electron?.remote.getCurrentWindow().getTitle() || "";
-  return titleToId[title] || 0;
+  return overlayTitleToId[title] || 0;
 }
 
 export default function Overlay() {
@@ -56,6 +44,16 @@ export default function Overlay() {
   }, []);
 
   const deboucer = useDebounce(500);
+
+  const closeOverlay = useCallback(() => {
+    if (electron) {
+      const window = electron.remote.getCurrentWindow();
+      postChannelMessage({
+        type: "OVERLAY_SET_SETTINGS",
+        value: { settings: { show: false }, window: window.getTitle() },
+      });
+    }
+  }, []);
 
   const channelMessageHandler = useCallback(
     (msg: MessageEvent<ChannelMessage>) => {
@@ -83,6 +81,11 @@ export default function Overlay() {
   );
 
   useEffect(() => {
+    // if (electron) {
+    //   const { setIgnoreMouseEvents } = electron.remote.getCurrentWindow();
+    //   setIgnoreMouseEvents(false);
+    // }
+
     const channel = bcConnect() as any;
     channel.onmessage = channelMessageHandler;
 
@@ -125,7 +128,9 @@ export default function Overlay() {
 
   if (electron && settings?.autosize && heightDivAdjustRef.current) {
     electron.remote.getCurrentWindow().setBounds({
-      height: Math.ceil(heightDivAdjustRef.current.offsetHeight) + 24,
+      // 24px topbar
+      // 20px margin
+      height: Math.ceil(heightDivAdjustRef.current.offsetHeight) + 24 + 20,
     });
   }
 
@@ -135,12 +140,18 @@ export default function Overlay() {
   }
 
   return (
-    <>
-      {process.platform !== "linux" && <TopBar />}
+    <div
+      className="click-on"
+      style={{
+        padding: "10px",
+        // backgroundColor: `rgba(0,0,0,0.1)`,
+      }}
+    >
+      {process.platform !== "linux" && <TopBar closeCallback={closeOverlay} />}
       <div
         style={{
           backgroundColor: `rgba(0,0,0, ${settings?.alphaBack || 0})`,
-          height: "-webkit-fill-available",
+          height: "100%",
         }}
       >
         <div ref={heightDivAdjustRef} style={{ opacity: settings?.alpha || 0 }}>
@@ -155,8 +166,20 @@ export default function Overlay() {
               }}
             />
           )}
+          {settings &&
+            !!settings.clock &&
+            matchState &&
+            !settings.collapsed && (
+              <Clock
+                matchBeginTime={new Date(matchState.beginTime)}
+                oppName={(matchState.opponent.name || "").slice(0, -6)}
+                playerSeat={matchState.player ? matchState.player.seat : 1}
+                priorityTimers={matchState.priorityTimers}
+                turnPriority={matchState.currentPriority}
+              />
+            )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

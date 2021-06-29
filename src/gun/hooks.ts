@@ -10,10 +10,12 @@ import { IGunStaticSEA } from "gun/types/static/sea";
 import { useMemo } from "react";
 import { Cards, DatabaseClass } from "mtgatool-shared";
 import { GunState } from "../types/gunTypes";
+import { OverlayHandler } from "../common/overlayHandler";
 
 declare global {
   interface Window {
     database: DatabaseClass;
+    overlayHandler: OverlayHandler | undefined;
     globalStore: any;
     cards: Cards;
     cardsPrev: Cards;
@@ -38,7 +40,6 @@ export function useGun() {
       window.gun ??
       Gun<GunState>([
         "http://api.mtgatool.com:8765/gun",
-        "https://kmm-gun.herokuapp.com:8765/gun",
         "https://gun-us.herokuapp.com/:8765/gun",
         // "mtgatool-gun-eqszq.ondigitalocean.app:8765/gun",
       ])

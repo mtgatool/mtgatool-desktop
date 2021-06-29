@@ -30,6 +30,7 @@ import SettingsPersistor from "./SettingsPersistor";
 import isElectron from "../utils/electron/isElectron";
 
 import info from "../info.json";
+import overlayHandler from "../common/overlayHandler";
 
 function App() {
   useGun();
@@ -37,9 +38,15 @@ function App() {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const { loginState, loading, backgroundGrpid } = useSelector(
+  const { loginState, loading, backgroundGrpid, matchInProgress } = useSelector(
     (state: AppState) => state.renderer
   );
+
+  useEffect(() => {
+    if (overlayHandler) {
+      overlayHandler.settingsUpdated();
+    }
+  }, [matchInProgress]);
 
   useEffect(() => {
     if (!electron) {

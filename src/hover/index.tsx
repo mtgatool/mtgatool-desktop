@@ -32,10 +32,17 @@ import {
 import { Chances } from "../../../mtgatool-shared/dist";
 import GroupedLandsDetails from "../overlay/GroupedLandsDetails";
 import { CARD_SIZE_RATIO } from "../common/static";
+import useTransparentFix from "../hooks/useTransparentFix";
+import setTopMost from "../utils/electron/setTopMost";
 
 const { LANDS_HACK } = constants;
 
 export default function Hover() {
+  useTransparentFix();
+  if (electron) {
+    electron.remote.getCurrentWindow().setFocusable(false);
+    setTopMost(true);
+  }
   const [hovering, setHovering] = useState(false);
   const [cardOdds, setCardOdds] = useState<Chances>();
   const [grpId, setGrpId] = useState<number>();
@@ -204,7 +211,7 @@ export default function Hover() {
   }, [grpId, hovering, quality, settings, calculatePosition]);
 
   return (
-    <div className="hover-root">
+    <div className="click-through hover-root">
       <div ref={wrapperRef} className="hover-cards-wrapper">
         {grpId == LANDS_HACK && cardOdds ? (
           // eslint-disable-next-line react/jsx-props-no-spreading

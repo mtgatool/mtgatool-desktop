@@ -71,23 +71,25 @@ export default function createOverlay(
   return new Promise<void>((resolve) => {
     newWindow.webContents.once("dom-ready", () => {
       // eslint-disable-next-line func-names
-      setTimeout(function () {
-        if (electron && process.env.NODE_ENV === "development") {
-          // const overlayDevtools = new electron.remote.BrowserWindow({
-          //   title: "MTG Arena Tool - overlay debug",
-          //   icon: path.join(__dirname, "logo512.png"),
-          // });
-          // overlayDevtools.removeMenu();
-          // newWindow.webContents.setDevToolsWebContents(
-          //   overlayDevtools.webContents
-          // );
-          // newWindow.webContents.openDevTools({ mode: "detach" });
+      if (electron && process.env.NODE_ENV === "development") {
+        // const overlayDevtools = new electron.remote.BrowserWindow({
+        //   title: "MTG Arena Tool - overlay debug",
+        //   icon: path.join(__dirname, "logo512.png"),
+        // });
+        // overlayDevtools.removeMenu();
+        // newWindow.webContents.setDevToolsWebContents(
+        //   overlayDevtools.webContents
+        // );
+        // newWindow.webContents.openDevTools({ mode: "detach" });
+      }
 
-          newWindow.setAlwaysOnTop(true, "floating");
-          newWindow.setFocusable(false);
-          newWindow.moveTop();
-          newWindow.show();
-        }
+      setTimeout(() => {
+        newWindow.show();
+      }, 250);
+
+      setTimeout(() => {
+        newWindow.setFocusable(false);
+        newWindow.setAlwaysOnTop(true, "pop-up-menu", 1);
       }, 500);
     });
 

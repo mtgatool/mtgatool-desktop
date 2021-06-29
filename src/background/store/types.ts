@@ -19,6 +19,7 @@ import {
 } from "mtgatool-shared/dist/types/greTypes";
 
 export interface MatchState {
+  matchStarted: boolean;
   logTime: Date;
   matchId: string;
   eventId: string;

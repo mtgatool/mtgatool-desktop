@@ -112,7 +112,7 @@ export default function ContentWrapper() {
                 >
                   <Page
                     collectionData={collectionData}
-                    openPassphrasPopup={openPopup.current}
+                    openPassphrasePopup={openPopup.current}
                     openAdvancedCollectionSearch={
                       openAdvancedCollectionSearch.current
                     }

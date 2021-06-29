@@ -3,10 +3,12 @@
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
+import { InternalDeck } from "../../../../../mtgatool-shared/dist";
 import usePagingControls from "../../../hooks/usePagingControls";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { Filters, StringFilterType } from "../../../types/genericFilterTypes";
 import { GunDeck } from "../../../types/gunTypes";
+import baseToObj from "../../../utils/baseToObj";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import doDecksFilter from "../../../utils/tables/doDecksFilter";
 import setFilter from "../../../utils/tables/filters/setFilter";
@@ -33,7 +35,7 @@ export default function DecksList() {
   ]);
 
   const [sortValue, setSortValue] = useState<Sort<GunDeck>>({
-    key: "lastModified",
+    key: "lastUsed",
     sort: -1,
   });
 
@@ -46,8 +48,10 @@ export default function DecksList() {
       .map((key) => decks[`${key}-v${decksIndex[key]}`])
       .filter((d) => d)
       .map((d) => {
+        const internalDeck = baseToObj<InternalDeck>(d.internalDeck);
         return {
           ...d,
+          lastUsed: d.lastUsed || new Date(internalDeck.lastUpdated).getTime(),
           colors: d.colors > 32 ? d.colors - 32 : d.colors,
         };
       });

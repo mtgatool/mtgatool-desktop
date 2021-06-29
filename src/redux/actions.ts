@@ -9,6 +9,7 @@ export const actions = {
   SET_UUID: MainDataSlice.setUUID,
   SET_UUID_DATA: MainDataSlice.setUUIDData,
   SET_ALL_UUID_DATA: MainDataSlice.setAllUUIDData,
+  SET_CARDS: MainDataSlice.setCards,
   SET_MATCHES: MainDataSlice.setMatches,
   SET_MATCH: MainDataSlice.setMatch,
   SET_DECKS: MainDataSlice.setDecks,
@@ -28,6 +29,8 @@ export const actions = {
   SET_DAILY_ENDS: RendererSlice.setRewardsDailyEnds,
   SET_WEEKLY_ENDS: RendererSlice.setRewardsWeeklyEnds,
   SET_COLLECTION_QUERY: RendererSlice.setCollectionQuery,
+  SET_MATCH_IN_PROGRESS: RendererSlice.setMatchInProgress,
+  SET_SCENE: RendererSlice.setScene,
   SET_SETTINGS: SettingsSlice.setSettings,
   SET_OVERLAY_SETTINGS: SettingsSlice.setOverlaySettings,
 };

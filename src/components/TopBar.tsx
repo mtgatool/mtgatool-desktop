@@ -18,7 +18,7 @@ import minimizeWindow from "../utils/electron/minimizeWindow";
 import setMaximize from "../utils/electron/setMaximize";
 import hideWindow from "../utils/electron/hideWindow";
 import isMaximized from "../utils/electron/isMaximized";
-import { AppState } from "../redux/stores/rendererStore";
+import store, { AppState } from "../redux/stores/rendererStore";
 import getWindowTitle from "../utils/electron/getWindowTitle";
 import { ALL_OVERLAYS, WINDOW_MAIN } from "../types/app";
 import electron from "../utils/electron/electronWrapper";
@@ -33,16 +33,26 @@ function clickMaximize(): void {
 }
 
 function clickClose(): void {
-  // if (store.getState().settings.close_to_tray) {
-  hideWindow();
-  // } else {
-  //  ipcSend("quit", 1);
-  // }
+  if (store.getState().settings.closeToTray) {
+    hideWindow();
+  } else {
+    // ipcSend("quit", 1);
+  }
 }
 
 function clickCloseOverlay(): void {
   if (electron) {
     const thisWindowTitle = electron.remote.getCurrentWindow().getTitle();
+    // const overlayId = overlayTitleToId[thisWindowTitle];
+    // reduxAction(store.dispatch, {
+    //   type: "SET_OVERLAY_SETTINGS",
+    //   arg: {
+    //     id: overlayId,
+    //     settings: {
+    //       show: false,
+    //     },
+    //   },
+    // });
     electron.remote.BrowserWindow.getAllWindows().forEach((w) => {
       if (w.getTitle() == thisWindowTitle) {
         w.close();
@@ -54,10 +64,11 @@ function clickCloseOverlay(): void {
 
 interface TopBarProps {
   forceOs?: string;
+  closeCallback?: () => void;
 }
 
 export default function TopBar(props: TopBarProps): JSX.Element {
-  const { forceOs } = props;
+  const { forceOs, closeCallback } = props;
   const [hoverControls, setHoverControls] = useState(false);
 
   const { topArtist, offline } = useSelector(
@@ -92,7 +103,7 @@ export default function TopBar(props: TopBarProps): JSX.Element {
     <div
       onClick={clickMinimize}
       key="top-minimize"
-      className={`${"minimize"} ${topButtonClass}`}
+      className={`minimize ${topButtonClass}`}
     >
       <MinimizeSVG style={iconStyle} />
     </div>
@@ -104,7 +115,7 @@ export default function TopBar(props: TopBarProps): JSX.Element {
     <div
       onClick={clickMaximize}
       key="top-maximize"
-      className={`${"maximize"} ${topButtonClass}`}
+      className={`maximize ${topButtonClass}`}
     >
       {isMaximized() ? (
         <RestoreSVG style={iconStyle} />
@@ -116,9 +127,9 @@ export default function TopBar(props: TopBarProps): JSX.Element {
 
   const close = (
     <div
-      onClick={isOverlay ? clickCloseOverlay : clickClose}
+      onClick={closeCallback || (isOverlay ? clickCloseOverlay : clickClose)}
       key="top-close"
-      className={`${"close"} ${topButtonClass}`}
+      className={`close ${topButtonClass}`}
     >
       <CloseSVG style={iconStyle} />
     </div>
@@ -128,7 +139,7 @@ export default function TopBar(props: TopBarProps): JSX.Element {
 
   return (
     <div
-      className="top"
+      className="top click-on"
       style={{ flexDirection: isReverse ? "row-reverse" : "row" }}
     >
       {isOverlay && (

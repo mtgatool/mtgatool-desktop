@@ -12,6 +12,7 @@ import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import getToolVersion from "../utils/getToolVersion";
 import getOpponentDeck from "./getOpponentDeck";
 import globalStore from "./store";
+import { setMatchStarted } from "./store/currentMatchStore";
 
 const { DEFAULT_TILE } = constants;
 
@@ -118,6 +119,7 @@ export default function saveMatch(id: string): void {
   // const gameNumberCompleted = currentMatch.gameInfo.results.filter(
   //   (res) => res.scope == "MatchScope_Game"
   // ).length;
+  setMatchStarted(false);
   postChannelMessage({
     type: "GAME_STATS",
     value: match,

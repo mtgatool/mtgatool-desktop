@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import LogEntry from "../../types/logDecoder";
 import actionLog from "../actionLog";
 import globalStore from "../store";
@@ -60,5 +61,9 @@ export default function EventMatchCreated(entry: Entry): void {
     };
     setPlayer(player);
     setEventId(json.eventId);
+
+    postChannelMessage({
+      type: "GAME_START",
+    });
   }
 }

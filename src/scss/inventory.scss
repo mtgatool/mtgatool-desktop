@@ -121,7 +121,6 @@
 }
 
 .inventory-card-img {
-  @include animated;
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
@@ -130,8 +129,10 @@
   box-shadow: 0 5px 14px 2px rgba(0, 0, 0, 0.25);
   width: 100%;
   height: 100%;
+  -webkit-transition: background-image 0.25s cubic-bezier(0, 0, 0.2, 1);
 
   &:hover {
+    margin: -1px;
     border: 1px solid var(--color-button-hover);
   }
 }

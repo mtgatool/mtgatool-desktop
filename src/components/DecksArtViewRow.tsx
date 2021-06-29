@@ -15,7 +15,7 @@ import getPreconDeckName from "../utils/getPreconDeckName";
 
 import squirrels from "../assets/images/squirrels.png";
 
-interface DecksArtViewRowProps {
+export interface DecksArtViewRowProps {
   clickDeck: (deck: GunDeck) => void;
   deck: GunDeck;
 }

@@ -4,10 +4,11 @@ import {
   InternalMatch,
   InternalRank,
   InventoryUpdate,
-  OverlaySettingsData,
   PlayerInventory,
 } from "mtgatool-shared";
 import { OverlayUpdateMatchState } from "../background/store/types";
+import { OverlaySettings } from "../common/defaultConfig";
+import { ClientSceneChange } from "../types/logDecoder";
 
 export type MessageType =
   | "START_LOG_READING"
@@ -16,10 +17,13 @@ export type MessageType =
   | "LOG_READ_FINISHED"
   | "SET_UUID"
   | "OVERLAY_UPDATE"
+  | "OVERLAY_SET_SETTINGS"
   | "OVERLAY_UPDATE_SETTINGS"
   | "OVERLAY_UPDATE_BOUNDS"
   | "OVERLAY_SETTINGS"
   | "GAME_STATS"
+  | "GAME_START"
+  | "SET_SCENE"
   | "UPSERT_GUN_DECK"
   | "UPSERT_GUN_CARDS"
   | "UPSERT_GUN_RANK"
@@ -63,19 +67,33 @@ export interface OverlayUpdateSettingsMessage extends ChannelMessageBase {
   type: "OVERLAY_UPDATE_SETTINGS";
 }
 
+export interface OverlaySetSettingsMessage extends ChannelMessageBase {
+  type: "OVERLAY_SET_SETTINGS";
+  value: { settings: Partial<OverlaySettings>; window: string };
+}
+
 export interface OverlayUpdateBoundsMessage extends ChannelMessageBase {
   type: "OVERLAY_UPDATE_BOUNDS";
-  value: { bounds: OverlaySettingsData["bounds"]; window: string };
+  value: { bounds: OverlaySettings["bounds"]; window: string };
 }
 
 export interface OverlaySettingsMessage extends ChannelMessageBase {
   type: "OVERLAY_SETTINGS";
-  value: OverlaySettingsData;
+  value: OverlaySettings;
+}
+
+export interface GameStartMessage extends ChannelMessageBase {
+  type: "GAME_START";
 }
 
 export interface GameStatsMessage extends ChannelMessageBase {
   type: "GAME_STATS";
   value: InternalMatch;
+}
+
+export interface SetSceneMessage extends ChannelMessageBase {
+  type: "SET_SCENE";
+  value: ClientSceneChange;
 }
 
 export interface UpsertGunDeckMessage extends ChannelMessageBase {
@@ -123,8 +141,11 @@ export type ChannelMessage =
   | SetUUIDMessage
   | OverlayUpdateMessage
   | OverlayUpdateSettingsMessage
+  | OverlaySetSettingsMessage
   | OverlayUpdateBoundsMessage
   | GameStatsMessage
+  | GameStartMessage
+  | SetSceneMessage
   | UpsertGunDeckMessage
   | UpsertGunCardsMessage
   | UpsertGunRankMessage

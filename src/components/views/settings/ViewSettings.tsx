@@ -4,6 +4,8 @@ import { ReactComponent as Close } from "../../../assets/images/svg/close.svg";
 import isElectron from "../../../utils/electron/isElectron";
 import AboutSettingsPanel from "./AboutSettingsPanel";
 import OverlaySettingsPanel from "./OverlaySettingsPanel";
+import VisualSettingsPanel from "./VisualSettingsPanel";
+import ShortcutsSettingsPanel from "./ShortcutsSettingsPanel";
 
 const SETTINGS_BEHAVIOUR = 10;
 const SETTINGS_ARENA_DATA = 11;
@@ -73,13 +75,13 @@ export default function ViewSettings(props: ViewSettingsProps) {
   tabs[SETTINGS_VISUAL] = {
     ...defaultTab,
     id: SETTINGS_VISUAL,
-    component: Fragment, // SectionVisual,
+    component: VisualSettingsPanel, // SectionVisual,
     title: "Visual",
   };
   tabs[SETTINGS_SHORTCUTS] = {
     ...defaultTab,
     id: SETTINGS_SHORTCUTS,
-    component: Fragment, // SectionShortcuts,
+    component: ShortcutsSettingsPanel, // SectionShortcuts,
     title: "Shortcuts",
   };
   tabs[SETTINGS_PRIVACY] = {

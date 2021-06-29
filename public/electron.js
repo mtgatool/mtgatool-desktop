@@ -83,7 +83,7 @@ function createCardHoverWindow() {
   mainGlobals.cardHoverWindow.once("dom-ready", () => {
     // eslint-disable-next-line func-names
     setTimeout(function () {
-      mainGlobals.cardHoverWindow.setAlwaysOnTop(true, "floating");
+      mainGlobals.cardHoverWindow.setAlwaysOnTop(true, "pop-up-menu");
       mainGlobals.cardHoverWindow.setFocusable(false);
       mainGlobals.cardHoverWindow.moveTop();
       mainGlobals.cardHoverWindow.show();

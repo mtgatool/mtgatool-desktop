@@ -20,10 +20,12 @@ const getRarityKey = (
   return undefined;
 };
 
-export default function WildcardsCost(props: {
+export interface WildcardsCostProps {
   deck: Deck;
   shrink?: boolean;
-}): JSX.Element {
+}
+
+export default function WildcardsCost(props: WildcardsCostProps): JSX.Element {
   const { shrink, deck } = props;
 
   const missingWildcards = getDeckMissing(deck);

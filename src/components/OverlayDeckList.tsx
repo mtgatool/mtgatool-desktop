@@ -36,7 +36,7 @@ function getRank(cardId: number): number {
   return cardObj?.rank || 0;
 }
 
-function compareQuantity(a: CardObject, b: CardObject): -1 | 0 | 1 {
+function _compareQuantity(a: CardObject, b: CardObject): -1 | 0 | 1 {
   if (b.quantity - a.quantity < 0) return -1;
   if (b.quantity - a.quantity > 0) return 1;
   return 0;
@@ -102,8 +102,9 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
   const deckClone = deck.clone();
 
   let sortFunc = compareCards;
+
   if (settings.mode === OVERLAY_ODDS || settings.mode == OVERLAY_MIXED) {
-    sortFunc = compareQuantity;
+    sortFunc = compareCards; // compareQuantity;
   } else if (settings.mode === OVERLAY_DRAFT) {
     sortFunc = compareDraftPicks;
   }

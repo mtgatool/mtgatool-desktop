@@ -51,7 +51,25 @@ export default function mainChannelListeners() {
       switchPlayerUUID(msg.data.value);
     }
 
+    if (msg.data.type === "GAME_START") {
+      reduxAction(store.dispatch, {
+        type: "SET_MATCH_IN_PROGRESS",
+        arg: true,
+      });
+    }
+
+    if (msg.data.type === "SET_SCENE") {
+      reduxAction(store.dispatch, {
+        type: "SET_SCENE",
+        arg: msg.data.value.toSceneName,
+      });
+    }
+
     if (msg.data.type === "GAME_STATS") {
+      reduxAction(store.dispatch, {
+        type: "SET_MATCH_IN_PROGRESS",
+        arg: false,
+      });
       setGunMatch(msg.data.value);
     }
 
@@ -65,12 +83,26 @@ export default function mainChannelListeners() {
       }
     }
 
+    if (msg.data.type == "OVERLAY_SET_SETTINGS") {
+      const id = overlayTitleToId[msg.data.value.window];
+      if (id !== undefined) {
+        reduxAction(store.dispatch, {
+          type: "SET_OVERLAY_SETTINGS",
+          arg: { settings: { ...msg.data.value.settings }, id: id },
+        });
+      }
+    }
+
     if (msg.data.type === "UPSERT_GUN_DECK") {
       upsertGunDeck(msg.data.value);
     }
 
     if (msg.data.type === "UPSERT_GUN_CARDS") {
       upsertGunCards(msg.data.value);
+      reduxAction(store.dispatch, {
+        type: "SET_CARDS",
+        arg: msg.data.value,
+      });
     }
 
     if (msg.data.type === "UPSERT_GUN_RANK") {

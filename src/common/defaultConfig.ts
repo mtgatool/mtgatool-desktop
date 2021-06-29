@@ -1,4 +1,4 @@
-import { constants } from "mtgatool-shared";
+import { constants, CardQuality } from "mtgatool-shared";
 
 const {
   COLLECTION_CARD_MODE,
@@ -40,7 +40,7 @@ export const defaultConfig = {
   overlayHover: true,
   settingsSection: 1,
   settingsOverlaySection: 0,
-  cardsQuality: "normal",
+  cardsQuality: "normal" as CardQuality,
   startup: true,
   closeToTray: true,
   closeOnMatch: true,
@@ -53,11 +53,11 @@ export const defaultConfig = {
   matchesTableMode: MATCHES_LIST_MODE,
   skipFirstpass: false,
   enableKeyboardShortcuts: true,
-  shortcutOverlay_1: "Alt+Shift+1",
-  shortcutOverlay_2: "Alt+Shift+2",
-  shortcutOverlay_3: "Alt+Shift+3",
-  shortcutOverlay_4: "Alt+Shift+4",
-  shortcutOverlay_5: "Alt+Shift+5",
+  shortcutOverlay1: "Alt+Shift+1",
+  shortcutOverlay2: "Alt+Shift+2",
+  shortcutOverlay3: "Alt+Shift+3",
+  shortcutOverlay4: "Alt+Shift+4",
+  shortcutOverlay5: "Alt+Shift+5",
   shortcutEditmode: "Alt+Shift+E",
   shortcutDevtoolsMain: "Alt+Shift+D",
   shortcutDevtoolsOverlay: "Alt+Shift+O",

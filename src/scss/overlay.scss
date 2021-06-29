@@ -294,9 +294,13 @@
 
 .clock-priority-1,
 .clock-priority-2,
-.clock_pname1,
-.clock-pname2 {
+.clock-pname-1,
+.clock-pname-2 {
   width: 50%;
+  overflow: hidden;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .pname-priority {

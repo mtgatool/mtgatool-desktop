@@ -3,11 +3,11 @@ import Button from "../../ui/Button";
 import createOverlay from "../../../overlay/createOverlay";
 
 interface ViewHomeProps {
-  openPassphrasPopup: () => void;
+  openPassphrasePopup: () => void;
 }
 
 export default function ViewHome(props: ViewHomeProps) {
-  const { openPassphrasPopup } = props;
+  const { openPassphrasePopup } = props;
 
   return (
     <>
@@ -27,7 +27,7 @@ export default function ViewHome(props: ViewHomeProps) {
           style={{
             margin: "auto",
           }}
-          onClick={openPassphrasPopup}
+          onClick={openPassphrasePopup}
           text="Generate recovery key"
         />
         <Button
