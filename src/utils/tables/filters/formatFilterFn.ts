@@ -16,7 +16,7 @@ export default function formatFilterFn<D>(
 
   if (F) {
     return rows.filter((row) => {
-      const keyVal = (row[key] as unknown) as string[];
+      const keyVal = row[key] as unknown as string[];
       const ret = keyVal.includes(F);
       return filterValue.not ? !ret : ret;
     });

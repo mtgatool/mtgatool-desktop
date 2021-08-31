@@ -1,18 +1,17 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Cards } from "mtgatool-shared";
-import { GunDeck, GunMatch, GunUser, GunUUIDData } from "../../types/gunTypes";
-import baseToObj from "../../utils/baseToObj";
+import { DbDeck, DbMatch, DbUUIDData } from "../../types/dbTypes";
 
 const mainState = {
   cards: {} as Cards,
   cardsNew: {} as Cards,
   cardsPrev: {} as Cards,
   currentUUID: "",
-  uuidData: {} as Record<string, GunUUIDData>,
-  matches: {} as Record<string, GunMatch>,
+  uuidData: {} as Record<string, DbUUIDData>,
+  matches: {} as Record<string, DbMatch>,
   decksIndex: {} as Record<string, number>,
-  decks: {} as Record<string, GunDeck>,
+  decks: {} as Record<string, DbDeck>,
 };
 
 export type PlayerData = typeof mainState;
@@ -26,19 +25,12 @@ const mainDataSlice = createSlice({
     },
     setUUIDData: (
       state: PlayerData,
-      action: PayloadAction<Partial<GunUUIDData>>
+      action: PayloadAction<Partial<DbUUIDData>>
     ): void => {
       state.uuidData[state.currentUUID] = {
         ...state.uuidData[state.currentUUID],
         ...action.payload,
       };
-
-      if (action.payload.cards) {
-        state.cards = baseToObj(action.payload.cards);
-      }
-      if (action.payload.cardsPrev) {
-        state.cardsPrev = baseToObj(action.payload.cardsPrev);
-      }
     },
     setCards: (state: PlayerData, action: PayloadAction<Cards>): void => {
       state.cardsPrev = { ...state.cards };
@@ -46,32 +38,23 @@ const mainDataSlice = createSlice({
     },
     setAllUUIDData: (
       state: PlayerData,
-      action: PayloadAction<GunUser["uuidData"]>
+      action: PayloadAction<DbUUIDData>
     ): void => {
       state.uuidData = {
         ...state.uuidData,
-        ...action.payload,
+        [state.currentUUID]: action.payload,
       };
-
-      if (state.uuidData[state.currentUUID]?.cards) {
-        state.cards = baseToObj(state.uuidData[state.currentUUID].cards);
-      }
-      if (state.uuidData[state.currentUUID]?.cardsPrev) {
-        state.cardsPrev = baseToObj(
-          state.uuidData[state.currentUUID].cardsPrev
-        );
-      }
     },
     setMatches: (
       state: PlayerData,
-      action: PayloadAction<Record<string, GunMatch>>
+      action: PayloadAction<Record<string, DbMatch>>
     ): void => {
       state.matches = {
         ...state.matches,
         ...action.payload,
       };
     },
-    setMatch: (state: PlayerData, action: PayloadAction<GunMatch>): void => {
+    setMatch: (state: PlayerData, action: PayloadAction<DbMatch>): void => {
       state.matches = {
         ...state.matches,
         [action.payload.matchId]: action.payload,
@@ -79,11 +62,11 @@ const mainDataSlice = createSlice({
     },
     setDecks: (
       state: PlayerData,
-      action: PayloadAction<Record<string, GunDeck>>
+      action: PayloadAction<Record<string, DbDeck>>
     ): void => {
       state.decks = { ...state.decks, ...action.payload };
     },
-    setDeck: (state: PlayerData, action: PayloadAction<GunDeck>): void => {
+    setDeck: (state: PlayerData, action: PayloadAction<DbDeck>): void => {
       state.decks = {
         ...state.decks,
         [`${action.payload.deckId}-v${action.payload.version}`]: action.payload,

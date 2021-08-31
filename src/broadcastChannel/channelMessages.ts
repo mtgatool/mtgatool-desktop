@@ -24,9 +24,9 @@ export type MessageType =
   | "GAME_STATS"
   | "GAME_START"
   | "SET_SCENE"
-  | "UPSERT_GUN_DECK"
-  | "UPSERT_GUN_CARDS"
-  | "UPSERT_GUN_RANK"
+  | "UPSERT_DB_DECK"
+  | "UPSERT_DB_CARDS"
+  | "UPSERT_DB_RANK"
   | "INVENTORY_UPDATED"
   | "PLAYER_INVENTORY"
   | "HOVER_IN"
@@ -96,18 +96,18 @@ export interface SetSceneMessage extends ChannelMessageBase {
   value: ClientSceneChange;
 }
 
-export interface UpsertGunDeckMessage extends ChannelMessageBase {
-  type: "UPSERT_GUN_DECK";
+export interface UpsertDbDeckMessage extends ChannelMessageBase {
+  type: "UPSERT_DB_DECK";
   value: InternalDeck;
 }
 
-export interface UpsertGunCardsMessage extends ChannelMessageBase {
-  type: "UPSERT_GUN_CARDS";
+export interface UpsertDbCardsMessage extends ChannelMessageBase {
+  type: "UPSERT_DB_CARDS";
   value: Cards;
 }
 
-export interface UpsertGunRankMessage extends ChannelMessageBase {
-  type: "UPSERT_GUN_RANK";
+export interface UpsertDbRankMessage extends ChannelMessageBase {
+  type: "UPSERT_DB_RANK";
   value: InternalRank;
   uuid: string;
 }
@@ -146,9 +146,9 @@ export type ChannelMessage =
   | GameStatsMessage
   | GameStartMessage
   | SetSceneMessage
-  | UpsertGunDeckMessage
-  | UpsertGunCardsMessage
-  | UpsertGunRankMessage
+  | UpsertDbDeckMessage
+  | UpsertDbCardsMessage
+  | UpsertDbRankMessage
   | InventoryUpdatedMessage
   | PlayerInventoryMessage
   | HoverInMessage

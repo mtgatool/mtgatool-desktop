@@ -6,13 +6,13 @@ import stringFilterFn from "./filters/stringFilterFn";
 
 import colorsBitsFilterFn from "./filters/colorsBitsFilterFn";
 import { Filters } from "../../types/genericFilterTypes";
-import { GunDeck } from "../../types/gunTypes";
+import { DbDeck } from "../../types/dbTypes";
 
 export default function doDecksFilter(
-  data: GunDeck[],
-  filters: Filters<GunDeck>,
-  sort: Sort<GunDeck> = { key: "", sort: 1 }
-): GunDeck[] {
+  data: DbDeck[],
+  filters: Filters<DbDeck>,
+  sort: Sort<DbDeck> = { key: "", sort: 1 }
+): DbDeck[] {
   let filteredData = data;
 
   filters.forEach((filter) => {
@@ -20,7 +20,7 @@ export default function doDecksFilter(
     switch (filter.type) {
       case "string":
         if (filter.id === "name" || filter.id === "playerId") {
-          filteredData = stringFilterFn<GunDeck>(
+          filteredData = stringFilterFn<DbDeck>(
             filteredData,
             filter.value,
             filter.id
@@ -29,7 +29,7 @@ export default function doDecksFilter(
         break;
       case "minmax":
         if (filter.id === "version") {
-          filteredData = minMaxFilterFn<GunDeck>(
+          filteredData = minMaxFilterFn<DbDeck>(
             filteredData,
             filter.value,
             filter.id
@@ -38,7 +38,7 @@ export default function doDecksFilter(
         break;
       case "colors":
         if (filter.id === "colors") {
-          filteredData = colorsBitsFilterFn<GunDeck>(
+          filteredData = colorsBitsFilterFn<DbDeck>(
             filteredData,
             filter.value,
             filter.id

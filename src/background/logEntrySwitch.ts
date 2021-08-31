@@ -3,7 +3,7 @@ import * as Labels from "./onLabel";
 
 // eslint-disable-next-line complexity
 export default function logEntrySwitch(entry: LogEntry): void {
-  // debugLog(entry, entry.json());
+  console.log("logEntrySwitch", entry.arrow, entry.label, entry.json);
   switch (entry.label) {
     case "GreToClientEvent":
       Labels.GreToClient(entry);
@@ -116,12 +116,6 @@ export default function logEntrySwitch(entry: LogEntry): void {
       }
       break;
 
-    case "Event.MatchCreated":
-      if (entry.arrow == "<==") {
-        Labels.EventMatchCreated(entry);
-      }
-      break;
-
     case "Event.AIPractice":
       if (entry.arrow == "==>") {
         Labels.OutEventAIPractice(entry);
@@ -185,6 +179,12 @@ export default function logEntrySwitch(entry: LogEntry): void {
     case "PlayerInventory.GetFormats":
       if (entry.arrow == "<==") {
         Labels.GetPlayerInventoryGetFormats(entry);
+      }
+      break;
+
+    case "Event_GetCourses":
+      if (entry.arrow == "<==") {
+        Labels.InEventGetCourses(entry);
       }
       break;
 

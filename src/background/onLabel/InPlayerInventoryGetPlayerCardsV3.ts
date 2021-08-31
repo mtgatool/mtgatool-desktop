@@ -16,7 +16,7 @@ export default function InPlayerInventoryGetPlayerCardsV3(entry: Entry): void {
     const uuid = getLocalSetting("playerId");
     if (uuid && uuid !== "") {
       postChannelMessage({
-        type: "UPSERT_GUN_CARDS",
+        type: "UPSERT_DB_CARDS",
         value: json,
       });
       clearInterval(interval);

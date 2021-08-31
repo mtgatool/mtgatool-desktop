@@ -13,7 +13,7 @@ export default function stringFilterFn<D>(
     const F = filterValue.string.toLowerCase();
     let res = false;
 
-    const keyVal = (row[key] as unknown) as string;
+    const keyVal = row[key] as unknown as string;
 
     res = res || keyVal.toLowerCase().indexOf(F) !== -1;
 

@@ -10,7 +10,7 @@ export default function inBoolFilterFn<D>(
 ): D[] {
   const F = filterValue.value;
   return rows.filter((row) => {
-    const R = (row[key] as unknown) as boolean;
+    const R = row[key] as unknown as boolean;
 
     let ret: number | boolean = true;
     if (filterValue.mode == "=") ret = R === F;

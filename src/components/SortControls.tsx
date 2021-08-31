@@ -15,13 +15,8 @@ interface SortControlsProps<T> {
 }
 
 export default function SortControls<T>(props: SortControlsProps<T>) {
-  const {
-    columnKeys,
-    className,
-    columnNames,
-    defaultSort,
-    setSortCallback,
-  } = props;
+  const { columnKeys, className, columnNames, defaultSort, setSortCallback } =
+    props;
 
   const [currentSort, setCurrentSort] = useState<Sort<T>>(
     defaultSort || ({ key: "", sort: 1 } as Sort<T>)

@@ -10,7 +10,7 @@ export default function minMaxFilterFn<D>(
 ): D[] {
   const F = filterValue.value;
   return rows.filter((row) => {
-    const R = (row[key] as unknown) as number;
+    const R = row[key] as unknown as number;
 
     let ret: number | boolean = true;
     if (filterValue.mode == "=") ret = R === F;

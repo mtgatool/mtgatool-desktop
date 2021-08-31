@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { GunUserChain } from "../types/gunTypes";
+import { ToolDbClient } from "tool-db";
 
-export default function useGunUser(): [GunUserChain, boolean] {
-  const userRef = useMemo(() => window.gun.user() as GunUserChain, []);
-  const [loggedIn, setLoggedIn] = useState(!!(userRef as any).is || false);
+export default function useDbUser(): [ToolDbClient["user"], boolean] {
+  const userRef = useMemo(() => window.toolDb.user, []);
+  const [loggedIn, setLoggedIn] = useState(!!window.toolDb.user);
 
   const intervalRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     if (!loggedIn) {
       intervalRef.current = setInterval(() => {
-        if ((userRef as any).is) {
+        if (window.toolDb.user) {
           setLoggedIn(true);
         }
       }, 100);

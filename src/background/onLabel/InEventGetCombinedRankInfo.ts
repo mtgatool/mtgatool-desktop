@@ -60,7 +60,7 @@ export default function InEventGetCombinedRankInfo(entry: Entry): void {
   globalStore.rank = rank;
 
   postChannelMessage({
-    type: "UPSERT_GUN_RANK",
+    type: "UPSERT_DB_RANK",
     value: rank,
     uuid: json.playerId,
   });

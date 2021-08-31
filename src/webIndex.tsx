@@ -6,6 +6,7 @@ import ReactDOM from "react-dom";
 import { BrowserRouter as Router } from "react-router-dom";
 
 import { Provider } from "react-redux";
+import { ToolDbClient } from "tool-db";
 import App from "./components/App";
 import store from "./redux/stores/rendererStore";
 import "./index.scss";
@@ -14,8 +15,13 @@ import * as serviceWorker from "./serviceWorker";
 import defaultLocalSettings from "./utils/defaultLocalSettings";
 import mainChannelListeners from "./broadcastChannel/mainChannelListeners";
 import { loadDbFromCache } from "./utils/database-wrapper";
+import { DB_SERVER } from "./constants";
 
 loadDbFromCache();
+
+if (!window.toolDb) {
+  window.toolDb = new ToolDbClient(DB_SERVER);
+}
 
 defaultLocalSettings();
 mainChannelListeners();

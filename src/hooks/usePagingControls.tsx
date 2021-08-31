@@ -20,16 +20,16 @@ export default function usePagingControls(
   const [pageIndex, gotoPage] = useState(0);
   const [pageSize, setPageSize] = useState(defaultPageSize);
 
-  const pageCount = useMemo(() => Math.ceil(dataSize / pageSize), [
-    dataSize,
-    pageSize,
-  ]);
+  const pageCount = useMemo(
+    () => Math.ceil(dataSize / pageSize),
+    [dataSize, pageSize]
+  );
 
   const canPreviousPage = useMemo(() => pageIndex > 0, [pageIndex]);
-  const canNextPage = useMemo(() => pageIndex < pageCount - 1, [
-    pageIndex,
-    pageCount,
-  ]);
+  const canNextPage = useMemo(
+    () => pageIndex < pageCount - 1,
+    [pageIndex, pageCount]
+  );
 
   const pageOptions = useMemo(
     () => new Array(pageCount).fill(0).map((v, i) => i),

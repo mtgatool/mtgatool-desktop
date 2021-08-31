@@ -5,7 +5,6 @@ import { animated, useTransition } from "react-spring";
 import { useSelector } from "react-redux";
 import PopupComponent from "./PopupComponent";
 import PassphraseGenerate from "./PassphraseGenerate";
-import linkGunToRedux from "../redux/linkGunToRedux";
 import vodiFn from "../utils/voidfn";
 
 import ViewHome from "./views/home/ViewHome";
@@ -66,10 +65,6 @@ export default function ContentWrapper() {
   useEffect(() => {
     paths.current.push(params.page);
   }, [params]);
-
-  useEffect(() => {
-    linkGunToRedux();
-  }, []);
 
   const openPopup = useRef<() => void>(vodiFn);
   const closePopup = useRef<() => void>(vodiFn);

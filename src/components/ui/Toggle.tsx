@@ -11,15 +11,8 @@ interface ToggleProps {
 }
 
 export default function Toggle(props: ToggleProps): JSX.Element {
-  const {
-    disabled,
-    value,
-    callback,
-    style,
-    containerClassName,
-    text,
-    margin,
-  } = props;
+  const { disabled, value, callback, style, containerClassName, text, margin } =
+    props;
   const [currentValue, setCurrentValue] = useState(value);
 
   const onChange = useCallback(

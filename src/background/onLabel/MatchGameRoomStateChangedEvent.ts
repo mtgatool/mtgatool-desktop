@@ -1,10 +1,14 @@
 import { MatchGameRoomStateChange } from "mtgatool-shared";
+import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import LogEntry from "../../types/logDecoder";
 import getLocalSetting from "../../utils/getLocalSetting";
+import actionLog from "../actionLog";
 import saveMatch from "../saveMatch";
 import globalStore from "../store";
 import {
+  resetCurrentMatch,
   setCurrentMatchMany,
+  setEventId,
   setOpponent,
   setPlayer,
 } from "../store/currentMatchStore";
@@ -33,6 +37,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
 
   // Now only when a match begins
   if (gameRoom.stateType == "MatchGameRoomStateType_Playing") {
+    let oppId = "";
     gameRoom.gameRoomConfig.reservedPlayers.forEach((player) => {
       const { currentMatch } = globalStore;
       if (player.userId == getLocalSetting("playerId")) {
@@ -48,6 +53,9 @@ export default function onLabelMatchGameRoomStateChangedEvent(
         });
       } else {
         currentMatch.opponent.name = player.playerName;
+
+        console.log(`vs ${player.playerName}`);
+        oppId = player.userId;
         setOpponent({
           name: player.playerName,
           userid: player.userId,
@@ -56,6 +64,30 @@ export default function onLabelMatchGameRoomStateChangedEvent(
           oppSeat: player.systemSeatId,
         });
       }
+    });
+
+    actionLog(-99, globalStore.currentMatch.logTime, "");
+    resetCurrentMatch();
+
+    const metadata = (gameRoom.gameRoomConfig as any).clientMetadata;
+
+    const opponent = {
+      tier: metadata[`${oppId}_RankTier`],
+      rank: metadata[`${oppId}_RankClass`],
+      percentile: metadata[`${oppId}_LeaderboardPercentile`],
+      leaderboardPlace: metadata[`${oppId}_LeaderboardPlacement`],
+      // commanderGrpIds: json.opponentCommanderGrpIds,
+    };
+    setOpponent(opponent);
+
+    // const player = {
+    //   commanderGrpIds: json.commanderGrpIds,
+    // };
+    // setPlayer(player);
+    setEventId(eventId);
+
+    postChannelMessage({
+      type: "GAME_START",
     });
   }
   // When the match ends (but not the last message)

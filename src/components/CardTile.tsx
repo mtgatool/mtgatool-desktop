@@ -20,12 +20,8 @@ import getWildcardsMissing from "../utils/getWildcardsMissing";
 
 // import gray from "../assets/images/gray.png";
 
-const {
-  CARD_RARITIES,
-  COLORS_ALL,
-  FACE_SPLIT_FULL,
-  FACE_ADVENTURE_MAIN,
-} = constants;
+const { CARD_RARITIES, COLORS_ALL, FACE_SPLIT_FULL, FACE_ADVENTURE_MAIN } =
+  constants;
 
 const mana: Record<string, string> = {};
 mana.w = "mana-w";

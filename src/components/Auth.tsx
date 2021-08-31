@@ -1,4 +1,3 @@
-import { sha1 } from "mtgatool-shared";
 import { useHistory } from "react-router-dom";
 
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
@@ -15,10 +14,9 @@ import Checkbox from "./ui/Checkbox";
 
 import settingsIcon from "../assets/images/cog.png";
 
-import checkPassphrase from "../gun/checkPassphrase";
-import doWebLogin from "../gun/doWebLogin";
-import signup from "../gun/signup";
-import login from "../gun/login";
+import checkPassphrase from "../toolDb/checkPassphrase";
+import signup from "../toolDb/signup";
+import login from "../toolDb/login";
 
 import voidFn from "../utils/voidfn";
 import getLocalSetting from "../utils/getLocalSetting";
@@ -109,7 +107,7 @@ export default function Auth(props: AuthProps) {
       if (rememberme) {
         setLocalSetting("username", username);
         if (pass !== getLocalSetting("savedPassword")) {
-          setLocalSetting("savedPassword", sha1(pass));
+          setLocalSetting("savedPassword", pass);
         }
       } else {
         setLocalSetting("username", "");
@@ -125,9 +123,7 @@ export default function Auth(props: AuthProps) {
       if (pass.length < 8) {
         setErrorMessage("Passwords must contain at least 8 characters.");
       } else {
-        const pwd =
-          getLocalSetting("savedPassword") == pass ? pass : sha1(pass);
-        login(username, pwd)
+        login(username, pass)
           .then(() => {
             if (electron) {
               postChannelMessage({
@@ -142,7 +138,6 @@ export default function Auth(props: AuthProps) {
                 arg: LOGIN_WAITING,
               });
             } else {
-              doWebLogin();
               reduxAction(dispatch, {
                 type: "SET_LOGIN_STATE",
                 arg: LOGIN_OK,
@@ -153,7 +148,7 @@ export default function Auth(props: AuthProps) {
               });
             }
           })
-          .catch(setErrorMessage);
+          .catch((err) => setErrorMessage(err.message));
       }
     },
     [username, pass]
@@ -171,9 +166,7 @@ export default function Auth(props: AuthProps) {
       } else {
         setUsername(signupUsername);
         setPass(signupPass);
-        const pwd = sha1(signupPass);
-        signup(signupUsername, pwd)
-          .then(() => login(signupUsername, pwd))
+        signup(signupUsername, signupPass)
           .then(() => {
             if (electron) {
               postChannelMessage({
@@ -198,7 +191,7 @@ export default function Auth(props: AuthProps) {
               });
             }
           })
-          .catch(setErrorMessage);
+          .catch((err) => setErrorMessage(err.message));
       }
     },
     [signupUsername, signupPass, signupPassConfirm]
@@ -403,7 +396,7 @@ export default function Auth(props: AuthProps) {
                     </button>
                     <div className="form-error">{errorMessage}</div>
                     <div className="message-small">
-                      Already have an account?{" "}
+                      Already have an account?
                       <a onClick={() => setPage(1)} className="signup-link">
                         Log in!
                       </a>

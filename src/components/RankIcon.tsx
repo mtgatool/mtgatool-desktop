@@ -11,15 +11,8 @@ export interface RankIconProps {
 }
 
 export default function RankIcon(props: RankIconProps): JSX.Element {
-  const {
-    rank,
-    tier,
-    style,
-    step,
-    format,
-    percentile,
-    leaderboardPlace,
-  } = props;
+  const { rank, tier, style, step, format, percentile, leaderboardPlace } =
+    props;
   const rankIndex = getRankIndex(rank, tier);
 
   const newStyle = { ...{ width: "48px", height: "48px" }, ...style };

@@ -37,7 +37,7 @@ function decodePayload(payload: any, msgType: string): any {
     }
     const msg = msgDeserialiser.deserializeBinary(binaryMsg);
     return msg.toObject();
-  } catch (e) {
+  } catch (e: any) {
     console.error(e.message);
   }
   return undefined;

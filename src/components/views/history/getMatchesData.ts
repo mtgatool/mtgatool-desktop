@@ -1,5 +1,5 @@
 import { InternalMatch } from "../../../../../mtgatool-shared/dist";
-import { GunMatch } from "../../../types/gunTypes";
+import { DbMatch } from "../../../types/dbTypes";
 import baseToObj from "../../../utils/baseToObj";
 import getRankFilterVal from "./getRankFilterVal";
 
@@ -20,7 +20,7 @@ export interface MatchData {
   rank: number;
 }
 
-export default function getMatchesData(matches: GunMatch[]): MatchData[] {
+export default function getMatchesData(matches: DbMatch[]): MatchData[] {
   return matches.map((match) => {
     const internalMatch = baseToObj<InternalMatch>(match.internalMatch);
     return {

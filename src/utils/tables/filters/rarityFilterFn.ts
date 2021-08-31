@@ -11,7 +11,7 @@ export default function rarityFilterFn<D>(
 ): D[] {
   const F = filterValue.rarity;
   return rows.filter((row) => {
-    const R = (row[key] as unknown) as number;
+    const R = row[key] as unknown as number;
 
     let ret: number | boolean = true;
     if (filterValue.mode == "=") ret = R === F;

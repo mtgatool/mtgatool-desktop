@@ -52,8 +52,8 @@ export default function DeckView(): JSX.Element {
     (state: AppState) => state.mainData
   );
   const latestVersion = decksIndex[params.id];
-  const gunDeck = decks[`${params.id}-v${latestVersion}`];
-  const internalDeck = baseToObj<InternalDeck>(gunDeck.internalDeck);
+  const dbDeck = decks[`${params.id}-v${latestVersion}`];
+  const internalDeck = baseToObj<InternalDeck>(dbDeck.internalDeck);
   const deck = new Deck(internalDeck);
 
   const [deckView, setDeckView] = useState(VIEW_REGULAR);

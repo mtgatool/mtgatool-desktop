@@ -20,7 +20,7 @@ export default function onLabelInEventDeckSubmitV3(entry: Entry): void {
   selectDeck(selectedDeck);
 
   postChannelMessage({
-    type: "UPSERT_GUN_DECK",
+    type: "UPSERT_DB_DECK",
     value: selectedDeck.getSave(),
   });
 }

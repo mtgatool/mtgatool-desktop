@@ -8,7 +8,7 @@ import DeckColorsBar from "./DeckColorsBar";
 import getDeckMissing from "../utils/getDeckMissing";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
 import getWinrateClass from "../utils/getWinrateClass";
-import { GunDeck } from "../types/gunTypes";
+import { DbDeck } from "../types/dbTypes";
 import timeAgo from "../utils/timeAgo";
 import baseToObj from "../utils/baseToObj";
 import getPreconDeckName from "../utils/getPreconDeckName";
@@ -16,8 +16,8 @@ import getPreconDeckName from "../utils/getPreconDeckName";
 import squirrels from "../assets/images/squirrels.png";
 
 export interface DecksArtViewRowProps {
-  clickDeck: (deck: GunDeck) => void;
-  deck: GunDeck;
+  clickDeck: (deck: DbDeck) => void;
+  deck: DbDeck;
 }
 
 function isCached(src: string) {

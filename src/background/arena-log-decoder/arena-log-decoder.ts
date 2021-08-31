@@ -20,9 +20,17 @@ const LABEL_JSON_PATTERNS = [
   /\[UnityCrossThreadLogger\]Received unhandled GREMessageType: (?<label>.*)(?:\r\n|\n)*/,
 ];
 
-const LABEL_ARROW_JSON_PATTERN = /\[UnityCrossThreadLogger\](?<arrow>[<=]=[=>]) (?<label>.*?) /;
+const LABEL_ARROW_JSON_PATTERN =
+  /\[UnityCrossThreadLogger\](?<arrow>[<=]=[=>]) (?<label>.*?) /;
 
-const ALL_PATTERNS = [LABEL_ARROW_JSON_PATTERN, ...LABEL_JSON_PATTERNS];
+const LABEL_ARROW_JSON_PATTERN_NEW =
+  /(?<arrow>[<=]=[=>]) (?<label>.*?)\(.*-+.*\)(?:\r\n|\n)/;
+
+const ALL_PATTERNS = [
+  LABEL_ARROW_JSON_PATTERN,
+  LABEL_ARROW_JSON_PATTERN_NEW,
+  ...LABEL_JSON_PATTERNS,
+];
 
 const maxLinesOfAnyPattern = Math.max(
   ...ALL_PATTERNS.map((regex) => occurrences(regex.source, /\\n/g))
@@ -64,8 +72,11 @@ function parseLogEntry(
   absPosition: number
 ): any[] {
   let rematches: RegExpMatchArray | null;
-
-  if ((rematches = matchText.match(LABEL_ARROW_JSON_PATTERN))) {
+  // console.log("parseLogEntry", text, matchText);
+  if (
+    (rematches = matchText.match(LABEL_ARROW_JSON_PATTERN)) ||
+    (rematches = matchText.match(LABEL_ARROW_JSON_PATTERN_NEW))
+  ) {
     const jsonStart = position + matchText.length;
     if (jsonStart >= text.length) {
       return ["partial"];

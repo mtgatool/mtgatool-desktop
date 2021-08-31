@@ -15,7 +15,6 @@ export { default as InPlayerInventoryGetPlayerInventory } from "./InPlayerInvent
 export { default as InPlayerInventoryGetPlayerCardsV3 } from "./InPlayerInventoryGetPlayerCardsV3";
 export { default as InProgressionGetPlayerProgress } from "./InProgressionGetPlayerProgress";
 export { default as InEventDeckSubmitV3 } from "./InEventDeckSubmitV3";
-export { default as EventMatchCreated } from "./EventMatchCreated";
 export { default as OutEventAIPractice } from "./OutEventAIPractice";
 export { default as OutDirectGameChallenge } from "./OutDirectGameChallenge";
 export { default as InDraftDraftStatus } from "./InDraftDraftStatus";
@@ -34,3 +33,6 @@ export { default as outMakeHumanDraftPick } from "./OutMakeHumanDraftPick";
 export { default as onClientSceneChange } from "./onClientSceneChange";
 export { default as InEventJoinPodMaking } from "./InEventJoinPodMaking";
 export { default as onAuthenticateResponse } from "./onAuthenticateResponse";
+export { default as InEventGetCourses } from "./InEventGetCourses";
+export { default as InGetFormats } from "./InGetFormats";
+export { default as InStartHook } from "./InStartHook";

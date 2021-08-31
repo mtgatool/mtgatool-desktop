@@ -24,7 +24,7 @@ export default function RankUpdated(entry: Entry): void {
   rank[updateType].seasonOrdinal = json.seasonOrdinal;
 
   postChannelMessage({
-    type: "UPSERT_GUN_RANK",
+    type: "UPSERT_DB_RANK",
     value: rank,
     uuid: json.playerId,
   });

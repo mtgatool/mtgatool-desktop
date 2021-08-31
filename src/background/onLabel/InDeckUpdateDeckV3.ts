@@ -12,7 +12,7 @@ export default function InDeckUpdateDeckV3(entry: Entry): void {
 
   const entryDeck = convertDeckFromV3(json);
   postChannelMessage({
-    type: "UPSERT_GUN_DECK",
+    type: "UPSERT_DB_DECK",
     value: entryDeck.getSave(),
   });
 }

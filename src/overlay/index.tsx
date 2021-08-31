@@ -57,14 +57,14 @@ export default function Overlay() {
 
   const channelMessageHandler = useCallback(
     (msg: MessageEvent<ChannelMessage>) => {
-      if (msg.data.type === "UPSERT_GUN_CARDS") {
+      if (msg.data.type === "UPSERT_DB_CARDS") {
         window.cards = msg.data.value;
       }
 
       if (msg.data.type === "OVERLAY_UPDATE_SETTINGS") {
-        const newSettings: OverlaySettings = (JSON.parse(
-          getLocalSetting("settings")
-        ) as Settings).overlays[getCurrentOverlayId()];
+        const newSettings: OverlaySettings = (
+          JSON.parse(getLocalSetting("settings")) as Settings
+        ).overlays[getCurrentOverlayId()];
 
         setSettings({
           ...settings,
@@ -129,8 +129,8 @@ export default function Overlay() {
   if (electron && settings?.autosize && heightDivAdjustRef.current) {
     electron.remote.getCurrentWindow().setBounds({
       // 24px topbar
-      // 20px margin
-      height: Math.ceil(heightDivAdjustRef.current.offsetHeight) + 24 + 20,
+      // 12px margin
+      height: Math.ceil(heightDivAdjustRef.current.offsetHeight) + 24 + 12,
     });
   }
 
@@ -143,7 +143,7 @@ export default function Overlay() {
     <div
       className="click-on"
       style={{
-        padding: "10px",
+        padding: "6px",
         // backgroundColor: `rgba(0,0,0,0.1)`,
       }}
     >

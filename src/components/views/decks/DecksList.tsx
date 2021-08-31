@@ -7,7 +7,7 @@ import { InternalDeck } from "../../../../../mtgatool-shared/dist";
 import usePagingControls from "../../../hooks/usePagingControls";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { Filters, StringFilterType } from "../../../types/genericFilterTypes";
-import { GunDeck } from "../../../types/gunTypes";
+import { DbDeck } from "../../../types/dbTypes";
 import baseToObj from "../../../utils/baseToObj";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import doDecksFilter from "../../../utils/tables/doDecksFilter";
@@ -21,7 +21,7 @@ export default function DecksList() {
   const history = useHistory();
   const [colorFilterState, setColorFilterState] = useState(31);
 
-  const defaultDeckFilters: StringFilterType<GunDeck> = {
+  const defaultDeckFilters: StringFilterType<DbDeck> = {
     type: "string",
     id: "playerId",
     value: {
@@ -30,11 +30,9 @@ export default function DecksList() {
     },
   };
 
-  const [filters, setFilters] = useState<Filters<GunDeck>>([
-    defaultDeckFilters,
-  ]);
+  const [filters, setFilters] = useState<Filters<DbDeck>>([defaultDeckFilters]);
 
-  const [sortValue, setSortValue] = useState<Sort<GunDeck>>({
+  const [sortValue, setSortValue] = useState<Sort<DbDeck>>({
     key: "lastUsed",
     sort: -1,
   });
@@ -61,7 +59,7 @@ export default function DecksList() {
   const pagingControlProps = usePagingControls(filteredData.length, 25);
 
   const openDeck = useCallback(
-    (deck: GunDeck) => {
+    (deck: DbDeck) => {
       // reduxAction(dispatch, { type: "SET_BACK_GRPID", arg: deck.tile });
       history.push(`/decks/${deck.deckId}`);
     },
@@ -95,7 +93,7 @@ export default function DecksList() {
         className="section"
         style={{ margin: "16px 0", flexDirection: "column" }}
       >
-        <SortControls<GunDeck>
+        <SortControls<DbDeck>
           setSortCallback={setSortValue}
           defaultSort={sortValue}
           columnKeys={["lastModified", "lastUsed", "colors", "format"]}

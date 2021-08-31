@@ -1,5 +1,6 @@
 module.exports = {
   env: {
+    "cypress/globals": true,
     browser: true,
     commonjs: true,
     es6: true,
@@ -34,6 +35,7 @@ module.exports = {
     "object-shorthand": 0,
     complexity: ["warn", 40],
     "max-statements": ["warn", 100],
+    "react/jsx-no-bind": "off",
     "react/jsx-filename-extension": [
       1,
       {
@@ -92,11 +94,20 @@ module.exports = {
   },
   parser: "@typescript-eslint/parser",
   extends: [
+    "plugin:cypress/recommended",
     "airbnb-base",
     "airbnb/rules/react",
     "plugin:react/recommended",
     "plugin:prettier/recommended",
     "plugin:@typescript-eslint/recommended",
   ],
-  plugins: ["jest", "jsx-a11y", "import", "prettier", "react", "react-hooks"],
+  plugins: [
+    "cypress",
+    "jest",
+    "jsx-a11y",
+    "import",
+    "prettier",
+    "react",
+    "react-hooks",
+  ],
 };

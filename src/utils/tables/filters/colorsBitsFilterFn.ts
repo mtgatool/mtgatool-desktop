@@ -11,7 +11,7 @@ export default function colorsBitsFilterFn<D>(
 ): D[] {
   const F = filterValue.color;
   return rows.filter((row) => {
-    const C = (row[key] as unknown) as number;
+    const C = row[key] as unknown as number;
 
     let ret: number | boolean = true;
     if (filterValue.mode == "strict") ret = F == C;

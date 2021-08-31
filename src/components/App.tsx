@@ -19,9 +19,6 @@ import electron from "../utils/electron/electronWrapper";
 import getLocalSetting from "../utils/getLocalSetting";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
 
-import { useGun, useSea } from "../gun/hooks";
-import doWebLogin from "../gun/doWebLogin";
-import login from "../gun/login";
 import reduxAction from "../redux/reduxAction";
 import PopupComponent from "./PopupComponent";
 import vodiFn from "../utils/voidfn";
@@ -33,8 +30,6 @@ import info from "../info.json";
 import overlayHandler from "../common/overlayHandler";
 
 function App() {
-  useGun();
-  useSea();
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -53,9 +48,10 @@ function App() {
       const pwd = getLocalSetting("savedPassword");
       const user = getLocalSetting("username");
 
-      login(user, pwd)
+      window.toolDb
+        .signIn(user, pwd)
         .then(async () => {
-          await doWebLogin();
+          // await doWebLogin();
           reduxAction(dispatch, {
             type: "SET_LOGIN_STATE",
             arg: LOGIN_OK,

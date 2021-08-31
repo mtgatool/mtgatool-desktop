@@ -13,7 +13,7 @@ export default function InDeckGetDeckListsV3(entry: Entry): void {
   json.forEach((d) => {
     const deck = convertDeckFromV3(d);
     postChannelMessage({
-      type: "UPSERT_GUN_DECK",
+      type: "UPSERT_DB_DECK",
       value: deck.getSave(),
     });
   });

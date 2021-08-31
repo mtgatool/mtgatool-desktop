@@ -23,7 +23,7 @@ export default function MythicRatingUpdated(entry: Entry): void {
   rank[type].leaderboardPlace = json.newMythicLeaderboardPlacement;
 
   postChannelMessage({
-    type: "UPSERT_GUN_RANK",
+    type: "UPSERT_DB_RANK",
     value: rank,
     uuid: getLocalSetting("playerId"),
   });

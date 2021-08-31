@@ -114,8 +114,8 @@ export default function MatchView(): JSX.Element {
   const params = useParams<{ page: string; id: string }>();
   const { matches } = useSelector((state: AppState) => state.mainData);
 
-  const gunMatch = matches[params.id];
-  const match = baseToObj<InternalMatch>(gunMatch.internalMatch);
+  const DbMatch = matches[params.id];
+  const match = baseToObj<InternalMatch>(DbMatch.internalMatch);
 
   const [view, setView] = useState(VIEW_MATCH);
   const [gameSeen, setGameSeen] = useState(0);
@@ -440,7 +440,7 @@ export default function MatchView(): JSX.Element {
 
         <Section
           style={{
-            padding: view == VIEW_MATCH ? "16px" : "",
+            padding: "16px",
             gridArea: "right",
             flexDirection: "column",
           }}

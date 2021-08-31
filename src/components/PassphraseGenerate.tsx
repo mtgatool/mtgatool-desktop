@@ -1,6 +1,6 @@
 import { ChangeEvent, useCallback, useState } from "react";
 import { ReactComponent as Close } from "../assets/images/svg/close.svg";
-import newResetPassphrase from "../gun/newResetPassphrase";
+import newResetPassphrase from "../toolDb/newResetPassphrase";
 import copyToClipboard from "../utils/copyToClipboard";
 import Button from "./ui/Button";
 

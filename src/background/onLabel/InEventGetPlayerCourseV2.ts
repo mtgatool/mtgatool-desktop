@@ -29,7 +29,7 @@ export default function InEventGetPlayerCourseV2(entry: Entry): void {
     selectDeck(deck);
 
     postChannelMessage({
-      type: "UPSERT_GUN_DECK",
+      type: "UPSERT_DB_DECK",
       value: deck.getSave(),
     });
   }

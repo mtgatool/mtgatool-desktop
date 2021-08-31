@@ -60,7 +60,7 @@ function ShortcutsRow({
         className={`${ld} shortcuts-line`}
         style={{ gridArea: `${index + 2} / 2 / auto / 3` }}
       >
-        {((settings as unknown) as Record<string, string>)[code]}
+        {(settings as unknown as Record<string, string>)[code]}
       </div>
       <div
         className={`${ld} shortcuts-line`}

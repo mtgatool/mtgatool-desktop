@@ -1,8 +1,31 @@
 // eslint-disable-next-line import/no-unresolved
-import { IGunChainReference } from "gun/types/chain";
-import { InternalRank } from "mtgatool-shared";
+import { Cards, DatabaseClass, InternalRank } from "mtgatool-shared";
+import { ToolDbClient } from "../../../tool-chain/dist";
+import { OverlayHandler } from "../common/overlayHandler";
 
-export interface GunDeck {
+declare global {
+  interface Window {
+    toolDb: ToolDbClient;
+    database: DatabaseClass;
+    overlayHandler: OverlayHandler | undefined;
+    globalStore: any;
+    cards: Cards;
+    cardsPrev: Cards;
+  }
+}
+
+export interface UserRecoveryData {
+  recovery: string;
+  iv: string;
+}
+
+export interface UserCardsData {
+  cards: Cards;
+  prevCards: Cards;
+  updated: number;
+}
+
+export interface DbDeck {
   playerId: string;
   name: string;
   deckHash: string;
@@ -23,7 +46,7 @@ export interface GunDeck {
   };
 }
 
-export interface GunMatch {
+export interface DbMatch {
   playerId: string;
   matchId: string;
   playerDeckId: string;
@@ -40,7 +63,7 @@ export interface GunMatch {
   timestamp: number;
 }
 
-export interface GunUUIDData {
+export interface DbUUIDData {
   gold: number;
   gems: number;
   vaultProgress: number;
@@ -58,18 +81,6 @@ export interface GunUUIDData {
   };
 }
 
-export interface GunUser {
-  matches: Record<string, GunMatch>;
-  decksIndex: Record<string, number>;
-  decks: Record<string, GunDeck>;
-  defaultUUID: string;
-  uuidData: {
-    [uuid: string]: GunUUIDData;
-  };
-}
-
-export type GunUserChain = IGunChainReference<GunUser>;
-
-export interface GunState {
+export interface DbState {
   [record: string]: any;
 }

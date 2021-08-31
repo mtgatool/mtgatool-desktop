@@ -1,10 +1,10 @@
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 import { overlayTitleToId } from "../common/maps";
-import setGunMatch from "../gun/setGunMatch";
-import upsertGunCards from "../gun/upsertGunCards";
-import upsertGunDeck from "../gun/upsertGunDeck";
-import upsertGunInventory from "../gun/upsertGunInventory";
-import upsertGunRank from "../gun/upsertGunRank";
+import setDbMatch from "../toolDb/setDbMatch";
+import upsertDbCards from "../toolDb/upsertDbCards";
+import upsertDbDeck from "../toolDb/upsertDbDeck";
+import upsertDbInventory from "../toolDb/upsertDbInventory";
+import upsertDbRank from "../toolDb/upsertDbRank";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import LogEntry from "../types/logDecoder";
@@ -70,7 +70,7 @@ export default function mainChannelListeners() {
         type: "SET_MATCH_IN_PROGRESS",
         arg: false,
       });
-      setGunMatch(msg.data.value);
+      setDbMatch(msg.data.value);
     }
 
     if (msg.data.type == "OVERLAY_UPDATE_BOUNDS") {
@@ -93,25 +93,25 @@ export default function mainChannelListeners() {
       }
     }
 
-    if (msg.data.type === "UPSERT_GUN_DECK") {
-      upsertGunDeck(msg.data.value);
+    if (msg.data.type === "UPSERT_DB_DECK") {
+      upsertDbDeck(msg.data.value);
     }
 
-    if (msg.data.type === "UPSERT_GUN_CARDS") {
-      upsertGunCards(msg.data.value);
+    if (msg.data.type === "UPSERT_DB_CARDS") {
+      upsertDbCards(msg.data.value);
       reduxAction(store.dispatch, {
         type: "SET_CARDS",
         arg: msg.data.value,
       });
     }
 
-    if (msg.data.type === "UPSERT_GUN_RANK") {
-      upsertGunRank(msg.data.value, msg.data.uuid);
+    if (msg.data.type === "UPSERT_DB_RANK") {
+      upsertDbRank(msg.data.value, msg.data.uuid);
     }
 
     if (msg.data.type === "PLAYER_INVENTORY") {
       const inventoryData = msg.data.value;
-      upsertGunInventory(inventoryData);
+      upsertDbInventory(inventoryData);
     }
   };
 }

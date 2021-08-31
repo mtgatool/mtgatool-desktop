@@ -53,7 +53,7 @@ function fsWatch(
     try {
       const stats = await fsAsync.stat(path);
       return stats.size;
-    } catch (err) {
+    } catch (err: any) {
       if (err.code === "ENOENT") return 0;
       throw err;
     }

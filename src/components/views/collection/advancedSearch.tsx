@@ -188,15 +188,12 @@ export default function AdvancedSearch(
   // Set filters state
   const [filterColors, setFilterColors] = useState<number>(defaultCol);
   const [filterSets, setFilterSets] = useState<string[]>(defaultSets);
-  const [colorFilterOption, setColorFilterOption] = useState(
-    defaultColorFilter
-  );
-  const [formatFilterOption, setFormatFilterOption] = useState<string>(
-    defaultFormat
-  );
-  const [rarityFilterOption, setRarityFilterOption] = useState<string>(
-    defaultRarity
-  );
+  const [colorFilterOption, setColorFilterOption] =
+    useState(defaultColorFilter);
+  const [formatFilterOption, setFormatFilterOption] =
+    useState<string>(defaultFormat);
+  const [rarityFilterOption, setRarityFilterOption] =
+    useState<string>(defaultRarity);
   const [raritySeparatorOption, setRaritySeparatorOption] = useState<string>(
     defaultRaritySeparator
   );

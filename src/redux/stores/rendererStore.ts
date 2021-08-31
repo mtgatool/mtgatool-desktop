@@ -17,5 +17,7 @@ const store = configureStore({
   middleware: [],
 });
 
+(window as any).store = store;
+
 export default store;
 export type AppState = ReturnType<typeof rootReducer>;

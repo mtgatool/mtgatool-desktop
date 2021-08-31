@@ -6,6 +6,7 @@ import ReactDOM from "react-dom";
 import { BrowserRouter as Router } from "react-router-dom";
 
 import { Provider } from "react-redux";
+import { ToolDbClient } from "tool-db";
 import App from "./components/App";
 import Overlay from "./overlay";
 import Hover from "./hover";
@@ -20,6 +21,7 @@ import { loadDbFromCache } from "./utils/database-wrapper";
 import initDirectories from "./utils/initDirectories";
 import getWindowTitle from "./utils/electron/getWindowTitle";
 import { ALL_OVERLAYS, WINDOW_BACKGROUND, WINDOW_HOVER } from "./types/app";
+import { DB_SERVER } from "./constants";
 
 const title = getWindowTitle();
 loadDbFromCache();
@@ -79,6 +81,10 @@ if (title == WINDOW_BACKGROUND) {
     );
   }
 } else {
+  if (!window.toolDb) {
+    window.toolDb = new ToolDbClient(DB_SERVER);
+  }
+
   defaultLocalSettings();
   mainChannelListeners();
   ReactDOM.render(
