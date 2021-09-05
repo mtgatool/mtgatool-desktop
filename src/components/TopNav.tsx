@@ -3,7 +3,7 @@ import _ from "lodash";
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useHistory, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getRankIndex, InternalRank } from "mtgatool-shared";
+import { getRankIndex, InternalRankData } from "mtgatool-shared";
 
 import formatRank from "../utils/formatRank";
 
@@ -16,6 +16,7 @@ import getLocalSetting from "../utils/getLocalSetting";
 import { AppState } from "../redux/stores/rendererStore";
 import Alt from "./Alt";
 import vodiFn from "../utils/voidfn";
+import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 
 interface TopNavItemProps {
   compact: boolean;
@@ -57,8 +58,9 @@ function TopNavItem(props: TopNavItemProps): JSX.Element {
 
 interface TopRankProps {
   uri: string;
-  rank: InternalRank["constructed"] | InternalRank["limited"] | null;
+  rank: CombinedRankInfo | null;
   rankClass: string;
+  type: "constructed" | "limited";
 }
 
 function TopRankIcon(props: TopRankProps): JSX.Element {
@@ -66,7 +68,7 @@ function TopRankIcon(props: TopRankProps): JSX.Element {
   const openAltRef = useRef<() => void>(vodiFn);
   const positionRef = useRef<HTMLDivElement>(null);
 
-  const { uri, rank, rankClass } = props;
+  const { uri, rank, rankClass, type } = props;
 
   const { pathname } = useLocation();
   const history = useHistory();
@@ -85,9 +87,37 @@ function TopRankIcon(props: TopRankProps): JSX.Element {
     );
   }
 
-  const propTitle = formatRank(rank);
+  let internalRank: InternalRankData = {
+    rank: rank.constructedClass,
+    tier: rank.constructedLevel,
+    step: rank.constructedStep,
+    won: rank.constructedMatchesWon,
+    lost: rank.constructedMatchesLost,
+    drawn: rank.constructedMatchesDrawn,
+    percentile: rank.constructedPercentile,
+    leaderboardPlace: rank.constructedLeaderboardPlace,
+    seasonOrdinal: rank.constructedSeasonOrdinal,
+  };
+
+  if (type === "limited") {
+    internalRank = {
+      rank: rank.limitedClass,
+      tier: rank.limitedLevel,
+      step: rank.limitedStep,
+      won: rank.limitedMatchesWon,
+      lost: rank.limitedMatchesLost,
+      drawn: rank.limitedMatchesDrawn,
+      percentile: rank.limitedPercentile,
+      leaderboardPlace: rank.limitedLeaderboardPlace,
+      seasonOrdinal: rank.limitedSeasonOrdinal,
+    };
+  }
+
+  const propTitle = formatRank(internalRank);
   const rankStyle = {
-    backgroundPosition: `${getRankIndex(rank.rank, rank.tier) * -48}px 0px`,
+    backgroundPosition: `${
+      getRankIndex(internalRank.rank, internalRank.tier) * -48
+    }px 0px`,
   };
 
   return (
@@ -136,9 +166,7 @@ export default function TopNav(props: TopNavProps): JSX.Element {
   const { openSettings } = props;
 
   const [compact, setCompact] = useState(false);
-  const { currentUUID, uuidData } = useSelector(
-    (state: AppState) => state.mainData
-  );
+  const { uuidData } = useSelector((state: AppState) => state.mainData);
 
   const topNavIconsRef: any = useRef(null);
   const dispatcher = useDispatch();
@@ -201,13 +229,13 @@ export default function TopNav(props: TopNavProps): JSX.Element {
 
   const contructedNav = {
     uri: "history",
-    rank: uuidData[currentUUID]?.rank?.constructed ?? null,
+    rank: uuidData.rank,
     rankClass: "top-constructed-rank",
   };
 
   const limitedNav = {
     uri: "history",
-    rank: uuidData[currentUUID]?.rank?.limited ?? null,
+    rank: uuidData.rank,
     rankClass: "top-limited-rank",
   };
 
@@ -239,8 +267,8 @@ export default function TopNav(props: TopNavProps): JSX.Element {
       </div>
       <div className="info">
         <div className="userdata-container">
-          <TopRankIcon {...contructedNav} />
-          <TopRankIcon {...limitedNav} />
+          <TopRankIcon type="constructed" {...contructedNav} />
+          <TopRankIcon type="limited" {...limitedNav} />
           <div className="top-username" title="Arena username">
             {userName}
           </div>

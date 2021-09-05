@@ -8,6 +8,7 @@ interface Entry extends LogEntry {
   json: RankUpdate;
 }
 
+// DEPRECTATED
 export default function RankUpdated(entry: Entry): void {
   const { json } = entry;
   if (json.newClass == "Mythic" && json.oldClass == "Mythic") return;
@@ -18,14 +19,20 @@ export default function RankUpdated(entry: Entry): void {
     | "constructed"
     | "limited";
 
-  rank[updateType].rank = json.newClass;
-  rank[updateType].tier = json.newLevel;
-  rank[updateType].step = json.newStep;
-  rank[updateType].seasonOrdinal = json.seasonOrdinal;
+  if (updateType === "constructed") {
+    rank.constructedClass = json.newClass;
+    rank.constructedLevel = json.newLevel;
+    rank.constructedStep = json.newStep;
+    rank.constructedSeasonOrdinal = json.seasonOrdinal;
+  } else {
+    rank.limitedClass = json.newClass;
+    rank.limitedLevel = json.newLevel;
+    rank.limitedStep = json.newStep;
+    rank.limitedSeasonOrdinal = json.seasonOrdinal;
+  }
 
   postChannelMessage({
     type: "UPSERT_DB_RANK",
     value: rank,
-    uuid: json.playerId,
   });
 }

@@ -1,11 +1,14 @@
 import _ from "lodash";
 import { Deck, InternalMatch } from "mtgatool-shared";
+import reduxAction from "../redux/reduxAction";
+
+import store from "../redux/stores/rendererStore";
 import { DbDeck, DbMatch } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
-import objToBase from "../utils/objToBase";
 
 export default async function setDbMatch(match: InternalMatch) {
   console.log("> Set match", match);
+  const { dispatch, getState } = store;
 
   const newDbMatch: DbMatch = {
     matchId: match.id,
@@ -19,42 +22,56 @@ export default async function setDbMatch(match: InternalMatch) {
     playerLosses: match.opponent.wins,
     eventId: match.eventId,
     duration: match.duration,
-    internalMatch: objToBase(match),
+    internalMatch: match,
     timestamp: new Date().getTime(),
-    actionLog: match.actionLog,
+    // actionLog: match.actionLog,
   };
 
   const hasWon = match.player.wins > match.opponent.wins;
 
   window.toolDb.putData<DbMatch>(`matches-${match.id}`, newDbMatch, true);
+
+  reduxAction(dispatch, {
+    type: "SET_MATCH",
+    arg: newDbMatch,
+  });
+
   window.toolDb
     .getData<string[]>("matchesIndex", true)
-    .then((oldMatchesIndex) =>
-      window.toolDb.putData<string[]>(
-        "matchesIndex",
-        _.uniq([...oldMatchesIndex, match.id]),
-        true
-      )
-    );
+    .then((oldMatchesIndex) => {
+      const newMatchesIndex = _.uniq([...(oldMatchesIndex || []), match.id]);
 
-  window.toolDb
-    .getData<Record<string, number>>("decksIndex", true)
-    .then((oldDecksIndex) => {
-      const deckId = `${match.playerDeck.id}-v${
-        oldDecksIndex[match.playerDeck.id]
-      }`;
-
-      window.toolDb.getData<DbDeck>(`decks-${deckId}`, true).then((deck) => {
-        const newDeck: DbDeck = { ...deck };
-        if (!Object.keys(newDeck.matches).includes(match.id)) {
-          newDeck.stats.gameWins += match.player.wins;
-          newDeck.stats.gameLosses += match.opponent.wins;
-          newDeck.stats.matchWins += hasWon ? 1 : 0;
-          newDeck.stats.matchLosses += hasWon ? 0 : 1;
-          console.log("Deck's match new stats: ", newDeck.stats);
-
-          window.toolDb.putData<DbDeck>(`decks-${deckId}`, newDeck, true);
-        }
+      reduxAction(dispatch, {
+        type: "SET_MATCHES_INDEX",
+        arg: newMatchesIndex,
       });
+
+      window.toolDb.putData<string[]>("matchesIndex", newMatchesIndex, true);
     });
+
+  const { decks, decksIndex } = getState().mainData;
+
+  const deckDbKey = `${match.playerDeck.id}-v${
+    decksIndex[match.playerDeck.id] || 0
+  }`;
+
+  const oldDeck = decks[match.playerDeck.id];
+
+  if (oldDeck) {
+    const newDeck: DbDeck = { ...oldDeck };
+    if (!Object.keys(newDeck.matches).includes(match.id)) {
+      newDeck.stats.gameWins += match.player.wins;
+      newDeck.stats.gameLosses += match.opponent.wins;
+      newDeck.stats.matchWins += hasWon ? 1 : 0;
+      newDeck.stats.matchLosses += hasWon ? 0 : 1;
+      console.log("Deck's match new stats: ", newDeck.stats);
+
+      window.toolDb.putData<DbDeck>(`decks-${deckDbKey}`, newDeck, true);
+
+      reduxAction(dispatch, {
+        type: "SET_DECK",
+        arg: newDeck,
+      });
+    }
+  }
 }

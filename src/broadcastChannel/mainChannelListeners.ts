@@ -20,6 +20,13 @@ export default function mainChannelListeners() {
   channel.onmessage = (msg: MessageEvent<ChannelMessage>) => {
     // console.log(msg.data.type);
 
+    if (msg.data.type === "DATABASE_PEERS") {
+      reduxAction(store.dispatch, {
+        type: "SET_PEERS",
+        arg: msg.data.peers,
+      });
+    }
+
     if (msg.data.type === "LOG_MESSAGE_RECV") {
       const entry = msg.data.value as LogEntry;
 
@@ -106,7 +113,7 @@ export default function mainChannelListeners() {
     }
 
     if (msg.data.type === "UPSERT_DB_RANK") {
-      upsertDbRank(msg.data.value, msg.data.uuid);
+      upsertDbRank(msg.data.value);
     }
 
     if (msg.data.type === "PLAYER_INVENTORY") {

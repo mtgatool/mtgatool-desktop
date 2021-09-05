@@ -9,6 +9,7 @@ import {
 } from "mtgatool-shared/dist/shared/constants";
 
 export const initialRendererState = {
+  peers: ["api.mtgatool.com"],
   archivedCache: {} as Record<string, boolean>,
   backgroundGrpid: null as number | null,
   loading: false,
@@ -42,6 +43,9 @@ const rendererSlice = createSlice({
   name: "renderer",
   initialState: initialRendererState,
   reducers: {
+    setPeers: (state: RendererState, action: PayloadAction<string[]>): void => {
+      state.peers = [...state.peers, ...action.payload];
+    },
     setLoginState: (
       state: RendererState,
       action: PayloadAction<
@@ -148,6 +152,7 @@ const rendererSlice = createSlice({
 });
 
 export const {
+  setPeers,
   setLoginState,
   setLogCompletion,
   setBackgroundGrpid,

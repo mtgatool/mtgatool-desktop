@@ -18,13 +18,8 @@ interface ClockProps {
 export default function Clock(props: ClockProps): JSX.Element {
   const [clockMode, setClockMode] = useState(CLOCK_MODE_BOTH);
   const [now, setNow] = useState(new Date());
-  const {
-    matchBeginTime,
-    priorityTimers,
-    turnPriority,
-    oppName,
-    playerSeat,
-  } = props;
+  const { matchBeginTime, priorityTimers, turnPriority, oppName, playerSeat } =
+    props;
 
   const handleClockPrev = useCallback((): void => {
     if (clockMode <= CLOCK_MODE_BOTH) {

@@ -1,13 +1,12 @@
 import { InternalMatch } from "../../../../../mtgatool-shared/dist";
 import { DbMatch } from "../../../types/dbTypes";
-import baseToObj from "../../../utils/baseToObj";
 import getRankFilterVal from "./getRankFilterVal";
 
 // This interface is used only to pass to the filters and sorting table
 // It should be kept as simple as possible!
 export interface MatchData {
   matchId: string;
-  internalMatch: string;
+  internalMatch: InternalMatch;
   playerDeckName: string;
   timestamp: number;
   duration: number;
@@ -22,7 +21,7 @@ export interface MatchData {
 
 export default function getMatchesData(matches: DbMatch[]): MatchData[] {
   return matches.map((match) => {
-    const internalMatch = baseToObj<InternalMatch>(match.internalMatch);
+    const { internalMatch } = match;
     return {
       matchId: match.matchId,
       internalMatch: match.internalMatch,

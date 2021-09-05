@@ -6,6 +6,7 @@ interface Entry extends LogEntry {
   json: PlayerInventory;
 }
 
+// DEPRECATED
 export default function InPlayerInventoryGetPlayerInventory(
   entry: Entry
 ): void {
@@ -14,10 +15,5 @@ export default function InPlayerInventoryGetPlayerInventory(
   postChannelMessage({
     type: "SET_UUID",
     value: json.playerId,
-  });
-
-  postChannelMessage({
-    type: "PLAYER_INVENTORY",
-    value: json,
   });
 }

@@ -52,13 +52,8 @@ function generateInternalMatch(): InternalMatch {
     0
   );
 
-  const matchTags: string[] = [];
   const playerDeck = globalStore.currentMatch.originalDeck.getSave();
   const oppDeck = getOpponentDeck();
-
-  if (oppDeck.archetype && oppDeck.archetype !== "Unknown") {
-    matchTags.push(oppDeck.archetype);
-  }
 
   const [playerWins, opponentWins, draws] = matchResults(
     currentMatch.gameInfo.results

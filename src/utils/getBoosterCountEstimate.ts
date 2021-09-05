@@ -14,15 +14,14 @@ export default function getBoosterCountEstimate(
   };
 
   const { mainData } = store.getState();
-  const uuid = mainData.currentUUID;
 
-  if (!mainData?.uuidData[uuid]?.wcCommon) return 0;
+  if (!mainData?.uuidData) return 0;
 
   const ownedWildcards = {
-    common: mainData.uuidData[uuid].wcCommon,
-    uncommon: mainData.uuidData[uuid].wcUncommon,
-    rare: mainData.uuidData[uuid].wcRare,
-    mythic: mainData.uuidData[uuid].wcMythic,
+    common: mainData.uuidData.WildCardCommons,
+    uncommon: mainData.uuidData.WildCardUnCommons,
+    rare: mainData.uuidData.WildCardRares,
+    mythic: mainData.uuidData.WildCardRares,
   };
 
   CARD_RARITIES.forEach((rarity) => {

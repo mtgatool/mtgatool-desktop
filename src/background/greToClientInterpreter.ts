@@ -1032,21 +1032,6 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
       })`
     );
   }
-  /*
-  ipcSend(
-    "set_turn",
-    {
-      playerSeat: currentMatch.playerSeat,
-      turnPhase: turnInfo.phase,
-      turnStep: turnInfo.step,
-      turnNumber: turnInfo.turnNumber,
-      turnActive: turnInfo.activePlayer,
-      turnPriority: turnInfo.priorityPlayer,
-      turnDecision: turnInfo.decisionPlayer,
-    },
-    IPC_OVERLAY
-  );
-  */
 }
 
 const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {

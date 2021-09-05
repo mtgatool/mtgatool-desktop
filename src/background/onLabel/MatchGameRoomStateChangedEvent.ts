@@ -1,9 +1,16 @@
-import { MatchGameRoomStateChange } from "mtgatool-shared";
+import {
+  CardsList,
+  convertV4ListToV2,
+  Deck,
+  InternalDeck,
+  MatchGameRoomStateChange,
+} from "mtgatool-shared";
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import LogEntry from "../../types/logDecoder";
 import getLocalSetting from "../../utils/getLocalSetting";
 import actionLog from "../actionLog";
 import saveMatch from "../saveMatch";
+import selectDeck from "../selectDeck";
 import globalStore from "../store";
 import {
   resetCurrentMatch,
@@ -38,6 +45,33 @@ export default function onLabelMatchGameRoomStateChangedEvent(
   // Now only when a match begins
   if (gameRoom.stateType == "MatchGameRoomStateType_Playing") {
     let oppId = "";
+
+    const course = globalStore.currentCourses[eventId];
+    if (course) {
+      // Should make a standard function to conver these new format decks
+      const main = convertV4ListToV2(course.CourseDeck.MainDeck);
+      const side = convertV4ListToV2(course.CourseDeck.Sideboard);
+      const deck: InternalDeck = {
+        id: course.CourseDeckSummary.DeckId,
+        name: course.CourseDeckSummary.Name || "",
+        lastUpdated: "",
+        deckTileId: course.CourseDeckSummary.DeckTileId,
+        format: "",
+        mainDeck: main,
+        sideboard: side,
+        colors: new CardsList(main).getColors().getBits(),
+        type: "InternalDeck",
+      };
+      if (deck) {
+        selectDeck(new Deck(deck));
+
+        postChannelMessage({
+          type: "UPSERT_DB_DECK",
+          value: deck,
+        });
+      }
+    }
+
     gameRoom.gameRoomConfig.reservedPlayers.forEach((player) => {
       const { currentMatch } = globalStore;
       if (player.userId == getLocalSetting("playerId")) {
@@ -99,13 +133,22 @@ export default function onLabelMatchGameRoomStateChangedEvent(
         ? "constructed"
         : "limited";
 
-    const player = {
+    let player = {
       seat: currentMatch.playerSeat,
-      tier: playerRank[format].tier,
-      rank: playerRank[format].rank,
-      percentile: playerRank[format].percentile,
-      leaderboardPlace: playerRank[format].leaderboardPlace,
+      tier: playerRank.constructedLevel,
+      rank: playerRank.constructedClass,
+      percentile: playerRank.constructedPercentile,
+      leaderboardPlace: playerRank.constructedLeaderboardPlace,
     };
+    if (format == "limited") {
+      player = {
+        seat: currentMatch.playerSeat,
+        tier: playerRank.limitedLevel,
+        rank: playerRank.limitedClass,
+        percentile: playerRank.limitedPercentile,
+        leaderboardPlace: playerRank.limitedLeaderboardPlace,
+      };
+    }
     setPlayer(player);
 
     gameRoom.finalMatchResult.resultList.forEach((res) => {

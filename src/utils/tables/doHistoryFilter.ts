@@ -26,13 +26,6 @@ export default function doHistoryFilter(
             filter.id
           );
         }
-        if (filter.id === "internalMatch") {
-          filteredData = stringFilterFn<MatchData>(
-            filteredData,
-            filter.value,
-            filter.id
-          );
-        }
         if (filter.id === "playerDeckName") {
           filteredData = stringFilterFn<MatchData>(
             filteredData,

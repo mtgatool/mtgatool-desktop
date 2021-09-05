@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { Colors, Deck, formatPercent, InternalDeck } from "mtgatool-shared";
+import { Colors, Deck, formatPercent } from "mtgatool-shared";
 import { useEffect, useState } from "react";
 import ManaCost from "./ManaCost";
 
@@ -10,7 +10,6 @@ import { getCardArtCrop } from "../utils/getCardArtCrop";
 import getWinrateClass from "../utils/getWinrateClass";
 import { DbDeck } from "../types/dbTypes";
 import timeAgo from "../utils/timeAgo";
-import baseToObj from "../utils/baseToObj";
 import getPreconDeckName from "../utils/getPreconDeckName";
 
 import squirrels from "../assets/images/squirrels.png";
@@ -30,15 +29,14 @@ export default function DecksArtViewRow(
   props: DecksArtViewRowProps
 ): JSX.Element {
   const { clickDeck, deck } = props;
-  const imageUrl = getCardArtCrop(deck.tile);
+  const imageUrl = getCardArtCrop(deck.deckTileId);
   const [cardUrl, setCardUrl] = useState<string | undefined>(
     isCached(imageUrl) ? imageUrl : undefined
   );
 
-  const internalDeck = baseToObj<InternalDeck>(deck.internalDeck);
-  const deckObj = new Deck(internalDeck);
+  const deckObj = new Deck(deck);
 
-  const deckColors = new Colors().addFromBits(deck.colors);
+  const deckColors = new Colors().addFromBits(deck.colors || 0);
 
   const totalMatches = deck.stats.matchLosses + deck.stats.matchWins;
   const winrate = totalMatches > 0 ? deck.stats.matchWins / totalMatches : 0;
@@ -51,8 +49,7 @@ export default function DecksArtViewRow(
     winrateInterval = formatPercent(winrate);
   }
 
-  const lastTouch =
-    deck.lastUsed || new Date(internalDeck.lastUpdated).getTime();
+  const lastTouch = new Date(deck.lastUpdated).getTime();
   const missingWildcards = getDeckMissing(deckObj);
   const totalMissing =
     missingWildcards.common +

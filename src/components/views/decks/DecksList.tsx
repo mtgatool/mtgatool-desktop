@@ -3,12 +3,11 @@
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { InternalDeck } from "../../../../../mtgatool-shared/dist";
+
 import usePagingControls from "../../../hooks/usePagingControls";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { Filters, StringFilterType } from "../../../types/genericFilterTypes";
 import { DbDeck } from "../../../types/dbTypes";
-import baseToObj from "../../../utils/baseToObj";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import doDecksFilter from "../../../utils/tables/doDecksFilter";
 import setFilter from "../../../utils/tables/filters/setFilter";
@@ -46,10 +45,9 @@ export default function DecksList() {
       .map((key) => decks[`${key}-v${decksIndex[key]}`])
       .filter((d) => d)
       .map((d) => {
-        const internalDeck = baseToObj<InternalDeck>(d.internalDeck);
         return {
           ...d,
-          lastUsed: d.lastUsed || new Date(internalDeck.lastUpdated).getTime(),
+          lastUsed: new Date(d.lastUpdated).getTime(),
           colors: d.colors > 32 ? d.colors - 32 : d.colors,
         };
       });
@@ -61,7 +59,7 @@ export default function DecksList() {
   const openDeck = useCallback(
     (deck: DbDeck) => {
       // reduxAction(dispatch, { type: "SET_BACK_GRPID", arg: deck.tile });
-      history.push(`/decks/${deck.deckId}`);
+      history.push(`/decks/${deck.id}`);
     },
     [history]
   );
@@ -96,7 +94,7 @@ export default function DecksList() {
         <SortControls<DbDeck>
           setSortCallback={setSortValue}
           defaultSort={sortValue}
-          columnKeys={["lastModified", "lastUsed", "colors", "format"]}
+          columnKeys={["lastUpdated", "lastUsed", "colors", "format"]}
           columnNames={["Last Modified", "Last Used", "Colors", "Format"]}
         />
         <div className="decks-table-wrapper">
@@ -106,16 +104,16 @@ export default function DecksList() {
               (pagingControlProps.pageIndex + 1) * pagingControlProps.pageSize
             )
             .map((deck) => {
-              if (deck && deck.internalDeck) {
+              if (deck) {
                 return (
                   <DecksArtViewRow
                     clickDeck={openDeck}
-                    key={deck.deckId}
+                    key={deck.id}
                     deck={deck}
                   />
                 );
               }
-              return <Fragment key={deck.deckId} />;
+              return <Fragment key={`${new Date().getTime()}-decklist`} />;
             })}
         </div>
 

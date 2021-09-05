@@ -1,13 +1,12 @@
 import { MythicRatingUpdate } from "mtgatool-shared";
-import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import LogEntry from "../../types/logDecoder";
-import getLocalSetting from "../../utils/getLocalSetting";
 import globalStore from "../store";
 
 interface Entry extends LogEntry {
   json: MythicRatingUpdate;
 }
 
+// DEPRECATED
 export default function MythicRatingUpdated(entry: Entry): void {
   const { json } = entry;
 
@@ -19,12 +18,16 @@ export default function MythicRatingUpdated(entry: Entry): void {
       ? "limited"
       : "constructed";
 
-  rank[type].percentile = json.newMythicPercentile;
-  rank[type].leaderboardPlace = json.newMythicLeaderboardPlacement;
+  if (type === "constructed") {
+    rank.constructedPercentile = json.newMythicPercentile;
+    rank.constructedLeaderboardPlace = json.newMythicLeaderboardPlacement;
+  } else {
+    rank.limitedPercentile = json.newMythicPercentile;
+    rank.limitedLeaderboardPlace = json.newMythicLeaderboardPlacement;
+  }
 
-  postChannelMessage({
-    type: "UPSERT_DB_RANK",
-    value: rank,
-    uuid: getLocalSetting("playerId"),
-  });
+  // postChannelMessage({
+  //   type: "UPSERT_DB_RANK",
+  //   value: rank,
+  // });
 }

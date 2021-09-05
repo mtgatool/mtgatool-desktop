@@ -1,21 +1,12 @@
-import {
-  constants,
-  Deck,
-  getJumpstartThemes,
-  themeCards,
-  JumpstartThemes,
-  InternalDeck,
-} from "mtgatool-shared";
+import { Deck, InternalDeck } from "mtgatool-shared";
 import db from "../utils/database-wrapper";
 import globalStore from "./store";
-
-const { DEFAULT_TILE } = constants;
 
 function calculateDeviation(values: number[]): number {
   return Math.sqrt(values.reduce((a, b) => a + b) / (values.length - 1));
 }
 
-function getBestArchetype(deck: Deck): string {
+function _getBestArchetype(deck: Deck): string {
   let bestMatch = "-";
   if (deck.getMainboard().get().length === 0) return bestMatch;
 
@@ -75,10 +66,11 @@ function getOpponentDeck(): InternalDeck {
   const _deck = new Deck(undefined, oppCardsList, []);
   _deck.getMainboard().removeDuplicates(true);
 
-  const format = db.events_format[globalStore.currentMatch.eventId];
+  // const format = db.events_format[globalStore.currentMatch.eventId];
   // currentMatch.opponent.deck.archetype = "-";
   const deckSave = _deck.getSave();
 
+  /*
   if (globalStore.currentMatch.eventId.indexOf("Jumpstart") !== -1) {
     const oppThemes = getJumpstartThemes(_deck);
     const oppThemeTile = themeCards[oppThemes[0] as JumpstartThemes];
@@ -101,6 +93,7 @@ function getOpponentDeck(): InternalDeck {
     }
     deckSave.archetype = oppArchetype;
   }
+  */
 
   return deckSave;
 }

@@ -2,15 +2,16 @@ import {
   Cards,
   InternalDeck,
   InternalMatch,
-  InternalRank,
   InventoryUpdate,
-  PlayerInventory,
 } from "mtgatool-shared";
+import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { OverlayUpdateMatchState } from "../background/store/types";
 import { OverlaySettings } from "../common/defaultConfig";
+import { DbInventoryInfo } from "../types/dbTypes";
 import { ClientSceneChange } from "../types/logDecoder";
 
 export type MessageType =
+  | "DATABASE_PEERS"
   | "START_LOG_READING"
   | "STOP_LOG_READING"
   | "LOG_MESSAGE_RECV"
@@ -34,6 +35,11 @@ export type MessageType =
 
 export interface ChannelMessageBase {
   type: MessageType;
+}
+
+export interface DatabasePeersMessage extends ChannelMessageBase {
+  type: "DATABASE_PEERS";
+  peers: string[];
 }
 
 export interface StartLogReadingMessage extends ChannelMessageBase {
@@ -108,8 +114,7 @@ export interface UpsertDbCardsMessage extends ChannelMessageBase {
 
 export interface UpsertDbRankMessage extends ChannelMessageBase {
   type: "UPSERT_DB_RANK";
-  value: InternalRank;
-  uuid: string;
+  value: CombinedRankInfo;
 }
 
 export interface InventoryUpdatedMessage extends ChannelMessageBase {
@@ -121,7 +126,7 @@ export interface InventoryUpdatedMessage extends ChannelMessageBase {
 
 export interface PlayerInventoryMessage extends ChannelMessageBase {
   type: "PLAYER_INVENTORY";
-  value: PlayerInventory;
+  value: DbInventoryInfo;
 }
 
 export interface HoverInMessage extends ChannelMessageBase {
@@ -134,6 +139,7 @@ export interface HoverOutMessage extends ChannelMessageBase {
 }
 
 export type ChannelMessage =
+  | DatabasePeersMessage
   | StartLogReadingMessage
   | StopLogReadingMessage
   | LogMessageRecvMessage

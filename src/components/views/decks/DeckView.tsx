@@ -7,7 +7,6 @@ import {
   Deck,
   getDeckColorsAmmount,
   getDeckLandsAmmount,
-  InternalDeck,
 } from "mtgatool-shared";
 import { useState, useEffect } from "react";
 import ReactSvgPieChart from "react-svg-piechart";
@@ -32,7 +31,7 @@ import CraftingCost from "../../CraftingCost";
 import getSampleHand from "../../../utils/getSampleHand";
 import CardTile from "../../CardTile";
 import { AppState } from "../../../redux/stores/rendererStore";
-import baseToObj from "../../../utils/baseToObj";
+
 import DeckList from "../../DeckList";
 import reduxAction from "../../../redux/reduxAction";
 
@@ -53,8 +52,8 @@ export default function DeckView(): JSX.Element {
   );
   const latestVersion = decksIndex[params.id];
   const dbDeck = decks[`${params.id}-v${latestVersion}`];
-  const internalDeck = baseToObj<InternalDeck>(dbDeck.internalDeck);
-  const deck = new Deck(internalDeck);
+
+  const deck = new Deck(dbDeck);
 
   const [deckView, setDeckView] = useState(VIEW_REGULAR);
   const [shuffle, setShuffle] = useState([true]);

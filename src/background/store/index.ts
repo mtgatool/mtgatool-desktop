@@ -1,3 +1,5 @@
+import { CombinedRankInfo } from "../onLabel/InEventGetCombinedRankInfo";
+import { Course } from "../onLabel/InEventGetCourses";
 import { draftStateObject } from "./currentDraftStore";
 import { matchStateObject } from "./currentMatchStore";
 
@@ -7,30 +9,27 @@ const globalStore = {
   currentMatch: matchStateObject,
   currentDraft: draftStateObject,
   currentActionLog: "",
+  currentCourses: {} as Record<string, Course>,
   rank: {
-    constructed: {
-      rank: "",
-      tier: 0,
-      step: 0,
-      won: 0,
-      lost: 0,
-      drawn: 0,
-      percentile: 0,
-      leaderboardPlace: 0,
-      seasonOrdinal: 0,
-    },
-    limited: {
-      rank: "",
-      tier: 0,
-      step: 0,
-      won: 0,
-      lost: 0,
-      drawn: 0,
-      percentile: 0,
-      leaderboardPlace: 0,
-      seasonOrdinal: 0,
-    },
-  },
+    constructedSeasonOrdinal: 0,
+    constructedClass: "Begginer",
+    constructedLevel: 0,
+    constructedStep: 0,
+    constructedMatchesWon: 0,
+    constructedMatchesLost: 0,
+    constructedMatchesDrawn: 0,
+    limitedSeasonOrdinal: 0,
+    limitedClass: "Begginer",
+    limitedLevel: 0,
+    limitedStep: 0,
+    limitedMatchesWon: 0,
+    limitedMatchesLost: 0,
+    limitedMatchesDrawn: 0,
+    constructedPercentile: 0,
+    constructedLeaderboardPlace: 0,
+    limitedPercentile: 0,
+    limitedLeaderboardPlace: 0,
+  } as CombinedRankInfo,
 };
 
 window.globalStore = globalStore;

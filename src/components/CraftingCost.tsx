@@ -21,15 +21,14 @@ interface CraftingCostProps {
 export default function CraftingCost(props: CraftingCostProps): JSX.Element {
   const { deck } = props;
   const { mainData } = useSelector((state: AppState) => state);
-  const uuid = mainData.currentUUID;
 
-  if (!mainData?.uuidData[uuid]?.wcCommon) return <></>;
+  if (!mainData?.uuidData) return <></>;
 
   const ownedWildcards: IndexableObject = {
-    common: mainData.uuidData[uuid].wcCommon,
-    uncommon: mainData.uuidData[uuid].wcUncommon,
-    rare: mainData.uuidData[uuid].wcRare,
-    mythic: mainData.uuidData[uuid].wcMythic,
+    common: mainData.uuidData.WildCardCommons,
+    uncommon: mainData.uuidData.WildCardUnCommons,
+    rare: mainData.uuidData.WildCardRares,
+    mythic: mainData.uuidData.WildCardMythics,
   };
 
   // Another deck.getSave() conversion here..

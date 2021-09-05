@@ -4,12 +4,13 @@ import store from "../redux/stores/rendererStore";
 
 import { DbDeck } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
-import objToBase from "../utils/objToBase";
 
 let upsertDecksIndexTimeout: NodeJS.Timeout | undefined;
 
-export default async function upsertDb(internal: InternalDeck) {
+export default async function upsertDbDeck(internal: InternalDeck) {
+  // console.log("upsertDbDeck", internal);
   const deck = new Deck(internal);
+  // console.log(deck);
 
   const { decksIndex } = store.getState().mainData;
   const { dispatch } = store;
@@ -26,16 +27,12 @@ export default async function upsertDb(internal: InternalDeck) {
 
   const newDbDeck: DbDeck = {
     playerId: getLocalSetting("playerId"),
-    name: deck.getName(),
     version: version,
     deckHash: deck.getHash(),
-    deckId: deck.id,
-    colors: deck.colors.getBits(),
-    tile: deck.tile,
-    format: deck.format,
-    internalDeck: objToBase(deck.getSave()),
+    ...deck.getSave(),
     lastUsed: 0,
-    lastModified: new Date().getTime(),
+    colors: deck.getColors().getBits(),
+    hidden: false,
     matches: {},
     stats: {
       gameWins: 0,
@@ -58,12 +55,18 @@ export default async function upsertDb(internal: InternalDeck) {
       },
     });
 
+    reduxAction(dispatch, {
+      type: "SET_DECK",
+      arg: newDbDeck,
+    });
+
     window.toolDb.putData<DbDeck>(`decks-${currentDeckKey}`, newDbDeck, true);
   } else {
+    console.log(`Checking if ${currentDeckKey} needs to be upserted`);
     window.toolDb
       .getData<DbDeck>(`decks-${currentDeckKey}`, true)
       .then((currentDeck) => {
-        if (!currentDeck.deckHash) return;
+        if (!currentDeck || !currentDeck.deckHash) return;
 
         console.log(currentDeckKey);
         console.log(currentDeck);
@@ -88,6 +91,11 @@ export default async function upsertDb(internal: InternalDeck) {
               ...decksIndex,
               [deck.id]: version,
             },
+          });
+
+          reduxAction(dispatch, {
+            type: "SET_DECK",
+            arg: newDbDeck,
           });
 
           // decksRef.get(newDeckDeckKey).put(newDbDeck);

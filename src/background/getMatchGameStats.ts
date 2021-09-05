@@ -44,7 +44,6 @@ export default function getMatchGameStats(): void {
       deckTileId: 0,
       lastUpdated: new Date().toISOString(),
       format: "",
-      description: "",
       type: "InternalDeck",
     },
   };

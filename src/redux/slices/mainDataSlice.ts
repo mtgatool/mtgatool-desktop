@@ -8,7 +8,8 @@ const mainState = {
   cardsNew: {} as Cards,
   cardsPrev: {} as Cards,
   currentUUID: "",
-  uuidData: {} as Record<string, DbUUIDData>,
+  uuidData: {} as DbUUIDData,
+  matchesIndex: [] as string[],
   matches: {} as Record<string, DbMatch>,
   decksIndex: {} as Record<string, number>,
   decks: {} as Record<string, DbDeck>,
@@ -25,25 +26,16 @@ const mainDataSlice = createSlice({
     },
     setUUIDData: (
       state: PlayerData,
-      action: PayloadAction<Partial<DbUUIDData>>
+      action: PayloadAction<DbUUIDData>
     ): void => {
-      state.uuidData[state.currentUUID] = {
-        ...state.uuidData[state.currentUUID],
+      state.uuidData = {
+        ...state.uuidData,
         ...action.payload,
       };
     },
     setCards: (state: PlayerData, action: PayloadAction<Cards>): void => {
       state.cardsPrev = { ...state.cards };
       state.cards = action.payload;
-    },
-    setAllUUIDData: (
-      state: PlayerData,
-      action: PayloadAction<DbUUIDData>
-    ): void => {
-      state.uuidData = {
-        ...state.uuidData,
-        [state.currentUUID]: action.payload,
-      };
     },
     setMatches: (
       state: PlayerData,
@@ -69,7 +61,7 @@ const mainDataSlice = createSlice({
     setDeck: (state: PlayerData, action: PayloadAction<DbDeck>): void => {
       state.decks = {
         ...state.decks,
-        [`${action.payload.deckId}-v${action.payload.version}`]: action.payload,
+        [`${action.payload.id}-v${action.payload.version}`]: action.payload,
       };
     },
     setDecksIndex: (
@@ -78,19 +70,25 @@ const mainDataSlice = createSlice({
     ): void => {
       state.decksIndex = action.payload;
     },
+    setMatchesIndex: (
+      state: PlayerData,
+      action: PayloadAction<string[]>
+    ): void => {
+      state.matchesIndex = action.payload;
+    },
   },
 });
 
 export const {
   setUUID,
   setCards,
-  setAllUUIDData,
   setUUIDData,
   setMatches,
   setMatch,
   setDecks,
   setDeck,
   setDecksIndex,
+  setMatchesIndex,
 } = mainDataSlice.actions;
 
 export default mainDataSlice;

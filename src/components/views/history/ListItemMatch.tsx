@@ -1,10 +1,5 @@
 import _ from "lodash";
-import {
-  Colors,
-  constants,
-  getEventPrettyName,
-  InternalMatch,
-} from "mtgatool-shared";
+import { Colors, constants, getEventPrettyName } from "mtgatool-shared";
 
 import {
   Column,
@@ -18,7 +13,6 @@ import ManaCost from "../../ManaCost";
 import { toMMSS } from "../../../utils/dateTo";
 import RankSmall from "../../RankSmall";
 import ResultDetails from "../../ResultDetails";
-import baseToObj from "../../../utils/baseToObj";
 import timeAgo from "../../../utils/timeAgo";
 import RankIcon from "../../RankIcon";
 import isLimitedEventId from "../../../utils/isLimitedEventId";
@@ -35,7 +29,7 @@ export default function ListItemMatch({
   match,
   openMatchCallback,
 }: ListItemMatchProps): JSX.Element {
-  const internalMatch = baseToObj<InternalMatch>(match.internalMatch);
+  const { internalMatch } = match;
 
   const onRowClick = (): void => {
     openMatchCallback(match);
@@ -142,7 +136,9 @@ export default function ListItemMatch({
         >
           <ManaCost
             className="mana-s20"
-            colors={internalMatch.oppDeck.colors || []}
+            colors={new Colors()
+              .addFromBits(internalMatch.oppDeck.colors || 0)
+              .get()}
           />
         </FlexBottom>
       </Column>

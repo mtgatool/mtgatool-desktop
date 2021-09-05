@@ -1,6 +1,13 @@
 // eslint-disable-next-line import/no-unresolved
-import { Cards, DatabaseClass, InternalRank } from "mtgatool-shared";
+import {
+  Cards,
+  DatabaseClass,
+  InternalDeck,
+  InternalMatch,
+} from "mtgatool-shared";
 import { ToolDbClient } from "../../../tool-chain/dist";
+import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
+import { InventoryInfo } from "../background/onLabel/InStartHook";
 import { OverlayHandler } from "../common/overlayHandler";
 
 declare global {
@@ -25,19 +32,15 @@ export interface UserCardsData {
   updated: number;
 }
 
-export interface DbDeck {
+export interface DbDeck extends InternalDeck {
   playerId: string;
-  name: string;
   deckHash: string;
-  deckId: string;
   version: number;
-  colors: number;
-  tile: number;
-  format: string;
-  internalDeck: string;
   matches: Record<string, boolean>;
+  colors: number;
+  hidden: boolean;
   lastUsed: number;
-  lastModified: number;
+  // lastModified: number;
   stats: {
     gameWins: number;
     gameLosses: number;
@@ -58,28 +61,19 @@ export interface DbMatch {
   playerLosses: number;
   eventId: string;
   duration: number;
-  internalMatch: string;
-  actionLog: string;
+  internalMatch: InternalMatch;
   timestamp: number;
 }
 
-export interface DbUUIDData {
-  gold: number;
-  gems: number;
-  vaultProgress: number;
-  wcTrackPosition: number;
-  wcCommon: number;
-  wcUncommon: number;
-  wcRare: number;
-  wcMythic: number;
-  cards: string;
-  cardsPrev: string;
-  cardsUpdated: number;
-  rank: InternalRank;
-  boosters: {
-    [collationId: string]: number;
-  };
-}
+export type DbInventoryInfo = Omit<
+  InventoryInfo,
+  "SeqId" | "Changes" | "CustomTokens" | "Vouchers" | "Cosmetics"
+>;
+
+export type DbUUIDData = DbInventoryInfo & {
+  rank: CombinedRankInfo;
+  updated: number;
+};
 
 export interface DbState {
   [record: string]: any;

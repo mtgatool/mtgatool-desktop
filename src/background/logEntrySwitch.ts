@@ -25,7 +25,7 @@ export default function logEntrySwitch(entry: LogEntry): void {
       }
       break;
 
-    case "Event.GetCombinedRankInfo":
+    case "Rank_GetCombinedRankInfo":
       if (entry.arrow == "<==") {
         Labels.InEventGetCombinedRankInfo(entry);
       }

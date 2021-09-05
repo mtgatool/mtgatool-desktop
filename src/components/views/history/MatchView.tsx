@@ -37,7 +37,6 @@ import CardList from "../../CardList";
 import { toMMSS } from "../../../utils/dateTo";
 import ActionLog from "../../ActionLog";
 import { AppState } from "../../../redux/stores/rendererStore";
-import baseToObj from "../../../utils/baseToObj";
 
 interface GameStatsProps {
   game: MatchGameStats;
@@ -115,17 +114,17 @@ export default function MatchView(): JSX.Element {
   const { matches } = useSelector((state: AppState) => state.mainData);
 
   const DbMatch = matches[params.id];
-  const match = baseToObj<InternalMatch>(DbMatch.internalMatch);
+  const { internalMatch } = DbMatch;
 
   const [view, setView] = useState(VIEW_MATCH);
   const [gameSeen, setGameSeen] = useState(0);
 
-  const playerDeck = new Deck(match.playerDeck);
-  const oppDeck = new Deck(match.oppDeck);
-  const isLimited = db.limited_ranked_events.includes(match.eventId);
+  const playerDeck = new Deck(internalMatch.playerDeck);
+  const oppDeck = new Deck(internalMatch.oppDeck);
+  const isLimited = db.limited_ranked_events.includes(internalMatch.eventId);
 
-  const logExists = !!match.actionLog;
-  const actionLogDataString = match.actionLog ?? "";
+  const logExists = !!internalMatch.actionLog;
+  const actionLogDataString = internalMatch.actionLog ?? "";
 
   const goBack = (): void => {
     history.goBack();
@@ -145,14 +144,14 @@ export default function MatchView(): JSX.Element {
 
   useEffect(() => {
     setView(VIEW_MATCH);
-  }, [match.id]);
+  }, [internalMatch.id]);
 
   let deck = oppDeck;
 
-  const arrayGameStats = Object.values(match.gameStats);
+  const arrayGameStats = Object.values(internalMatch.gameStats);
 
   // v4.1.0: Introduced by-game cards seen
-  const gameDetails = match && match.toolVersion >= 262400;
+  const gameDetails = internalMatch && internalMatch.toolVersion >= 262400;
   if (gameDetails) {
     const combinedList: number[] = [];
     arrayGameStats
@@ -206,8 +205,8 @@ export default function MatchView(): JSX.Element {
   }, [existsPrev, gameSeen]);
 
   const gameNext = useCallback(() => {
-    if (existsNext(gameSeen, match)) setGameSeen(gameSeen + 1);
-  }, [existsNext, gameSeen, match]);
+    if (existsNext(gameSeen, internalMatch)) setGameSeen(gameSeen + 1);
+  }, [existsNext, gameSeen, internalMatch]);
 
   const clickAdd = (): void => {
     // Add to your decks
@@ -227,9 +226,9 @@ export default function MatchView(): JSX.Element {
   };
 
   const copyOppName = useCallback((): void => {
-    copyToClipboard(match.opponent.name);
+    copyToClipboard(internalMatch.opponent.name);
     // popup => Opponent's name copied to clipboard
-  }, [match]);
+  }, [internalMatch]);
 
   /*
   const mulliganType =
@@ -240,8 +239,8 @@ export default function MatchView(): JSX.Element {
   */
   const duration = arrayGameStats.reduce((acc, cur) => acc + cur.time, 0);
 
-  const pw = match.player.wins;
-  const ow = match.opponent.wins;
+  const pw = internalMatch.player.wins;
+  const ow = internalMatch.opponent.wins;
   return (
     <>
       <div
@@ -297,14 +296,14 @@ export default function MatchView(): JSX.Element {
               className="match-top-result"
               style={{ color: `var(--color-${pw > ow ? "g" : "r"})` }}
             >{`${pw}-${ow}`}</div>
-            <ResultDetails match={match} />
+            <ResultDetails match={internalMatch} />
           </Flex>
           <Flex>
             <IconEvent
               style={{ margin: "auto 16px auto 8px" }}
               fill="var(--color-icon)"
             />
-            <div>{getEventPrettyName(match.eventId)}</div>
+            <div>{getEventPrettyName(internalMatch.eventId)}</div>
           </Flex>
           <Flex>
             <IconTime
@@ -338,7 +337,7 @@ export default function MatchView(): JSX.Element {
         >
           <Flex>
             <div className="match-player-name">
-              vs {match.opponent.name.slice(0, -6)}
+              vs {internalMatch.opponent.name.slice(0, -6)}
             </div>
             <SvgButton
               style={{ margin: "auto 2px" }}
@@ -347,10 +346,10 @@ export default function MatchView(): JSX.Element {
             />
           </Flex>
           <RankIcon
-            rank={match.opponent.rank}
-            tier={match.opponent.tier}
-            percentile={match.opponent.percentile || 0}
-            leaderboardPlace={match.opponent.leaderboardPlace || 0}
+            rank={internalMatch.opponent.rank}
+            tier={internalMatch.opponent.tier}
+            percentile={internalMatch.opponent.percentile || 0}
+            leaderboardPlace={internalMatch.opponent.leaderboardPlace || 0}
             format={isLimited ? "limited" : "constructed"}
           />
           <Flex>
@@ -365,7 +364,7 @@ export default function MatchView(): JSX.Element {
             gridArea: "buttons",
           }}
         >
-          {gameDetails && match && (
+          {gameDetails && internalMatch && (
             <div
               style={{
                 display: "flex",
@@ -396,7 +395,7 @@ export default function MatchView(): JSX.Element {
               </div>
               <SvgButton
                 style={
-                  !existsNext(gameSeen, match)
+                  !existsNext(gameSeen, internalMatch)
                     ? {
                         cursor: "default",
                         opacity: 0.5,

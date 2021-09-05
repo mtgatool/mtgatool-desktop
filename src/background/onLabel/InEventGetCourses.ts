@@ -1,13 +1,16 @@
-import { v2cardsList } from "mtgatool-shared";
+import { v4cardsList } from "mtgatool-shared";
 import LogEntry from "../../types/logDecoder";
+import globalStore from "../store";
 
-interface Course {
+export interface Course {
   CourseId: string;
   InternalEventName: string;
   CurrentModule: number;
   ModulePayload: string;
   CourseDeckSummary: {
     DeckId: string;
+    Name?: string;
+    Description?: string;
     Attributes: {
       name: string;
       value: string;
@@ -18,16 +21,15 @@ interface Course {
     UnownedCards: Record<string, string>;
   };
   CourseDeck: {
-    MainDeck: v2cardsList;
-    ReducedSideboard: [];
-    Sideboard: [];
-    CommandZone: [];
-    Companions: [];
-    CardSkins: [];
+    MainDeck: v4cardsList;
+    ReducedSideboard: v4cardsList;
+    Sideboard: v4cardsList;
+    CommandZone: v4cardsList;
+    Companions: v4cardsList;
+    CardSkins: v4cardsList;
   };
-  CurrentLosses: number;
-  CardPool: number[];
-  JumpStart: {
+  CardPool?: number[];
+  JumpStart?: {
     CurrentChoices: [];
     PacketsChosen: [
       {
@@ -38,6 +40,8 @@ interface Course {
       }[]
     ];
   };
+  CurrentWins?: number;
+  CurrentLosses?: number;
 }
 
 interface CoursesEvent {
@@ -49,5 +53,9 @@ interface Entry extends LogEntry {
 }
 
 export default function InEventGetCourses(entry: Entry): void {
-  const _json = entry.json;
+  const { json } = entry;
+
+  json.Courses.forEach((course) => {
+    globalStore.currentCourses[course.InternalEventName] = course;
+  });
 }

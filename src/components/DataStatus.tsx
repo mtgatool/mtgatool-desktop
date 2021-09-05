@@ -29,7 +29,7 @@ export default function DataStatus() {
   const openAltRef = useRef<() => void>(vodiFn);
   const positionRef = useRef<HTMLDivElement>(null);
 
-  const { cards, currentUUID, uuidData, matches, decks } = useSelector(
+  const { cards, uuidData, matches, decks } = useSelector(
     (state: AppState) => state.mainData
   );
 
@@ -65,11 +65,7 @@ export default function DataStatus() {
           <StatusLine
             title="User data"
             status={
-              uuidData[currentUUID]?.rank &&
-              uuidData[currentUUID]?.wcCommon &&
-              uuidData[currentUUID]?.gems
-                ? "OK"
-                : "LOADING"
+              uuidData.WildCardCommons && uuidData.Gems ? "OK" : "LOADING"
             }
           />
         </div>
