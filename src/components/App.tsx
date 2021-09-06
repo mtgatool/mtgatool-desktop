@@ -28,6 +28,7 @@ import isElectron from "../utils/electron/isElectron";
 
 import info from "../info.json";
 import overlayHandler from "../common/overlayHandler";
+import login from "../toolDb/login";
 
 function App() {
   const history = useHistory();
@@ -48,10 +49,8 @@ function App() {
       const pwd = getLocalSetting("savedPassword");
       const user = getLocalSetting("username");
 
-      window.toolDb
-        .signIn(user, pwd)
+      login(user, pwd)
         .then(async () => {
-          // await doWebLogin();
           reduxAction(dispatch, {
             type: "SET_LOGIN_STATE",
             arg: LOGIN_OK,

@@ -83,6 +83,7 @@ if (title == WINDOW_BACKGROUND) {
 } else {
   if (!window.toolDb) {
     window.toolDb = new ToolDbClient(DB_SERVER);
+    window.toolDb.debug = true;
   }
 
   defaultLocalSettings();

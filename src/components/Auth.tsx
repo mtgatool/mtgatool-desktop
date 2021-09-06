@@ -4,6 +4,7 @@ import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { animated, useSpring } from "react-spring";
 import { LOGIN_OK, LOGIN_WAITING } from "mtgatool-shared/dist/shared/constants";
+import { sha1 } from "tool-db";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 
 import AuthSettings from "./AuthSettings";
@@ -39,7 +40,7 @@ export default function Auth(props: AuthProps) {
   const history = useHistory();
   const dispatch = useDispatch();
   const [errorMessage, setErrorMessage] = useState("");
-  const [pass, setPass] = useState(getLocalSetting("savedPassword"));
+  const [pass, setPass] = useState("");
   const [username, setUsername] = useState(getLocalSetting("username"));
   const [usernameRecover, setUsernameRecover] = useState("");
 
@@ -106,8 +107,8 @@ export default function Auth(props: AuthProps) {
     if (loginState === LOGIN_OK) {
       if (rememberme) {
         setLocalSetting("username", username);
-        if (pass !== getLocalSetting("savedPassword")) {
-          setLocalSetting("savedPassword", pass);
+        if (sha1(pass) !== getLocalSetting("savedPassword")) {
+          setLocalSetting("savedPassword", sha1(pass));
         }
       } else {
         setLocalSetting("username", "");
@@ -123,7 +124,7 @@ export default function Auth(props: AuthProps) {
       if (pass.length < 8) {
         setErrorMessage("Passwords must contain at least 8 characters.");
       } else {
-        login(username, pass)
+        login(username, sha1(pass))
           .then(() => {
             if (electron) {
               postChannelMessage({
@@ -166,7 +167,7 @@ export default function Auth(props: AuthProps) {
       } else {
         setUsername(signupUsername);
         setPass(signupPass);
-        signup(signupUsername, signupPass)
+        signup(signupUsername, sha1(signupPass))
           .then(() => {
             if (electron) {
               postChannelMessage({
@@ -268,14 +269,14 @@ export default function Auth(props: AuthProps) {
                     <div
                       className="form-input-container"
                       style={{
-                        marginBottom: "20px",
+                        marginBottom: "48px",
                       }}
                     >
                       <textarea
                         onChange={handlePassphraseCHange}
                         autoComplete="off"
                         style={{
-                          height: "40px",
+                          height: "64px",
                         }}
                         value={passphrase}
                       />

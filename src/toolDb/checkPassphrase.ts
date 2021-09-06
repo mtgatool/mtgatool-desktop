@@ -9,10 +9,10 @@ import { UserRecoveryData } from "../types/dbTypes";
 
 /* eslint-disable prefer-promise-reject-errors */
 export default function checkPassphrase(username: string, passphrase: string) {
-  return window.toolDb.getData<UserRootData>(`@${username}`).then((userData) =>
+  return window.toolDb.getData<UserRootData>(`==${username}`).then((userData) =>
     window.toolDb
       .getData<UserRecoveryData>(
-        `~${userData?.keys.skpub}.recovery`,
+        `:${userData?.keys.skpub}.recovery`,
         false,
         5000
       )
