@@ -1,9 +1,11 @@
 import { UserCardsData } from "../types/dbTypes";
 
 export default function signup(username: string, password: string) {
-  return window.toolDb.signUp(username, password).then((msg) => {
-    window.toolDb.signIn(username, password).then(() => {
-      window.toolDb.putData<UserCardsData>(
+  return new Promise((resolve) => {
+    async function doSign() {
+      const msg = await window.toolDb.signUp(username, password);
+      await window.toolDb.signIn(username, password);
+      await window.toolDb.putData<UserCardsData>(
         "cards",
         {
           cards: {},
@@ -12,10 +14,11 @@ export default function signup(username: string, password: string) {
         },
         true
       );
-      window.toolDb.putData("decksIndex", {}, true);
-      window.toolDb.putData("matchesIndex", [], true);
+      await window.toolDb.putData("decksIndex", {}, true);
+      await window.toolDb.putData("matchesIndex", [], true);
 
-      return msg;
-    });
+      resolve(msg);
+    }
+    doSign();
   });
 }

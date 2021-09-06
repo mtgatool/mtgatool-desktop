@@ -1,6 +1,8 @@
 import reduxAction from "../redux/reduxAction";
 import { setCards } from "../redux/slices/mainDataSlice";
 import store from "../redux/stores/rendererStore";
+import { DbUUIDData } from "../types/dbTypes";
+import getLocalSetting from "../utils/getLocalSetting";
 
 export default function login(username: string, password: string) {
   const { dispatch } = store;
@@ -15,6 +17,7 @@ export default function login(username: string, password: string) {
 
         data.forEach((id: string) => {
           window.toolDb.getData(`matches-${id}`, true).then((match) => {
+            console.log(`matches-${id}`, match);
             reduxAction(dispatch, {
               type: "SET_MATCH",
               arg: match,
@@ -37,6 +40,7 @@ export default function login(username: string, password: string) {
           window.toolDb
             .getData(`decks-${id}-v${data[id]}`, true)
             .then((deck) => {
+              console.log(`decks-${id}-v${data[id]}`, deck);
               reduxAction(dispatch, {
                 type: "SET_DECK",
                 arg: deck,
@@ -48,8 +52,16 @@ export default function login(username: string, password: string) {
       .catch(console.warn);
 
     window.toolDb
-      .getData("uuidData", true)
-      .then((data) => console.log("uuidData", data))
+      .getData<DbUUIDData>(`${getLocalSetting("playerId")}-data`, true)
+      .then((data) => {
+        console.log("player data", data);
+        if (data) {
+          reduxAction(dispatch, {
+            type: "SET_UUID_DATA",
+            arg: data,
+          });
+        }
+      })
       .catch(console.warn);
 
     window.toolDb

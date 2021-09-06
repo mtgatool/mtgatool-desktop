@@ -1,3 +1,4 @@
+/* eslint-disable radix */
 import {
   CardsList,
   convertV4ListToV2,
@@ -6,6 +7,7 @@ import {
   MatchGameRoomStateChange,
 } from "mtgatool-shared";
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
+import upsertDbRank from "../../toolDb/upsertDbRank";
 import LogEntry from "../../types/logDecoder";
 import getLocalSetting from "../../utils/getLocalSetting";
 import actionLog from "../actionLog";
@@ -19,6 +21,7 @@ import {
   setOpponent,
   setPlayer,
 } from "../store/currentMatchStore";
+import { CombinedRankInfo } from "./InEventGetCombinedRankInfo";
 
 interface Entry extends LogEntry {
   json: MatchGameRoomStateChange;
@@ -42,8 +45,30 @@ export default function onLabelMatchGameRoomStateChangedEvent(
 
   if (eventId == "NPE") return;
 
+  // Only update if needed
+  if (json.players) {
+    json.players.forEach((player) => {
+      const { currentMatch } = globalStore;
+      if (
+        player.userId == getLocalSetting("playerId") &&
+        currentMatch.playerSeat !== player.systemSeatId
+      ) {
+        setCurrentMatchMany({
+          playerSeat: player.systemSeatId,
+        });
+      } else if (currentMatch.oppSeat !== player.systemSeatId) {
+        setCurrentMatchMany({
+          oppSeat: player.systemSeatId,
+        });
+      }
+    });
+  }
+
   // Now only when a match begins
   if (gameRoom.stateType == "MatchGameRoomStateType_Playing") {
+    actionLog(-99, globalStore.currentMatch.logTime, "");
+    resetCurrentMatch();
+    const playerId = getLocalSetting("playerId");
     let oppId = "";
 
     const course = globalStore.currentCourses[eventId];
@@ -64,7 +89,6 @@ export default function onLabelMatchGameRoomStateChangedEvent(
       };
       if (deck) {
         selectDeck(new Deck(deck));
-
         postChannelMessage({
           type: "UPSERT_DB_DECK",
           value: deck,
@@ -73,24 +97,20 @@ export default function onLabelMatchGameRoomStateChangedEvent(
     }
 
     gameRoom.gameRoomConfig.reservedPlayers.forEach((player) => {
-      const { currentMatch } = globalStore;
-      if (player.userId == getLocalSetting("playerId")) {
-        currentMatch.player.name = player.playerName;
+      if (player.userId == playerId) {
         setPlayer({
+          seat: player.systemSeatId,
           name: player.playerName,
           userid: player.userId,
         });
         setCurrentMatchMany({
-          name: player.playerName,
           playerSeat: player.systemSeatId,
-          userid: player.userId,
         });
       } else {
-        currentMatch.opponent.name = player.playerName;
-
         console.log(`vs ${player.playerName}`);
         oppId = player.userId;
         setOpponent({
+          seat: player.systemSeatId,
           name: player.playerName,
           userid: player.userId,
         });
@@ -100,24 +120,25 @@ export default function onLabelMatchGameRoomStateChangedEvent(
       }
     });
 
-    actionLog(-99, globalStore.currentMatch.logTime, "");
-    resetCurrentMatch();
-
     const metadata = (gameRoom.gameRoomConfig as any).clientMetadata;
 
     const opponent = {
-      tier: metadata[`${oppId}_RankTier`],
+      tier: parseInt(metadata[`${oppId}_RankTier`]) + 1,
       rank: metadata[`${oppId}_RankClass`],
-      percentile: metadata[`${oppId}_LeaderboardPercentile`],
-      leaderboardPlace: metadata[`${oppId}_LeaderboardPlacement`],
+      percentile: parseInt(metadata[`${oppId}_LeaderboardPercentile`]),
+      leaderboardPlace: parseInt(metadata[`${oppId}_LeaderboardPlacement`]),
       // commanderGrpIds: json.opponentCommanderGrpIds,
     };
     setOpponent(opponent);
 
-    // const player = {
-    //   commanderGrpIds: json.commanderGrpIds,
-    // };
-    // setPlayer(player);
+    const player = {
+      tier: parseInt(metadata[`${playerId}_RankTier`]) + 1,
+      rank: metadata[`${playerId}_RankClass`],
+      percentile: parseInt(metadata[`${playerId}_LeaderboardPercentile`]),
+      leaderboardPlace: parseInt(metadata[`${playerId}_LeaderboardPlacement`]),
+    };
+    setPlayer(player);
+
     setEventId(eventId);
 
     postChannelMessage({
@@ -127,29 +148,20 @@ export default function onLabelMatchGameRoomStateChangedEvent(
   // When the match ends (but not the last message)
   if (gameRoom.stateType == "MatchGameRoomStateType_MatchCompleted") {
     const { currentMatch } = globalStore;
-    const playerRank = globalStore.rank;
+    // const playerRank = globalStore.rank;
     const format =
       currentMatch.gameInfo.superFormat == "SuperFormat_Constructed"
         ? "constructed"
         : "limited";
 
-    let player = {
-      seat: currentMatch.playerSeat,
-      tier: playerRank.constructedLevel,
-      rank: playerRank.constructedClass,
-      percentile: playerRank.constructedPercentile,
-      leaderboardPlace: playerRank.constructedLeaderboardPlace,
-    };
+    const toAdd: Partial<CombinedRankInfo> = {};
+
     if (format == "limited") {
-      player = {
-        seat: currentMatch.playerSeat,
-        tier: playerRank.limitedLevel,
-        rank: playerRank.limitedClass,
-        percentile: playerRank.limitedPercentile,
-        leaderboardPlace: playerRank.limitedLeaderboardPlace,
-      };
+      toAdd.limitedClass = currentMatch.player.rank;
+    } else {
+      toAdd.constructedClass = currentMatch.player.rank;
     }
-    setPlayer(player);
+    upsertDbRank(toAdd);
 
     gameRoom.finalMatchResult.resultList.forEach((res) => {
       if (res.scope == "MatchScope_Match") {
@@ -157,26 +169,6 @@ export default function onLabelMatchGameRoomStateChangedEvent(
       }
     });
 
-    // clearDeck();
-    // globals.matchCompletedOnGameNumber = gameRoom.finalMatchResult.resultList.length - 1;
     saveMatch(`${gameRoom.finalMatchResult.matchId}`);
-  }
-  // Only update if needed
-  if (json.players) {
-    json.players.forEach((player) => {
-      const { currentMatch } = globalStore;
-      if (
-        player.userId == getLocalSetting("playerId") &&
-        currentMatch.playerSeat !== player.systemSeatId
-      ) {
-        setCurrentMatchMany({
-          playerSeat: player.systemSeatId,
-        });
-      } else if (currentMatch.oppSeat !== player.systemSeatId) {
-        setCurrentMatchMany({
-          oppSeat: player.systemSeatId,
-        });
-      }
-    });
   }
 }

@@ -55,10 +55,10 @@ export default async function setDbMatch(match: InternalMatch) {
     decksIndex[match.playerDeck.id] || 0
   }`;
 
-  const oldDeck = decks[match.playerDeck.id];
-
+  const oldDeck = decks[deckDbKey];
+  console.log("oldDeck", oldDeck);
   if (oldDeck) {
-    const newDeck: DbDeck = { ...oldDeck };
+    const newDeck: DbDeck = JSON.parse(JSON.stringify(oldDeck));
     if (!Object.keys(newDeck.matches).includes(match.id)) {
       newDeck.stats.gameWins += match.player.wins;
       newDeck.stats.gameLosses += match.opponent.wins;
