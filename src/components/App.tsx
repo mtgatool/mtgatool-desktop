@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 import { Switch, Route, useHistory } from "react-router-dom";
 
+import { ToolDbClient } from "tool-db";
+
 import Auth from "./Auth";
 import CardHover from "./CardHover";
 import ContentWrapper from "./ContentWrapper";
@@ -29,14 +31,22 @@ import isElectron from "../utils/electron/isElectron";
 import info from "../info.json";
 import overlayHandler from "../common/overlayHandler";
 import login from "../toolDb/login";
+import { DB_SERVER } from "../constants";
 
 function App() {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const { loginState, loading, backgroundGrpid, matchInProgress } = useSelector(
-    (state: AppState) => state.renderer
-  );
+  const { loginState, loading, backgroundGrpid, matchInProgress, peers } =
+    useSelector((state: AppState) => state.renderer);
+
+  useEffect(() => {
+    if (!window.toolDbInitialized) {
+      window.toolDb = new ToolDbClient(DB_SERVER);
+      window.toolDbInitialized = true;
+      window.toolDb.debug = true;
+    }
+  }, [peers]);
 
   useEffect(() => {
     if (overlayHandler) {

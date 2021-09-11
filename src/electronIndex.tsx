@@ -7,6 +7,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 
 import { Provider } from "react-redux";
 import { ToolDbClient } from "tool-db";
+
 import App from "./components/App";
 import Overlay from "./overlay";
 import Hover from "./hover";

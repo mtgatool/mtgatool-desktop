@@ -46,6 +46,8 @@ export default function createOverlay(
     webPreferences: {
       webSecurity: false,
       nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true,
     },
   });
 

@@ -9,41 +9,11 @@ const {
 } = require("electron");
 const path = require("path");
 const url = require("url");
-const dht = require("@hyperswarm/dht");
 
-const crypto = require("crypto");
 const mainIpcInitialize = require("./ipcHandlers");
 const openDevTools = require("./openDevTools");
 const mainGlobals = require("./mainGlobals");
 const installDevTools = require("./devtools");
-
-const sha256 = (d) => crypto.createHash("sha256").update(d).digest("hex");
-
-async function getPeers() {
-  const hyperPeers = [];
-  const node = dht({
-    ephemeral: true,
-  });
-
-  const bufferKey = Buffer.from(sha256("mtgatool-db-swarm"), "hex");
-
-  node
-    .lookup(bufferKey)
-    .on("data", (data) => {
-      data.peers.forEach((p) => {
-        if (!hyperPeers.includes(p.host)) {
-          hyperPeers.push(p.host);
-        }
-      });
-    })
-    .on("end", () => {
-      mainGlobals.backgroundWindow.webContents.send("peersFound", hyperPeers);
-      // unannounce it and shutdown
-      node.unannounce(bufferKey, { port: 4001 }, () => {
-        node.destroy();
-      });
-    });
-}
 
 let tray = null;
 
@@ -52,7 +22,6 @@ app.allowRendererProcessReuse = false;
 function sendInit() {
   console.log("Renderer Init signal");
   mainGlobals.backgroundWindow.webContents.send("rendererInit", true);
-  getPeers();
 }
 
 function showWindow() {
@@ -99,6 +68,8 @@ function createCardHoverWindow() {
     webPreferences: {
       webSecurity: false,
       nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true,
     },
   });
 
@@ -132,6 +103,8 @@ function createWindow() {
     title: "mtgatool-background",
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true,
     },
   });
 
@@ -162,6 +135,8 @@ function createWindow() {
     acceptFirstMouse: true,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true,
     },
   });
 

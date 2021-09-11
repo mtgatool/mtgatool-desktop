@@ -1,15 +1,15 @@
+import { useState, useEffect } from "react";
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-nested-ternary */
 import {
   compareCards,
-  constants,
+  // constants,
   DbCardData,
   Deck,
-  getDeckColorsAmmount,
-  getDeckLandsAmmount,
+  // getDeckColorsAmmount,
+  // getDeckLandsAmmount,
 } from "mtgatool-shared";
-import { useState, useEffect } from "react";
-import ReactSvgPieChart from "react-svg-piechart";
+// import ReactSvgPieChart from "react-svg-piechart";
 import { useHistory, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import copyToClipboard from "../../../utils/copyToClipboard";
@@ -35,7 +35,7 @@ import { AppState } from "../../../redux/stores/rendererStore";
 import DeckList from "../../DeckList";
 import reduxAction from "../../../redux/reduxAction";
 
-const { MANA_COLORS } = constants;
+// const { MANA_COLORS } = constants;
 
 const VIEW_VISUAL = 0;
 const VIEW_REGULAR = 1;
@@ -89,22 +89,22 @@ export default function DeckView(): JSX.Element {
     copyToClipboard(list);
   };
 
-  const colorCounts = getDeckColorsAmmount(deck);
-  const colorsPie = [
-    { title: "White", value: colorCounts.w, color: MANA_COLORS[0] },
-    { title: "Blue", value: colorCounts.u, color: MANA_COLORS[1] },
-    { title: "Black", value: colorCounts.b, color: MANA_COLORS[2] },
-    { title: "Red", value: colorCounts.r, color: MANA_COLORS[3] },
-    { title: "Green", value: colorCounts.g, color: MANA_COLORS[4] },
-  ];
-  const landCounts = getDeckLandsAmmount(deck);
-  const landsPie = [
-    { title: "White", value: landCounts.w, color: MANA_COLORS[0] },
-    { title: "Blue", value: landCounts.u, color: MANA_COLORS[1] },
-    { title: "Black", value: landCounts.b, color: MANA_COLORS[2] },
-    { title: "Red", value: landCounts.r, color: MANA_COLORS[3] },
-    { title: "Green", value: landCounts.g, color: MANA_COLORS[4] },
-  ];
+  // const colorCounts = getDeckColorsAmmount(deck);
+  // const colorsPie = [
+  //   { title: "White", value: colorCounts.w, color: MANA_COLORS[0] },
+  //   { title: "Blue", value: colorCounts.u, color: MANA_COLORS[1] },
+  //   { title: "Black", value: colorCounts.b, color: MANA_COLORS[2] },
+  //   { title: "Red", value: colorCounts.r, color: MANA_COLORS[3] },
+  //   { title: "Green", value: colorCounts.g, color: MANA_COLORS[4] },
+  // ];
+  // const landCounts = getDeckLandsAmmount(deck);
+  // const landsPie = [
+  //   { title: "White", value: landCounts.w, color: MANA_COLORS[0] },
+  //   { title: "Blue", value: landCounts.u, color: MANA_COLORS[1] },
+  //   { title: "Black", value: landCounts.b, color: MANA_COLORS[2] },
+  //   { title: "Red", value: landCounts.r, color: MANA_COLORS[3] },
+  //   { title: "Green", value: landCounts.g, color: MANA_COLORS[4] },
+  // ];
 
   const wildcardsCost = getDeckRaritiesCount(deck);
 
@@ -209,11 +209,11 @@ export default function DeckView(): JSX.Element {
               <div className="pie-container-outer">
                 <div className="pie-container">
                   <span>Mana Symbols</span>
-                  <ReactSvgPieChart strokeWidth={0} data={colorsPie} />
+                  {/* <ReactSvgPieChart strokeWidth={0} data={colorsPie} /> */}
                 </div>
                 <div className="pie-container">
                   <span>Mana Sources</span>
-                  <ReactSvgPieChart strokeWidth={0} data={landsPie} />
+                  {/* <ReactSvgPieChart strokeWidth={0} data={landsPie} /> */}
                 </div>
               </div>
             </Section>

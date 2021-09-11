@@ -123,7 +123,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
     const metadata = (gameRoom.gameRoomConfig as any).clientMetadata;
 
     const opponent = {
-      tier: parseInt(metadata[`${oppId}_RankTier`]) + 1,
+      tier: parseInt(metadata[`${oppId}_RankTier`]),
       rank: metadata[`${oppId}_RankClass`],
       percentile: parseInt(metadata[`${oppId}_LeaderboardPercentile`]),
       leaderboardPlace: parseInt(metadata[`${oppId}_LeaderboardPlacement`]),
@@ -132,7 +132,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
     setOpponent(opponent);
 
     const player = {
-      tier: parseInt(metadata[`${playerId}_RankTier`]) + 1,
+      tier: parseInt(metadata[`${playerId}_RankTier`]),
       rank: metadata[`${playerId}_RankClass`],
       percentile: parseInt(metadata[`${playerId}_LeaderboardPercentile`]),
       leaderboardPlace: parseInt(metadata[`${playerId}_LeaderboardPlacement`]),
