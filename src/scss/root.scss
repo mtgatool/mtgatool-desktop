@@ -45,6 +45,7 @@
   --color-text-disabled: #505050;
   --color-text-link: #AABEDF;
 
+  --color-link: #B1B1E6;
   --color-text-button: #333333;
   --color-button: #AABEDF;
   --color-button-hover: #8AA5D1;
@@ -80,6 +81,33 @@ html {
   display: flex;
   height: calc(100% - 65px);
   z-index: 5;
+}
+
+a {
+  cursor: pointer;
+  color: var(--color-link);
+  margin: 0;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+h1 {
+  color: var(--color-g);
+  font-size: 30px;
+  font-family: var(--sub-font-name-it);
+  font-weight: 100;
+  margin: 0;
+  padding: 0;
+}
+
+p {
+  margin: 0;
+  padding: 0;
+  font-family: var(--main-font-name-it);
+  color: var(--color-text);
 }
 
 body {

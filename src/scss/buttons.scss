@@ -92,26 +92,49 @@
   width: 200px;
   height: 30px;
   line-height: 30px;
-  border-radius: 2px;
+  border-radius: 3px;
   color: var(--color-text-button);
   font-size: 16px;
   text-align: center;
   margin: auto 4px;
-  border: 1px solid var(--color-dark);
   background-color: var(--color-button);
-  font-family: var(--main-font-name);
+  font-family: var(--main-font-name-it);
   transform: translateY(0);
   -webkit-transition: all .2s ease-in-out;
 
   &:active {
-    border: 1px solid var(--color-dark-hover);
     background-color: var(--color-button);
   }
   
   &:hover {
-    border: 1px solid var(--color-dark-hover);
     color: var(--color-text-hover);
     background-color: var(--color-button-hover);
+  }
+}
+
+.button-simple-dark {
+  align-self: center;
+  cursor: pointer;
+  width: 200px;
+  height: 30px;
+  line-height: 30px;
+  border-radius: 3px;
+  color: var(--color-text);
+  font-size: 16px;
+  text-align: center;
+  margin: auto 4px;
+  background-color: var(--color-text-button);
+  font-family: var(--main-font-name-it);
+  transform: translateY(0);
+  -webkit-transition: all .2s ease-in-out;
+
+  &:active {
+    background-color: var(--color-text-dark);
+  }
+  
+  &:hover {
+    color: var(--color-text-hover);
+    background-color: var(--color-section);
   }
 }
 
@@ -121,12 +144,11 @@
   width: 200px;
   height: 30px;
   line-height: 30px;
-  border-radius: 2px;
+  border-radius: 3px;
   color: var(--color-text-disabled);
   font-size: 16px;
   text-align: center;
   margin: auto 4px;
-  border: 1px solid var(--color-dark);
   background-color: var(--color-button);
   font-family: var(--main-font-name);
   transform: translateY(0);

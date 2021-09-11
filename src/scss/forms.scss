@@ -89,6 +89,16 @@
   padding: 3.5em 0em 2em 0em;
   border-radius: 3px;
   box-shadow: 0px 2px 7px 4px rgba(0, 0, 0, 0.3);
+  position: relative;
+
+  .page-indicator {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 14px;
+    color: #808080;
+    font-family: var(--main-font-name-it);
+  }
 }
 
 .form-button {
@@ -140,4 +150,33 @@
   height: 32px;
   margin: 0px auto;
   -webkit-transition: all 0.3s ease-in;
+}
+
+.welcome-page {
+  width: calc(100% - 48px);
+  height: 100%;
+  margin: auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+
+  .buttons-flex {
+    width: 100%;
+    max-width: calc(100% - 240px);
+    display: flex;
+    margin: auto auto 0 auto;
+    justify-content: space-between;
+
+    div {
+      line-height: 36px;
+    }
+  }
+
+  h1 {
+    margin: 8px 0;
+  }
+
+  p {
+    margin: 8px 0;
+  }
 }

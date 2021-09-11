@@ -32,6 +32,7 @@ import info from "../info.json";
 import overlayHandler from "../common/overlayHandler";
 import login from "../toolDb/login";
 import { DB_SERVER } from "../constants";
+import Welcome from "./Welcome";
 
 function App() {
   const history = useHistory();
@@ -55,7 +56,10 @@ function App() {
   }, [matchInProgress]);
 
   useEffect(() => {
-    if (!electron) {
+    const welcome = getLocalSetting("welcome");
+    if (!welcome || welcome === "false") {
+      history.push("/welcome");
+    } else if (!electron) {
       const pwd = getLocalSetting("savedPassword");
       const user = getLocalSetting("username");
 
@@ -130,6 +134,7 @@ function App() {
         )}
         <ErrorBoundary>
           <Switch>
+            <Route exact path="/welcome" component={Welcome} />
             <Route exact path="/auth" component={Auth} />
             <Route path="/:page">
               <>
