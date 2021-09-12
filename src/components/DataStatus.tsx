@@ -29,9 +29,8 @@ export default function DataStatus() {
   const openAltRef = useRef<() => void>(vodiFn);
   const positionRef = useRef<HTMLDivElement>(null);
 
-  const { cards, uuidData, matches, decks } = useSelector(
-    (state: AppState) => state.mainData
-  );
+  const { cards, uuidData, matchesIndex, decksIndex, currentUUID } =
+    useSelector((state: AppState) => state.mainData);
 
   return (
     <>
@@ -47,12 +46,12 @@ export default function DataStatus() {
       >
         <div className="data-status-container">
           <StatusLine
-            title={`Matches (${Object.keys(matches).length})`}
-            status={Object.keys(matches).length > 0 ? "OK" : "LOADING"}
+            title={`Matches (${matchesIndex.length})`}
+            status={matchesIndex.length > 0 ? "OK" : "LOADING"}
           />
           <StatusLine
-            title={`Decks (${Object.keys(decks).length})`}
-            status={Object.keys(decks).length > 0 ? "OK" : "LOADING"}
+            title={`Decks (${Object.keys(decksIndex).length})`}
+            status={Object.keys(decksIndex).length > 0 ? "OK" : "LOADING"}
           />
           <StatusLine
             title={`Cards database (${Object.keys(database.cards).length})`}
@@ -65,7 +64,10 @@ export default function DataStatus() {
           <StatusLine
             title="User data"
             status={
-              uuidData.WildCardCommons && uuidData.Gems ? "OK" : "LOADING"
+              uuidData[currentUUID]?.inventory.WildCardCommons !== undefined &&
+              uuidData[currentUUID]?.inventory.Gems !== undefined
+                ? "OK"
+                : "LOADING"
             }
           />
         </div>
