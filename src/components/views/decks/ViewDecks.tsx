@@ -12,13 +12,11 @@ export default function ViewDecks() {
   const { url } = useRouteMatch();
   const [, loggedIn] = useDbUser();
 
-  const { decksIndex, decks } = useSelector(
-    (state: AppState) => state.mainData
-  );
+  const { decksIndex } = useSelector((state: AppState) => state.mainData);
 
   return (
     <>
-      {loggedIn && decksIndex && decks ? (
+      {loggedIn && decksIndex ? (
         <Switch>
           <Route exact path={`${url}/:id`} component={DeckView} />
           <Route exact path={`${url}/`} component={DecksList} />

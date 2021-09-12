@@ -14,7 +14,7 @@ import ListItemMatch from "./ListItemMatch";
 
 export default function HistoryList() {
   const history = useHistory();
-  const matches = useSelector((state: AppState) => state.mainData.matches);
+  const { matchesIndex } = useSelector((state: AppState) => state.mainData);
 
   const [filters] = useState<Filters<MatchData>>([]);
 
@@ -25,11 +25,11 @@ export default function HistoryList() {
 
   const filteredData = useMemo(() => {
     if (filters) {
-      const matchesForFiltering = getMatchesData(Object.values(matches));
+      const matchesForFiltering = getMatchesData(matchesIndex);
       return doHistoryFilter(matchesForFiltering, filters, sortValue);
     }
     return [];
-  }, [matches, filters, sortValue]);
+  }, [matchesIndex, filters, sortValue]);
 
   const pagingControlProps = usePagingControls(filteredData.length, 25);
 

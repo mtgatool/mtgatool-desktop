@@ -17,11 +17,13 @@ export default function getBoosterCountEstimate(
 
   if (!mainData?.uuidData) return 0;
 
+  const uuid = mainData.currentUUID;
+
   const ownedWildcards = {
-    common: mainData.uuidData.WildCardCommons,
-    uncommon: mainData.uuidData.WildCardUnCommons,
-    rare: mainData.uuidData.WildCardRares,
-    mythic: mainData.uuidData.WildCardRares,
+    common: mainData.uuidData[uuid].inventory.WildCardCommons,
+    uncommon: mainData.uuidData[uuid].inventory.WildCardUnCommons,
+    rare: mainData.uuidData[uuid].inventory.WildCardRares,
+    mythic: mainData.uuidData[uuid].inventory.WildCardRares,
   };
 
   CARD_RARITIES.forEach((rarity) => {

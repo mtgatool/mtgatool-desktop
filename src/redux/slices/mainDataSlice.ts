@@ -1,14 +1,21 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Cards } from "mtgatool-shared";
-import { DbDeck, DbMatch, DbUUIDData } from "../../types/dbTypes";
+import {
+  DbDeck,
+  DbMatch,
+  DbUUIDData,
+  defaultUUIDData,
+} from "../../types/dbTypes";
 
 const mainState = {
   cards: {} as Cards,
   cardsNew: {} as Cards,
   cardsPrev: {} as Cards,
   currentUUID: "",
-  uuidData: {} as DbUUIDData,
+  uuidData: {
+    "": defaultUUIDData,
+  } as Record<string, DbUUIDData>,
   matchesIndex: [] as string[],
   matches: {} as Record<string, DbMatch>,
   decksIndex: {} as Record<string, number>,
@@ -26,11 +33,14 @@ const mainDataSlice = createSlice({
     },
     setUUIDData: (
       state: PlayerData,
-      action: PayloadAction<DbUUIDData>
+      action: PayloadAction<{ data: DbUUIDData; uuid: string }>
     ): void => {
       state.uuidData = {
         ...state.uuidData,
-        ...action.payload,
+        [action.payload.uuid]: {
+          ...(state.uuidData[action.payload.uuid] || {}),
+          ...action.payload.data,
+        },
       };
     },
     setCards: (state: PlayerData, action: PayloadAction<Cards>): void => {

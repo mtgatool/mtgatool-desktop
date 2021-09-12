@@ -36,13 +36,20 @@ export default function DecksList() {
     sort: -1,
   });
 
-  const { decksIndex, decks } = useSelector(
-    (state: AppState) => state.mainData
-  );
+  const { decksIndex } = useSelector((state: AppState) => state.mainData);
 
   const filteredData = useMemo(() => {
-    const decksForFiltering = Object.keys(decksIndex)
-      .map((key) => decks[`${key}-v${decksIndex[key]}`])
+    const gunDB = JSON.parse(localStorage.getItem("gun/") || "{}");
+    const pubkey = window.toolDb.user?.pubKey || "";
+
+    const allDecksArray = Object.keys(decksIndex)
+      .map((id) => `${id}-v${decksIndex[id]}`)
+      .map((id) => {
+        const record = gunDB[`:${pubkey}.decks-${id}`];
+        return JSON.parse(record.v).value;
+      });
+
+    const decksForFiltering = allDecksArray
       .filter((d) => d)
       .map((d) => {
         return {
@@ -52,7 +59,7 @@ export default function DecksList() {
         };
       });
     return doDecksFilter(decksForFiltering, filters, sortValue);
-  }, [decksIndex, decks, filters, sortValue]);
+  }, [decksIndex, filters, sortValue]);
 
   const pagingControlProps = usePagingControls(filteredData.length, 25);
 

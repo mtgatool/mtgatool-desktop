@@ -24,11 +24,13 @@ export default function CraftingCost(props: CraftingCostProps): JSX.Element {
 
   if (!mainData?.uuidData) return <></>;
 
+  const uuid = mainData.currentUUID;
+
   const ownedWildcards: IndexableObject = {
-    common: mainData.uuidData.WildCardCommons,
-    uncommon: mainData.uuidData.WildCardUnCommons,
-    rare: mainData.uuidData.WildCardRares,
-    mythic: mainData.uuidData.WildCardMythics,
+    common: mainData.uuidData[uuid].inventory.WildCardCommons,
+    uncommon: mainData.uuidData[uuid].inventory.WildCardUnCommons,
+    rare: mainData.uuidData[uuid].inventory.WildCardRares,
+    mythic: mainData.uuidData[uuid].inventory.WildCardMythics,
   };
 
   // Another deck.getSave() conversion here..

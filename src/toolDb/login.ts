@@ -2,62 +2,93 @@ import reduxAction from "../redux/reduxAction";
 import { setCards } from "../redux/slices/mainDataSlice";
 import store from "../redux/stores/rendererStore";
 import { DbUUIDData } from "../types/dbTypes";
-import getLocalSetting from "../utils/getLocalSetting";
 
 export function afterLogin() {
   const { dispatch } = store;
-  window.toolDb
-    .getData("matchesIndex", true)
-    .then((data) => {
-      reduxAction(dispatch, {
-        type: "SET_MATCHES_INDEX",
-        arg: data,
-      });
+  const pubKey = window.toolDb.user?.pubKey || "";
+  // window.toolDb.addKeyListener(`:${pubKey}.matches-`, (data) => {
+  //   if (data) {
+  //     reduxAction(dispatch, {
+  //       type: "SET_MATCH",
+  //       arg: data,
+  //     });
+  //   }
+  // });
 
-      data.forEach((id: string) => {
-        window.toolDb.getData(`matches-${id}`, true).then((match) => {
-          console.log(`matches-${id}`, match);
-          reduxAction(dispatch, {
-            type: "SET_MATCH",
-            arg: match,
-          });
-        });
-      });
-      console.log("matchesIndex", data);
-    })
-    .catch(console.warn);
+  // window.toolDb.addKeyListener(`:${pubKey}.decks-`, (data) => {
+  //   if (data) {
+  //     reduxAction(dispatch, {
+  //       type: "SET_DECK",
+  //       arg: data,
+  //     });
+  //   }
+  // });
 
-  window.toolDb
-    .getData("decksIndex", true)
-    .then((data) => {
-      reduxAction(dispatch, {
-        type: "SET_DECKS_INDEX",
-        arg: data,
-      });
-
-      Object.keys(data).forEach((id: string) => {
-        window.toolDb.getData(`decks-${id}-v${data[id]}`, true).then((deck) => {
-          console.log(`decks-${id}-v${data[id]}`, deck);
-          reduxAction(dispatch, {
-            type: "SET_DECK",
-            arg: deck,
-          });
-        });
-      });
-      console.log("decksIndex", data);
-    })
-    .catch(console.warn);
-
-  window.toolDb
-    .getData<DbUUIDData>(`${getLocalSetting("playerId")}-data`, true)
-    .then((data) => {
-      console.log("player data", data);
-      if (data) {
-        reduxAction(dispatch, {
-          type: "SET_UUID_DATA",
-          arg: data,
-        });
+  window.toolDb.addKeyListener(`:${pubKey}.matchesIndex`, (data) => {
+    data.forEach((id: string) => {
+      if (!store.getState().mainData.matchesIndex.includes(id)) {
+        window.toolDb.getData(`matches-${id}`, true, 5000);
       }
+    });
+
+    reduxAction(dispatch, {
+      type: "SET_MATCHES_INDEX",
+      arg: data,
+    });
+
+    console.log("matchesIndex", data);
+  });
+
+  window.toolDb.addKeyListener(`:${pubKey}.decksIndex`, (data) => {
+    Object.keys(data).forEach((id: string) => {
+      if (
+        !Object.keys(store.getState().mainData.decksIndex).includes(
+          `${id}-v${data[id]}`
+        )
+      ) {
+        window.toolDb.getData(`decks-${id}-v${data[id]}`, true, 5000);
+      }
+    });
+
+    reduxAction(dispatch, {
+      type: "SET_DECKS_INDEX",
+      arg: data,
+    });
+    console.log("decksIndex", data);
+  });
+
+  window.toolDb.getData("matchesIndex", true, 5000).catch(console.warn);
+
+  window.toolDb.getData("decksIndex", true, 5000).catch(console.warn);
+
+  window.toolDb
+    .getData("userids", true, 5000)
+    .then((data) => {
+      console.log("Userids", data);
+      let newest = "";
+      let newestDate = 0;
+      Object.keys(data).forEach((uuid) => {
+        if (data[uuid] > newestDate) {
+          newestDate = data[uuid];
+          newest = uuid;
+        }
+        window.toolDb
+          .getData<DbUUIDData>(`${uuid}-data`, true, 5000)
+          .then((uuidData) => {
+            if (uuidData) {
+              reduxAction(dispatch, {
+                type: "SET_UUID_DATA",
+                arg: { data: uuidData, uuid },
+              });
+            }
+          })
+          .catch(console.warn);
+
+        reduxAction(dispatch, {
+          type: "SET_UUID",
+          arg: newest,
+        });
+      });
     })
     .catch(console.warn);
 

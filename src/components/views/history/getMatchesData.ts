@@ -19,7 +19,14 @@ export interface MatchData {
   rank: number;
 }
 
-export default function getMatchesData(matches: DbMatch[]): MatchData[] {
+export default function getMatchesData(matchesIds: string[]): MatchData[] {
+  const gunDB = JSON.parse(localStorage.getItem("gun/") || "{}");
+  const pubkey = window.toolDb.user?.pubKey || "";
+  const matches: DbMatch[] = matchesIds
+    .map((id) => gunDB[`:${pubkey}.matches-${id}`])
+    .filter((m) => m)
+    .map((m) => JSON.parse(m.v).value);
+
   return matches.map((match) => {
     const { internalMatch } = match;
     return {
