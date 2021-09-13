@@ -12,3 +12,15 @@
 .flex-item {
   display: flex;
 }
+
+.wip-sign {
+  background-image: url("../assets/images/work.jpg");
+  width: 400px;
+  height: 292px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 16px auto;
+  border-radius: 10px;
+  overflow: hidden;
+}

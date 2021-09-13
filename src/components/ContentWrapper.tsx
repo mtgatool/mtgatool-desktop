@@ -7,6 +7,7 @@ import PopupComponent from "./PopupComponent";
 import PassphraseGenerate from "./PassphraseGenerate";
 import vodiFn from "../utils/voidfn";
 
+import ViewWip from "./views/wip/ViewWip";
 import ViewHome from "./views/home/ViewHome";
 import ViewDecks from "./views/decks/ViewDecks";
 import ViewHistory from "./views/history/ViewHistory";
@@ -19,11 +20,9 @@ const views = {
   home: ViewHome,
   decks: ViewDecks,
   history: ViewHistory,
-  timeline: ViewHome,
-  events: ViewHome,
-  explore: ViewHome,
-  cards: ViewHome,
-  economy: ViewHome,
+  timeline: ViewWip,
+  drafts: ViewWip,
+  explore: ViewWip,
   collection: ViewCollection,
 };
 

@@ -199,29 +199,17 @@ export default function TopNav(props: TopNavProps): JSX.Element {
     icon: "icon-timeline",
     title: "TIMELINE",
   };
-  const eventsTab = {
+  const draftsTab = {
     ...defaultTab,
-    uri: "events",
-    icon: "icon-events",
-    title: "EVENTS",
+    uri: "drafts",
+    icon: "icon-drafts",
+    title: "DRAFTS",
   };
   const exploreTab = {
     ...defaultTab,
     uri: "explore",
     icon: "icon-explore",
     title: "EXPLORE",
-  };
-  const cardsTab = {
-    ...defaultTab,
-    uri: "cards",
-    icon: "icon-collection",
-    title: "CARDS",
-  };
-  const economyTab = {
-    ...defaultTab,
-    uri: "economy",
-    icon: "icon-economy",
-    title: "ECONOMY",
   };
   const collectionTab = {
     ...defaultTab,
@@ -262,10 +250,8 @@ export default function TopNav(props: TopNavProps): JSX.Element {
         <TopNavItem {...myDecksTab} />
         <TopNavItem {...historyTab} />
         <TopNavItem {...timelineTab} />
-        <TopNavItem {...eventsTab} />
+        <TopNavItem {...draftsTab} />
         <TopNavItem {...exploreTab} />
-        <TopNavItem {...cardsTab} />
-        <TopNavItem {...economyTab} />
         <TopNavItem {...collectionTab} />
       </div>
       <div className="info">
