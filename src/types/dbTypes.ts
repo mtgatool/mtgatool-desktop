@@ -5,7 +5,8 @@ import {
   InternalDeck,
   InternalMatch,
 } from "mtgatool-shared";
-import { ToolDbClient } from "../../../tool-chain/dist";
+import ToolDbClient from "tool-db/dist/toolDbClient";
+
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { InventoryInfo } from "../background/onLabel/InStartHook";
 import { OverlayHandler } from "../common/overlayHandler";
