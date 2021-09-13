@@ -1,46 +1,53 @@
-# Getting Started with Create React App
+[![Build Status](https://travis-ci.org/mtgatool/mtgatool-desktop.svg?branch=master)](https://travis-ci.org/mtgatool/mtgatool-desktop)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<p align="center">
+  <img width="200" height="200" src="https://github.com/Manuel-777/MTG-Arena-Tool-Metadata/raw/master/icon.png"><br>
+  <b><h1>MTG Arena Tool</h1></b>
+</p>
 
-## Available Scripts
+MTG Arena Tool is a collection browser, a deck tracker and a statistics manager. Explore which decks you played against and what other players are brewing. MTG Arena Tool is all about improving your Magic Arena experience.
 
-In the project directory, you can run:
+***THIS IS PRELIMINARY, NOT FULLY TESTED version 6***.
 
-### `yarn start`
+Things are still unfinished, bugs will probably happen. Use at your own risk.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Run from source
+Before running you will need to install some packages globally;
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```npm install -g foreman @craco/craco```
 
-### `yarn test`
+Once installed you can proceed installing the app's packages;
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```npm install```
 
-### `yarn build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+To run the desktop app in development mode (with hot module reloading enabled)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```npm start```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+To do the same, but for the web use:
 
-### `yarn eject`
+```npm start:web```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+You can use the app in localhost:3006 (we use this port to avoid conflicts with the electron version at port 3000)
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Build is rather straightforward for both web and desktop;
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```npm run build```
 
-## Learn More
+```npm run build:web```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## License
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+[GPLv3](./LICENSE.md)
+
+## Contact
+You can find me at any of these;
+
+[Twitter](https://twitter.com/MEtchegaray7)
+
+[Discord](https://discord.gg/K9bPkJy)
+
+[mtgatool@gmail.com](mailto:mtgatool@gmail.com)
