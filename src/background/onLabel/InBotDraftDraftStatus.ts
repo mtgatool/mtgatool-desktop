@@ -2,7 +2,7 @@
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import LogEntry from "../../types/logDecoder";
 import globalStore from "../store";
-import { setDraftPack } from "../store/currentDraftStore";
+import { setDraftData, setDraftPack } from "../store/currentDraftStore";
 
 interface Entry extends LogEntry {
   json: {
@@ -16,13 +16,21 @@ interface Entry extends LogEntry {
   };
 }
 
-export default function onLabelInDraftMakePick(entry: Entry): void {
+export default function InBotDraftDraftStatus(entry: Entry): void {
   const { json } = entry;
+  // debugLog("LABEL:  Draft status ", json);
   if (!json) return;
 
-  const cards = (json.DraftPack || []).map((n) => parseInt(n));
   const pack = json.PackNumber;
   const pick = json.PickNumber;
-  setDraftPack(cards, pack, pick);
+  const currentPack = (json.DraftPack || []).slice(0).map((n) => parseInt(n));
+
+  setDraftPack(currentPack, pack, pick);
+
+  const course = globalStore.currentCourses[json.EventName];
+  if (course && course.CourseId && course.CourseId !== "") {
+    setDraftData({ id: course.CourseId });
+  }
+
   postChannelMessage({ type: "DRAFT_STATUS", value: globalStore.currentDraft });
 }

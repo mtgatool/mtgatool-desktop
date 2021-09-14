@@ -6,6 +6,7 @@ import AboutSettingsPanel from "./AboutSettingsPanel";
 import OverlaySettingsPanel from "./OverlaySettingsPanel";
 import VisualSettingsPanel from "./VisualSettingsPanel";
 import ShortcutsSettingsPanel from "./ShortcutsSettingsPanel";
+import AccountSettingsPanel from "./AccountSettingsPanel";
 
 const SETTINGS_BEHAVIOUR = 10;
 const SETTINGS_ARENA_DATA = 11;
@@ -14,10 +15,15 @@ const SETTINGS_VISUAL = 13;
 const SETTINGS_SHORTCUTS = 14;
 const SETTINGS_PRIVACY = 15;
 const SETTINGS_ABOUT = 16;
+const SETTINGS_ACCOUNT = 17;
+
+export interface SettingsPanelProps {
+  doClose: () => void;
+}
 
 interface SettingsNavProps {
   // eslint-disable-next-line react/no-unused-prop-types
-  component: (() => JSX.Element) | typeof Fragment;
+  component: ((props: SettingsPanelProps) => JSX.Element) | typeof Fragment;
   id: number;
   title: string;
   currentTab: number;
@@ -46,7 +52,7 @@ interface ViewSettingsProps {
 
 export default function ViewSettings(props: ViewSettingsProps) {
   const { onClose } = props;
-  const [currentTab, setCurrentTab] = useState(SETTINGS_BEHAVIOUR);
+  const [currentTab, setCurrentTab] = useState(SETTINGS_ACCOUNT);
 
   const defaultTab = {
     currentTab: currentTab,
@@ -97,6 +103,13 @@ export default function ViewSettings(props: ViewSettingsProps) {
     title: "About",
   };
 
+  tabs[SETTINGS_ACCOUNT] = {
+    ...defaultTab,
+    id: SETTINGS_ACCOUNT,
+    component: AccountSettingsPanel,
+    title: "My Account",
+  };
+
   const CurrentSettings = tabs[currentTab].component;
 
   return (
@@ -109,6 +122,7 @@ export default function ViewSettings(props: ViewSettingsProps) {
           <div
             style={{ marginTop: "16px", marginLeft: "auto", maxWidth: "200px" }}
           >
+            <SettingsNav {...tabs[SETTINGS_ACCOUNT]} />
             {isElectron() && <SettingsNav {...tabs[SETTINGS_BEHAVIOUR]} />}
             <SettingsNav {...tabs[SETTINGS_ARENA_DATA]} />
             {isElectron() && <SettingsNav {...tabs[SETTINGS_OVERLAY]} />}
@@ -121,7 +135,7 @@ export default function ViewSettings(props: ViewSettingsProps) {
         <div className="settings-right">
           <div className="settings-page">
             <div className="settings-title">{tabs[currentTab].title}</div>
-            <CurrentSettings />
+            <CurrentSettings doClose={onClose} />
           </div>
         </div>
       </div>

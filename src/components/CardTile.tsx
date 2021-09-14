@@ -74,23 +74,23 @@ interface CardTileQuantityBase {
   type: CardTileQuantityTypes;
 }
 
-interface QuantityOdds extends CardTileQuantityBase {
+export interface QuantityOdds extends CardTileQuantityBase {
   type: "ODDS";
   quantity: number;
   odds: string;
 }
 
-interface QuantityNumber extends CardTileQuantityBase {
+export interface QuantityNumber extends CardTileQuantityBase {
   type: "NUMBER";
   quantity: number;
 }
 
-interface QuantityRank extends CardTileQuantityBase {
+export interface QuantityRank extends CardTileQuantityBase {
   type: "RANK";
   quantity: string;
 }
 
-interface QuantityText extends CardTileQuantityBase {
+export interface QuantityText extends CardTileQuantityBase {
   type: "TEXT";
   quantity: string;
 }

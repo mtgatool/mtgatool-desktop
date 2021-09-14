@@ -4,7 +4,7 @@
 /* eslint-disable react/no-array-index-key */
 import { Fragment, useState, useCallback, useEffect } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
 import {
   CardsList,
@@ -36,7 +36,7 @@ import { getCardArtCrop } from "../../../utils/getCardArtCrop";
 import CardList from "../../CardList";
 import { toMMSS } from "../../../utils/dateTo";
 import ActionLog from "../../ActionLog";
-import { AppState } from "../../../redux/stores/rendererStore";
+import { DbMatch } from "../../../types/dbTypes";
 
 interface GameStatsProps {
   game: MatchGameStats;
@@ -111,10 +111,14 @@ export default function MatchView(): JSX.Element {
   const history = useHistory();
   const dispatch = useDispatch();
   const params = useParams<{ page: string; id: string }>();
-  const { matches } = useSelector((state: AppState) => state.mainData);
 
-  const DbMatch = matches[params.id];
-  const { internalMatch } = DbMatch;
+  const gunDB = JSON.parse(localStorage.getItem("gun/") || "{}");
+  const pubkey = window.toolDb.user?.pubKey || "";
+
+  const matchData = JSON.parse(gunDB[`:${pubkey}.matches-${params.id}`].v)
+    .value as DbMatch;
+  console.log(matchData);
+  const { internalMatch } = matchData;
 
   const [view, setView] = useState(VIEW_MATCH);
   const [gameSeen, setGameSeen] = useState(0);

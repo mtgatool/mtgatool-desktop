@@ -8,6 +8,12 @@ interface Entry extends LogEntry {
 export default function onClientSceneChange(entry: Entry): void {
   const { json } = entry;
 
+  if (json.fromSceneName === "Draft") {
+    postChannelMessage({
+      type: "DRAFT_END",
+    });
+  }
+
   postChannelMessage({
     type: "SET_SCENE",
     value: json,

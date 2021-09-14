@@ -31,6 +31,7 @@ export const actions = {
   SET_WEEKLY_ENDS: RendererSlice.setRewardsWeeklyEnds,
   SET_COLLECTION_QUERY: RendererSlice.setCollectionQuery,
   SET_MATCH_IN_PROGRESS: RendererSlice.setMatchInProgress,
+  SET_DRAFT_IN_PROGRESS: RendererSlice.setDraftInProgress,
   SET_SCENE: RendererSlice.setScene,
   SET_SETTINGS: SettingsSlice.setSettings,
   SET_OVERLAY_SETTINGS: SettingsSlice.setOverlaySettings,

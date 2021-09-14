@@ -17,7 +17,8 @@ export { default as InProgressionGetPlayerProgress } from "./InProgressionGetPla
 export { default as InEventDeckSubmitV3 } from "./InEventDeckSubmitV3";
 export { default as OutEventAIPractice } from "./OutEventAIPractice";
 export { default as OutDirectGameChallenge } from "./OutDirectGameChallenge";
-export { default as InDraftDraftStatus } from "./InDraftDraftStatus";
+export { default as InBotDraftDraftStatus } from "./InBotDraftDraftStatus";
+export { default as outBotDraftDraftStatus } from "./outBotDraftDraftStatus";
 export { default as InDraftMakePick } from "./InDraftMakePick";
 export { default as OutDraftMakePick } from "./OutDraftMakePick";
 export { default as InEventCompleteDraft } from "./InEventCompleteDraft";

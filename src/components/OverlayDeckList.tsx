@@ -12,71 +12,18 @@ import {
 } from "mtgatool-shared";
 import { OverlaySettings } from "../common/defaultConfig";
 
-import getCardTypeSort from "../utils/getCardTypeSort";
 import CardTile, { LandsTile, CardTileQuantity } from "./CardTile";
 
 import DeckManaCurve from "./DeckManaCurve";
 import DeckTypesStats from "./DeckTypesStats";
-import OwnershipStars from "./OwnershipStars";
 import SampleSizePanel from "./SampleSizePanel";
 
-const {
-  DRAFT_RANKS,
-  DRAFT_RANKS_LOLA,
-  OVERLAY_DRAFT,
-  OVERLAY_FULL,
-  OVERLAY_LEFT,
-  OVERLAY_MIXED,
-  OVERLAY_ODDS,
-  LANDS_HACK,
-} = constants;
-
-function getRank(cardId: number): number {
-  const cardObj = database.card(cardId);
-  return cardObj?.rank || 0;
-}
+const { OVERLAY_FULL, OVERLAY_LEFT, OVERLAY_MIXED, OVERLAY_ODDS, LANDS_HACK } =
+  constants;
 
 function _compareQuantity(a: CardObject, b: CardObject): -1 | 0 | 1 {
   if (b.quantity - a.quantity < 0) return -1;
   if (b.quantity - a.quantity > 0) return 1;
-  return 0;
-}
-
-function compareDraftPicks(a: CardObject, b: CardObject): -1 | 0 | 1 {
-  const aCard = database.card(a.id);
-  const bCard = database.card(b.id);
-  if (bCard === undefined) {
-    return -1;
-  }
-  if (aCard === undefined) {
-    return 1;
-  }
-  const aColors = new Colors();
-  if (aCard.cost) {
-    aColors.addFromCost(aCard.cost);
-  }
-  const bColors = new Colors();
-  if (bCard.cost) {
-    bColors.addFromCost(bCard.cost);
-  }
-  const aType = getCardTypeSort(aCard.type);
-  const bType = getCardTypeSort(bCard.type);
-
-  const rankDiff =
-    aCard.source == 0 ? bCard.rank - aCard.rank : aCard.rank - bCard.rank;
-  const colorsLengthDiff = aColors.length - bColors.length;
-  const cmcDiff = aCard.cmc - bCard.cmc;
-  const typeDiff = aType - bType;
-  const localeCompare = aCard.name.localeCompare(bCard.name);
-  const compare =
-    rankDiff || colorsLengthDiff || cmcDiff || typeDiff || localeCompare;
-
-  if (compare < 0) {
-    return -1;
-  }
-  if (compare > 0) {
-    return 1;
-  }
   return 0;
 }
 
@@ -105,8 +52,6 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
 
   if (settings.mode === OVERLAY_ODDS || settings.mode == OVERLAY_MIXED) {
     sortFunc = compareCards; // compareQuantity;
-  } else if (settings.mode === OVERLAY_DRAFT) {
-    sortFunc = compareDraftPicks;
   }
 
   const mainCardTiles: JSX.Element[] = [];
@@ -198,24 +143,6 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
               maximumSignificantDigits: 2,
             }),
           };
-        } else if (settings.mode === OVERLAY_DRAFT) {
-          const rank = getRank(card.id);
-          quantity = {
-            type: "RANK",
-            quantity:
-              fullCard.source == 0 ? DRAFT_RANKS[rank] : DRAFT_RANKS_LOLA[rank],
-          };
-        }
-
-        if (settings.mode === OVERLAY_DRAFT) {
-          mainCardTiles.push(
-            <div
-              className="overlay-card-quantity"
-              key={`maincardtile_owned_${index}_${card.id}`}
-            >
-              <OwnershipStars card={fullCard} />
-            </div>
-          );
         } else if (
           shouldDoGroupLandsHack &&
           fullCard &&

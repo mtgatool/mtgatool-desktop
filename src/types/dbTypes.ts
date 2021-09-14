@@ -121,3 +121,28 @@ export const defaultUUIDData: DbUUIDData = {
   updatedCards: new Date().getTime(),
   updated: new Date().getTime(),
 };
+
+export interface DbAccount {
+  displayName: string;
+  bio: string;
+}
+
+export interface DbVote {
+  pubKey: string;
+  signature: string;
+  vote: number;
+}
+
+// Key is livedraft-v1-${id}
+// We use versioning to allow upgrades on the protocol
+// Verification will only allow owner to modify
+// Others can add votes (subject to verification and deduplication checks)
+// On each pick votes are reset?
+export interface DbliveDraftV1 {
+  draftId: string;
+  currentPick: string[];
+  currentPack: string[];
+  picks: string[][];
+  packs: string[][][];
+  currentVotes: DbVote;
+}

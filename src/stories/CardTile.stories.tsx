@@ -15,21 +15,13 @@ export default {
 
 const Template: Story<CardTileProps> = (args) => <CardTile {...args} />;
 
-const testDeck = new Deck(undefined, [
-  77501,
-  77501,
-  70732,
-  70732,
-  66111,
-  66111,
-  75537,
-  71256,
-  77517,
-  72121,
-  75030,
-  76476,
-  59677,
-]);
+const testDeck = new Deck(
+  undefined,
+  [
+    77501, 77501, 70732, 70732, 66111, 66111, 75537, 71256, 77517, 72121, 75030,
+    76476, 59677,
+  ]
+);
 
 export const CardTileNormal = Template.bind({});
 CardTileNormal.args = {

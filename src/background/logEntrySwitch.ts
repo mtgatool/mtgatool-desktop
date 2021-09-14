@@ -3,6 +3,15 @@ import * as Labels from "./onLabel";
 
 // eslint-disable-next-line complexity
 export default function logEntrySwitch(entry: LogEntry): void {
+  if (typeof entry.json.Payload === "string") {
+    try {
+      const newJson = JSON.parse(entry.json.Payload);
+      // eslint-disable-next-line no-param-reassign
+      entry.json = newJson;
+    } catch (e) {
+      console.warn(e);
+    }
+  }
   console.log("logEntrySwitch", entry.arrow, entry.label, entry.json);
   switch (entry.label) {
     case "GreToClientEvent":
@@ -16,12 +25,6 @@ export default function logEntrySwitch(entry: LogEntry): void {
     case "Event.GetPlayerCourseV2":
       if (entry.arrow == "<==") {
         Labels.InEventGetPlayerCourseV2(entry);
-      }
-      break;
-
-    case "Event.Join":
-      if (entry.arrow == "<==") {
-        Labels.InEventJoin(entry);
       }
       break;
 
@@ -128,13 +131,16 @@ export default function logEntrySwitch(entry: LogEntry): void {
       }
       break;
 
-    case "Draft.DraftStatus":
+    case "BotDraft_DraftStatus":
+      if (entry.arrow == "==>") {
+        Labels.outBotDraftDraftStatus(entry);
+      }
       if (entry.arrow == "<==") {
-        Labels.InDraftDraftStatus(entry);
+        Labels.InBotDraftDraftStatus(entry);
       }
       break;
 
-    case "Draft.MakePick":
+    case "BotDraft_DraftPick":
       if (entry.arrow == "<==") {
         Labels.InDraftMakePick(entry);
       } else {

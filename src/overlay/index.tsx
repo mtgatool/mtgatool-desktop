@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Chances, compareCards, Deck } from "mtgatool-shared";
+import { Chances, compareCards, Deck, InternalDraftv2 } from "mtgatool-shared";
 
 import {
+  OVERLAY_DRAFT,
   OVERLAY_FULL,
   OVERLAY_LOG,
   OVERLAY_SEEN,
@@ -20,6 +21,7 @@ import { OverlaySettings, Settings } from "../common/defaultConfig";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import Clock from "./Clock";
 import { overlayTitleToId } from "../common/maps";
+import DraftOverlay from "./DraftOverlay";
 
 function getCurrentOverlayId(): number {
   const title = electron?.remote.getCurrentWindow().getTitle() || "";
@@ -30,6 +32,7 @@ export default function Overlay() {
   const [deck, setDeck] = useState<Deck>();
   const [settings, setSettings] = useState<OverlaySettings>();
   const [matchState, setMatchState] = useState<OverlayUpdateMatchState>();
+  const [draftState, setDraftState] = useState<InternalDraftv2>();
   const [odds, setOdds] = useState<Chances>();
   const heightDivAdjustRef = useRef<HTMLDivElement>(null);
 
@@ -75,6 +78,10 @@ export default function Overlay() {
 
       if (msg.data.type === "OVERLAY_UPDATE") {
         setMatchState(msg.data.value);
+      }
+
+      if (msg.data.type === "DRAFT_STATUS") {
+        setDraftState(msg.data.value);
       }
     },
     [settings]
@@ -155,6 +162,9 @@ export default function Overlay() {
         }}
       >
         <div ref={heightDivAdjustRef} style={{ opacity: settings?.alpha || 0 }}>
+          {settings && settings.mode === OVERLAY_DRAFT && draftState && (
+            <DraftOverlay state={draftState} />
+          )}
           {deck && settings && (
             <OverlayDeckList
               deck={deck}

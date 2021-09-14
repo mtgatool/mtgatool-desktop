@@ -34,6 +34,7 @@ export const initialRendererState = {
   collectionQuery: "",
   forceQuery: 0,
   matchInProgress: false,
+  draftInProgress: false,
   currentScene: "",
 };
 
@@ -145,6 +146,12 @@ const rendererSlice = createSlice({
     ): void => {
       state.matchInProgress = action.payload;
     },
+    setDraftInProgress: (
+      state: RendererState,
+      action: PayloadAction<boolean>
+    ): void => {
+      state.draftInProgress = action.payload;
+    },
     setScene: (state: RendererState, action: PayloadAction<string>): void => {
       state.currentScene = action.payload;
     },
@@ -168,6 +175,7 @@ export const {
   setRewardsWeeklyEnds,
   setCollectionQuery,
   setMatchInProgress,
+  setDraftInProgress,
   setScene,
 } = rendererSlice.actions;
 

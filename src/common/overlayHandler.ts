@@ -1,3 +1,13 @@
+import {
+  OVERLAY_DRAFT,
+  OVERLAY_DRAFT_BREW,
+  OVERLAY_FULL,
+  OVERLAY_LEFT,
+  OVERLAY_LOG,
+  OVERLAY_MIXED,
+  OVERLAY_ODDS,
+  OVERLAY_SEEN,
+} from "mtgatool-shared/dist/shared/constants";
 import closeOverlay from "../overlay/closeOverlay";
 import createOverlay from "../overlay/createOverlay";
 import store from "../redux/stores/rendererStore";
@@ -35,12 +45,23 @@ export class OverlayHandler {
   };
 
   public settingsUpdated = () => {
-    const { matchInProgress } = store.getState().renderer;
+    const { matchInProgress, draftInProgress } = store.getState().renderer;
 
     store.getState().settings.overlays.forEach((overlay, index) => {
       this._openState[index] =
         (overlay.showAlways && overlay.show) ||
-        (overlay.show && matchInProgress);
+        ((overlay.mode === OVERLAY_SEEN ||
+          overlay.mode === OVERLAY_FULL ||
+          overlay.mode === OVERLAY_LEFT ||
+          overlay.mode === OVERLAY_LOG ||
+          overlay.mode === OVERLAY_MIXED ||
+          overlay.mode === OVERLAY_ODDS) &&
+          overlay.show &&
+          matchInProgress) ||
+        ((overlay.mode === OVERLAY_DRAFT ||
+          overlay.mode === OVERLAY_DRAFT_BREW) &&
+          overlay.show &&
+          draftInProgress);
     });
     this._updateOverlays();
   };

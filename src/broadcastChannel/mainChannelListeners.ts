@@ -1,4 +1,6 @@
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
+
+import { InternalDraftv2 } from "mtgatool-shared";
 import { overlayTitleToId } from "../common/maps";
 import setDbMatch from "../toolDb/setDbMatch";
 import upsertDbCards from "../toolDb/upsertDbCards";
@@ -78,6 +80,40 @@ export default function mainChannelListeners() {
         arg: false,
       });
       setDbMatch(msg.data.value);
+    }
+
+    if (msg.data.type === "DRAFT_STATUS") {
+      reduxAction(store.dispatch, {
+        type: "SET_DRAFT_IN_PROGRESS",
+        arg: true,
+      });
+    }
+
+    let draftUpsertTImeout = null;
+    if (msg.data.type === "DRAFT_STATUS") {
+      if (draftUpsertTImeout !== null) {
+        clearTimeout(draftUpsertTImeout);
+      }
+      draftUpsertTImeout = setTimeout(() => {
+        if (
+          msg.data.type === "DRAFT_STATUS" &&
+          msg.data.value.id &&
+          msg.data.value.id !== ""
+        ) {
+          window.toolDb.putData<InternalDraftv2>(
+            `draft-${msg.data.value.id}`,
+            msg.data.value,
+            true
+          );
+        }
+      }, 250);
+    }
+
+    if (msg.data.type === "DRAFT_END") {
+      reduxAction(store.dispatch, {
+        type: "SET_DRAFT_IN_PROGRESS",
+        arg: false,
+      });
     }
 
     if (msg.data.type == "OVERLAY_UPDATE_BOUNDS") {

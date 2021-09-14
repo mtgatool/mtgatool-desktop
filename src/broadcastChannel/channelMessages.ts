@@ -1,6 +1,7 @@
 import {
   Cards,
   InternalDeck,
+  InternalDraftv2,
   InternalMatch,
   InventoryUpdate,
 } from "mtgatool-shared";
@@ -31,7 +32,9 @@ export type MessageType =
   | "INVENTORY_UPDATED"
   | "PLAYER_INVENTORY"
   | "HOVER_IN"
-  | "HOVER_OUT";
+  | "HOVER_OUT"
+  | "DRAFT_STATUS"
+  | "DRAFT_END";
 
 export interface ChannelMessageBase {
   type: MessageType;
@@ -138,6 +141,15 @@ export interface HoverOutMessage extends ChannelMessageBase {
   type: "HOVER_OUT";
 }
 
+export interface DraftStatusMessage extends ChannelMessageBase {
+  type: "DRAFT_STATUS";
+  value: InternalDraftv2;
+}
+
+export interface DraftEndMessage extends ChannelMessageBase {
+  type: "DRAFT_END";
+}
+
 export type ChannelMessage =
   | DatabasePeersMessage
   | StartLogReadingMessage
@@ -159,4 +171,6 @@ export type ChannelMessage =
   | PlayerInventoryMessage
   | HoverInMessage
   | HoverOutMessage
-  | OverlaySettingsMessage;
+  | OverlaySettingsMessage
+  | DraftStatusMessage
+  | DraftEndMessage;
