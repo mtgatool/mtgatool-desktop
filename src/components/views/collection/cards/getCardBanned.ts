@@ -1,4 +1,4 @@
-import { DbCardData } from "../../../../../../mtgatool-shared/dist";
+import { DbCardData } from "mtgatool-shared/dist";
 import allFormats from "../../../../common/allFormats";
 
 export default function getCardBanned(card: DbCardData): string[] {

@@ -1,4 +1,4 @@
-import { DbCardData } from "../../../../../../mtgatool-shared/dist";
+import { DbCardData } from "mtgatool-shared/dist";
 import database from "../../../../utils/database-wrapper";
 
 export default function getCardInBoosters(card: DbCardData): boolean {

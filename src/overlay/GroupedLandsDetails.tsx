@@ -1,6 +1,5 @@
-import { constants } from "mtgatool-shared";
+import { constants, Chances } from "mtgatool-shared";
 
-import { Chances } from "../../../mtgatool-shared/dist";
 import manaClasses from "../common/manaClasses";
 
 const { BLACK, BLUE, GREEN, RED, WHITE } = constants;

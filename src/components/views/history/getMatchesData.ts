@@ -1,4 +1,4 @@
-import { InternalMatch } from "../../../../../mtgatool-shared/dist";
+import { InternalMatch } from "mtgatool-shared/dist";
 import { DbMatch } from "../../../types/dbTypes";
 import getRankFilterVal from "./getRankFilterVal";
 

@@ -1,4 +1,4 @@
-import { DbCardData } from "../../../../../../mtgatool-shared/dist";
+import { DbCardData } from "mtgatool-shared/dist";
 import allFormats from "../../../../common/allFormats";
 import database from "../../../../utils/database-wrapper";
 

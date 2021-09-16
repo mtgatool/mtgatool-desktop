@@ -1,4 +1,4 @@
-import { DbCardData } from "../../../../../../mtgatool-shared/dist";
+import { DbCardData } from "mtgatool-shared/dist";
 import getCardFormats from "./getCardFormats";
 
 export default function getCardIsCraftable(card: DbCardData): boolean {

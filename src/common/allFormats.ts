@@ -1,4 +1,4 @@
-import { Format } from "../../../mtgatool-shared/dist";
+import { Format } from "mtgatool-shared/dist";
 
 const formats = [
   {

@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { constants } from "mtgatool-shared";
+import { constants, Chances } from "mtgatool-shared";
 import { ChannelMessage } from "../broadcastChannel/channelMessages";
 import NoCard from "../assets/images/nocard.png";
 import { Settings } from "../common/defaultConfig";
@@ -29,7 +29,6 @@ import {
   WINDOW_OVERLAY_4,
 } from "../types/app";
 
-import { Chances } from "../../../mtgatool-shared/dist";
 import GroupedLandsDetails from "../overlay/GroupedLandsDetails";
 import { CARD_SIZE_RATIO } from "../common/static";
 import useTransparentFix from "../hooks/useTransparentFix";

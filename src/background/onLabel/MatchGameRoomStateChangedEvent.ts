@@ -87,6 +87,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
         colors: new CardsList(main).getColors().getBits(),
         type: "InternalDeck",
       };
+
       if (deck) {
         selectDeck(new Deck(deck));
         postChannelMessage({
