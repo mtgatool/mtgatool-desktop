@@ -82,17 +82,19 @@ export default function ContentWrapper() {
       <div className="wrapper">
         <div className="wrapper-inner">
           <div className="overflow-ux">
-            {transitions.map(({ item, props }) => {
+            {transitions.map(({ item, props }, index) => {
               const Page = Object.values(views)[item];
               return (
                 <animated.div
                   className="view-container"
-                  key={Object.keys(views)[item]}
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={`${Object.keys(views)[item]}-${index}`}
                   style={{
                     ...props,
                   }}
                 >
                   <Page
+                    key={`${Object.keys(views)[item]}-page`}
                     collectionData={collectionData}
                     openAdvancedCollectionSearch={
                       openAdvancedCollectionSearch.current
