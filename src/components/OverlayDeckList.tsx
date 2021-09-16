@@ -143,9 +143,10 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
               maximumSignificantDigits: 2,
             }),
           };
-        } else if (
+        }
+
+        if (
           shouldDoGroupLandsHack &&
-          fullCard &&
           fullCard.type &&
           fullCard.type.includes("Land", 0)
         ) {
