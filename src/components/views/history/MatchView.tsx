@@ -14,7 +14,6 @@ import {
   InternalMatch,
   compareCards,
 } from "mtgatool-shared";
-import db from "../../../utils/database-wrapper";
 
 import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
 import { ReactComponent as CopyButton } from "../../../assets/images/svg/copy.svg";
@@ -37,6 +36,7 @@ import CardList from "../../CardList";
 import { toMMSS } from "../../../utils/dateTo";
 import ActionLog from "../../ActionLog";
 import { DbMatch } from "../../../types/dbTypes";
+import isLimitedEventId from "../../../utils/isLimitedEventId";
 
 interface GameStatsProps {
   game: MatchGameStats;
@@ -125,7 +125,7 @@ export default function MatchView(): JSX.Element {
 
   const playerDeck = new Deck(internalMatch.playerDeck);
   const oppDeck = new Deck(internalMatch.oppDeck);
-  const isLimited = db.limited_ranked_events.includes(internalMatch.eventId);
+  const isLimited = isLimitedEventId(internalMatch.eventId);
 
   const logExists = !!internalMatch.actionLog;
   const actionLogDataString = internalMatch.actionLog ?? "";

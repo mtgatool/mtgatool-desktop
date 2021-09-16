@@ -1,11 +1,10 @@
 import { Deck, InternalDeck } from "mtgatool-shared";
-import db from "../utils/database-wrapper";
 import globalStore from "./store";
 
+/*
 function calculateDeviation(values: number[]): number {
   return Math.sqrt(values.reduce((a, b) => a + b) / (values.length - 1));
 }
-
 function _getBestArchetype(deck: Deck): string {
   let bestMatch = "-";
   if (deck.getMainboard().get().length === 0) return bestMatch;
@@ -24,8 +23,7 @@ function _getBestArchetype(deck: Deck): string {
   const highest = lowestDeviation; // err..
 
   // Test for each archetype
-  // debugLog("highest", highest);
-  db.archetypes.forEach((arch) => {
+  archetypes.forEach((arch) => {
     // debugLog(arch.name);
     mainDeviations = [];
     deck
@@ -34,10 +32,9 @@ function _getBestArchetype(deck: Deck): string {
       .forEach((card) => {
         const cardData = db.card(card.id);
         if (!cardData) return;
-        // let q = card.quantity;
         const { name } = cardData;
         const archMain = arch.average.mainDeck;
-        const deviation = 1 - (archMain[name] ? 1 : 0); // archMain[name] ? archMain[name] : 0 // for full data
+        const deviation = 1 - (archMain[name] ? 1 : 0);
         mainDeviations.push(deviation * deviation);
         // debugLog(name, deviation, archMain[name]);
       });
@@ -56,7 +53,7 @@ function _getBestArchetype(deck: Deck): string {
 
   return bestMatch;
 }
-
+*/
 function getOpponentDeck(): InternalDeck {
   let oppCardsList: number[] = [...globalStore.currentMatch.opponent.cardsUsed];
   globalStore.currentMatch.matchGameStats.forEach((stats) => {
