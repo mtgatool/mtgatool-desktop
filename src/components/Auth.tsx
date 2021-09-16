@@ -158,8 +158,8 @@ export default function Auth(props: AuthProps) {
   const onSignup = useCallback(
     (e): void => {
       e.preventDefault();
-      if (signupUsername.length < 6) {
-        setErrorMessage("Username must be at least 6 characters long");
+      if (signupUsername.length < 5) {
+        setErrorMessage("Username must be at least 5 characters long");
       } else if (signupPass.length < 8) {
         setErrorMessage("Passwords must contain at least 8 characters.");
       } else if (signupPass !== signupPassConfirm) {

@@ -42,6 +42,7 @@ export default function DecksList() {
     const gunDB = JSON.parse(localStorage.getItem("gun/") || "{}");
     const pubkey = window.toolDb.user?.pubKey || "";
 
+    
     const allDecksArray = Object.keys(decksIndex)
       .map((id) => `${id}-v${decksIndex[id]}`)
       .map((id) => {
