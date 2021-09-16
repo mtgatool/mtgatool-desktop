@@ -4,7 +4,6 @@ import { animated, useTransition } from "react-spring";
 
 import { useSelector } from "react-redux";
 import PopupComponent from "./PopupComponent";
-import PassphraseGenerate from "./PassphraseGenerate";
 import vodiFn from "../utils/voidfn";
 
 import ViewWip from "./views/wip/ViewWip";
@@ -65,9 +64,6 @@ export default function ContentWrapper() {
     paths.current.push(params.page);
   }, [params]);
 
-  const openPopup = useRef<() => void>(vodiFn);
-  const closePopup = useRef<() => void>(vodiFn);
-
   const openAdvancedCollectionSearch = useRef<() => void>(vodiFn);
   const closeAdvancedCollectionSearch = useRef<() => void>(vodiFn);
 
@@ -82,15 +78,7 @@ export default function ContentWrapper() {
       >
         <AdvancedSearch closeCallback={closeAdvancedCollectionSearch.current} />
       </PopupComponent>
-      <PopupComponent
-        open={false}
-        width="1000px"
-        height="500px"
-        openFnRef={openPopup}
-        closeFnRef={closePopup}
-      >
-        <PassphraseGenerate onClose={closePopup.current} />
-      </PopupComponent>
+
       <div className="wrapper">
         <div className="wrapper-inner">
           <div className="overflow-ux">
@@ -106,7 +94,6 @@ export default function ContentWrapper() {
                 >
                   <Page
                     collectionData={collectionData}
-                    openPassphrasePopup={openPopup.current}
                     openAdvancedCollectionSearch={
                       openAdvancedCollectionSearch.current
                     }

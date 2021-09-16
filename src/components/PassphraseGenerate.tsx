@@ -1,18 +1,10 @@
 import { ChangeEvent, useCallback, useState } from "react";
-import { ReactComponent as Close } from "../assets/images/svg/close.svg";
+
 import newResetPassphrase from "../toolDb/newResetPassphrase";
 import copyToClipboard from "../utils/copyToClipboard";
 import Button from "./ui/Button";
 
-interface PassphraseGenerateProps {
-  onClose: () => void;
-}
-
-export default function PassphraseGenerate(
-  props: PassphraseGenerateProps
-): JSX.Element {
-  const { onClose } = props;
-
+export default function PassphraseGenerate(): JSX.Element {
   const [phrase, setPhrase] = useState("-");
   const [hint, setHint] = useState("");
 
@@ -26,36 +18,20 @@ export default function PassphraseGenerate(
 
   return (
     <>
-      <div className="close-button" onClick={onClose}>
-        <Close fill="var(--color-text-hover)" />
-      </div>
-      <div className="popup-welcome" style={{ color: "var(--color-back)" }}>
-        <div className="title green">Welcome!</div>
-        <div className="desc">
-          Howdy fellow planeswalker! Before you get started you need to know one
-          or two things.
-        </div>
-        <div className="desc">
-          Since MTG Arena Tool is now a decentralized application, it does not
-          have a central server storage. That means that user information is
-          stored locally and across <i>all</i> peers of MTG Arena Tool.
-        </div>
-        <div className="desc">
-          That is awesome for a lot of reasons! but it does come with extra
-          security concerns you need to account for. If you lose your password{" "}
-          <i>it is virtually impossible to recover access to your account</i>.
-        </div>
-        <div className="desc">
-          Therefore, we heavily encourage users to generate a randomized
-          passphrase for account recovery. You can use it later to gain access
-          to the password hint that you enter below. Keep it somewhere safe!
-        </div>
-        <div className="desc red" style={{ marginTop: "12px" }}>
-          <b>
-            This key will not be available once you close this dialog, but you
-            can always generate a new one.
-          </b>
-        </div>
+      <div
+        className="popup-welcome"
+        style={{ textAlign: "center", width: "100%", margin: "32px 0" }}
+      >
+        <p>
+          We encourage users to generate a randomized passphrase for account
+          recovery. You can use it later to gain access to the password hint
+          that you enter below. Keep it somewhere safe! Its the only way you can
+          recover your password if case you forget it.
+        </p>
+        <p className="red" style={{ marginTop: "12px" }}>
+          This passphrase will not be available once you close this dialog, but
+          you can always generate a new one.
+        </p>
         <div className="phrase-container">
           <div className="phrase">{phrase}</div>
           <div

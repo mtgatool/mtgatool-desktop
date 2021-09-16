@@ -285,19 +285,34 @@
 .copy-button {
   margin: auto 4px auto 0;
   cursor: pointer;
-  width: 16px;
-  height: 16px;
-  opacity: 0.5;
+  width: 24px;
+  height: 24px;
+  opacity: 0.7;
   background-image: url(../assets/images/copy.png);
   background-position: center;
   background-size: cover;
   -webkit-transition: all .2s ease-in-out;
+
+  &:hover {
+    opacity: 1;
+  }
 }
 
-.copy-button:hover {
-  opacity: 1;
+.copy-button-small {
+  margin: auto 4px auto 0;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+  background-image: url(../assets/images/copy.png);
+  background-position: center;
+  background-size: cover;
+  -webkit-transition: all .2s ease-in-out;
+  
+  &:hover {
+    opacity: 1;
+  }
 }
-
 
 .ontheplaytext {
   color: var(--color-g);

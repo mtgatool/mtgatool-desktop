@@ -139,10 +139,7 @@ export interface DbVote {
 // Others can add votes (subject to verification and deduplication checks)
 // On each pick votes are reset?
 export interface DbliveDraftV1 {
-  draftId: string;
-  currentPick: string[];
-  currentPack: string[];
-  picks: string[][];
-  packs: string[][][];
-  currentVotes: DbVote;
+  owner: string;
+  ref: string;
+  currentVotes: Record<string, DbVote>;
 }

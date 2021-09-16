@@ -7,6 +7,7 @@ import reduxAction from "../../../redux/reduxAction";
 import { DbAccount } from "../../../types/dbTypes";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
+import PassphraseGenerate from "../../PassphraseGenerate";
 import Button from "../../ui/Button";
 import { SettingsPanelProps } from "./ViewSettings";
 
@@ -92,7 +93,7 @@ export default function AccountSettingsPanel(
           className="avatar-med"
           style={{ backgroundImage: `url(${avatar})` }}
         />
-        <label htmlFor="avatarInput">
+        <label htmlFor="avatarInput" style={{ margin: "0" }}>
           <Button text="Edit Avatar" onClick={vodiFn} />
           <input
             style={{ display: "none" }}
@@ -102,6 +103,7 @@ export default function AccountSettingsPanel(
           />
         </label>
       </div>
+      <PassphraseGenerate />
       <Button
         style={{ margin: "128px auto 0 auto" }}
         text="Logout"

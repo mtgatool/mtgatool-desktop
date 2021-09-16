@@ -2,13 +2,7 @@ import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 import Button from "../../ui/Button";
 import createOverlay from "../../../overlay/createOverlay";
 
-interface ViewHomeProps {
-  openPassphrasePopup: () => void;
-}
-
-export default function ViewHome(props: ViewHomeProps) {
-  const { openPassphrasePopup } = props;
-
+export default function ViewHome() {
   return (
     <>
       <div className="section">
@@ -22,13 +16,6 @@ export default function ViewHome(props: ViewHomeProps) {
             });
           }}
           text="Re-read log"
-        />
-        <Button
-          style={{
-            margin: "auto",
-          }}
-          onClick={openPassphrasePopup}
-          text="Generate recovery key"
         />
         <Button
           style={{

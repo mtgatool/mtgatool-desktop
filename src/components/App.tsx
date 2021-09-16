@@ -33,6 +33,7 @@ import overlayHandler from "../common/overlayHandler";
 import login from "../toolDb/login";
 import { DB_SERVER } from "../constants";
 import Welcome from "./Welcome";
+import liveDraftVerification from "../toolDb/liveDraftVerification";
 
 function App() {
   const history = useHistory();
@@ -46,6 +47,10 @@ function App() {
       window.toolDb = new ToolDbClient(DB_SERVER);
       window.toolDbInitialized = true;
       window.toolDb.debug = true;
+      window.toolDb.addCustomVerification(
+        "live-draft-v1-",
+        liveDraftVerification
+      );
     }
   }, [peers]);
 

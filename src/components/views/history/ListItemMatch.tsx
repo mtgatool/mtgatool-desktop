@@ -112,7 +112,7 @@ export default function ListItemMatch({
               e.nativeEvent.stopImmediatePropagation();
               copyToClipboard(internalMatch.opponent.name);
             }}
-            className="copy-button"
+            className="copy-button-small"
           />
           <RankSmall
             rank={{
