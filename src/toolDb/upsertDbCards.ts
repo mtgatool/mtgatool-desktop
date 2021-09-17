@@ -4,7 +4,7 @@ import store from "../redux/stores/rendererStore";
 import { DbUUIDData, defaultUUIDData } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
 
-export default async function upsertDbRank(cards: Cards) {
+export default async function upsertDbCards(cards: Cards) {
   console.log("> Upsert cards", cards);
 
   const uuid = getLocalSetting("playerId") || "default";

@@ -7,7 +7,7 @@ import {
   MatchGameRoomStateChange,
 } from "mtgatool-shared";
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
-import upsertDbRank from "../../toolDb/upsertDbRank";
+
 import LogEntry from "../../types/logDecoder";
 import getLocalSetting from "../../utils/getLocalSetting";
 import actionLog from "../actionLog";
@@ -162,7 +162,11 @@ export default function onLabelMatchGameRoomStateChangedEvent(
     } else {
       toAdd.constructedClass = currentMatch.player.rank;
     }
-    upsertDbRank(toAdd);
+
+    postChannelMessage({
+      type: "UPSERT_DB_RANK",
+      value: toAdd,
+    });
 
     gameRoom.finalMatchResult.resultList.forEach((res) => {
       if (res.scope == "MatchScope_Match") {

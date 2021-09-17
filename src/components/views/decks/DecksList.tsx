@@ -46,7 +46,7 @@ export default function DecksList() {
       .map((id) => `${id}-v${decksIndex[id]}`)
       .map((id) => {
         const record = gunDB[`:${pubkey}.decks-${id}`];
-        return JSON.parse(record.v).value;
+        return record ? JSON.parse(record.v).value : undefined;
       });
 
     const decksForFiltering = allDecksArray

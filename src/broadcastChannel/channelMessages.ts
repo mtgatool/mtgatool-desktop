@@ -117,7 +117,7 @@ export interface UpsertDbCardsMessage extends ChannelMessageBase {
 
 export interface UpsertDbRankMessage extends ChannelMessageBase {
   type: "UPSERT_DB_RANK";
-  value: CombinedRankInfo;
+  value: Partial<CombinedRankInfo>;
 }
 
 export interface InventoryUpdatedMessage extends ChannelMessageBase {
