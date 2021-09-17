@@ -24,7 +24,7 @@ jobs:
     - name: "Test"
       run: "npm test"
     - name: "Build release, create GitHub release and upload assets (electron-builder)"
-      run: "npm run dist"
+      run: "npm run release"
       env:
         GH_TOKEN: ${{ github.token }}
         # create release if it doesn't exist

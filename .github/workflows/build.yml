@@ -22,6 +22,6 @@ jobs:
     - name: "Install modules"
       run: "npm install"
     - name: "Build (npm)"
-      run: "npm run build:prod"
+      run: "npm run build"
     - name: "Test"
       run: "npm test"
