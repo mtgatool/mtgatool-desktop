@@ -20,7 +20,7 @@ jobs:
     - name: "Checkout source code"
       uses: "actions/checkout@v2"
     - name: "Install modules"
-      run: "npm install"
+      run: "npm run install:ci"
     - name: "Test"
       run: "npm test"
     - name: "Build release, create GitHub release and upload assets (electron-builder)"

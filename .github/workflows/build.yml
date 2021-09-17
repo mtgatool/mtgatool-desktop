@@ -20,7 +20,7 @@ jobs:
     - name: "Checkout source code"
       uses: "actions/checkout@v2"
     - name: "Install modules"
-      run: "npm install"
+      run: "npm run install:ci"
     - name: "Build (npm)"
       run: "npm run build"
     - name: "Test"

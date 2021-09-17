@@ -61,6 +61,7 @@
     "semantic-release": "semantic-release",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
+    "install:ci": "npm install && npm install @craco/craco",
     "chromatic": "npx chromatic --project-token=62e160e30516"
   },
   "build": {
