@@ -5,10 +5,11 @@ import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import { DbDeck, DbMatch } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
+import getGunDb from "./getGunDb";
 
 export default async function setDbMatch(match: InternalMatch) {
   console.log("> Set match", match);
-  const { dispatch, getState } = store;
+  const { dispatch } = store;
 
   const newDbMatch: DbMatch = {
     matchId: match.id,
@@ -31,13 +32,8 @@ export default async function setDbMatch(match: InternalMatch) {
 
   window.toolDb.putData<DbMatch>(`matches-${match.id}`, newDbMatch, true);
 
-  reduxAction(dispatch, {
-    type: "SET_MATCH",
-    arg: newDbMatch,
-  });
-
   window.toolDb
-    .getData<string[]>("matchesIndex", true)
+    .getData<string[]>("matchesIndex", true, 3000)
     .then((oldMatchesIndex) => {
       const newMatchesIndex = _.uniq([...(oldMatchesIndex || []), match.id]);
 
@@ -49,13 +45,15 @@ export default async function setDbMatch(match: InternalMatch) {
       window.toolDb.putData<string[]>("matchesIndex", newMatchesIndex, true);
     });
 
-  const { decks, decksIndex } = getState().mainData;
+  const gunDB = getGunDb();
+  const pubkey = window.toolDb.user?.pubKey || "";
+  const decksIndex = gunDB[`:${pubkey}.decksIndex`] ?? {};
 
   const deckDbKey = `${match.playerDeck.id}-v${
-    decksIndex[match.playerDeck.id] || 0
+    decksIndex[match.playerDeck.id] ?? 0
   }`;
 
-  const oldDeck = decks[deckDbKey];
+  const oldDeck = gunDB[`:${pubkey}.${deckDbKey}`];
   console.log("oldDeck", oldDeck);
   if (oldDeck) {
     const newDeck: DbDeck = JSON.parse(JSON.stringify(oldDeck));
@@ -64,14 +62,10 @@ export default async function setDbMatch(match: InternalMatch) {
       newDeck.stats.gameLosses += match.opponent.wins;
       newDeck.stats.matchWins += hasWon ? 1 : 0;
       newDeck.stats.matchLosses += hasWon ? 0 : 1;
+      newDeck.matches[match.id] = hasWon;
       console.log("Deck's match new stats: ", newDeck.stats);
 
       window.toolDb.putData<DbDeck>(`decks-${deckDbKey}`, newDeck, true);
-
-      reduxAction(dispatch, {
-        type: "SET_DECK",
-        arg: newDeck,
-      });
     }
   }
 }

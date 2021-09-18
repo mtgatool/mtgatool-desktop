@@ -4,15 +4,19 @@ import store from "../redux/stores/rendererStore";
 
 import { DbDeck } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
+import getGunDb from "./getGunDb";
+import getLocalDbValue from "./getLocalDbValue";
 
 let upsertDecksIndexTimeout: NodeJS.Timeout | undefined;
 
 export default async function upsertDbDeck(internal: InternalDeck) {
-  // console.log("upsertDbDeck", internal);
+  console.log("upsertDbDeck", internal);
   const deck = new Deck(internal);
-  // console.log(deck);
+  console.log(deck);
 
-  const { decksIndex } = store.getState().mainData;
+  const gunDB = getGunDb();
+  const pubkey = window.toolDb.user?.pubKey || "";
+  const decksIndex = getLocalDbValue(gunDB, `:${pubkey}.decksIndex`);
   const { dispatch } = store;
 
   console.log("DecksIndex", decksIndex);
@@ -91,11 +95,6 @@ export default async function upsertDbDeck(internal: InternalDeck) {
               ...decksIndex,
               [deck.id]: version,
             },
-          });
-
-          reduxAction(dispatch, {
-            type: "SET_DECK",
-            arg: newDbDeck,
           });
 
           // decksRef.get(newDeckDeckKey).put(newDbDeck);
