@@ -141,7 +141,6 @@
     "@storybook/addon-links": "^6.2.9",
     "@storybook/node-logger": "^6.2.9",
     "@storybook/preset-create-react-app": "^3.1.7",
-    "@types/gun": "^0.9.2",
     "@types/jest": "^26.0.15",
     "@types/leveldown": "^4.0.2",
     "@types/lodash": "^4.14.168",
