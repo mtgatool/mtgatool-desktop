@@ -1,8 +1,9 @@
 /* eslint-disable no-alert */
 /* eslint-disable no-restricted-globals */
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { format, fromUnixTime } from "date-fns";
 import { database } from "mtgatool-shared";
+import info from "../info.json";
 
 import { ReactComponent as Close } from "../assets/images/svg/close.svg";
 
@@ -12,6 +13,7 @@ import showOpenLogDialog from "../utils/showOpenLogDialog";
 import setLocalSetting from "../utils/setLocalSetting";
 import getLocalSetting from "../utils/getLocalSetting";
 import openExternal from "../utils/openExternal";
+import isElectron from "../utils/electron/isElectron";
 
 function clickBetaChannel(value: boolean): void {
   setLocalSetting("betaChannel", value ? "true" : "false");
@@ -23,16 +25,24 @@ interface AuthSettingsProps {
 
 export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
   const { onClose } = props;
+  const [path, setPath] = useState(getLocalSetting("logPath"));
 
   // Arena log controls
   const arenaLogCallback = useCallback((value: string): void => {
     if (value === getLocalSetting("logPath")) return;
-    const confirmation = confirm(
-      "Changing the Arena log location requires a restart to take effect, are you sure?"
-    );
-    if (confirmation) {
-      setLocalSetting("logPath", value);
-    }
+    setLocalSetting("logPath", value);
+    setPath(value);
+    // This restart is not really needed since we are doing this before the app really starts reading the log
+    // Only do this if we are changing the path once the app started.
+    // const confirmation = confirm(
+    //   "Changing the Arena log location requires a restart to take effect, are you sure?"
+    // );
+    // if (confirmation) {
+    // setLocalSetting("logPath", value);
+    //   if (isElectron()) {
+    //     restartApp();
+    //   }
+    // }
   }, []);
 
   const openPathDialog = useCallback(() => {
@@ -52,26 +62,24 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
       </div>
       <div className="popup-inner" style={{ color: "var(--color-back)" }}>
         <div className="title">Settings</div>
-        <div className="input-container">
-          <label className="label">Arena Log:</label>
-          <div
-            style={{
-              display: "flex",
-              maxWidth: "80%",
-              width: "-webkit-fill-available",
-              justifyContent: "flex-end",
-            }}
-          >
-            <div className="open-button" onClick={openPathDialog} />
-            <div className="form-input-container">
-              <input
-                autoComplete="off"
-                readOnly
-                value={getLocalSetting("logPath")}
-              />
+        {isElectron() && (
+          <div className="input-container" style={{ height: "40px" }}>
+            <label className="label">Arena Log:</label>
+            <div
+              style={{
+                display: "flex",
+                maxWidth: "80%",
+                width: "-webkit-fill-available",
+                justifyContent: "flex-end",
+              }}
+            >
+              <div className="open-button" onClick={openPathDialog} />
+              <div className="form-input-container">
+                <input autoComplete="off" readOnly value={path} />
+              </div>
             </div>
           </div>
-        </div>
+        )}
         <Toggle
           text="Beta updates channel"
           value={getLocalSetting("betaChannel") == "true"}
@@ -80,22 +88,25 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
           margin={false}
         />
         <div className="about">
-          <div
+          <p
             style={{ margin: "4px", textDecoration: "underline" }}
             className="link"
             onClick={(): void =>
               openExternal("https://mtgatool.com/release-notes/")
             }
           >
-            {`Version ${process.env.REACT_APP_VERSION}`}
-          </div>
+            {`Version ${info.version} - ${info.branch}, ${new Date(
+              info.timestamp
+            ).toDateString()}`}
+          </p>
+
           {database.metadata ? (
-            <div style={{ margin: "4px" }}>
+            <p>
               Metadata: v{database.metadata.version || "???"}, updated{" "}
               {database.metadata.updated
                 ? format(fromUnixTime(database.metadata.updated / 1000), "Pp")
                 : "???"}
-            </div>
+            </p>
           ) : (
             <></>
           )}
