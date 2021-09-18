@@ -13,6 +13,10 @@ module.exports = {
             use: "native-addon-loader",
           },
         ],
+        noParse: /gun\.js$/,
+      },
+      node: {
+        fs: "empty",
       },
     },
     plugins: [...ModuleReplacement({ webIndex: false, electronIndex: true })],
