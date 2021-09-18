@@ -28,6 +28,10 @@ export default function PassphraseGenerate(): JSX.Element {
           that you enter below. Keep it somewhere safe! Its the only way you can
           recover your password if case you forget it.
         </p>
+        <p>
+          It is not recommended to write your password in plaintext here, but
+          rather a hint to help you remember.
+        </p>
         <p className="red" style={{ marginTop: "12px" }}>
           This passphrase will not be available once you close this dialog, but
           you can always generate a new one.
