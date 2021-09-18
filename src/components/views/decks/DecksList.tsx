@@ -15,6 +15,7 @@ import DecksArtViewRow from "../../DecksArtViewRow";
 import ManaFilter from "../../ManaFilter";
 import PagingControls from "../../PagingControls";
 import SortControls, { Sort } from "../../SortControls";
+import getGunDb from "../../../toolDb/getGunDb";
 
 export default function DecksList() {
   const history = useHistory();
@@ -39,7 +40,7 @@ export default function DecksList() {
   const { decksIndex } = useSelector((state: AppState) => state.mainData);
 
   const filteredData = useMemo(() => {
-    const gunDB = JSON.parse(localStorage.getItem("gun/") || "{}");
+    const gunDB = getGunDb();
     const pubkey = window.toolDb.user?.pubKey || "";
 
     const allDecksArray = Object.keys(decksIndex)

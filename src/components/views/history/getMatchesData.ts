@@ -1,4 +1,5 @@
 import { InternalMatch } from "mtgatool-shared/dist";
+import getGunDb from "../../../toolDb/getGunDb";
 import { DbMatch } from "../../../types/dbTypes";
 import getRankFilterVal from "./getRankFilterVal";
 
@@ -20,7 +21,7 @@ export interface MatchData {
 }
 
 export default function getMatchesData(matchesIds: string[]): MatchData[] {
-  const gunDB = JSON.parse(localStorage.getItem("gun/") || "{}");
+  const gunDB = getGunDb();
   const pubkey = window.toolDb.user?.pubKey || "";
   const matches: DbMatch[] = matchesIds
     .map((id) => gunDB[`:${pubkey}.matches-${id}`])
