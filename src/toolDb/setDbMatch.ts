@@ -53,7 +53,7 @@ export default async function setDbMatch(match: InternalMatch) {
     decksIndex[match.playerDeck.id] ?? 0
   }`;
 
-  const oldDeck = gunDB[`:${pubkey}.${deckDbKey}`];
+  const oldDeck = gunDB[`:${pubkey}.decks-${deckDbKey}`];
   console.log("oldDeck", oldDeck);
   if (oldDeck) {
     const newDeck: DbDeck = JSON.parse(JSON.stringify(oldDeck));
