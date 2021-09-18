@@ -13,6 +13,12 @@ MTG Arena Tool is a collection browser, a deck tracker and a statistics manager.
 Things are still unfinished, bugs will probably happen. Use at your own risk.
 
 ### Run from source
+
+**Make sure you are using node 15+ and npm 7+**
+
+If swtching node versions is an issue you can use [nvm](https://github.com/nvm-sh/nvm) (there's a [Windows versiion](https://github.com/coreybutler/nvm-windows) too!)
+
+
 Before running you will need to install some packages globally;
 
 ```npm install -g foreman @craco/craco```
