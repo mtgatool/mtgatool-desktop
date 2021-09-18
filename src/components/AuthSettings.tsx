@@ -28,7 +28,7 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
   const arenaLogCallback = useCallback((value: string): void => {
     if (value === getLocalSetting("logPath")) return;
     const confirmation = confirm(
-      "Changing the Arena log location requires a restart, are you sure?"
+      "Changing the Arena log location requires a restart to take effect, are you sure?"
     );
     if (confirmation) {
       setLocalSetting("logPath", value);

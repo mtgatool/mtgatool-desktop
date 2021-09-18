@@ -1,11 +1,11 @@
-import defaultLogUri from "../utils/defaultLogUri";
 import ArenaLogWatcher from "./arena-log-watcher";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import logEntrySwitch from "./logEntrySwitch";
+import getLocalSetting from "../utils/getLocalSetting";
 
 export default function start() {
   ArenaLogWatcher.start({
-    path: defaultLogUri(),
+    path: getLocalSetting("logPath"),
     chunkSize: 268435440,
     onLogEntry: (entry) => {
       logEntrySwitch(entry);
