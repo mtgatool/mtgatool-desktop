@@ -24,4 +24,4 @@ jobs:
     - name: "Build (npm)"
       run: "npm run build:web"
     - name: "Test"
-      run: "npm test"
+      run: "npm run jest:ci"

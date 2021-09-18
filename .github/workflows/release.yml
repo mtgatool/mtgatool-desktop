@@ -22,7 +22,7 @@ jobs:
     - name: "Install modules"
       run: "npm run install:ci"
     - name: "Test"
-      run: "npm test"
+      run: "npm run jest:ci"
     - name: "Build release, create GitHub release and upload assets (electron-builder)"
       run: "npm run release"
       env:
