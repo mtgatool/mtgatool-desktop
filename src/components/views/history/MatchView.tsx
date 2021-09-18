@@ -38,6 +38,7 @@ import ActionLog from "../../ActionLog";
 import { DbMatch } from "../../../types/dbTypes";
 import isLimitedEventId from "../../../utils/isLimitedEventId";
 import getGunDb from "../../../toolDb/getGunDb";
+import getLocalDbValue from "../../../toolDb/getLocalDbValue";
 
 interface GameStatsProps {
   game: MatchGameStats;
@@ -116,8 +117,11 @@ export default function MatchView(): JSX.Element {
   const gunDB = getGunDb();
   const pubkey = window.toolDb.user?.pubKey || "";
 
-  const matchData = JSON.parse(gunDB[`:${pubkey}.matches-${params.id}`].v)
-    .value as DbMatch;
+  const matchData = getLocalDbValue(
+    gunDB,
+    `:${pubkey}.matches-${params.id}`
+  ) as DbMatch;
+
   console.log(matchData);
   const { internalMatch } = matchData;
 

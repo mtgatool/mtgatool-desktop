@@ -36,6 +36,7 @@ import DeckList from "../../DeckList";
 import reduxAction from "../../../redux/reduxAction";
 import { DbDeck } from "../../../types/dbTypes";
 import getGunDb from "../../../toolDb/getGunDb";
+import getLocalDbValue from "../../../toolDb/getLocalDbValue";
 
 // const { MANA_COLORS } = constants;
 
@@ -56,8 +57,13 @@ export default function DeckView(): JSX.Element {
   const pubkey = window.toolDb.user?.pubKey || "";
   const decks: Record<string, DbDeck> = {};
   Object.keys(decksIndex).forEach((id) => {
-    const record = gunDB[`:${pubkey}.decks-${id}-v${decksIndex[id]}`];
-    decks[`${id}-v${decksIndex[id]}`] = JSON.parse(record.v).value;
+    const record = getLocalDbValue(
+      gunDB,
+      `:${pubkey}.decks-${id}-v${decksIndex[id]}`
+    );
+    if (record) {
+      decks[`${id}-v${decksIndex[id]}`] = record;
+    }
   });
 
   const dbDeck = decks[`${params.id}-v${latestVersion}`];
