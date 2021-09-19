@@ -115,6 +115,11 @@ function createWindow() {
   if (mainGlobals.backgroundWindow !== null || mainGlobals.mainWindow !== null)
     return;
 
+  if (mainGlobals.updaterWindow) {
+    mainGlobals.updaterWindow.destroy();
+    mainGlobals.updaterWindow = null;
+  }
+
   mainGlobals.backgroundWindow = new BrowserWindow({
     show: false,
     resizable: true,
