@@ -7,6 +7,7 @@ import { DbDeck, DbMatch } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
 import getGunDb from "./getGunDb";
 import getLocalDbValue from "./getLocalDbValue";
+import pushToLiveFeed from "./pushToLivefeed";
 
 export default async function setDbMatch(match: InternalMatch) {
   console.log("> Set match", match);
@@ -32,6 +33,7 @@ export default async function setDbMatch(match: InternalMatch) {
   const hasWon = match.player.wins > match.opponent.wins;
 
   window.toolDb.putData<DbMatch>(`matches-${match.id}`, newDbMatch, true);
+  pushToLiveFeed(newDbMatch);
 
   window.toolDb
     .getData<string[]>("matchesIndex", true, 3000)
