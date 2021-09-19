@@ -6,6 +6,7 @@ import store from "../redux/stores/rendererStore";
 import { DbDeck, DbMatch } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
 import getGunDb from "./getGunDb";
+import getLocalDbValue from "./getLocalDbValue";
 
 export default async function setDbMatch(match: InternalMatch) {
   console.log("> Set match", match);
@@ -53,7 +54,7 @@ export default async function setDbMatch(match: InternalMatch) {
     decksIndex[match.playerDeck.id] ?? 0
   }`;
 
-  const oldDeck = gunDB[`:${pubkey}.decks-${deckDbKey}`];
+  const oldDeck = getLocalDbValue(gunDB, `:${pubkey}.decks-${deckDbKey}`);
   console.log("oldDeck", oldDeck);
   if (oldDeck) {
     const newDeck: DbDeck = JSON.parse(JSON.stringify(oldDeck));
