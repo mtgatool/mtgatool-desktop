@@ -4,6 +4,8 @@ export const WINDOW_HOVER = "mtgatool-hover";
 
 export const WINDOW_MAIN = "MTG Arena Tool";
 
+export const WINDOW_UPDATER = "mtgatool-updater";
+
 export const WINDOW_OVERLAY_0 = "mtgatool-overlay-0";
 
 export const WINDOW_OVERLAY_1 = "mtgatool-overlay-1";

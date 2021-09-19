@@ -37,6 +37,14 @@ export default function Auth(props: AuthProps) {
   const { defaultPage } = props;
   const [page, setPage] = useState(defaultPage || 1);
 
+  const [_refresh, setRefresh] = useState(1);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setRefresh(2);
+    }, 100);
+  }, []);
+
   const history = useHistory();
   const dispatch = useDispatch();
   const [errorMessage, setErrorMessage] = useState("");
@@ -286,7 +294,7 @@ export default function Auth(props: AuthProps) {
                         margin: "14px 0 4px 0",
                       }}
                       className="form-button"
-                      type="submit"
+                      type="button"
                       onClick={onRecover}
                     >
                       Recover
@@ -390,7 +398,7 @@ export default function Auth(props: AuthProps) {
                         margin: "14px 0 4px 0",
                       }}
                       className="form-button"
-                      type="submit"
+                      type="button"
                       onClick={onSignup}
                     >
                       Signup

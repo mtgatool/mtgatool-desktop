@@ -21,13 +21,29 @@ import mainChannelListeners from "./broadcastChannel/mainChannelListeners";
 import { loadDbFromCache } from "./utils/database-wrapper";
 import initDirectories from "./utils/initDirectories";
 import getWindowTitle from "./utils/electron/getWindowTitle";
-import { ALL_OVERLAYS, WINDOW_BACKGROUND, WINDOW_HOVER } from "./types/app";
+import {
+  ALL_OVERLAYS,
+  WINDOW_BACKGROUND,
+  WINDOW_HOVER,
+  WINDOW_UPDATER,
+} from "./types/app";
 import { DB_SERVER } from "./constants";
+import Updater from "./updater";
 
 const title = getWindowTitle();
-loadDbFromCache();
 
-if (title == WINDOW_BACKGROUND) {
+if (title !== WINDOW_UPDATER) {
+  loadDbFromCache();
+}
+
+if (title == WINDOW_UPDATER) {
+  ReactDOM.render(
+    <React.StrictMode>
+      <Updater />
+    </React.StrictMode>,
+    document.getElementById("root")
+  );
+} else if (title == WINDOW_BACKGROUND) {
   initDirectories();
   if (module.hot && process.env.NODE_ENV === "development") {
     module.hot.accept();
