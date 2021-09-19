@@ -76,18 +76,28 @@
     "win": {
       "target": "NSIS",
       "icon": "public/icons/icon.ico",
-      "artifactName": "${productName}.${ext}"
+      "artifactName": "${productName}-${version}.${ext}"
     },
     "mac": {
       "target": "pkg",
-      "artifactName": "${productName}.${ext}"
+      "icon": "public/icons/icon.icns",
+      "artifactName": "${productName}-${version}.${ext}",
+      "extendInfo": {
+        "LSUIElement": 1
+      }
     },
     "linux": {
       "target": "AppImage",
       "category": "Utility;",
       "icon": "public/icons/icon-512.png",
-      "artifactName": "${productName}.${ext}"
+      "artifactName": "${productName}-${version}.${ext}"
     },
+    "publish": [
+      {
+        "provider": "github",
+        "releaseType": "prerelease"
+      }
+    ],
     "extraResources": [
       {
         "from": "./public/extra/",
