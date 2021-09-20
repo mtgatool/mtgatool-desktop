@@ -38,7 +38,9 @@ export default async function setDbMatch(match: InternalMatch) {
   window.toolDb
     .getData<string[]>("matchesIndex", true, 3000)
     .then((oldMatchesIndex) => {
-      const newMatchesIndex = _.uniq([...(oldMatchesIndex || []), match.id]);
+      const newMatchesIndex = oldMatchesIndex
+        ? [...oldMatchesIndex, match.id]
+        : [match.id];
 
       reduxAction(dispatch, {
         type: "SET_MATCHES_INDEX",

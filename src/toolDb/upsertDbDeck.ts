@@ -53,7 +53,6 @@ export default async function upsertDbDeck(internal: InternalDeck) {
     reduxAction(dispatch, {
       type: "SET_DECKS_INDEX",
       arg: {
-        ...decksIndex,
         [deck.id]: version,
       },
     });
@@ -86,7 +85,6 @@ export default async function upsertDbDeck(internal: InternalDeck) {
           reduxAction(dispatch, {
             type: "SET_DECKS_INDEX",
             arg: {
-              ...decksIndex,
               [deck.id]: version,
             },
           });

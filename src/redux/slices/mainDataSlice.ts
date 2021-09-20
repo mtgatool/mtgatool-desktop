@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import _ from "lodash";
 import { Cards } from "mtgatool-shared";
 
 import { DbMatch, DbUUIDData, defaultUUIDData } from "../../types/dbTypes";
@@ -49,13 +50,13 @@ const mainDataSlice = createSlice({
       state: PlayerData,
       action: PayloadAction<Record<string, number>>
     ): void => {
-      state.decksIndex = action.payload;
+      state.decksIndex = { ...state.decksIndex, ...action.payload };
     },
     setMatchesIndex: (
       state: PlayerData,
       action: PayloadAction<string[]>
     ): void => {
-      state.matchesIndex = action.payload;
+      state.matchesIndex = _.uniq([...state.matchesIndex, ...action.payload]);
     },
   },
 });
