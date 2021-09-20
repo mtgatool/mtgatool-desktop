@@ -5,13 +5,16 @@ import { ReactComponent as ArchiveIcon } from "../assets/images/svg/archive.svg"
 import { getCardArtCrop } from "../utils/getCardArtCrop";
 
 interface ListItemProps extends JSX.ElementChildrenAttribute {
-  click: () => void;
+  click?: () => void;
 }
 
 export function ListItem(props: PropsWithChildren<ListItemProps>): JSX.Element {
   const { click, children } = props;
   return (
-    <div onClick={click} className="list-item-container">
+    <div
+      onClick={click}
+      className={`list-item-container${!click ? "-nohover" : ""}`}
+    >
       {children}
     </div>
   );

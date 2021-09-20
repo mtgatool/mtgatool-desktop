@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { Deck, InternalDeck } from "mtgatool-shared";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
@@ -6,8 +7,6 @@ import { DbDeck } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
 import getGunDb from "./getGunDb";
 import getLocalDbValue from "./getLocalDbValue";
-
-let upsertDecksIndexTimeout: NodeJS.Timeout | undefined;
 
 export default async function upsertDbDeck(internal: InternalDeck) {
   console.log("upsertDbDeck", internal);
@@ -54,14 +53,8 @@ export default async function upsertDbDeck(internal: InternalDeck) {
     reduxAction(dispatch, {
       type: "SET_DECKS_INDEX",
       arg: {
-        ...decksIndex,
         [deck.id]: version,
       },
-    });
-
-    reduxAction(dispatch, {
-      type: "SET_DECK",
-      arg: newDbDeck,
     });
 
     window.toolDb.putData<DbDeck>(`decks-${currentDeckKey}`, newDbDeck, true);
@@ -92,7 +85,6 @@ export default async function upsertDbDeck(internal: InternalDeck) {
           reduxAction(dispatch, {
             type: "SET_DECKS_INDEX",
             arg: {
-              ...decksIndex,
               [deck.id]: version,
             },
           });
@@ -106,13 +98,12 @@ export default async function upsertDbDeck(internal: InternalDeck) {
       });
   }
 
-  if (upsertDecksIndexTimeout) clearTimeout(upsertDecksIndexTimeout);
-  upsertDecksIndexTimeout = setTimeout(() => {
-    const newDecksIndex = store.getState().mainData.decksIndex;
+  const newDecksIndex = store.getState().mainData.decksIndex;
+  if (!_.isEqual(newDecksIndex, decksIndex) && !_.isEqual(newDecksIndex, {})) {
     window.toolDb.putData<Record<string, number>>(
       "decksIndex",
       newDecksIndex,
       true
     );
-  }, 1500);
+  }
 }

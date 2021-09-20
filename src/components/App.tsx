@@ -34,6 +34,8 @@ import login from "../toolDb/login";
 import { DB_SERVER } from "../constants";
 import Welcome from "./Welcome";
 import liveDraftVerification from "../toolDb/liveDraftVerification";
+import { DbMatch } from "../types/dbTypes";
+import incomingLiveFeed from "../toolDb/incomingLiveFeed";
 
 function App() {
   const history = useHistory();
@@ -50,6 +52,11 @@ function App() {
       window.toolDb.addCustomVerification(
         "live-draft-v1-",
         liveDraftVerification
+      );
+
+      window.toolDb.addKeyListener<DbMatch | null>(
+        "matches-livefeed",
+        incomingLiveFeed
       );
     }
   }, [peers]);

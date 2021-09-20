@@ -22,7 +22,7 @@ const { DEFAULT_TILE } = constants;
 
 interface ListItemMatchProps {
   match: MatchData;
-  openMatchCallback: (match: MatchData) => void;
+  openMatchCallback?: (match: MatchData) => void;
 }
 
 export default function ListItemMatch({
@@ -32,7 +32,9 @@ export default function ListItemMatch({
   const { internalMatch } = match;
 
   const onRowClick = (): void => {
-    openMatchCallback(match);
+    if (openMatchCallback) {
+      openMatchCallback(match);
+    }
   };
 
   let dateTime = new Date(match.timestamp);
@@ -45,7 +47,7 @@ export default function ListItemMatch({
   const isLimited = isLimitedEventId(match.eventId);
 
   return (
-    <ListItem click={onRowClick}>
+    <ListItem click={openMatchCallback ? onRowClick : undefined}>
       <div
         className="list-item-left-indicator"
         style={{

@@ -20,6 +20,24 @@ export interface MatchData {
   rank: number;
 }
 
+export function convertDbMatchToData(match: DbMatch): MatchData {
+  const { internalMatch } = match;
+  return {
+    matchId: match.matchId,
+    internalMatch: match.internalMatch,
+    playerDeckName: internalMatch.player.name,
+    timestamp: match.timestamp,
+    duration: match.duration,
+    win: match.playerWins > match.playerLosses,
+    eventId: match.eventId,
+    playerDeckColors: match.playerDeckColors,
+    oppDeckColors: match.oppDeckColors,
+    playerWins: match.playerWins,
+    playerLosses: match.playerLosses,
+    rank: getRankFilterVal(internalMatch.player.rank),
+  };
+}
+
 export default function getMatchesData(matchesIds: string[]): MatchData[] {
   const gunDB = getGunDb();
   const pubkey = window.toolDb.user?.pubKey || "";
@@ -28,21 +46,5 @@ export default function getMatchesData(matchesIds: string[]): MatchData[] {
     .filter((m) => m)
     .map((m) => JSON.parse(m.v).value);
 
-  return matches.map((match) => {
-    const { internalMatch } = match;
-    return {
-      matchId: match.matchId,
-      internalMatch: match.internalMatch,
-      playerDeckName: internalMatch.player.name,
-      timestamp: match.timestamp,
-      duration: match.duration,
-      win: match.playerWins > match.playerLosses,
-      eventId: match.eventId,
-      playerDeckColors: match.playerDeckColors,
-      oppDeckColors: match.oppDeckColors,
-      playerWins: match.playerWins,
-      playerLosses: match.playerLosses,
-      rank: getRankFilterVal(internalMatch.player.rank),
-    };
-  });
+  return matches.map(convertDbMatchToData);
 }

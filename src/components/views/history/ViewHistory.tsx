@@ -12,11 +12,11 @@ export default function ViewHistory() {
   const { url } = useRouteMatch();
   const [, loggedIn] = useDbUser();
 
-  const matches = useSelector((state: AppState) => state.mainData.matches);
+  const { matchesIndex } = useSelector((state: AppState) => state.mainData);
 
   return (
     <>
-      {loggedIn && matches ? (
+      {loggedIn && matchesIndex ? (
         <Switch>
           <Route exact path={`${url}/:id`} component={MatchView} />
           <Route exact path={`${url}/`} component={HistoryList} />

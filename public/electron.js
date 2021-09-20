@@ -112,12 +112,14 @@ function createCardHoverWindow() {
 }
 
 function createWindow() {
-  if (mainGlobals.backgroundWindow !== null || mainGlobals.mainWindow !== null)
-    return;
+  console.log(">> createWindow()");
 
-  if (mainGlobals.updaterWindow) {
-    mainGlobals.updaterWindow.destroy();
-    mainGlobals.updaterWindow = null;
+  if (
+    mainGlobals.backgroundWindow !== null ||
+    mainGlobals.mainWindow !== null
+  ) {
+    console.log("Already initialized? not doing it again");
+    return;
   }
 
   mainGlobals.backgroundWindow = new BrowserWindow({
@@ -223,6 +225,12 @@ function createWindow() {
     mainGlobals.mainWindow.show();
     mainGlobals.mainWindow.focus();
     sendInit();
+
+    if (mainGlobals.updaterWindow) {
+      console.log("destroy updater");
+      mainGlobals.updaterWindow.destroy();
+      mainGlobals.updaterWindow = null;
+    }
   });
 
   mainIpcInitialize();
@@ -290,7 +298,7 @@ autoUpdater.on("update-not-available", (info) => {
       "Client up to date!"
     );
   }
-  setTimeout(createWindow, 100);
+  createWindow();
 });
 
 autoUpdater.on("error", (err) => {
@@ -302,7 +310,7 @@ autoUpdater.on("error", (err) => {
   }
   console.log("Update error: ");
   console.log(err, "error");
-  setTimeout(createWindow, 100);
+  createWindow();
 });
 
 autoUpdater.on("download-progress", (progressObj) => {
