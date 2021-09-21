@@ -48,7 +48,10 @@ export default function Auth(props: AuthProps) {
   const history = useHistory();
   const dispatch = useDispatch();
   const [errorMessage, setErrorMessage] = useState("");
-  const [pass, setPass] = useState("");
+
+  const [savedPass, setSavedPass] = useState(getLocalSetting("savedPassword"));
+
+  const [pass, setPass] = useState(savedPass || "");
   const [username, setUsername] = useState(getLocalSetting("username"));
   const [usernameRecover, setUsernameRecover] = useState("");
 
@@ -89,6 +92,7 @@ export default function Auth(props: AuthProps) {
   );
 
   const handlePassChange = useCallback((event: InputChange): void => {
+    setSavedPass("");
     setPass(event.target.value);
   }, []);
 
@@ -132,7 +136,7 @@ export default function Auth(props: AuthProps) {
       if (pass.length < 8) {
         setErrorMessage("Passwords must contain at least 8 characters.");
       } else {
-        login(username, sha1(pass))
+        login(username, savedPass !== "" ? savedPass : sha1(pass))
           .then(() => {
             if (electron) {
               postChannelMessage({
@@ -160,7 +164,7 @@ export default function Auth(props: AuthProps) {
           .catch((err) => setErrorMessage(err.message));
       }
     },
-    [username, pass]
+    [username, savedPass, pass]
   );
 
   const onSignup = useCallback(
