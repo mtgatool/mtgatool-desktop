@@ -5,7 +5,7 @@ import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import { DbDeck, DbMatch } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
-import getGunDb from "./getGunDb";
+
 import getLocalDbValue from "./getLocalDbValue";
 import pushToLiveFeed from "./pushToLivefeed";
 
@@ -50,15 +50,16 @@ export default async function setDbMatch(match: InternalMatch) {
       window.toolDb.putData<string[]>("matchesIndex", newMatchesIndex, true);
     });
 
-  const gunDB = getGunDb();
   const pubkey = window.toolDb.user?.pubKey || "";
-  const decksIndex = gunDB[`:${pubkey}.decksIndex`] ?? {};
+  const decksIndex =
+    (await getLocalDbValue<Record<string, number>>(`:${pubkey}.decksIndex`)) ??
+    {};
 
   const deckDbKey = `${match.playerDeck.id}-v${
     decksIndex[match.playerDeck.id] ?? 0
   }`;
 
-  const oldDeck = getLocalDbValue(gunDB, `:${pubkey}.decks-${deckDbKey}`);
+  const oldDeck = await getLocalDbValue(`:${pubkey}.decks-${deckDbKey}`);
   console.log("oldDeck", oldDeck);
   if (oldDeck) {
     const newDeck: DbDeck = JSON.parse(JSON.stringify(oldDeck));

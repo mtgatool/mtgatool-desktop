@@ -1,5 +1,5 @@
 import { InternalMatch } from "mtgatool-shared/dist";
-import getGunDb from "../../../toolDb/getGunDb";
+import getLocalDbValue from "../../../toolDb/getLocalDbValue";
 import { DbMatch } from "../../../types/dbTypes";
 import getRankFilterVal from "./getRankFilterVal";
 
@@ -38,13 +38,15 @@ export function convertDbMatchToData(match: DbMatch): MatchData {
   };
 }
 
-export default function getMatchesData(matchesIds: string[]): MatchData[] {
-  const gunDB = getGunDb();
+export default function getMatchesData(
+  matchesIds: string[]
+): Promise<MatchData[]> {
   const pubkey = window.toolDb.user?.pubKey || "";
-  const matches: DbMatch[] = matchesIds
-    .map((id) => gunDB[`:${pubkey}.matches-${id}`])
-    .filter((m) => m)
-    .map((m) => JSON.parse(m.v).value);
+  const promises = matchesIds.map((id) => {
+    return getLocalDbValue<DbMatch>(`:${pubkey}.matches-${id}`);
+  });
 
-  return matches.map(convertDbMatchToData);
+  return Promise.all(promises).then((matches) =>
+    matches.filter((m) => m).map((m: any) => convertDbMatchToData(m))
+  );
 }

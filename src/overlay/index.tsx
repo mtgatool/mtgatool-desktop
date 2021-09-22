@@ -36,6 +36,8 @@ export default function Overlay() {
   const [odds, setOdds] = useState<Chances>();
   const heightDivAdjustRef = useRef<HTMLDivElement>(null);
 
+  const allSettings = JSON.parse(getLocalSetting("settings")) as Settings;
+
   const updateNewBounds = useCallback(() => {
     if (electron) {
       const window = electron.remote.getCurrentWindow();
@@ -137,7 +139,10 @@ export default function Overlay() {
     electron.remote.getCurrentWindow().setBounds({
       // 24px topbar
       // 12px margin
-      height: Math.ceil(heightDivAdjustRef.current.offsetHeight) + 24 + 12,
+      height:
+        Math.ceil(heightDivAdjustRef.current.offsetHeight) +
+        24 +
+        (allSettings.overlaysTransparency ? 12 : 0),
     });
   }
 
@@ -149,10 +154,17 @@ export default function Overlay() {
   return (
     <div
       className="click-on"
-      style={{
-        padding: "6px",
-        // backgroundColor: `rgba(0,0,0,0.1)`,
-      }}
+      style={
+        allSettings.overlaysTransparency
+          ? {
+              padding: "6px",
+              // backgroundColor: `rgba(0,0,0,0.1)`,
+            }
+          : {
+              backgroundColor: `#0d0d0f`,
+              height: "100%",
+            }
+      }
     >
       {process.platform !== "linux" && <TopBar closeCallback={closeOverlay} />}
       <div

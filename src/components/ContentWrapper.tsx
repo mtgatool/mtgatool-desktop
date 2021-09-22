@@ -82,13 +82,13 @@ export default function ContentWrapper() {
       <div className="wrapper">
         <div className="wrapper-inner">
           <div className="overflow-ux">
-            {transitions.map(({ item, props }, index) => {
+            {transitions.map(({ item, props }) => {
               const Page = Object.values(views)[item];
               return (
                 <animated.div
                   className="view-container"
                   // eslint-disable-next-line react/no-array-index-key
-                  key={`${Object.keys(views)[item]}-${index}`}
+                  key={`${Object.keys(views)[item]}-container`}
                   style={{
                     ...props,
                   }}

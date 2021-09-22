@@ -36,6 +36,7 @@ import Welcome from "./Welcome";
 import liveDraftVerification from "../toolDb/liveDraftVerification";
 import { DbMatch } from "../types/dbTypes";
 import incomingLiveFeed from "../toolDb/incomingLiveFeed";
+import getGunDb from "../toolDb/getGunDb";
 
 function App() {
   const history = useHistory();
@@ -58,6 +59,7 @@ function App() {
         "matches-livefeed",
         incomingLiveFeed
       );
+      getGunDb();
     }
   }, [peers]);
 

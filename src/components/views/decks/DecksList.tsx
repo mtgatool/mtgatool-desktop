@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-bitwise */
-import { Fragment, useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
@@ -15,11 +15,26 @@ import DecksArtViewRow from "../../DecksArtViewRow";
 import ManaFilter from "../../ManaFilter";
 import PagingControls from "../../PagingControls";
 import SortControls, { Sort } from "../../SortControls";
-import getGunDb from "../../../toolDb/getGunDb";
+import getLocalDbValue from "../../../toolDb/getLocalDbValue";
 
 export default function DecksList() {
   const history = useHistory();
   const [colorFilterState, setColorFilterState] = useState(31);
+  const { decksIndex } = useSelector((state: AppState) => state.mainData);
+
+  const [allDecksArray, setAllDecksArray] = useState<DbDeck[]>([]);
+
+  useEffect(() => {
+    const pubkey = window.toolDb.user?.pubKey || "";
+
+    const promises = Object.keys(decksIndex).map((id) => {
+      return getLocalDbValue<DbDeck>(
+        `:${pubkey}.decks-${id}-v${decksIndex[id]}`
+      ) as any;
+    });
+
+    Promise.all(promises).then(setAllDecksArray);
+  }, []);
 
   const defaultDeckFilters: StringFilterType<DbDeck> = {
     type: "string",
@@ -37,19 +52,7 @@ export default function DecksList() {
     sort: -1,
   });
 
-  const { decksIndex } = useSelector((state: AppState) => state.mainData);
-
   const filteredData = useMemo(() => {
-    const gunDB = getGunDb();
-    const pubkey = window.toolDb.user?.pubKey || "";
-
-    const allDecksArray = Object.keys(decksIndex)
-      .map((id) => `${id}-v${decksIndex[id]}`)
-      .map((id) => {
-        const record = gunDB[`:${pubkey}.decks-${id}`];
-        return record ? JSON.parse(record.v).value : undefined;
-      });
-
     const decksForFiltering = allDecksArray
       .filter((d) => d)
       .map((d) => {
@@ -60,14 +63,19 @@ export default function DecksList() {
         };
       });
     return doDecksFilter(decksForFiltering, filters, sortValue);
-  }, [decksIndex, filters, sortValue]);
+  }, [allDecksArray, decksIndex, filters, sortValue]);
 
   const pagingControlProps = usePagingControls(filteredData.length, 25);
 
   const openDeck = useCallback(
     (deck: DbDeck) => {
       // reduxAction(dispatch, { type: "SET_BACK_GRPID", arg: deck.tile });
-      history.push(`/decks/${deck.id}`);
+      const pubKey = window.toolDb.user?.pubKey || "";
+      history.push(
+        `/decks/${encodeURIComponent(
+          `:${pubKey}.decks-${deck.id}-v${deck.version}`
+        )}`
+      );
     },
     [history]
   );

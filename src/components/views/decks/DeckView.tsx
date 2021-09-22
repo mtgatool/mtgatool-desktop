@@ -35,8 +35,6 @@ import { AppState } from "../../../redux/stores/rendererStore";
 import DeckList from "../../DeckList";
 import reduxAction from "../../../redux/reduxAction";
 import { DbDeck } from "../../../types/dbTypes";
-import getGunDb from "../../../toolDb/getGunDb";
-import getLocalDbValue from "../../../toolDb/getLocalDbValue";
 
 // const { MANA_COLORS } = constants;
 
@@ -49,24 +47,17 @@ export default function DeckView(): JSX.Element {
   const dispatch = useDispatch();
   const history = useHistory();
   const params = useParams<{ page: string; id: string }>();
+  const [dbDeck, setDbDeck] = useState<DbDeck>();
 
   const { decksIndex } = useSelector((state: AppState) => state.mainData);
-  const latestVersion = decksIndex[params.id];
 
-  const gunDB = getGunDb();
-  const pubkey = window.toolDb.user?.pubKey || "";
-  const decks: Record<string, DbDeck> = {};
-  Object.keys(decksIndex).forEach((id) => {
-    const record = getLocalDbValue(
-      gunDB,
-      `:${pubkey}.decks-${id}-v${decksIndex[id]}`
-    );
-    if (record) {
-      decks[`${id}-v${decksIndex[id]}`] = record;
-    }
-  });
-
-  const dbDeck = decks[`${params.id}-v${latestVersion}`];
+  useEffect(() => {
+    window.toolDb.getData(decodeURIComponent(params.id)).then((d) => {
+      if (d) {
+        setDbDeck(d);
+      }
+    });
+  }, [params, decksIndex]);
 
   const deck = new Deck(dbDeck);
 

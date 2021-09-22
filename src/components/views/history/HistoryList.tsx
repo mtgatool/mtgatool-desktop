@@ -1,20 +1,22 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useCallback, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import usePagingControls from "../../../hooks/usePagingControls";
-import { AppState } from "../../../redux/stores/rendererStore";
 import { Filters } from "../../../types/genericFilterTypes";
 
 import doHistoryFilter from "../../../utils/tables/doHistoryFilter";
 import PagingControls from "../../PagingControls";
 import SortControls, { Sort } from "../../SortControls";
-import getMatchesData, { MatchData } from "./getMatchesData";
+import { MatchData } from "./getMatchesData";
 import ListItemMatch from "./ListItemMatch";
 
-export default function HistoryList() {
+interface HistoryListProps {
+  matchesData: MatchData[];
+}
+
+export default function HistoryList(props: HistoryListProps) {
   const history = useHistory();
-  const { matchesIndex } = useSelector((state: AppState) => state.mainData);
+  const { matchesData } = props;
 
   const [filters] = useState<Filters<MatchData>>([]);
 
@@ -25,17 +27,19 @@ export default function HistoryList() {
 
   const filteredData = useMemo(() => {
     if (filters) {
-      const matchesForFiltering = getMatchesData(matchesIndex);
-      return doHistoryFilter(matchesForFiltering, filters, sortValue);
+      return doHistoryFilter(matchesData, filters, sortValue);
     }
     return [];
-  }, [matchesIndex, filters, sortValue]);
+  }, [matchesData, filters, sortValue]);
 
   const pagingControlProps = usePagingControls(filteredData.length, 25);
 
   const openMatch = useCallback(
     (match: MatchData) => {
-      history.push(`/history/${match.matchId}`);
+      const pubKey = window.toolDb.user?.pubKey || "";
+      history.push(
+        `/history/${encodeURIComponent(`:${pubKey}.matches-${match.matchId}`)}`
+      );
     },
     [history]
   );
