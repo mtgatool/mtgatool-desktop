@@ -25,15 +25,15 @@ export default function createOverlay(
 ): Promise<void> {
   if (!electron) return new Promise((a, r) => r());
 
-  const settings: OverlaySettings = (
-    JSON.parse(getLocalSetting("settings")) as Settings
-  ).overlays[id];
+  const allSettings = JSON.parse(getLocalSetting("settings")) as Settings;
+  const settings: OverlaySettings = allSettings.overlays[id];
 
   const newWindow = new electron.remote.BrowserWindow({
-    transparent: true,
+    transparent: allSettings.overlaysTransparency,
     // resizable: false,
     // skipTaskbar: true,
     focusable: false,
+    backgroundColor: allSettings.overlaysTransparency ? "#FFF" : "#0d0d0f",
     title: overlayIdToTitle[id],
     show: false,
     frame: false,

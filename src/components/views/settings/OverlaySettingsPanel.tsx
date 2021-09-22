@@ -348,6 +348,13 @@ function setHoverCards(checked: boolean): void {
   });
 }
 
+function setOverlaysTransparency(checked: boolean): void {
+  reduxAction(store.dispatch, {
+    type: "SET_SETTINGS",
+    arg: { overlaysTransparency: checked },
+  });
+}
+
 export default function OverlaySettingsPanel() {
   const dispatch = useDispatch();
   const settings = useSelector((state: AppState) => state.settings);
@@ -411,6 +418,12 @@ export default function OverlaySettingsPanel() {
         text="Show hover cards overlay"
         value={settings.overlayHover}
         callback={setHoverCards}
+      />
+
+      <Toggle
+        text="Use transparency effect"
+        value={settings.overlaysTransparency}
+        callback={setOverlaysTransparency}
       />
 
       <div

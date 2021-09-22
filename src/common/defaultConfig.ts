@@ -1,4 +1,5 @@
 import { constants, CardQuality } from "mtgatool-shared";
+import electron from "../utils/electron/electronWrapper";
 
 const {
   COLLECTION_CARD_MODE,
@@ -38,6 +39,7 @@ export const defaultConfig = {
   overlayBackColor: "#000000ff",
   overlayOverview: true,
   overlayHover: true,
+  overlaysTransparency: !!(electron && process.platform !== "linux"),
   settingsSection: 1,
   settingsOverlaySection: 0,
   cardsQuality: "normal" as CardQuality,
