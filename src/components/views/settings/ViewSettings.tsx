@@ -7,6 +7,7 @@ import OverlaySettingsPanel from "./OverlaySettingsPanel";
 import VisualSettingsPanel from "./VisualSettingsPanel";
 import ShortcutsSettingsPanel from "./ShortcutsSettingsPanel";
 import AccountSettingsPanel from "./AccountSettingsPanel";
+import DataSettingsPanel from "./DataSettingsPanel";
 
 const SETTINGS_BEHAVIOUR = 10;
 const SETTINGS_ARENA_DATA = 11;
@@ -69,7 +70,7 @@ export default function ViewSettings(props: ViewSettingsProps) {
   tabs[SETTINGS_ARENA_DATA] = {
     ...defaultTab,
     id: SETTINGS_ARENA_DATA,
-    component: Fragment, // SectionData,
+    component: DataSettingsPanel, // SectionData,
     title: "Arena Data",
   };
   tabs[SETTINGS_OVERLAY] = {

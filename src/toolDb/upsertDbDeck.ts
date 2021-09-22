@@ -5,7 +5,7 @@ import store from "../redux/stores/rendererStore";
 
 import { DbDeck } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
-import getGunDb from "./getGunDb";
+
 import getLocalDbValue from "./getLocalDbValue";
 
 export default async function upsertDbDeck(internal: InternalDeck) {
@@ -13,9 +13,10 @@ export default async function upsertDbDeck(internal: InternalDeck) {
   const deck = new Deck(internal);
   console.log(deck);
 
-  const gunDB = getGunDb();
   const pubkey = window.toolDb.user?.pubKey || "";
-  const decksIndex = getLocalDbValue(gunDB, `:${pubkey}.decksIndex`);
+  const decksIndex =
+    (await getLocalDbValue<Record<string, number>>(`:${pubkey}.decksIndex`)) ||
+    {};
   const { dispatch } = store;
 
   console.log("DecksIndex", decksIndex);

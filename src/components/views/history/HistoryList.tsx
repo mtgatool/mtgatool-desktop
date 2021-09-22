@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import usePagingControls from "../../../hooks/usePagingControls";
@@ -15,6 +15,7 @@ import ListItemMatch from "./ListItemMatch";
 export default function HistoryList() {
   const history = useHistory();
   const { matchesIndex } = useSelector((state: AppState) => state.mainData);
+  const [matchesData, setMatchesData] = useState<MatchData[]>([]);
 
   const [filters] = useState<Filters<MatchData>>([]);
 
@@ -23,13 +24,16 @@ export default function HistoryList() {
     sort: -1,
   });
 
+  useEffect(() => {
+    getMatchesData(matchesIndex).then(setMatchesData);
+  }, [matchesIndex]);
+
   const filteredData = useMemo(() => {
     if (filters) {
-      const matchesForFiltering = getMatchesData(matchesIndex);
-      return doHistoryFilter(matchesForFiltering, filters, sortValue);
+      return doHistoryFilter(matchesData, filters, sortValue);
     }
     return [];
-  }, [matchesIndex, filters, sortValue]);
+  }, [matchesData, filters, sortValue]);
 
   const pagingControlProps = usePagingControls(filteredData.length, 25);
 

@@ -37,8 +37,6 @@ import { toMMSS } from "../../../utils/dateTo";
 import ActionLog from "../../ActionLog";
 import { DbMatch } from "../../../types/dbTypes";
 import isLimitedEventId from "../../../utils/isLimitedEventId";
-import getGunDb from "../../../toolDb/getGunDb";
-import getLocalDbValue from "../../../toolDb/getLocalDbValue";
 
 interface GameStatsProps {
   game: MatchGameStats;
@@ -113,27 +111,33 @@ export default function MatchView(): JSX.Element {
   const history = useHistory();
   const dispatch = useDispatch();
   const params = useParams<{ page: string; id: string }>();
+  const [matchData, setMatchData] = useState<DbMatch>();
 
-  const gunDB = getGunDb();
-  const pubkey = window.toolDb.user?.pubKey || "";
-
-  const matchData = getLocalDbValue(
-    gunDB,
-    `:${pubkey}.matches-${params.id}`
-  ) as DbMatch;
-
-  console.log(matchData);
-  const { internalMatch } = matchData;
+  useEffect(() => {
+    window.toolDb.getData<DbMatch>(`matches-${params.id}`).then((match) => {
+      if (match) {
+        setMatchData(match);
+      }
+    });
+  }, [params]);
 
   const [view, setView] = useState(VIEW_MATCH);
   const [gameSeen, setGameSeen] = useState(0);
 
-  const playerDeck = new Deck(internalMatch.playerDeck);
-  const oppDeck = new Deck(internalMatch.oppDeck);
-  const isLimited = isLimitedEventId(internalMatch.eventId);
+  const playerDeck = matchData
+    ? new Deck(matchData.internalMatch.playerDeck)
+    : undefined;
+  const oppDeck = matchData
+    ? new Deck(matchData.internalMatch.oppDeck)
+    : undefined;
+  const isLimited = matchData
+    ? isLimitedEventId(matchData.internalMatch.eventId)
+    : undefined;
 
-  const logExists = !!internalMatch.actionLog;
-  const actionLogDataString = internalMatch.actionLog ?? "";
+  const logExists = matchData ? !!matchData.internalMatch.actionLog : undefined;
+  const actionLogDataString = matchData
+    ? matchData.internalMatch.actionLog ?? ""
+    : undefined;
 
   const goBack = (): void => {
     history.goBack();
@@ -153,49 +157,54 @@ export default function MatchView(): JSX.Element {
 
   useEffect(() => {
     setView(VIEW_MATCH);
-  }, [internalMatch.id]);
+  }, [matchData]);
 
   let deck = oppDeck;
 
-  const arrayGameStats = Object.values(internalMatch.gameStats);
+  const arrayGameStats = matchData
+    ? Object.values(matchData.internalMatch.gameStats)
+    : undefined;
 
   // v4.1.0: Introduced by-game cards seen
-  const gameDetails = internalMatch && internalMatch.toolVersion >= 262400;
+  const gameDetails =
+    matchData && matchData.internalMatch.toolVersion >= 262400;
   if (gameDetails) {
     const combinedList: number[] = [];
-    arrayGameStats
-      .map((stats: MatchGameStats) => {
-        const counts: { [key: number]: number } = {};
-        if (stats) {
-          // stats.cardsSeen.forEach(id => {
-          //   counts[id] = counts[id] ? counts[id] + 1 : 1;
-          // })
-          for (const i in stats.cardsSeen) {
-            const key = stats.cardsSeen[i];
-            counts[key] = counts[key] ? counts[key] + 1 : 1;
+    if (arrayGameStats) {
+      arrayGameStats
+        .map((stats: MatchGameStats) => {
+          const counts: { [key: number]: number } = {};
+          if (stats) {
+            // stats.cardsSeen.forEach(id => {
+            //   counts[id] = counts[id] ? counts[id] + 1 : 1;
+            // })
+            for (const i in stats.cardsSeen) {
+              const key = stats.cardsSeen[i];
+              counts[key] = counts[key] ? counts[key] + 1 : 1;
+            }
           }
-        }
-        return counts;
-      })
-      .forEach((counts: { [key: string]: number }) => {
-        for (const i in counts) {
-          const key = Number(i);
-          const c = combinedList.filter((d) => d === key).length;
+          return counts;
+        })
+        .forEach((counts: { [key: string]: number }) => {
+          for (const i in counts) {
+            const key = Number(i);
+            const c = combinedList.filter((d) => d === key).length;
 
-          let loopCount = counts[i] - c;
-          while (loopCount > 0) {
-            combinedList.push(key);
-            loopCount -= 1;
+            let loopCount = counts[i] - c;
+            while (loopCount > 0) {
+              combinedList.push(key);
+              loopCount -= 1;
+            }
           }
-        }
-      });
+        });
 
-    deck = new Deck(
-      {},
-      gameSeen == arrayGameStats?.length
-        ? combinedList
-        : arrayGameStats[gameSeen]?.cardsSeen || []
-    );
+      deck = new Deck(
+        {},
+        gameSeen == arrayGameStats?.length
+          ? combinedList
+          : arrayGameStats[gameSeen]?.cardsSeen || []
+      );
+    }
   }
 
   const existsPrev = useCallback((game: number): boolean => {
@@ -204,7 +213,9 @@ export default function MatchView(): JSX.Element {
 
   const existsNext = useCallback(
     (game: number, _match: InternalMatch): boolean => {
-      return _match && game < arrayGameStats.length;
+      return (
+        _match && arrayGameStats !== undefined && game < arrayGameStats.length
+      );
     },
     []
   );
@@ -214,18 +225,23 @@ export default function MatchView(): JSX.Element {
   }, [existsPrev, gameSeen]);
 
   const gameNext = useCallback(() => {
-    if (existsNext(gameSeen, internalMatch)) setGameSeen(gameSeen + 1);
-  }, [existsNext, gameSeen, internalMatch]);
+    if (matchData) {
+      if (existsNext(gameSeen, matchData.internalMatch))
+        setGameSeen(gameSeen + 1);
+    }
+  }, [existsNext, gameSeen, matchData]);
 
   const clickAdd = (): void => {
     // Add to your decks
   };
 
   const clickArena = (): void => {
-    deck.sortMainboard(compareCards);
-    deck.sortSideboard(compareCards);
-    copyToClipboard(deck.getExportArena());
-    // popup => Decklist copied to clipboard.
+    if (deck) {
+      deck.sortMainboard(compareCards);
+      deck.sortSideboard(compareCards);
+      copyToClipboard(deck.getExportArena());
+      // popup => Decklist copied to clipboard.
+    }
   };
 
   const clickTxt = (): void => {
@@ -235,9 +251,11 @@ export default function MatchView(): JSX.Element {
   };
 
   const copyOppName = useCallback((): void => {
-    copyToClipboard(internalMatch.opponent.name);
-    // popup => Opponent's name copied to clipboard
-  }, [internalMatch]);
+    if (matchData) {
+      copyToClipboard(matchData.internalMatch.opponent.name);
+      // popup => Opponent's name copied to clipboard
+    }
+  }, [matchData]);
 
   /*
   const mulliganType =
@@ -246,10 +264,14 @@ export default function MatchView(): JSX.Element {
       ? "london"
       : "vancouver";
   */
-  const duration = arrayGameStats.reduce((acc, cur) => acc + cur.time, 0);
+  const duration = arrayGameStats
+    ? arrayGameStats.reduce((acc, cur) => acc + cur.time, 0)
+    : 0;
 
-  const pw = internalMatch.player.wins;
-  const ow = internalMatch.opponent.wins;
+  const pw = matchData?.internalMatch.player.wins || 0;
+  const ow = matchData?.internalMatch.opponent.wins || 0;
+
+  if (!playerDeck || !matchData || !deck || !arrayGameStats) return <></>;
   return (
     <>
       <div
@@ -305,14 +327,14 @@ export default function MatchView(): JSX.Element {
               className="match-top-result"
               style={{ color: `var(--color-${pw > ow ? "g" : "r"})` }}
             >{`${pw}-${ow}`}</div>
-            <ResultDetails match={internalMatch} />
+            <ResultDetails match={matchData.internalMatch} />
           </Flex>
           <Flex>
             <IconEvent
               style={{ margin: "auto 16px auto 8px" }}
               fill="var(--color-icon)"
             />
-            <div>{getEventPrettyName(internalMatch.eventId)}</div>
+            <div>{getEventPrettyName(matchData.internalMatch.eventId)}</div>
           </Flex>
           <Flex>
             <IconTime
@@ -346,7 +368,7 @@ export default function MatchView(): JSX.Element {
         >
           <Flex>
             <div className="match-player-name">
-              vs {internalMatch.opponent.name.slice(0, -6)}
+              vs {matchData.internalMatch.opponent.name.slice(0, -6)}
             </div>
             <SvgButton
               style={{ margin: "auto 2px" }}
@@ -355,14 +377,16 @@ export default function MatchView(): JSX.Element {
             />
           </Flex>
           <RankIcon
-            rank={internalMatch.opponent.rank}
-            tier={internalMatch.opponent.tier}
-            percentile={internalMatch.opponent.percentile || 0}
-            leaderboardPlace={internalMatch.opponent.leaderboardPlace || 0}
+            rank={matchData.internalMatch.opponent.rank}
+            tier={matchData.internalMatch.opponent.tier}
+            percentile={matchData.internalMatch.opponent.percentile || 0}
+            leaderboardPlace={
+              matchData.internalMatch.opponent.leaderboardPlace || 0
+            }
             format={isLimited ? "limited" : "constructed"}
           />
           <Flex>
-            <ManaCost colors={oppDeck.colors.get()} />
+            <ManaCost colors={oppDeck?.colors.get() || []} />
           </Flex>
         </Section>
 
@@ -373,7 +397,7 @@ export default function MatchView(): JSX.Element {
             gridArea: "buttons",
           }}
         >
-          {gameDetails && internalMatch && (
+          {gameDetails && matchData && (
             <div
               style={{
                 display: "flex",
@@ -398,13 +422,13 @@ export default function MatchView(): JSX.Element {
                   width: "-webkit-fill-available",
                 }}
               >
-                {gameSeen == arrayGameStats.length
+                {gameSeen == arrayGameStats?.length || 0
                   ? `Combined`
                   : `Seen in game ${gameSeen + 1}`}
               </div>
               <SvgButton
                 style={
-                  !existsNext(gameSeen, internalMatch)
+                  !existsNext(gameSeen, matchData.internalMatch)
                     ? {
                         cursor: "default",
                         opacity: 0.5,
@@ -454,7 +478,7 @@ export default function MatchView(): JSX.Element {
           }}
         >
           {view == VIEW_LOG ? (
-            <ActionLog logStr={actionLogDataString} />
+            <ActionLog logStr={actionLogDataString || ""} />
           ) : arrayGameStats[gameSeen] ? (
             <GameStats index={gameSeen} game={arrayGameStats[gameSeen]} />
           ) : (

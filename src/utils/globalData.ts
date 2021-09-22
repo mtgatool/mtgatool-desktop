@@ -8,6 +8,7 @@ const globalData = {
   mouseX: 0,
   mouseY: 0,
   CRDTList: {} as CRDT,
+  idb: null as IDBDatabase | null,
 };
 
 (window as any).globalData = globalData;
