@@ -70,7 +70,12 @@ export default function DecksList() {
   const openDeck = useCallback(
     (deck: DbDeck) => {
       // reduxAction(dispatch, { type: "SET_BACK_GRPID", arg: deck.tile });
-      history.push(`/decks/${deck.id}`);
+      const pubKey = window.toolDb.user?.pubKey || "";
+      history.push(
+        `/decks/${encodeURIComponent(
+          `:${pubKey}.decks-${deck.id}-v${deck.version}`
+        )}`
+      );
     },
     [history]
   );

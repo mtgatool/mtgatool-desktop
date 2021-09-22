@@ -112,13 +112,16 @@ export default function MatchView(): JSX.Element {
   const dispatch = useDispatch();
   const params = useParams<{ page: string; id: string }>();
   const [matchData, setMatchData] = useState<DbMatch>();
+  console.log(params.id);
 
   useEffect(() => {
-    window.toolDb.getData<DbMatch>(`matches-${params.id}`).then((match) => {
-      if (match) {
-        setMatchData(match);
-      }
-    });
+    window.toolDb
+      .getData<DbMatch>(decodeURIComponent(params.id))
+      .then((match) => {
+        if (match) {
+          setMatchData(match);
+        }
+      });
   }, [params]);
 
   const [view, setView] = useState(VIEW_MATCH);

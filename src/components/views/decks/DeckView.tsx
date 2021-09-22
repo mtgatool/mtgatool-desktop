@@ -52,8 +52,7 @@ export default function DeckView(): JSX.Element {
   const { decksIndex } = useSelector((state: AppState) => state.mainData);
 
   useEffect(() => {
-    const latestVersion = decksIndex[params.id];
-    window.toolDb.getData(`decks-${params.id}-v${latestVersion}`).then((d) => {
+    window.toolDb.getData(decodeURIComponent(params.id)).then((d) => {
       if (d) {
         setDbDeck(d);
       }
