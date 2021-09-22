@@ -119,7 +119,12 @@ export default function Auth(props: AuthProps) {
     if (loginState === LOGIN_OK) {
       if (rememberme) {
         setLocalSetting("username", username);
-        if (sha1(pass) !== getLocalSetting("savedPassword") && pass !== "") {
+        if (
+          savedPass !== getLocalSetting("savedPassword") &&
+          savedPass !== "" &&
+          pass != "" &&
+          pass !== savedPass
+        ) {
           setLocalSetting("savedPassword", sha1(pass));
         }
       } else {
