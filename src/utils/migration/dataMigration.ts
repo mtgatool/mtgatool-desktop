@@ -18,6 +18,11 @@ function convertOldInternalToDbMatch(
   match.player.wins = (match.player as any).win;
   match.opponent.wins = (match.opponent as any).win;
 
+  let date = new Date(match.date);
+  if ((match as any).date.$$date) {
+    date = new Date((match as any).date.$$date);
+  }
+
   const newMatch: DbMatch = {
     playerId: splittedId[5] || getLocalSetting("playerId"),
     playerName: match.arenaId || match.player.name,
@@ -31,7 +36,7 @@ function convertOldInternalToDbMatch(
     eventId: match.eventId,
     duration: match.duration,
     internalMatch: match,
-    timestamp: new Date(match.date).getTime(),
+    timestamp: date.getTime(),
   };
 
   let corrupted = false;
