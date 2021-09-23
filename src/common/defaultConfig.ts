@@ -11,10 +11,17 @@ const {
   OVERLAY_MIXED,
 } = constants;
 
+let primaryX = 0;
+let primaryY = 0;
+if (electron) {
+  primaryX = electron.remote.screen.getPrimaryDisplay().bounds.x;
+  primaryY = electron.remote.screen.getPrimaryDisplay().bounds.y;
+}
+
 const overlayCfg = {
   alpha: 1,
   alphaBack: 0.7,
-  bounds: { width: 300, height: 600, x: 0, y: 0 },
+  bounds: { width: 300, height: 600, x: primaryX, y: primaryY },
   clock: false,
   drawOdds: true,
   deck: true,
