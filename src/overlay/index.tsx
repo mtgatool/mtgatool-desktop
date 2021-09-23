@@ -166,7 +166,7 @@ export default function Overlay() {
             }
       }
     >
-      {process.platform !== "linux" && <TopBar closeCallback={closeOverlay} />}
+      <TopBar closeCallback={closeOverlay} />
       <div
         style={{
           backgroundColor: `rgba(0,0,0, ${settings?.alphaBack || 0})`,

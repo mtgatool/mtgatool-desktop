@@ -33,7 +33,7 @@ export default function createOverlay(
     // resizable: false,
     // skipTaskbar: true,
     focusable: false,
-    backgroundColor: allSettings.overlaysTransparency ? "#FFF" : "#0d0d0f",
+    backgroundColor: allSettings.overlaysTransparency ? undefined : "#0d0d0f",
     title: overlayIdToTitle[id],
     show: false,
     frame: false,
