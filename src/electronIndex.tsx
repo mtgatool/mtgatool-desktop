@@ -30,6 +30,7 @@ import {
 import { DB_SERVER } from "./constants";
 import Updater from "./updater";
 import getLocalSetting from "./utils/getLocalSetting";
+import registerShortcuts from "./utils/registerShortcuts";
 
 const title = getWindowTitle();
 
@@ -101,6 +102,10 @@ if (title == WINDOW_UPDATER) {
   }
 
   defaultLocalSettings();
+
+  const settings = JSON.parse(getLocalSetting("settings"));
+  registerShortcuts(settings);
+
   mainChannelListeners();
   ReactDOM.render(
     <React.StrictMode>

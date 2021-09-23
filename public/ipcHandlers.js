@@ -1,5 +1,6 @@
-const { ipcMain, dialog, app } = require("electron");
+const { globalShortcut, ipcMain, dialog, app } = require("electron");
 const mainGlobals = require("./mainGlobals");
+const openDevTools = require("./openDevTools");
 
 const ipc = ipcMain;
 
@@ -32,6 +33,10 @@ function handleIpcSwitch(_event, method, msg) {
         break;
       case "minimize":
         mainGlobals.mainWindow.minimize();
+        break;
+      case "setDevtoolsShortcut":
+        console.log(msg);
+        globalShortcut.register(msg.arg || "Alt+Shift+D", openDevTools);
         break;
       case "quit":
         app.quit();

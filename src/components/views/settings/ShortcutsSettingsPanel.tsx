@@ -7,6 +7,7 @@ import Toggle from "../../ui/Toggle";
 import Button from "../../ui/Button";
 import EditKey from "../../popups/EditKey";
 import electron from "../../../utils/electron/electronWrapper";
+import registerShortcuts from "../../../utils/registerShortcuts";
 
 const SHORTCUT_NAMES = {
   shortcutOverlay1: "Toggle Overlay 1",
@@ -14,8 +15,7 @@ const SHORTCUT_NAMES = {
   shortcutOverlay3: "Toggle Overlay 3",
   shortcutOverlay4: "Toggle Overlay 4",
   shortcutOverlay5: "Toggle Overlay 5",
-  shortcutDevtoolsMain: "Toggle Developer Tools (main)",
-  shortcutDevtoolsOverlay: "Toggle Developer Tools (overlays)",
+  shortcutDevtoolsMain: "Toggle Developer Tools",
 };
 
 function ShortcutsRow({
@@ -44,6 +44,8 @@ function ShortcutsRow({
         type: "SET_SETTINGS",
         arg: { ...settings, [code]: key },
       });
+
+      registerShortcuts(settings);
     },
     [code, dispatch, settings]
   );

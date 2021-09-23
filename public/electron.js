@@ -1,19 +1,11 @@
 // eslint-disable-next-line import/no-unresolved
-const {
-  app,
-  globalShortcut,
-  BrowserWindow,
-  protocol,
-  Menu,
-  Tray,
-} = require("electron");
+const { app, BrowserWindow, protocol, Menu, Tray } = require("electron");
 const path = require("path");
 const url = require("url");
 
 const { autoUpdater } = require("electron-updater");
 
 const mainIpcInitialize = require("./ipcHandlers");
-const openDevTools = require("./openDevTools");
 const mainGlobals = require("./mainGlobals");
 const installDevTools = require("./devtools");
 
@@ -181,8 +173,6 @@ function createWindow() {
   mainGlobals.mainWindow.removeMenu();
 
   createCardHoverWindow();
-
-  globalShortcut.register("Alt+Shift+D", openDevTools);
 
   let iconPath = iconTray;
   if (process.platform == "linux") {
