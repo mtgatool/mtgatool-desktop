@@ -38,12 +38,19 @@ import { DbMatch } from "../types/dbTypes";
 import incomingLiveFeed from "../toolDb/incomingLiveFeed";
 import getGunDb from "../toolDb/getGunDb";
 
-function App() {
+export interface AppProps {
+  forceOs?: string;
+}
+
+function App(props: AppProps) {
+  const { forceOs } = props;
   const history = useHistory();
   const dispatch = useDispatch();
 
   const { loginState, loading, backgroundGrpid, matchInProgress, peers } =
     useSelector((state: AppState) => state.renderer);
+
+  const os = forceOs || (electron ? process.platform : "web");
 
   useEffect(() => {
     if (!window.toolDbInitialized) {
@@ -97,7 +104,7 @@ function App() {
   }, [history, dispatch]);
 
   let wrapperClass = "app-wrapper-back";
-  if (process.platform == "linux" || electron) {
+  if (os == "linux") {
     if (loginState == LOGIN_OK) {
       wrapperClass = "app-wrapper-back-no-frame";
     }
@@ -124,11 +131,11 @@ function App() {
       >
         <ViewSettings onClose={closeSettings.current} />
       </PopupComponent>
-      {electron && process.platform !== "linux" && <TopBar />}
+      {os !== "" && os !== "linux" && <TopBar forceOs={os} />}
       <div
         className={wrapperClass}
         style={{
-          height: `calc(100% - ${electron ? 24 : 0}px)`,
+          height: `calc(100% - ${os !== "" && os !== "linux" ? 24 : 0}px)`,
           backgroundImage: backgroundImage,
         }}
       >
@@ -136,9 +143,9 @@ function App() {
         {loading ? (
           <LoadingBar
             style={
-              loginState == LOGIN_OK || process.platform == "linux"
+              loginState == LOGIN_OK || os == "linux"
                 ? {
-                    top: process.platform !== "linux" ? "72px" : "0px",
+                    top: os !== "linux" ? "72px" : "0px",
                   }
                 : {}
             }
@@ -159,7 +166,7 @@ function App() {
           </Switch>
         </ErrorBoundary>
         {loginState == LOGIN_OK ? <DataStatus /> : <></>}
-        {electron ? (
+        {os !== "" ? (
           <div className="version-number">v{info.version}</div>
         ) : (
           <></>

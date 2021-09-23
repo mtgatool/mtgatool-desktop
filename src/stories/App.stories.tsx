@@ -2,7 +2,7 @@
 import { Story, Meta } from "@storybook/react";
 
 import Auth, { AuthProps } from "../components/Auth";
-import App from "../components/App";
+import App, { AppProps } from "../components/App";
 
 import "../index.scss";
 
@@ -12,9 +12,7 @@ export default {
 } as Meta;
 
 const Template: Story<AuthProps> = (args) => <Auth {...args} />;
-const AppTemplate: Story = () => <App />;
-
-export const AppComponent = AppTemplate.bind({});
+const AppTemplate: Story<AppProps> = (args) => <App {...args} />;
 
 export const AuthComponentLogin = Template.bind({});
 AuthComponentLogin.args = {
@@ -29,4 +27,19 @@ AuthComponentSignup.args = {
 export const AuthComponentForgot = Template.bind({});
 AuthComponentForgot.args = {
   defaultPage: 0,
+};
+
+export const AppWindows = AppTemplate.bind({});
+AppWindows.args = {
+  forceOs: "windows",
+};
+
+export const AppOSX = AppTemplate.bind({});
+AppOSX.args = {
+  forceOs: "darwin",
+};
+
+export const AppLinux = AppTemplate.bind({});
+AppLinux.args = {
+  forceOs: "linux",
 };
