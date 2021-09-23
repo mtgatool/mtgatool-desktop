@@ -40,19 +40,26 @@ const scryfallDataPath = path.join(
 */
 
 export function updateCache(data: string): void {
-  try {
-    // eslint-disable-next-line no-undef
-    const fs = __non_webpack_require__("fs");
-    if (cachePath) {
-      console.log(`Saved metadata to ${cachePath}`);
-      fs.writeFileSync(cachePath, data);
+  if (electron) {
+    try {
+      // eslint-disable-next-line no-undef
+      const fs = __non_webpack_require__("fs");
+      if (cachePath) {
+        console.log(`Saved metadata to ${cachePath}`);
+        fs.writeFileSync(cachePath, data);
+      }
+    } catch (e) {
+      console.log(`Error updating cache: ${e}`, "error");
     }
-  } catch (e) {
-    console.log(`Error updating cache: ${e}`, "error");
+  } else {
+    // requests are cached so we are cool?
   }
 }
 
-export function loadDbFromCache(): void {
+export function loadDbFromCache(
+  lang?: string,
+  forceReload = false
+): Promise<void> {
   loadDbFromShared();
   if (electron) {
     // eslint-disable-next-line no-undef
@@ -66,14 +73,16 @@ export function loadDbFromCache(): void {
       // database.setDatabaseUnsafely(distributedDb as Metadata);
       updateCache(JSON.stringify(database.metadata));
     }
+  } else {
+    // requests are cached so we are cool?
   }
 
-  axios
-    .get("https://mtgatool.com/database/latest/")
+  return axios
+    .get(`https://mtgatool.com/database/latest/${lang}`)
     .then((latestRes) => {
-      if (parseInt(latestRes.data.latest) > database.version) {
-        axios
-          .get<any>("https://mtgatool.com/database/")
+      if (forceReload || parseInt(latestRes.data.latest) > database.version) {
+        return axios
+          .get<any>(`https://mtgatool.com/database/${lang}`)
           .then((res) => {
             console.log("Updated cards database OK");
             console.log("New DB version: ", latestRes.data.latest);
@@ -86,9 +95,9 @@ export function loadDbFromCache(): void {
             );
             console.info(e);
           });
-      } else {
-        console.log(`Database up to date. (v${latestRes.data.latest})`);
       }
+      console.log(`Database up to date. (v${latestRes.data.latest})`);
+      return Promise.resolve();
     })
     .catch((e) => {
       console.info(

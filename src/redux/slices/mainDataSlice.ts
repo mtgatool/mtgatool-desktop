@@ -9,6 +9,7 @@ const mainState = {
   cards: {} as Cards,
   cardsNew: {} as Cards,
   cardsPrev: {} as Cards,
+  forceCollection: 1,
   currentUUID: "",
   uuidData: {
     "": defaultUUIDData,
@@ -46,6 +47,12 @@ const mainDataSlice = createSlice({
       state.cardsPrev = { ...state.cards };
       state.cards = action.payload;
     },
+    setForceCollection: (
+      state: PlayerData,
+      _action: PayloadAction<undefined>
+    ): void => {
+      state.forceCollection = new Date().getTime();
+    },
     setDecksIndex: (
       state: PlayerData,
       action: PayloadAction<Record<string, number>>
@@ -65,6 +72,7 @@ export const {
   addLiveFeed,
   setUUID,
   setCards,
+  setForceCollection,
   setUUIDData,
   setDecksIndex,
   setMatchesIndex,

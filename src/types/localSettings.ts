@@ -11,6 +11,7 @@ export const settingKeys = [
   "playerId",
   "settings",
   "welcome",
+  "lang",
 ] as const;
 
 export type SettingKey = typeof settingKeys[number];
@@ -25,4 +26,5 @@ export const defaultSettings: Record<SettingKey, string> = {
   playerId: "",
   settings: JSON.stringify(defaultConfig),
   welcome: "false",
+  lang: "en",
 };

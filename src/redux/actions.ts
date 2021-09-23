@@ -10,6 +10,7 @@ export const actions = {
   SET_UUID: MainDataSlice.setUUID,
   SET_UUID_DATA: MainDataSlice.setUUIDData,
   SET_CARDS: MainDataSlice.setCards,
+  FORCE_COLLECTION: MainDataSlice.setForceCollection,
   SET_DECKS_INDEX: MainDataSlice.setDecksIndex,
   SET_MATCHES_INDEX: MainDataSlice.setMatchesIndex,
   SET_PEERS: RendererSlice.setPeers,

@@ -29,11 +29,13 @@ export default function ContentWrapper() {
   const params = useParams<{ page: string }>();
   const paths = useRef<string[]>([params.page]);
 
-  const { cards, cardsNew } = useSelector((state: AppState) => state.mainData);
+  const { cards, cardsNew, forceCollection } = useSelector(
+    (state: AppState) => state.mainData
+  );
 
   const collectionData = useMemo(() => {
     return getCollectionData(cards, cardsNew);
-  }, [cards, cardsNew]);
+  }, [cards, cardsNew, forceCollection]);
 
   const prevIndex = Object.keys(views).findIndex(
     (k) => k == paths.current[paths.current.length - 1]

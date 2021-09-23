@@ -28,7 +28,8 @@ export default function AboutSettingsPanel(): JSX.Element {
       </div>
       {database.metadata ? (
         <div className="message-sub15">
-          Metadata: version {database.metadata.version || "???"}, updated{" "}
+          Metadata: v{database.metadata.version || "???"} ({database.lang}),
+          updated{" "}
           {database.metadata.updated
             ? format(fromUnixTime(database.metadata.updated / 1000), "Pp")
             : "???"}

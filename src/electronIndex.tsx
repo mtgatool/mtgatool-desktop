@@ -29,12 +29,9 @@ import {
 } from "./types/app";
 import { DB_SERVER } from "./constants";
 import Updater from "./updater";
+import getLocalSetting from "./utils/getLocalSetting";
 
 const title = getWindowTitle();
-
-if (title !== WINDOW_UPDATER) {
-  loadDbFromCache();
-}
 
 if (title == WINDOW_UPDATER) {
   ReactDOM.render(
@@ -131,6 +128,10 @@ if (title == WINDOW_UPDATER) {
       document.getElementById("root")
     );
   }
+}
+
+if (title !== WINDOW_UPDATER) {
+  loadDbFromCache(getLocalSetting("lang"));
 }
 
 // If you want your app to work offline and load faster, you can change

@@ -6,10 +6,54 @@ import reduxAction from "../../../redux/reduxAction";
 import store from "../../../redux/stores/rendererStore";
 
 import { DbMatch } from "../../../types/dbTypes";
+import { loadDbFromCache } from "../../../utils/database-wrapper";
+import getLocalSetting from "../../../utils/getLocalSetting";
 import dataMigration from "../../../utils/migration/dataMigration";
+import setLocalSetting from "../../../utils/setLocalSetting";
 
 import vodiFn from "../../../utils/voidfn";
 import Button from "../../ui/Button";
+import Select from "../../ui/Select";
+
+const SCRYFALL_LANGS = [
+  "en",
+  "de",
+  "es",
+  "fr",
+  "it",
+  "ru",
+  "pt",
+  "ja",
+  "zhs",
+  "ko",
+];
+
+function getLanguageName(lang: string): string {
+  switch (lang) {
+    case "en":
+      return "English";
+    case "es":
+      return "Spanish";
+    case "pt":
+      return "Portuguese";
+    case "de":
+      return "Deutsch";
+    case "fr":
+      return "French";
+    case "it":
+      return "Italian";
+    case "ja":
+      return "Japanese";
+    case "ru":
+      return "Russian";
+    case "ko":
+      return "Korean";
+    case "zhs":
+      return "Chinese (simplified)";
+    default:
+      return "-";
+  }
+}
 
 export default function DataSettingsPanel(): JSX.Element {
   const dispatch = useDispatch();
@@ -18,6 +62,8 @@ export default function DataSettingsPanel(): JSX.Element {
   const dbFileRef = useRef<Blob | null>(null);
   const [toMigrate, setToMigrate] = useState<DbMatch[]>([]);
   const [totalToMigrate, setTotalToMigrate] = useState(0);
+
+  const [dbLang, setDbLang] = useState<string>(getLocalSetting("lang") || "en");
 
   const doDataMigration = useCallback(() => {
     if (dbFileRef.current) {
@@ -67,6 +113,17 @@ export default function DataSettingsPanel(): JSX.Element {
     }
   }, [toMigrate]);
 
+  const setCardsLanguage = useCallback(
+    (lang: string) => {
+      setDbLang(lang);
+      setLocalSetting("lang", lang);
+      loadDbFromCache(getLocalSetting("lang")).then(() => {
+        reduxAction(dispatch, { type: "FORCE_COLLECTION", arg: undefined });
+      });
+    },
+    [dispatch]
+  );
+
   return (
     <>
       <div>
@@ -93,11 +150,28 @@ export default function DataSettingsPanel(): JSX.Element {
         </p>
       )}
       <Button
-        style={{ margin: "128px auto 0 auto" }}
+        style={{ margin: "64px auto 32px auto" }}
         text="Begin migration"
         className="button-simple"
         onClick={doDataMigration}
       />
+      <div className="centered-setting-container">
+        <label>Arena Data </label>
+        <Select
+          options={SCRYFALL_LANGS}
+          current={dbLang}
+          optionFormatter={getLanguageName}
+          callback={setCardsLanguage}
+        />
+      </div>
+      <div className="settings-note">
+        <i>
+          <p>
+            Changes the cards data language, <b>not the interface</b>.
+          </p>
+          <p>Card names when exporting will also be changed.</p>
+        </i>
+      </div>
     </>
   );
 }
