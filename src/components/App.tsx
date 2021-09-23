@@ -50,7 +50,7 @@ function App(props: AppProps) {
   const { loginState, loading, backgroundGrpid, matchInProgress, peers } =
     useSelector((state: AppState) => state.renderer);
 
-  const os = forceOs || (electron ? process.platform : "web");
+  const os = forceOs || (electron ? process.platform : "");
 
   useEffect(() => {
     if (!window.toolDbInitialized) {
