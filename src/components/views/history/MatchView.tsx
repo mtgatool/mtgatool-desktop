@@ -37,6 +37,7 @@ import { toMMSS } from "../../../utils/dateTo";
 import ActionLog from "../../ActionLog";
 import { DbMatch } from "../../../types/dbTypes";
 import isLimitedEventId from "../../../utils/isLimitedEventId";
+import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
 
 interface GameStatsProps {
   game: MatchGameStats;
@@ -371,7 +372,10 @@ export default function MatchView(): JSX.Element {
         >
           <Flex>
             <div className="match-player-name">
-              vs {matchData.internalMatch.opponent.name.slice(0, -6)}
+              vs{" "}
+              {getPlayerNameWithoutSuffix(
+                matchData.internalMatch.opponent.name
+              )}
             </div>
             <SvgButton
               style={{ margin: "auto 2px" }}

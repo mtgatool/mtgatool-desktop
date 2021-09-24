@@ -14,8 +14,23 @@ const tryConnection = () => {
     if (!startedElectron) {
       console.log("starting electron");
       startedElectron = true;
-      const { exec } = childProcess;
-      exec("npm run electron");
+      const { spawn } = childProcess;
+      // "npm.cmd" for windows, "npm" on the other OS!
+      const ls = spawn(process.platform === "win32" ? "npm.cmd" : "npm", [
+        "run",
+        "electron",
+      ]);
+      ls.stdout.on("data", (data) => {
+        console.log(data.toString());
+      });
+
+      ls.stderr.on("data", (data) => {
+        console.error(data.toString());
+      });
+
+      ls.on("exit", (code) => {
+        console.warning(`child process exited with code ${code.toString()}`);
+      });
     }
   });
 };

@@ -22,6 +22,7 @@ import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import Clock from "./Clock";
 import { overlayTitleToId } from "../common/maps";
 import DraftOverlay from "./DraftOverlay";
+import getPlayerNameWithoutSuffix from "../utils/getPlayerNameWithoutSuffix";
 
 function getCurrentOverlayId(): number {
   const title = electron?.remote.getCurrentWindow().getTitle() || "";
@@ -194,7 +195,9 @@ export default function Overlay() {
             !settings.collapsed && (
               <Clock
                 matchBeginTime={new Date(matchState.beginTime)}
-                oppName={(matchState.opponent.name || "").slice(0, -6)}
+                oppName={getPlayerNameWithoutSuffix(
+                  matchState.opponent.name || ""
+                )}
                 playerSeat={matchState.player ? matchState.player.seat : 1}
                 priorityTimers={matchState.priorityTimers}
                 turnPriority={matchState.currentPriority}

@@ -26,7 +26,13 @@ const mainDataSlice = createSlice({
   initialState: mainState,
   reducers: {
     addLiveFeed: (state: PlayerData, action: PayloadAction<DbMatch>): void => {
-      state.liveFeed = [action.payload, ...state.liveFeed].slice(0, 10);
+      const matches = state.liveFeed.filter(
+        (v) => v.matchId === action.payload.matchId
+      );
+      state.liveFeed =
+        matches.length === 0
+          ? [action.payload, ...state.liveFeed].slice(0, 10)
+          : state.liveFeed;
     },
     setUUID: (state: PlayerData, action: PayloadAction<string>): void => {
       state.currentUUID = action.payload;

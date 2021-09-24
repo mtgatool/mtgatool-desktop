@@ -1,10 +1,8 @@
-import electron from "./electron/electronWrapper";
+import info from "../info.json";
 
 /* eslint-disable radix */
 export default function getToolVersion(): number {
-  const base = !electron
-    ? process.env.REACT_APP_VERSION || ""
-    : (electron.app || electron.remote.app).getVersion();
-
-  return parseInt(base.split(".").reduce((acc, cur) => `${+acc * 256 + +cur}`));
+  return parseInt(
+    info.version.split(".").reduce((acc, cur) => `${+acc * 256 + +cur}`)
+  );
 }

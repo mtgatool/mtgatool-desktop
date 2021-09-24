@@ -7,6 +7,7 @@ export default function registerShortcuts(settings: AppState["settings"]) {
     electron.remote.globalShortcut.unregisterAll();
     if (settings.enableKeyboardShortcuts) {
       electron.ipcRenderer.send(
+        "ipc_switch",
         "setDevtoolsShortcut",
         settings.shortcutDevtoolsMain
       );

@@ -8,6 +8,7 @@ const ipc = ipcMain;
 const ipcWindows = {};
 
 function handleIpcSwitch(_event, method, msg) {
+  console.log(method, msg);
   if (msg.to) {
     const target = ipcWindows[msg.to];
     if (target) {
@@ -35,7 +36,6 @@ function handleIpcSwitch(_event, method, msg) {
         mainGlobals.mainWindow.minimize();
         break;
       case "setDevtoolsShortcut":
-        console.log(msg);
         globalShortcut.register(msg.arg || "Alt+Shift+D", openDevTools);
         break;
       case "quit":

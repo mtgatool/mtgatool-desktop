@@ -17,6 +17,7 @@ import timeAgo from "../../../utils/timeAgo";
 import RankIcon from "../../RankIcon";
 import isLimitedEventId from "../../../utils/isLimitedEventId";
 import { MatchData } from "./getMatchesData";
+import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
 
 const { DEFAULT_TILE } = constants;
 
@@ -104,7 +105,7 @@ export default function ListItemMatch({
       <Column className="list-item-right">
         <FlexTop>
           <div className="list-match-title">
-            {`vs ${internalMatch.opponent.name.slice(0, -6)}`}
+            {`vs ${getPlayerNameWithoutSuffix(internalMatch.opponent.name)}`}
           </div>
           <div
             onClick={(
