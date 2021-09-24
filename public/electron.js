@@ -18,6 +18,18 @@ let tray = null;
 
 app.allowRendererProcessReuse = false;
 
+function quit() {
+  app.quit();
+  app.exit();
+}
+
+const singleLock = app.requestSingleInstanceLock();
+
+if (!singleLock) {
+  console.log("We dont have single instance lock! quitting the app.");
+  quit();
+}
+
 function sendInit() {
   console.log("Renderer Init signal");
   mainGlobals.backgroundWindow.webContents.send("rendererInit", true);
@@ -54,11 +66,6 @@ function toggleWindow() {
   } else {
     showWindow();
   }
-}
-
-function quit() {
-  app.quit();
-  app.exit();
 }
 
 function createCardHoverWindow() {
@@ -256,6 +263,10 @@ function createUpdaterWindow() {
         slashes: true,
       })
   );
+  win.on("close", (e) => {
+    win.hide();
+    e.preventDefault();
+  });
 
   return win;
 }
@@ -339,5 +350,17 @@ app.on("window-all-closed", () => {
 app.on("activate", () => {
   if (mainGlobals.mainWindow === null) {
     preCreateWindow();
+  }
+});
+
+app.on("second-instance", () => {
+  if (mainGlobals.updaterWindow) {
+    showWindow();
+  } else if (mainGlobals.mainWindow?.isVisible()) {
+    if (mainGlobals.mainWindow.isMinimized()) {
+      showWindow();
+    }
+  } else {
+    showWindow();
   }
 });
