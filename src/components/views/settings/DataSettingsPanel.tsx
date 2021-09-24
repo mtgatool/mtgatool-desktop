@@ -144,13 +144,23 @@ export default function DataSettingsPanel(): JSX.Element {
           />
         </label>
       </div>
-      {totalToMigrate > 0 && toMigrate.length > 0 && (
-        <p>
-          {totalToMigrate - toMigrate.length}/{totalToMigrate}
-        </p>
-      )}
+
+      <div style={{ textAlign: "center", height: "48px" }}>
+        {totalToMigrate > 0 && toMigrate.length > 0 && (
+          <>
+            <p>
+              Restoring data ({totalToMigrate - toMigrate.length}/
+              {totalToMigrate})
+            </p>
+            <b className="red" style={{ lineHeight: "28px" }}>
+              Do not close this dialog!
+            </b>
+          </>
+        )}
+      </div>
+
       <Button
-        style={{ margin: "64px auto 32px auto" }}
+        style={{ margin: "16px auto 32px auto" }}
         text="Begin migration"
         className="button-simple"
         onClick={doDataMigration}
