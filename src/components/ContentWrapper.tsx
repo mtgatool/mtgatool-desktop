@@ -25,6 +25,13 @@ const views = {
   collection: ViewCollection,
 };
 
+function delay(transition: any, timeout: number): any {
+  return (_item: any) => async (next: any, _cancel: any) => {
+    await new Promise((resolve) => setTimeout(resolve, timeout));
+    await next(transition);
+  };
+}
+
 export default function ContentWrapper() {
   const params = useParams<{ page: string }>();
   const paths = useRef<string[]>([params.page]);
@@ -44,16 +51,14 @@ export default function ContentWrapper() {
 
   const leftAnim = {
     from: { opacity: 0, transform: "translate3d(100%, 0, 0)" },
-    enter: { opacity: 1, transform: "translate3d(0%, 0, 0)" },
+    enter: delay({ opacity: 1, transform: "translate3d(0%, 0, 0)" }, 100),
     leave: { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
-    delay: 100,
   };
 
   const rightAnim = {
     from: { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
-    enter: { opacity: 1, transform: "translate3d(0%, 0, 0)" },
+    enter: delay({ opacity: 1, transform: "translate3d(0%, 0, 0)" }, 100),
     leave: { opacity: 0, transform: "translate3d(100%, 0, 0)" },
-    delay: 100,
   };
 
   const transitions = useTransition(

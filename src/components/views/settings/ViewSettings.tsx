@@ -128,7 +128,7 @@ export default function ViewSettings(props: ViewSettingsProps) {
             <SettingsNav {...tabs[SETTINGS_DATA]} />
             {isElectron() && <SettingsNav {...tabs[SETTINGS_OVERLAY]} />}
             <SettingsNav {...tabs[SETTINGS_VISUAL]} />
-            <SettingsNav {...tabs[SETTINGS_SHORTCUTS]} />
+            {isElectron() && <SettingsNav {...tabs[SETTINGS_SHORTCUTS]} />}
             <SettingsNav {...tabs[SETTINGS_PRIVACY]} />
             <SettingsNav {...tabs[SETTINGS_ABOUT]} />
           </div>
