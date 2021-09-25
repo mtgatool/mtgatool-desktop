@@ -26,7 +26,7 @@ export default function PassphraseGenerate(): JSX.Element {
           We encourage users to generate a randomized passphrase for account
           recovery. You can use it later to gain access to the password hint
           that you enter below. Keep it somewhere safe! Its the only way you can
-          recover your password if case you forget it.
+          recover your password in case you forget it.
         </p>
         <p>
           It is not recommended to write your password in plaintext here, but
