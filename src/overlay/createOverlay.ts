@@ -67,7 +67,7 @@ export default function createOverlay(
           protocol: "file:",
           slashes: true,
         })
-      : "http://localhost:3000"
+      : "http://localhost:3001"
   );
 
   return new Promise<void>((resolve) => {

@@ -16,6 +16,8 @@ const icon256 = "icon-256.png";
 
 let tray = null;
 
+app.disableHardwareAcceleration();
+app.setAppUserModelId("com.mtgatool.desktop");
 app.allowRendererProcessReuse = false;
 
 function quit() {
