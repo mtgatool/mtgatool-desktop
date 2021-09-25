@@ -10,7 +10,7 @@ import AccountSettingsPanel from "./AccountSettingsPanel";
 import DataSettingsPanel from "./DataSettingsPanel";
 
 const SETTINGS_BEHAVIOUR = 10;
-const SETTINGS_ARENA_DATA = 11;
+const SETTINGS_DATA = 11;
 const SETTINGS_OVERLAY = 12;
 const SETTINGS_VISUAL = 13;
 const SETTINGS_SHORTCUTS = 14;
@@ -67,11 +67,11 @@ export default function ViewSettings(props: ViewSettingsProps) {
     component: Fragment, // SectionBehaviour,
     title: "Behaviour",
   };
-  tabs[SETTINGS_ARENA_DATA] = {
+  tabs[SETTINGS_DATA] = {
     ...defaultTab,
-    id: SETTINGS_ARENA_DATA,
+    id: SETTINGS_DATA,
     component: DataSettingsPanel, // SectionData,
-    title: "Arena Data",
+    title: "Data",
   };
   tabs[SETTINGS_OVERLAY] = {
     ...defaultTab,
@@ -125,7 +125,7 @@ export default function ViewSettings(props: ViewSettingsProps) {
           >
             <SettingsNav {...tabs[SETTINGS_ACCOUNT]} />
             {isElectron() && <SettingsNav {...tabs[SETTINGS_BEHAVIOUR]} />}
-            <SettingsNav {...tabs[SETTINGS_ARENA_DATA]} />
+            <SettingsNav {...tabs[SETTINGS_DATA]} />
             {isElectron() && <SettingsNav {...tabs[SETTINGS_OVERLAY]} />}
             <SettingsNav {...tabs[SETTINGS_VISUAL]} />
             <SettingsNav {...tabs[SETTINGS_SHORTCUTS]} />

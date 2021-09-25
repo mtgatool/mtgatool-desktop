@@ -166,7 +166,7 @@ export default function DataSettingsPanel(): JSX.Element {
         onClick={doDataMigration}
       />
       <div className="centered-setting-container">
-        <label>Arena Data </label>
+        <label>Cards Data</label>
         <Select
           options={SCRYFALL_LANGS}
           current={dbLang}
