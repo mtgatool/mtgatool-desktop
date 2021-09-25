@@ -40,7 +40,7 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "nf start -p 3000",
+    "start": "nf start -p 3001",
     "cm": "git-cz",
     "react-start": "node generateInfo.js && craco start",
     "react-build": "craco build",
