@@ -1,8 +1,8 @@
+/* eslint-disable radix */
 import { GREToClientMessage } from "mtgatool-shared/dist/types/greTypes";
 import LogEntry from "../../types/logDecoder";
 import GREMessage from "../greToClientInterpreter";
-import parseLogTimestamp from "../../utils/parseLogTimestamp";
-import { matchStateObject } from "../store/currentMatchStore";
+import { setCurrentMatchMany } from "../store/currentMatchStore";
 
 interface EntryJson {
   transactionId: string;
@@ -27,11 +27,16 @@ export default function GreToClient(entry: Entry): void {
   }
   const { json } = entry;
 
+  if (json.timestamp) {
+    setCurrentMatchMany({
+      logTime: new Date(parseInt(json.timestamp)),
+    });
+  }
+
   if (json?.greToClientEvent?.greToClientMessages) {
-    matchStateObject.logTime = parseLogTimestamp(json.timestamp);
     const message = json.greToClientEvent.greToClientMessages;
     message.forEach((msg) => {
-      GREMessage(msg, matchStateObject.logTime);
+      GREMessage(msg);
       /*
       const msgId = msg.msgId;
       globals.currentMatch.GREtoClient[msgId] = msg;

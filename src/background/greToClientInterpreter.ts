@@ -62,7 +62,9 @@ import {
 function changePriority(previous: number, current: number, time: number): void {
   const priorityTimers = objectClone(globalStore.currentMatch.priorityTimers);
   priorityTimers.timers[previous] += time - priorityTimers.last;
-  priorityTimers.last = time;
+  priorityTimers.last = globalStore.currentMatch.logTime.getTime();
+
+  console.log("changePriority", previous, priorityTimers, time);
 
   setCurrentMatchMany({
     priorityTimers: priorityTimers,
@@ -203,11 +205,13 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
 
   // A player played a land
   if (ann.details.category == "PlayLand") {
-    const grpId = instanceIdToObject(ann.affectedIds[0]).grpId || 0;
-    const playerName = getNameBySeat(ann.affectorId);
-    setHeat(ann.affectorId, 1);
+    const affected = instanceIdToObject(ann.affectedIds[0]);
+    const grpId = affected.grpId || 0;
+
+    const playerName = getNameBySeat(affected.controllerSeatId);
+    setHeat(affected.controllerSeatId, 1);
     actionLog(
-      ann.affectorId,
+      affected.controllerSeatId,
       globalStore.currentMatch.logTime,
       `${playerName} played ${actionLogGenerateLink(grpId)}`,
       grpId
@@ -1015,18 +1019,19 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
   ) {
     setOnThePlay(turnInfo.activePlayer);
   }
+  console.log("checkTurnDiff", currentMatch.logTime);
   if (turnInfo.priorityPlayer !== currentPriority) {
     changePriority(
-      turnInfo.priorityPlayer || 0,
       currentPriority,
-      globalStore.currentMatch.logTime.getTime()
+      turnInfo.priorityPlayer || 0,
+      currentMatch.logTime.getTime()
     );
   }
   if (currentTurnInfo.turnNumber !== turnInfo.turnNumber) {
-    globalStore.currentMatch.totalTurns += 1;
+    currentMatch.totalTurns += 1;
     actionLog(
       -1,
-      globalStore.currentMatch.logTime,
+      currentMatch.logTime,
       `${getNameBySeat(turnInfo.activePlayer || 0)}'s turn begins. (#${
         turnInfo.turnNumber
       })`
@@ -1193,13 +1198,8 @@ export function GREMessageByID(msgId: number, time: Date): void {
 }
 */
 
-export default function GREMessage(
-  message: GREToClientMessage,
-  time: Date
-): void {
+export default function GREMessage(message: GREToClientMessage): void {
   globalStore.currentMatch.GREtoClient[message.msgId || 0] = message;
-  globalStore.currentMatch.logTime = time;
-
   GREMessagesSwitch(message, message.type);
 
   // globals.currentMatch.cardTypesByZone = getCardsTypeZone();

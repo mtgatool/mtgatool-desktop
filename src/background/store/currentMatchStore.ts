@@ -90,10 +90,6 @@ export const matchStateObject = {
   cardsOdds: new Chances(),
 } as MatchState;
 
-export function setDate(arg: Date): void {
-  globalStore.currentMatch.logTime = arg;
-}
-
 export function setMatchId(arg: string): void {
   globalStore.currentMatch.matchId = arg;
 }
