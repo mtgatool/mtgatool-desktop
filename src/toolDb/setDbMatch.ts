@@ -26,7 +26,7 @@ export default async function setDbMatch(match: InternalMatch) {
     eventId: match.eventId,
     duration: match.duration,
     internalMatch: match,
-    timestamp: new Date().getTime(),
+    timestamp: new Date(match.date).getTime() || new Date().getTime(),
     // actionLog: match.actionLog,
   };
 

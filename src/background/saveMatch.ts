@@ -71,7 +71,7 @@ function generateInternalMatch(): InternalMatch {
   const newMatch: InternalMatch = {
     onThePlay: currentMatch.onThePlay,
     id: currentMatch.matchId,
-    date: new Date().toISOString(),
+    date: currentMatch.logTime.toISOString() || new Date().toISOString(),
     eventId: currentMatch.eventId,
     player: { ...currentMatch.player, wins: playerWins },
     opponent: { ...currentMatch.opponent, wins: opponentWins },

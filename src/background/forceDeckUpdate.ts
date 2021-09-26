@@ -51,8 +51,10 @@ const forceDeckUpdate = (removeUsed = true): void => {
     .get()
     .forEach((card: CardObject) => {
       // card.total = card.quantity;
-      decksize += card.quantity;
-      cardsleft += card.quantity;
+      if (card && card.quantity) {
+        decksize += card.quantity;
+        cardsleft += card.quantity;
+      }
     });
 
   if (removeUsed) {
@@ -68,7 +70,8 @@ const forceDeckUpdate = (removeUsed = true): void => {
   playerCardsBottom.forEach((grpId: number) => {
     playerCardsLeft.getMainboard().remove(grpId, 1);
   });
-  cardsleft -= playerCardsBottom.length;
+
+  cardsleft = Math.max(cardsleft - playerCardsBottom.length, 0);
 
   if (cardsleft < oddsSampleSize) cardsleft = oddsSampleSize;
 
@@ -81,7 +84,7 @@ const forceDeckUpdate = (removeUsed = true): void => {
         Math.min(oddsSampleSize, card.quantity),
         cardsleft,
         oddsSampleSize,
-        card.quantity
+        card.quantity || 0
       ) * 100
     )
   );
