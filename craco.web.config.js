@@ -14,6 +14,9 @@ module.exports = {
         fs: "empty",
       },
     },
+    optimization: {
+      minimize: false,
+    },
     plugins: [...ModuleReplacement({ webIndex: true, electronIndex: false })],
   },
   eslint: {
