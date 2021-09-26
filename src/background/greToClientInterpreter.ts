@@ -64,7 +64,7 @@ function changePriority(previous: number, current: number, time: number): void {
   priorityTimers.timers[previous] += time - priorityTimers.last;
   priorityTimers.last = globalStore.currentMatch.logTime.getTime();
 
-  console.log("changePriority", previous, priorityTimers, time);
+  // console.log("changePriority", previous, priorityTimers, time);
 
   setCurrentMatchMany({
     priorityTimers: priorityTimers,
@@ -1019,7 +1019,7 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
   ) {
     setOnThePlay(turnInfo.activePlayer);
   }
-  console.log("checkTurnDiff", currentMatch.logTime);
+  // console.log("checkTurnDiff", currentMatch.logTime);
   if (turnInfo.priorityPlayer !== currentPriority) {
     changePriority(
       currentPriority,
