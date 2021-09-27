@@ -3,6 +3,45 @@ import { setCards } from "../redux/slices/mainDataSlice";
 import store from "../redux/stores/rendererStore";
 import { DbUUIDData } from "../types/dbTypes";
 
+import getLocalDbValue from "./getLocalDbValue";
+
+function handleDecksIndex(data: Record<string, number> | undefined) {
+  if (data) {
+    Object.keys(data).forEach((id: string) => {
+      if (
+        !Object.keys(store.getState().mainData.decksIndex).includes(
+          `${id}-v${data[id]}`
+        )
+      ) {
+        window.toolDb.getData(`decks-${id}-v${data[id]}`, true, 5000);
+      }
+    });
+
+    reduxAction(store.dispatch, {
+      type: "SET_DECKS_INDEX",
+      arg: data,
+    });
+    console.log("decksIndex", data);
+  }
+}
+
+function handleMatchesIndex(data: string[] | undefined) {
+  if (data) {
+    data.forEach((id: string) => {
+      if (!store.getState().mainData.matchesIndex.includes(id)) {
+        window.toolDb.getData(`matches-${id}`, true, 5000);
+      }
+    });
+
+    reduxAction(store.dispatch, {
+      type: "SET_MATCHES_INDEX",
+      arg: data,
+    });
+
+    console.log("matchesIndex", data);
+  }
+}
+
 export function afterLogin() {
   const { dispatch } = store;
   const pubKey = window.toolDb.user?.pubKey || "";
@@ -24,42 +63,19 @@ export function afterLogin() {
   //   }
   // });
 
-  window.toolDb.addKeyListener(`:${pubKey}.matchesIndex`, (data) => {
-    data.forEach((id: string) => {
-      if (!store.getState().mainData.matchesIndex.includes(id)) {
-        window.toolDb.getData(`matches-${id}`, true, 5000);
-      }
-    });
+  window.toolDb.addKeyListener(`:${pubKey}.matchesIndex`, handleMatchesIndex);
 
-    reduxAction(dispatch, {
-      type: "SET_MATCHES_INDEX",
-      arg: data,
-    });
-
-    console.log("matchesIndex", data);
-  });
-
-  window.toolDb.addKeyListener(`:${pubKey}.decksIndex`, (data) => {
-    Object.keys(data).forEach((id: string) => {
-      if (
-        !Object.keys(store.getState().mainData.decksIndex).includes(
-          `${id}-v${data[id]}`
-        )
-      ) {
-        window.toolDb.getData(`decks-${id}-v${data[id]}`, true, 5000);
-      }
-    });
-
-    reduxAction(dispatch, {
-      type: "SET_DECKS_INDEX",
-      arg: data,
-    });
-    console.log("decksIndex", data);
-  });
+  window.toolDb.addKeyListener(`:${pubKey}.decksIndex`, handleDecksIndex);
 
   window.toolDb.getData("matchesIndex", true, 5000).catch(console.warn);
 
   window.toolDb.getData("decksIndex", true, 5000).catch(console.warn);
+
+  getLocalDbValue<string[]>(`:${pubKey}.matchesIndex`).then(handleMatchesIndex);
+
+  getLocalDbValue<Record<string, number>>(`:${pubKey}.decksIndex`).then(
+    handleDecksIndex
+  );
 
   window.toolDb
     .getData("userids", true, 5000)

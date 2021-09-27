@@ -2,7 +2,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import usePagingControls from "../../../hooks/usePagingControls";
-import { Filters } from "../../../types/genericFilterTypes";
+import { Filters, StringFilterType } from "../../../types/genericFilterTypes";
+import getLocalSetting from "../../../utils/getLocalSetting";
 
 import doHistoryFilter from "../../../utils/tables/doHistoryFilter";
 import PagingControls from "../../PagingControls";
@@ -18,7 +19,16 @@ export default function HistoryList(props: HistoryListProps) {
   const history = useHistory();
   const { matchesData } = props;
 
-  const [filters] = useState<Filters<MatchData>>([]);
+  const defaultHistoryFilters: StringFilterType<MatchData> = {
+    type: "string",
+    id: "uuid",
+    value: {
+      string: getLocalSetting("playerId") || "",
+      not: false,
+    },
+  };
+
+  const [filters] = useState<Filters<MatchData>>([defaultHistoryFilters]);
 
   const [sortValue, setSortValue] = useState<Sort<MatchData>>({
     key: "timestamp",

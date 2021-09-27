@@ -34,7 +34,7 @@ export default function DecksList() {
     });
 
     Promise.all(promises).then(setAllDecksArray);
-  }, []);
+  }, [decksIndex]);
 
   const defaultDeckFilters: StringFilterType<DbDeck> = {
     type: "string",
@@ -63,7 +63,7 @@ export default function DecksList() {
         };
       });
     return doDecksFilter(decksForFiltering, filters, sortValue);
-  }, [allDecksArray, decksIndex, filters, sortValue]);
+  }, [allDecksArray, filters, sortValue]);
 
   const pagingControlProps = usePagingControls(filteredData.length, 25);
 

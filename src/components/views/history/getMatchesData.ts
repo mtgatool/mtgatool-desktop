@@ -6,6 +6,7 @@ import getRankFilterVal from "./getRankFilterVal";
 // This interface is used only to pass to the filters and sorting table
 // It should be kept as simple as possible!
 export interface MatchData {
+  uuid: string;
   matchId: string;
   internalMatch: InternalMatch;
   playerDeckName: string;
@@ -23,6 +24,7 @@ export interface MatchData {
 export function convertDbMatchToData(match: DbMatch): MatchData {
   const { internalMatch } = match;
   return {
+    uuid: match.playerId,
     matchId: match.matchId,
     internalMatch: match.internalMatch,
     playerDeckName: internalMatch.player.name,
