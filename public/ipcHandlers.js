@@ -1,6 +1,8 @@
+/* eslint-disable no-case-declarations */
 const { globalShortcut, ipcMain, dialog, app } = require("electron");
 const mainGlobals = require("./mainGlobals");
 const openDevTools = require("./openDevTools");
+const Spy = require("./spy");
 
 const ipc = ipcMain;
 
@@ -38,6 +40,12 @@ function handleIpcSwitch(_event, method, msg) {
       case "setDevtoolsShortcut":
         globalShortcut.register(msg.arg || "Alt+Shift+D", openDevTools);
         break;
+      case "spyGetUUID":
+        if (mainGlobals.spy) {
+          const UUID = mainGlobals.spy.getUUID();
+          _event.sender.send(method, UUID);
+        }
+        break;
       case "quit":
         app.quit();
         break;
@@ -53,6 +61,9 @@ function handleIpcRegister(event, method) {
 }
 
 function mainIpcInitialize() {
+  if (process.platform === "win32") {
+    mainGlobals.spy = Spy();
+  }
   ipc.on("ipc_switch", handleIpcSwitch);
   ipc.on("ipc_register", handleIpcRegister);
 }

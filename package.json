@@ -15,6 +15,7 @@
     "date-fns": "^2.19.0",
     "electron-devtools-installer": "^3.1.1",
     "electron-log": "^4.3.2",
+    "electron-node-ffi": "git+https://github.com/raviSussol/electron-node-ffi.git",
     "electron-updater": "^4.3.9",
     "google-protobuf": "^3.15.6",
     "lodash": "^4.17.21",
@@ -37,7 +38,8 @@
     "shortid": "^2.2.16",
     "tool-db": "^1.0.23",
     "typescript": "^4.1.2",
-    "web-vitals": "^1.0.1"
+    "web-vitals": "^1.0.1",
+    "webpack-node-externals": "^3.0.0"
   },
   "scripts": {
     "start": "nf start -p 3001",
@@ -100,6 +102,13 @@
     ],
     "extraResources": [
       {
+        "from": "./node_modules/ffi-napi/node_modules/ref-napi/prebuilds/**/*",
+        "to": ".",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
         "from": "./public/extra/",
         "to": "extra",
         "filter": [
@@ -152,6 +161,7 @@
     "@storybook/addon-links": "^6.2.9",
     "@storybook/node-logger": "^6.2.9",
     "@storybook/preset-create-react-app": "^3.1.7",
+    "@types/ffi-napi": "^4.0.4",
     "@types/jest": "^26.0.15",
     "@types/leveldown": "^4.0.2",
     "@types/lodash": "^4.14.168",
@@ -185,6 +195,11 @@
     "node-sass": "^6.0.1",
     "prettier": "^2.2.1"
   },
+  "extraFiles": [
+    "./node_modules/ffi-napi/prebuilds/**/*",
+    "./node_modules/ffi-napi/node_modules/ref-napi/prebuilds/**/*",
+    "./node_modules/ref-napi/prebuilds/**/*"
+  ],
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"

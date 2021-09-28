@@ -131,6 +131,7 @@ function createWindow() {
     icon: path.join(__dirname, "icons", iconNormal),
     title: "mtgatool-background",
     webPreferences: {
+      webSecurity: false,
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true,

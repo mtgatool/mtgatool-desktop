@@ -1,3 +1,4 @@
+const nodeExternals = require("webpack-node-externals");
 const ModuleReplacement = require("./module-resolver-file");
 const eslintConfig = require("./.eslintrc");
 
@@ -19,6 +20,11 @@ module.exports = {
         fs: "empty",
       },
     },
+    externals: [
+      nodeExternals({
+        allowlist: [/^(?!(^(ffi-napi)$)).*$/i],
+      }),
+    ],
     plugins: [...ModuleReplacement({ webIndex: false, electronIndex: true })],
   },
   eslint: {
