@@ -70,6 +70,7 @@ export const defaultConfig = {
   shortcutEditmode: "Alt+Shift+E",
   shortcutDevtoolsMain: "Alt+Shift+D",
   shortcutDevtoolsOverlay: "Alt+Shift+O",
+  hoverPosition: 7,
   overlays: [
     {
       ...overlayCfg,

@@ -348,6 +348,13 @@ function setHoverCards(checked: boolean): void {
   });
 }
 
+function setHoverPos(pos: number): void {
+  reduxAction(store.dispatch, {
+    type: "SET_SETTINGS",
+    arg: { hoverPosition: pos },
+  });
+}
+
 function setOverlaysTransparency(checked: boolean): void {
   reduxAction(store.dispatch, {
     type: "SET_SETTINGS",
@@ -419,6 +426,63 @@ export default function OverlaySettingsPanel() {
         value={settings.overlayHover}
         callback={setHoverCards}
       />
+
+      <div className="hover-position-selector">
+        <div
+          className={`hover-pos p0 ${
+            settings.hoverPosition === 0 ? "active" : ""
+          }`}
+          onClick={() => setHoverPos(0)}
+        />
+        <div
+          className={`hover-pos p1 ${
+            settings.hoverPosition === 1 ? "active" : ""
+          }`}
+          onClick={() => setHoverPos(1)}
+        />
+        <div
+          className={`hover-pos p2 ${
+            settings.hoverPosition === 2 ? "active" : ""
+          }`}
+          onClick={() => setHoverPos(2)}
+        />
+        <div
+          className={`hover-pos p3 ${
+            settings.hoverPosition === 3 ? "active" : ""
+          }`}
+          onClick={() => setHoverPos(3)}
+        />
+        <div
+          className={`hover-pos p4 ${
+            settings.hoverPosition === 4 ? "active" : ""
+          }`}
+          onClick={() => setHoverPos(4)}
+        />
+        <div
+          className={`hover-pos p5 ${
+            settings.hoverPosition === 5 ? "active" : ""
+          }`}
+          onClick={() => setHoverPos(5)}
+        />
+        <div
+          className={`hover-pos p6 ${
+            settings.hoverPosition === 6 ? "active" : ""
+          }`}
+          onClick={() => setHoverPos(6)}
+        />
+        <div
+          className={`hover-pos p7 ${
+            settings.hoverPosition === 7 ? "active" : ""
+          }`}
+          onClick={() => setHoverPos(7)}
+        />
+        <div
+          className={`hover-pos p8 ${
+            settings.hoverPosition === 8 ? "active" : ""
+          }`}
+          onClick={() => setHoverPos(8)}
+        />
+      </div>
 
       <Toggle
         text="Use transparency effect"

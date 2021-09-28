@@ -77,6 +77,70 @@
   }
 }
 
+.hover-position-selector {
+  width: 340px;
+  height: 180px;
+  padding: 8px;
+  position: relative;
+  border-radius: 4px;
+  background-color: var(--color-dark);
+  margin: auto;
+
+  .hover-pos {
+    position: absolute;
+    border-radius: 2px;
+    cursor: pointer;
+    width: 80px;
+    height: 48px;
+    background-color: var(--color-section);
+
+    &:hover {
+      background-color: var(--color-button-hover);
+    }
+
+    &.active {
+      background-color: var(--color-button);
+    }
+
+    &.p0 {
+      left: 6px;
+      top: 6px;
+    }
+    &.p1 {
+      left: calc(50% - 40px);
+      top: 6px;
+    }
+    &.p2 {
+      right: 6px;
+      top: 6px;
+    }
+    &.p3 {
+      left: 6px;
+      top: calc(50% - 24px);
+    }
+    &.p4 {
+      left: calc(50% - 40px);
+      top: calc(50% - 24px);
+    }
+    &.p5 {
+      right: 6px;
+      top: calc(50% - 24px);
+    }
+    &.p6 {
+      left: 6px;
+      bottom: 6px;
+    }
+    &.p7 {
+      left: calc(50% - 40px);
+      bottom: 6px;
+    }
+    &.p8 {
+      right: 6px;
+      bottom: 6px;
+    }
+  }
+}
+
 .overlay-section {
   background-color: var(--color-section);
   padding: 16px;

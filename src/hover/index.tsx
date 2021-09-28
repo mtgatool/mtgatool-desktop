@@ -52,10 +52,9 @@ export default function Hover() {
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const quality = useMemo(() => settings?.cardsQuality || "normal", [settings]);
-  const hoverSize = useMemo(
-    () => settings?.cardsSizeHoverCard || 12,
-    [settings]
-  );
+  const hoverSize = useMemo(() => settings?.cardsSizeHoverCard || 12, [
+    settings,
+  ]);
 
   const [frontLoaded, setFrontLoaded] = useState(0);
   const [backLoaded, setBackLoaded] = useState(0);
@@ -90,25 +89,83 @@ export default function Hover() {
           }
         }
       });
-
       const bounds = remote.getCurrentWindow().getBounds();
+
+      const left = display.bounds.x;
+      const center =
+        display.bounds.x +
+        Math.round(display.bounds.width / 2 - bounds.width / 2);
+      const right = display.bounds.x + display.bounds.width - bounds.width;
+
+      const top = display.bounds.y;
+
+      const middle =
+        display.bounds.y +
+        Math.round(display.bounds.height / 2) -
+        bounds.height / 2;
+
+      const bottom =
+        display.bounds.y +
+        Math.round(display.bounds.height - bounds.height - 32);
+
+      const pos = settings.hoverPosition;
+
+      let xPos = center;
+      let yPos = bottom;
+      switch (pos) {
+        case 0:
+          xPos = left;
+          yPos = top;
+          break;
+        case 1:
+          xPos = center;
+          yPos = top;
+          break;
+        case 2:
+          xPos = right;
+          yPos = top;
+          break;
+        case 3:
+          xPos = left;
+          yPos = middle;
+          break;
+        case 4:
+          xPos = center;
+          yPos = middle;
+          break;
+        case 5:
+          xPos = right;
+          yPos = middle;
+          break;
+        case 6:
+          xPos = left;
+          yPos = bottom;
+          break;
+        case 7:
+          xPos = center;
+          yPos = bottom;
+          break;
+        case 8:
+          xPos = right;
+          yPos = bottom;
+          break;
+        default:
+          break;
+      }
+
       remote.getCurrentWindow().setBounds({
-        x:
-          display.bounds.x +
-          Math.round(display.bounds.width / 2 - bounds.width / 2),
-        y:
-          display.bounds.y +
-          Math.round(display.bounds.height - bounds.height - 32),
+        x: xPos,
+        y: yPos,
       });
     }
-  }, []);
+  }, [settings]);
 
   useEffect(() => {
     const size = 100 + hoverSize * 15;
     const cardWidth = size;
     const cardHeight = size / CARD_SIZE_RATIO;
 
-    const width = Math.round(cardWidth * 2 + 64);
+    const width = Math.round(cardWidth + 64);
     const height = Math.round(cardHeight + 48);
 
     if (electron) {
