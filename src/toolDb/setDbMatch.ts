@@ -51,27 +51,41 @@ export default async function setDbMatch(match: InternalMatch) {
     });
 
   const pubkey = window.toolDb.user?.pubKey || "";
-  const decksIndex =
-    (await getLocalDbValue<Record<string, number>>(`:${pubkey}.decksIndex`)) ??
-    {};
+  window.toolDb
+    .getData<Record<string, number>>("decksIndex", true)
+    .then(async (index) => {
+      let decksIndex =
+        (await getLocalDbValue<Record<string, number>>(
+          `:${pubkey}.decksIndex`
+        )) || {};
+      if (index) {
+        decksIndex = index;
+      }
 
-  const deckDbKey = `${match.playerDeck.id}-v${
-    decksIndex[match.playerDeck.id] ?? 0
-  }`;
+      Object.keys(decksIndex).forEach(async (key) => {
+        const deckDbKey = `${key}-v${decksIndex[key]}`;
 
-  const oldDeck = await getLocalDbValue(`:${pubkey}.decks-${deckDbKey}`);
-  console.log("oldDeck", oldDeck);
-  if (oldDeck) {
-    const newDeck: DbDeck = JSON.parse(JSON.stringify(oldDeck));
-    if (!Object.keys(newDeck.matches).includes(match.id)) {
-      newDeck.stats.gameWins += match.player.wins;
-      newDeck.stats.gameLosses += match.opponent.wins;
-      newDeck.stats.matchWins += hasWon ? 1 : 0;
-      newDeck.stats.matchLosses += hasWon ? 0 : 1;
-      newDeck.matches[match.id] = hasWon;
-      console.log("Deck's match new stats: ", newDeck.stats);
+        const oldDeck = await getLocalDbValue<DbDeck>(
+          `:${pubkey}.decks-${deckDbKey}`
+        );
+        if (
+          oldDeck &&
+          oldDeck.id === match.playerDeck.id &&
+          oldDeck.deckHash === match.playerDeckHash
+        ) {
+          console.log("oldDeck", oldDeck);
+          const newDeck: DbDeck = JSON.parse(JSON.stringify(oldDeck));
+          if (!Object.keys(newDeck.matches).includes(match.id)) {
+            newDeck.stats.gameWins += match.player.wins;
+            newDeck.stats.gameLosses += match.opponent.wins;
+            newDeck.stats.matchWins += hasWon ? 1 : 0;
+            newDeck.stats.matchLosses += hasWon ? 0 : 1;
+            newDeck.matches[match.id] = hasWon;
+            console.log("Deck's match new stats: ", newDeck.stats);
 
-      window.toolDb.putData<DbDeck>(`decks-${deckDbKey}`, newDeck, true);
-    }
-  }
+            window.toolDb.putData<DbDeck>(`decks-${deckDbKey}`, newDeck, true);
+          }
+        }
+      });
+    });
 }
