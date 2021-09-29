@@ -397,6 +397,8 @@ export default function OverlaySettingsPanel() {
 
   useEffect(vodiFn, [currentOverlaySettings]);
 
+  const hPos = settings.hoverPosition;
+
   return (
     <>
       <label className="centered-setting-container">
@@ -427,65 +429,54 @@ export default function OverlaySettingsPanel() {
         callback={setHoverCards}
       />
 
+      <div
+        className="settings-note"
+        style={{ margin: "16px auto", width: "fit-content" }}
+      >
+        Select where the hover cards should appear in the screen.
+      </div>
+
       <div className="hover-position-selector">
         <div
-          className={`hover-pos p0 ${
-            settings.hoverPosition === 0 ? "active" : ""
-          }`}
+          className={`hover-pos p0 ${hPos === 0 ? "active" : ""}`}
           onClick={() => setHoverPos(0)}
         />
         <div
-          className={`hover-pos p1 ${
-            settings.hoverPosition === 1 ? "active" : ""
-          }`}
+          className={`hover-pos p1 ${hPos === 1 ? "active" : ""}`}
           onClick={() => setHoverPos(1)}
         />
         <div
-          className={`hover-pos p2 ${
-            settings.hoverPosition === 2 ? "active" : ""
-          }`}
+          className={`hover-pos p2 ${hPos === 2 ? "active" : ""}`}
           onClick={() => setHoverPos(2)}
         />
         <div
-          className={`hover-pos p3 ${
-            settings.hoverPosition === 3 ? "active" : ""
-          }`}
+          className={`hover-pos p3 ${hPos === 3 ? "active" : ""}`}
           onClick={() => setHoverPos(3)}
         />
         <div
-          className={`hover-pos p4 ${
-            settings.hoverPosition === 4 ? "active" : ""
-          }`}
+          className={`hover-pos p4 ${hPos === 4 ? "active" : ""}`}
           onClick={() => setHoverPos(4)}
         />
         <div
-          className={`hover-pos p5 ${
-            settings.hoverPosition === 5 ? "active" : ""
-          }`}
+          className={`hover-pos p5 ${hPos === 5 ? "active" : ""}`}
           onClick={() => setHoverPos(5)}
         />
         <div
-          className={`hover-pos p6 ${
-            settings.hoverPosition === 6 ? "active" : ""
-          }`}
+          className={`hover-pos p6 ${hPos === 6 ? "active" : ""}`}
           onClick={() => setHoverPos(6)}
         />
         <div
-          className={`hover-pos p7 ${
-            settings.hoverPosition === 7 ? "active" : ""
-          }`}
+          className={`hover-pos p7 ${hPos === 7 ? "active" : ""}`}
           onClick={() => setHoverPos(7)}
         />
         <div
-          className={`hover-pos p8 ${
-            settings.hoverPosition === 8 ? "active" : ""
-          }`}
+          className={`hover-pos p8 ${hPos === 8 ? "active" : ""}`}
           onClick={() => setHoverPos(8)}
         />
       </div>
 
       <Toggle
-        text="Use transparency effect"
+        text="Use transparency effect for overlays"
         value={settings.overlaysTransparency}
         callback={setOverlaysTransparency}
       />
