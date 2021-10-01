@@ -79,7 +79,9 @@ export default function mainChannelListeners() {
         type: "SET_MATCH_IN_PROGRESS",
         arg: false,
       });
-      setDbMatch(msg.data.value);
+      if (msg.data.value.eventId !== "AIBotMatch") {
+        setDbMatch(msg.data.value);
+      }
     }
 
     if (msg.data.type === "DRAFT_STATUS") {
