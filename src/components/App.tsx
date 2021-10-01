@@ -91,11 +91,15 @@ function App(props: AppProps) {
             arg: LOGIN_OK,
           });
 
-          if (history.location.pathname === "") {
+          if (
+            history.location.pathname === "" ||
+            history.location.pathname === "/"
+          ) {
             history.push("/auth");
           }
         })
-        .catch(() => {
+        .catch((e) => {
+          console.error(e);
           history.push("/auth");
         });
     } else {
