@@ -52,9 +52,10 @@ export default function Hover() {
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const quality = useMemo(() => settings?.cardsQuality || "normal", [settings]);
-  const hoverSize = useMemo(() => settings?.cardsSizeHoverCard || 12, [
-    settings,
-  ]);
+  const hoverSize = useMemo(
+    () => settings?.cardsSizeHoverCard || 12,
+    [settings]
+  );
 
   const [frontLoaded, setFrontLoaded] = useState(0);
   const [backLoaded, setBackLoaded] = useState(0);

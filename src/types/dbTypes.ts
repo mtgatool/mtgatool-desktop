@@ -4,6 +4,7 @@ import {
   DatabaseClass,
   InternalDeck,
   InternalMatch,
+  v2cardsList,
 } from "mtgatool-shared";
 import ToolDbClient from "tool-db/dist/toolDbClient";
 
@@ -26,6 +27,25 @@ declare global {
 export interface UserRecoveryData {
   recovery: string;
   iv: string;
+}
+
+export interface StatsDeck {
+  id: string;
+  deckTileId: number;
+  name: string;
+  mainDeck: v2cardsList;
+  sideboard: v2cardsList;
+  playerId: string;
+  deckHash: string;
+  matches: Record<string, boolean>;
+  colors: number;
+  lastUsed: number;
+  stats: {
+    gameWins: number;
+    gameLosses: number;
+    matchWins: number;
+    matchLosses: number;
+  };
 }
 
 export interface DbDeck extends InternalDeck {

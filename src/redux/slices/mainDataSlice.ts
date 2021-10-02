@@ -4,6 +4,7 @@ import _ from "lodash";
 import { Cards } from "mtgatool-shared";
 
 import { DbMatch, DbUUIDData, defaultUUIDData } from "../../types/dbTypes";
+import { AggregatedStats } from "../../utils/aggregateStats";
 
 const mainState = {
   cards: {} as Cards,
@@ -17,6 +18,7 @@ const mainState = {
   liveFeed: [] as DbMatch[],
   matchesIndex: [] as string[],
   decksIndex: {} as Record<string, number>,
+  fullStats: null as AggregatedStats | null,
 };
 
 export type PlayerData = typeof mainState;
@@ -25,6 +27,12 @@ const mainDataSlice = createSlice({
   name: "mainData",
   initialState: mainState,
   reducers: {
+    setFullStats: (
+      state: PlayerData,
+      action: PayloadAction<AggregatedStats>
+    ): void => {
+      state.fullStats = action.payload;
+    },
     addLiveFeed: (state: PlayerData, action: PayloadAction<DbMatch>): void => {
       const matches = state.liveFeed.filter(
         (v) => v.matchId === action.payload.matchId
@@ -75,6 +83,7 @@ const mainDataSlice = createSlice({
 });
 
 export const {
+  setFullStats,
   addLiveFeed,
   setUUID,
   setCards,

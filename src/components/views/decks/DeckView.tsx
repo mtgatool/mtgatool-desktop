@@ -35,6 +35,7 @@ import { AppState } from "../../../redux/stores/rendererStore";
 import DeckList from "../../DeckList";
 import reduxAction from "../../../redux/reduxAction";
 import { DbDeck } from "../../../types/dbTypes";
+import ChangesDeckView from "./ChangesDeckView";
 
 // const { MANA_COLORS } = constants;
 
@@ -158,6 +159,9 @@ export default function DeckView(): JSX.Element {
       <>
         {deckView == VIEW_VISUAL && (
           <VisualDeckView deck={deck} setRegularView={regularView} />
+        )}
+        {deckView == VIEW_CHANGES && dbDeck && (
+          <ChangesDeckView deck={dbDeck} setRegularView={regularView} />
         )}
         {deckView == VIEW_REGULAR && (
           <div className="regular-view-grid">

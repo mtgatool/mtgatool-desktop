@@ -8,15 +8,15 @@ import DeckColorsBar from "./DeckColorsBar";
 import getDeckMissing from "../utils/getDeckMissing";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
 import getWinrateClass from "../utils/getWinrateClass";
-import { DbDeck } from "../types/dbTypes";
+import { StatsDeck } from "../types/dbTypes";
 import timeAgo from "../utils/timeAgo";
 import getPreconDeckName from "../utils/getPreconDeckName";
 
 import squirrels from "../assets/images/squirrels.png";
 
 export interface DecksArtViewRowProps {
-  clickDeck: (deck: DbDeck) => void;
-  deck: DbDeck;
+  clickDeck: (deck: StatsDeck) => void;
+  deck: StatsDeck;
 }
 
 function isCached(src: string) {
@@ -49,7 +49,7 @@ export default function DecksArtViewRow(
     winrateInterval = formatPercent(winrate);
   }
 
-  const lastTouch = new Date(deck.lastUpdated).getTime();
+  const lastTouch = new Date(deck.lastUsed).getTime();
   const missingWildcards = getDeckMissing(deckObj);
   const totalMissing =
     missingWildcards.common +

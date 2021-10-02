@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { animated, useTransition } from "react-spring";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import PopupComponent from "./PopupComponent";
 import vodiFn from "../utils/voidfn";
 
@@ -14,6 +14,10 @@ import ViewCollection from "./views/collection/ViewCollection";
 import AdvancedSearch from "./views/collection/advancedSearch";
 import { AppState } from "../redux/stores/rendererStore";
 import getCollectionData from "./views/collection/cards/getCollectionData";
+import getLocalDbValue from "../toolDb/getLocalDbValue";
+import { DbMatch } from "../types/dbTypes";
+import reduxAction from "../redux/reduxAction";
+import aggregateStats from "../utils/aggregateStats";
 
 const views = {
   home: ViewHome,
@@ -33,16 +37,31 @@ function delay(transition: any, timeout: number): any {
 }
 
 export default function ContentWrapper() {
+  const dispatch = useDispatch();
   const params = useParams<{ page: string }>();
   const paths = useRef<string[]>([params.page]);
 
-  const { cards, cardsNew, forceCollection } = useSelector(
+  const { cards, cardsNew, forceCollection, matchesIndex } = useSelector(
     (state: AppState) => state.mainData
   );
 
   const collectionData = useMemo(() => {
     return getCollectionData(cards, cardsNew);
   }, [cards, cardsNew, forceCollection]);
+
+  useEffect(() => {
+    const pubkey = window.toolDb.user?.pubKey || "";
+    const promises = matchesIndex.map((id) => {
+      return getLocalDbValue<DbMatch>(`:${pubkey}.matches-${id}`);
+    });
+
+    Promise.all(promises).then((matches: any) => {
+      reduxAction(dispatch, {
+        type: "SET_FULL_STATS",
+        arg: aggregateStats(matches.filter((m: any) => m)),
+      });
+    });
+  }, [dispatch, matchesIndex]);
 
   const prevIndex = Object.keys(views).findIndex(
     (k) => k == paths.current[paths.current.length - 1]

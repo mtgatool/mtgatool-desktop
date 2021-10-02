@@ -112,3 +112,11 @@
   grid-template-rows: auto auto auto;
   grid-template-areas: "controls controls" "types types" "main side";
 }
+
+.changes-view-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  grid-template-rows: auto auto;
+  grid-template-areas: "controls controls" "deck changes";
+}

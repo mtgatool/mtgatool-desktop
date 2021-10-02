@@ -1,13 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-bitwise */
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import usePagingControls from "../../../hooks/usePagingControls";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { Filters, StringFilterType } from "../../../types/genericFilterTypes";
-import { DbDeck } from "../../../types/dbTypes";
+import { StatsDeck } from "../../../types/dbTypes";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import doDecksFilter from "../../../utils/tables/doDecksFilter";
 import setFilter from "../../../utils/tables/filters/setFilter";
@@ -15,28 +15,13 @@ import DecksArtViewRow from "../../DecksArtViewRow";
 import ManaFilter from "../../ManaFilter";
 import PagingControls from "../../PagingControls";
 import SortControls, { Sort } from "../../SortControls";
-import getLocalDbValue from "../../../toolDb/getLocalDbValue";
 
 export default function DecksList() {
   const history = useHistory();
   const [colorFilterState, setColorFilterState] = useState(31);
-  const { decksIndex } = useSelector((state: AppState) => state.mainData);
+  const fullStats = useSelector((state: AppState) => state.mainData.fullStats);
 
-  const [allDecksArray, setAllDecksArray] = useState<DbDeck[]>([]);
-
-  useEffect(() => {
-    const pubkey = window.toolDb.user?.pubKey || "";
-
-    const promises = Object.keys(decksIndex).map((id) => {
-      return getLocalDbValue<DbDeck>(
-        `:${pubkey}.decks-${id}-v${decksIndex[id]}`
-      ) as any;
-    });
-
-    Promise.all(promises).then(setAllDecksArray);
-  }, [decksIndex]);
-
-  const defaultDeckFilters: StringFilterType<DbDeck> = {
+  const defaultDeckFilters: StringFilterType<StatsDeck> = {
     type: "string",
     id: "playerId",
     value: {
@@ -45,37 +30,50 @@ export default function DecksList() {
     },
   };
 
-  const [filters, setFilters] = useState<Filters<DbDeck>>([defaultDeckFilters]);
+  const [filters, setFilters] = useState<Filters<StatsDeck>>([
+    defaultDeckFilters,
+  ]);
 
-  const [sortValue, setSortValue] = useState<Sort<DbDeck>>({
+  const [sortValue, setSortValue] = useState<Sort<StatsDeck>>({
     key: "lastUsed",
     sort: -1,
   });
 
   const filteredData = useMemo(() => {
-    const decksForFiltering = allDecksArray
-      .filter((d) => d)
+    if (!fullStats) return [];
+
+    const latestDeckHashesArray = Object.keys(fullStats.decks).map((id) => {
+      const hashes = fullStats.decks[id];
+      let latestTimestamp = fullStats.deckIndex[hashes[0]].lastUsed;
+      let latestHash = hashes[0];
+
+      hashes.forEach((h) => {
+        if (latestTimestamp < fullStats.deckIndex[h].lastUsed) {
+          latestTimestamp = fullStats.deckIndex[h].lastUsed;
+          latestHash = h;
+        }
+      });
+
+      return latestHash;
+    });
+
+    const decksForFiltering = latestDeckHashesArray
+      .map((hash) => fullStats.deckIndex[hash])
       .map((d) => {
         return {
           ...d,
-          lastUsed: new Date(d.lastUpdated).getTime(),
+          lastUsed: new Date(d.lastUsed).getTime(),
           colors: d.colors > 32 ? d.colors - 32 : d.colors,
         };
       });
     return doDecksFilter(decksForFiltering, filters, sortValue);
-  }, [allDecksArray, filters, sortValue]);
+  }, [fullStats, filters, sortValue]);
 
   const pagingControlProps = usePagingControls(filteredData.length, 25);
 
   const openDeck = useCallback(
-    (deck: DbDeck) => {
-      // reduxAction(dispatch, { type: "SET_BACK_GRPID", arg: deck.tile });
-      const pubKey = window.toolDb.user?.pubKey || "";
-      history.push(
-        `/decks/${encodeURIComponent(
-          `:${pubKey}.decks-${deck.id}-v${deck.version}`
-        )}`
-      );
+    (deck: StatsDeck) => {
+      history.push(`/decks/${encodeURIComponent(deck.deckHash)}`);
     },
     [history]
   );
@@ -107,11 +105,11 @@ export default function DecksList() {
         className="section"
         style={{ margin: "16px 0", flexDirection: "column" }}
       >
-        <SortControls<DbDeck>
+        <SortControls<StatsDeck>
           setSortCallback={setSortValue}
           defaultSort={sortValue}
-          columnKeys={["lastUpdated", "lastUsed", "colors", "format"]}
-          columnNames={["Last Modified", "Last Used", "Colors", "Format"]}
+          columnKeys={["lastUsed", "name", "colors"]}
+          columnNames={["Last Used", "Name", "Colors"]}
         />
         <div className="decks-table-wrapper">
           {filteredData

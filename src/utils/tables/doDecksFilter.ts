@@ -1,18 +1,18 @@
 import _ from "lodash";
 import { Sort } from "../../components/SortControls";
 import applySort from "./applySort";
-import minMaxFilterFn from "./filters/minMaxFilterFn";
+
 import stringFilterFn from "./filters/stringFilterFn";
 
 import colorsBitsFilterFn from "./filters/colorsBitsFilterFn";
 import { Filters } from "../../types/genericFilterTypes";
-import { DbDeck } from "../../types/dbTypes";
+import { StatsDeck } from "../../types/dbTypes";
 
 export default function doDecksFilter(
-  data: DbDeck[],
-  filters: Filters<DbDeck>,
-  sort: Sort<DbDeck> = { key: "", sort: 1 }
-): DbDeck[] {
+  data: StatsDeck[],
+  filters: Filters<StatsDeck>,
+  sort: Sort<StatsDeck> = { key: "", sort: 1 }
+): StatsDeck[] {
   let filteredData = data;
 
   filters.forEach((filter) => {
@@ -20,16 +20,7 @@ export default function doDecksFilter(
     switch (filter.type) {
       case "string":
         if (filter.id === "name" || filter.id === "playerId") {
-          filteredData = stringFilterFn<DbDeck>(
-            filteredData,
-            filter.value,
-            filter.id
-          );
-        }
-        break;
-      case "minmax":
-        if (filter.id === "version") {
-          filteredData = minMaxFilterFn<DbDeck>(
+          filteredData = stringFilterFn<StatsDeck>(
             filteredData,
             filter.value,
             filter.id
@@ -38,7 +29,7 @@ export default function doDecksFilter(
         break;
       case "colors":
         if (filter.id === "colors") {
-          filteredData = colorsBitsFilterFn<DbDeck>(
+          filteredData = colorsBitsFilterFn<StatsDeck>(
             filteredData,
             filter.value,
             filter.id
