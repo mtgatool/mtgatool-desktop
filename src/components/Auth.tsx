@@ -143,6 +143,10 @@ export default function Auth(props: AuthProps) {
       if (pass.length < 8) {
         setErrorMessage("Passwords must contain at least 8 characters.");
       } else {
+        reduxAction(dispatch, {
+          type: "SET_LOGIN_STATE",
+          arg: LOGIN_WAITING,
+        });
         login(username, savedPass !== "" ? savedPass : sha1(pass))
           .then(() => {
             if (electron) {
@@ -152,10 +156,6 @@ export default function Auth(props: AuthProps) {
               reduxAction(dispatch, {
                 type: "SET_LOADING",
                 arg: true,
-              });
-              reduxAction(dispatch, {
-                type: "SET_LOGIN_STATE",
-                arg: LOGIN_WAITING,
               });
             } else {
               reduxAction(dispatch, {
@@ -168,7 +168,13 @@ export default function Auth(props: AuthProps) {
               });
             }
           })
-          .catch((err) => setErrorMessage(err.message));
+          .catch((err) => {
+            reduxAction(dispatch, {
+              type: "SET_LOGIN_STATE",
+              arg: LOGIN_WAITING,
+            });
+            setErrorMessage(err.message);
+          });
       }
     },
     [username, savedPass, pass]
