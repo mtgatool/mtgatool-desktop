@@ -26,7 +26,6 @@ export default function getDeckChanges(
     });
 
   if (previousGamesStats) {
-    // lots of any! Should change this when #821 arrives
     previousGamesStats.forEach((stats, i: number) => {
       if (i !== 0) {
         const prevChanges = stats.sideboardChanges;

@@ -1,18 +1,22 @@
 import { CSSProperties } from "react";
 
-export type SectionProps = React.PropsWithChildren<{ style?: CSSProperties }>;
+export type SectionProps = React.PropsWithChildren<{
+  style?: CSSProperties;
+  onClick?: () => void;
+}>;
 
 export default function Section(props: SectionProps): JSX.Element {
-  const { children, style } = props;
+  const { children, style, onClick } = props;
 
   return (
     <div
       style={{
-        ...style,
         display: "flex",
         borderRadius: "2px",
         backgroundColor: `var(--color-section)`,
+        ...style,
       }}
+      onClick={onClick}
     >
       {children}
     </div>
