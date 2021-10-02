@@ -22,9 +22,8 @@ export default function CraftingCost(props: CraftingCostProps): JSX.Element {
   const { deck } = props;
   const { mainData } = useSelector((state: AppState) => state);
 
-  if (!mainData?.uuidData) return <></>;
-
   const uuid = mainData.currentUUID;
+  if (!mainData?.uuidData || !mainData.uuidData[uuid]) return <></>;
 
   const ownedWildcards: IndexableObject = {
     common: mainData.uuidData[uuid].inventory.WildCardCommons,

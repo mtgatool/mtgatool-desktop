@@ -14,10 +14,9 @@ export default function getBoosterCountEstimate(
   };
 
   const { mainData } = store.getState();
-
-  if (!mainData?.uuidData) return 0;
-
   const uuid = mainData.currentUUID;
+
+  if (!mainData?.uuidData || !mainData.uuidData[uuid]) return 0;
 
   const ownedWildcards = {
     common: mainData.uuidData[uuid].inventory.WildCardCommons,

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-nested-ternary */
 import {
+  Colors,
   compareCards,
   // constants,
   DbCardData,
@@ -12,6 +13,7 @@ import {
 // import ReactSvgPieChart from "react-svg-piechart";
 import { useHistory, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { DEFAULT_TILE } from "mtgatool-shared/dist/shared/constants";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { getCardArtCrop } from "../../../utils/getCardArtCrop";
 import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
@@ -30,11 +32,11 @@ import WildcardsCostPreset from "../../WildcardsCostPreset";
 import CraftingCost from "../../CraftingCost";
 import getSampleHand from "../../../utils/getSampleHand";
 import CardTile from "../../CardTile";
-import { AppState } from "../../../redux/stores/rendererStore";
 
 import DeckList from "../../DeckList";
 import reduxAction from "../../../redux/reduxAction";
-import { DbDeck } from "../../../types/dbTypes";
+import { StatsDeck } from "../../../types/dbTypes";
+import { AppState } from "../../../redux/stores/rendererStore";
 import ChangesDeckView from "./ChangesDeckView";
 
 // const { MANA_COLORS } = constants;
@@ -48,19 +50,29 @@ export default function DeckView(): JSX.Element {
   const dispatch = useDispatch();
   const history = useHistory();
   const params = useParams<{ page: string; id: string }>();
-  const [dbDeck, setDbDeck] = useState<DbDeck>();
 
-  const { decksIndex } = useSelector((state: AppState) => state.mainData);
+  const [dbDeck, setDbDeck] = useState<StatsDeck>();
+  const fullStats = useSelector((state: AppState) => state.mainData.fullStats);
 
   useEffect(() => {
-    window.toolDb.getData(decodeURIComponent(params.id)).then((d) => {
-      if (d) {
-        setDbDeck(d);
-      }
-    });
-  }, [params, decksIndex]);
+    if (fullStats) {
+      const hashes = fullStats.decks[params.id];
+      if (!hashes) return;
 
-  const deck = new Deck(dbDeck);
+      let latestTimestamp = fullStats.deckIndex[hashes[0]].lastUsed;
+      let latestHash = hashes[0];
+
+      hashes.forEach((h) => {
+        if (latestTimestamp < fullStats.deckIndex[h].lastUsed) {
+          latestTimestamp = fullStats.deckIndex[h].lastUsed;
+          latestHash = h;
+        }
+      });
+      setDbDeck(fullStats.deckIndex[latestHash]);
+    }
+  }, [fullStats, params]);
+
+  const deck = new Deck({}, dbDeck?.mainDeck || [], dbDeck?.sideboard || []);
 
   const [deckView, setDeckView] = useState(VIEW_REGULAR);
   const [shuffle, setShuffle] = useState([true]);
@@ -120,7 +132,9 @@ export default function DeckView(): JSX.Element {
       <div
         className="decks-top"
         style={{
-          backgroundImage: `url(${getCardArtCrop(deck.tile)})`,
+          backgroundImage: `url(${getCardArtCrop(
+            dbDeck?.deckTileId || DEFAULT_TILE
+          )})`,
         }}
       >
         <DeckColorsBar deck={deck} />
@@ -147,11 +161,14 @@ export default function DeckView(): JSX.Element {
                 textShadow: "3px 3px 6px #000000",
               }}
             >
-              {deck.getName()}
+              {dbDeck?.name}
             </div>
           </div>
           <div className="flex-item">
-            <ManaCost className="mana-s20" colors={deck.getColors().get()} />
+            <ManaCost
+              className="mana-s20"
+              colors={new Colors().addFromBits(dbDeck?.colors || 0).get()}
+            />
           </div>
         </div>
       </div>
@@ -160,8 +177,8 @@ export default function DeckView(): JSX.Element {
         {deckView == VIEW_VISUAL && (
           <VisualDeckView deck={deck} setRegularView={regularView} />
         )}
-        {deckView == VIEW_CHANGES && dbDeck && (
-          <ChangesDeckView deck={dbDeck} setRegularView={regularView} />
+        {deckView == VIEW_CHANGES && (
+          <ChangesDeckView setRegularView={regularView} />
         )}
         {deckView == VIEW_REGULAR && (
           <div className="regular-view-grid">

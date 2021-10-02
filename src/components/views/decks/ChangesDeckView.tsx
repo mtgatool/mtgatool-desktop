@@ -1,11 +1,13 @@
 /* eslint-disable react/no-array-index-key */
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import Section from "../../ui/Section";
 import Button from "../../ui/Button";
-import { DbDeck } from "../../../types/dbTypes";
+import { StatsDeck } from "../../../types/dbTypes";
+import { AppState } from "../../../redux/stores/rendererStore";
 
 interface ChangesDeckViewProps {
-  deck: DbDeck;
   setRegularView: () => void;
 }
 
@@ -13,18 +15,13 @@ export default function ChangesDeckView(
   props: ChangesDeckViewProps
 ): JSX.Element {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { deck, setRegularView } = props;
-
-  const [allDecksData, setAllDecksData] = useState<(DbDeck | null)[]>([]);
+  const { setRegularView } = props;
+  const [allDecksData, _setAllDecksData] = useState<StatsDeck[]>([]);
+  const _params = useParams<{ page: string; id: string }>();
+  const _fullStats = useSelector((state: AppState) => state.mainData.fullStats);
 
   useEffect(() => {
-    const versions = deck.version;
-    const promises = new Array(versions + 1).fill(true).map((_v, index) => {
-      console.log(`request decks-${deck.id}-v${index}`);
-      return window.toolDb.getData<DbDeck>(`decks-${deck.id}-v${index}`, true);
-    });
-
-    Promise.all(promises).then(setAllDecksData);
+    //
   }, []);
 
   return (
@@ -42,11 +39,7 @@ export default function ChangesDeckView(
       <Section style={{ padding: "16px", gridArea: "changes" }}>
         <p>Changes</p>
         {allDecksData.map((d) => {
-          return (
-            <p key={`change${d?.id}-v-${d?.version}`}>
-              {d ? d.version : "null"}
-            </p>
-          );
+          return <p key={`change${d?.id}-${d.deckHash}`}>{d.deckHash}</p>;
         })}
       </Section>
     </div>

@@ -73,7 +73,7 @@ export default function DecksList() {
 
   const openDeck = useCallback(
     (deck: StatsDeck) => {
-      history.push(`/decks/${encodeURIComponent(deck.deckHash)}`);
+      history.push(`/decks/${encodeURIComponent(deck.id)}`);
     },
     [history]
   );
