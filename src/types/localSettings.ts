@@ -12,6 +12,7 @@ export const settingKeys = [
   "settings",
   "welcome",
   "lang",
+  "peers",
 ] as const;
 
 export type SettingKey = typeof settingKeys[number];
@@ -27,4 +28,5 @@ export const defaultSettings: Record<SettingKey, string> = {
   settings: JSON.stringify(defaultConfig),
   welcome: "false",
   lang: "en",
+  peers: JSON.stringify(["api.mtgatool.com"]),
 };

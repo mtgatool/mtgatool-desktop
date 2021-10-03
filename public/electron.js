@@ -5,6 +5,7 @@ const url = require("url");
 
 const { autoUpdater } = require("electron-updater");
 
+const DC = require("discovery-channel");
 const mainIpcInitialize = require("./ipcHandlers");
 const mainGlobals = require("./mainGlobals");
 const installDevTools = require("./devtools");
@@ -35,6 +36,17 @@ if (!singleLock) {
 function sendInit() {
   console.log("Renderer Init signal");
   mainGlobals.backgroundWindow.webContents.send("rendererInit", true);
+
+  const peers = [];
+  const channel = DC();
+  channel.join("mtgatool-db-swarm");
+  channel.on("peer", (id, peer) => {
+    console.log("Server peer found: ", peer);
+    if (!peers.includes(peer.host)) {
+      peers.push(peer.host);
+      mainGlobals.backgroundWindow.webContents.send("peersFound", peers);
+    }
+  });
 }
 
 function showDock() {

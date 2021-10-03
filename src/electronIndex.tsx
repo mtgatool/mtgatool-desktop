@@ -2,11 +2,9 @@
 // eslint-disable-next-line no-use-before-define
 import React from "react";
 import ReactDOM from "react-dom";
-
 import { BrowserRouter as Router } from "react-router-dom";
 
 import { Provider } from "react-redux";
-import { ToolDbClient } from "tool-db";
 
 import App from "./components/App";
 import Overlay from "./overlay";
@@ -27,7 +25,7 @@ import {
   WINDOW_HOVER,
   WINDOW_UPDATER,
 } from "./types/app";
-import { DB_SERVER } from "./constants";
+
 import Updater from "./updater";
 import getLocalSetting from "./utils/getLocalSetting";
 import registerShortcuts from "./utils/registerShortcuts";
@@ -96,11 +94,6 @@ if (title == WINDOW_UPDATER) {
     );
   }
 } else {
-  if (!window.toolDb) {
-    window.toolDb = new ToolDbClient(DB_SERVER);
-    window.toolDb.debug = true;
-  }
-
   defaultLocalSettings();
 
   const settings = JSON.parse(getLocalSetting("settings"));

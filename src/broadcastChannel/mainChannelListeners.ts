@@ -13,6 +13,7 @@ import LogEntry from "../types/logDecoder";
 import bcConnect from "../utils/bcConnect";
 import switchPlayerUUID from "../utils/switchPlayerUUID";
 import { ChannelMessage } from "./channelMessages";
+import setLocalSetting from "../utils/setLocalSetting";
 
 export default function mainChannelListeners() {
   const channel = bcConnect() as any;
@@ -23,6 +24,8 @@ export default function mainChannelListeners() {
     // console.log(msg.data.type);
 
     if (msg.data.type === "DATABASE_PEERS") {
+      setLocalSetting("peers", JSON.stringify(msg.data.peers));
+      console.log("Peers: ", msg.data.peers);
       reduxAction(store.dispatch, {
         type: "SET_PEERS",
         arg: msg.data.peers,
