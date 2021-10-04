@@ -78,7 +78,14 @@ const TestDeck = {
   lastModified: 1624567344211,
   matches: {},
   hidden: false,
-  stats: { gameWins: 0, gameLosses: 0, matchWins: 0, matchLosses: 0 },
+  stats: {
+    gameWins: 0,
+    gameLosses: 0,
+    matchWins: 0,
+    matchLosses: 0,
+  },
+  totalGames: 0,
+  winrate: 0,
 };
 
 export const Primary = Template.bind({});

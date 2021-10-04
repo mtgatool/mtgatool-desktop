@@ -108,8 +108,14 @@ export default function DecksList() {
         <SortControls<StatsDeck>
           setSortCallback={setSortValue}
           defaultSort={sortValue}
-          columnKeys={["lastUsed", "name", "colors"]}
-          columnNames={["Last Used", "Name", "Colors"]}
+          columnKeys={["lastUsed", "name", "winrate", "totalGames", "colors"]}
+          columnNames={[
+            "Last Used",
+            "Name",
+            "Winrate",
+            "Games played",
+            "Colors",
+          ]}
         />
         <div className="decks-table-wrapper">
           {filteredData

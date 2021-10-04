@@ -72,6 +72,11 @@ export default function aggregateStats(
           matchWins: hasWon ? 1 : 0,
           matchLosses: hasWon ? 0 : 1,
         },
+        totalGames: match.playerWins + match.playerLosses,
+        winrate:
+          match.playerWins > 0
+            ? (100 / (match.playerWins + match.playerLosses)) * match.playerWins
+            : 0,
       };
 
       if (!stats.decks[playerDeck.id]) {
@@ -89,6 +94,12 @@ export default function aggregateStats(
       deckToUpdate.stats.gameLosses += match.playerLosses;
       deckToUpdate.stats.matchWins += hasWon ? 1 : 0;
       deckToUpdate.stats.matchLosses += hasWon ? 0 : 1;
+      deckToUpdate.totalGames =
+        deckToUpdate.stats.gameWins + deckToUpdate.stats.gameLosses;
+      deckToUpdate.winrate =
+        deckToUpdate.stats.gameWins > 0
+          ? (100 / deckToUpdate.totalGames) * deckToUpdate.stats.gameWins
+          : 0;
     }
   });
 

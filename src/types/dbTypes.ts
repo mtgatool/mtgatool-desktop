@@ -46,6 +46,8 @@ export interface StatsDeck {
     matchWins: number;
     matchLosses: number;
   };
+  totalGames: number;
+  winrate: number;
 }
 
 export interface DbDeck extends InternalDeck {
