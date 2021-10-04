@@ -13,6 +13,7 @@ import useHoverCard from "../../../hooks/useHoverCard";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { CardsData } from "../../../types/collectionTypes";
 import { getCardImage } from "../../../utils/getCardArtCrop";
+import getCssQuality from "../../../utils/getCssQuality";
 import openScryfallCard from "../../../utils/openScryfallCard";
 import OwnershipStars from "../../OwnershipStars";
 
@@ -70,7 +71,10 @@ export default function CardCollection(props: CardCollectionProps) {
           height: `${Math.round(cardSize / CARD_SIZE_RATIO)}px`,
         }}
       >
-        <div className="inventory-card-img" style={{ ...style }} />
+        <div
+          className={`inventory-card-img ${getCssQuality()}`}
+          style={{ ...style }}
+        />
       </div>
     </div>
   );

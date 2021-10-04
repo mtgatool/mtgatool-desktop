@@ -170,7 +170,9 @@ export default function Overlay() {
       <TopBar closeCallback={closeOverlay} />
       <div
         style={{
-          backgroundColor: `rgba(0,0,0, ${settings?.alphaBack || 0})`,
+          backgroundColor: `rgba(0,0,0, ${
+            allSettings.overlaysTransparency ? settings?.alphaBack || 0 : 0
+          })`,
           height: "100%",
         }}
       >

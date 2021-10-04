@@ -15,6 +15,7 @@ import DecksArtViewRow from "../../DecksArtViewRow";
 import ManaFilter from "../../ManaFilter";
 import PagingControls from "../../PagingControls";
 import SortControls, { Sort } from "../../SortControls";
+import getCssQuality from "../../../utils/getCssQuality";
 
 export default function DecksList() {
   const history = useHistory();
@@ -98,11 +99,14 @@ export default function DecksList() {
 
   return (
     <>
-      <div className="section" style={{ marginBottom: "0px" }}>
+      <div
+        className={`section ${getCssQuality()}`}
+        style={{ marginBottom: "0px" }}
+      >
         <ManaFilter initialState={colorFilterState} callback={setColorFilter} />
       </div>
       <div
-        className="section"
+        className={`section ${getCssQuality()}`}
         style={{ margin: "16px 0", flexDirection: "column" }}
       >
         <SortControls<StatsDeck>

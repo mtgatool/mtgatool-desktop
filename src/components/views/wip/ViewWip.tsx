@@ -1,8 +1,10 @@
+import getCssQuality from "../../../utils/getCssQuality";
+
 export default function ViewHome() {
   return (
     <>
       <div
-        className="section"
+        className={`section ${getCssQuality()}`}
         style={{ flexDirection: "column", textAlign: "center" }}
       >
         <div className="wip-sign" />

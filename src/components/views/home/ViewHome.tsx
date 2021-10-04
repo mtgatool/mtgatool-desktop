@@ -7,13 +7,17 @@ import ListItemMatch from "../history/ListItemMatch";
 
 import { AppState } from "../../../redux/stores/rendererStore";
 import { convertDbMatchToData } from "../history/getMatchesData";
+import getCssQuality from "../../../utils/getCssQuality";
 
 export default function ViewHome() {
   const { liveFeed } = useSelector((state: AppState) => state.mainData);
 
   return (
     <>
-      <div className="section" style={{ flexDirection: "column" }}>
+      <div
+        className={`section ${getCssQuality()}`}
+        style={{ flexDirection: "column" }}
+      >
         <div style={{ display: "flex" }}>
           <Button
             style={{

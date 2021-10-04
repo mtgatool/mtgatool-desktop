@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import usePagingControls from "../../../hooks/usePagingControls";
 import { Filters, StringFilterType } from "../../../types/genericFilterTypes";
+import getCssQuality from "../../../utils/getCssQuality";
 import getLocalSetting from "../../../utils/getLocalSetting";
 
 import doHistoryFilter from "../../../utils/tables/doHistoryFilter";
@@ -56,8 +57,11 @@ export default function HistoryList(props: HistoryListProps) {
 
   return (
     <>
-      <div className="section" style={{ marginBottom: "0px" }} />
-      <div className="section">
+      <div
+        className={`section ${getCssQuality()}`}
+        style={{ marginBottom: "0px" }}
+      />
+      <div className={`section ${getCssQuality()}`}>
         <div className="history-table-wrapper">
           <SortControls<MatchData>
             setSortCallback={setSortValue}

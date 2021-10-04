@@ -18,6 +18,7 @@ import getLocalDbValue from "../toolDb/getLocalDbValue";
 import { DbMatch } from "../types/dbTypes";
 import reduxAction from "../redux/reduxAction";
 import aggregateStats from "../utils/aggregateStats";
+import getCssQuality from "../utils/getCssQuality";
 
 const views = {
   home: ViewHome,
@@ -93,6 +94,8 @@ export default function ContentWrapper() {
   const openAdvancedCollectionSearch = useRef<() => void>(vodiFn);
   const closeAdvancedCollectionSearch = useRef<() => void>(vodiFn);
 
+  const CurrentPage = Object.values(views)[viewIndex];
+
   return (
     <>
       <PopupComponent
@@ -108,27 +111,41 @@ export default function ContentWrapper() {
       <div className="wrapper">
         <div className="wrapper-inner">
           <div className="overflow-ux">
-            {transitions.map(({ item, props }) => {
-              const Page = Object.values(views)[item];
-              return (
-                <animated.div
-                  className="view-container"
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={`${Object.keys(views)[item]}-container`}
-                  style={{
-                    ...props,
-                  }}
-                >
-                  <Page
-                    key={`${Object.keys(views)[item]}-page`}
-                    collectionData={collectionData}
-                    openAdvancedCollectionSearch={
-                      openAdvancedCollectionSearch.current
-                    }
-                  />
-                </animated.div>
-              );
-            })}
+            {getCssQuality() === "high" ? (
+              transitions.map(({ item, props }) => {
+                const Page = Object.values(views)[item];
+                return (
+                  <animated.div
+                    className="view-container"
+                    key={`${Object.keys(views)[item]}-container`}
+                    style={{
+                      ...props,
+                    }}
+                  >
+                    <Page
+                      key={`${Object.keys(views)[item]}-page`}
+                      collectionData={collectionData}
+                      openAdvancedCollectionSearch={
+                        openAdvancedCollectionSearch.current
+                      }
+                    />
+                  </animated.div>
+                );
+              })
+            ) : (
+              <div
+                className="view-container"
+                key={`${Object.keys(views)[viewIndex]}-container`}
+              >
+                <CurrentPage
+                  key={`${Object.keys(views)[viewIndex]}-page`}
+                  collectionData={collectionData}
+                  openAdvancedCollectionSearch={
+                    openAdvancedCollectionSearch.current
+                  }
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

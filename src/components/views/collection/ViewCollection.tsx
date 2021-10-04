@@ -20,6 +20,7 @@ import SortControls, { Sort } from "../../SortControls";
 import SetsFilter from "../../SetsFilter";
 import setFilter from "../../../utils/tables/filters/setFilter";
 import { Filters } from "../../../types/genericFilterTypes";
+import getCssQuality from "../../../utils/getCssQuality";
 
 interface ViewCollectionProps {
   collectionData: CardsData[];
@@ -114,7 +115,10 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
   return (
     <>
-      <div className="section" style={{ flexDirection: "column" }}>
+      <div
+        className={`section ${getCssQuality()}`}
+        style={{ flexDirection: "column" }}
+      >
         <div style={{ display: "flex" }}>
           <Button
             onClick={openAdvancedCollectionSearch}
@@ -135,7 +139,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
         </div>
       </div>
       <div
-        className="section"
+        className={`section ${getCssQuality()}`}
         style={{ marginTop: "0px", flexDirection: "column" }}
       >
         <SortControls<CardsData>

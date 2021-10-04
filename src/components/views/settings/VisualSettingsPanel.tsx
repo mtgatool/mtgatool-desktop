@@ -12,6 +12,8 @@ import CardTile from "../../CardTile";
 
 import database from "../../../utils/database-wrapper";
 import reduxAction from "../../../redux/reduxAction";
+import setLocalSetting from "../../../utils/setLocalSetting";
+import getLocalSetting from "../../../utils/getLocalSetting";
 
 export default function VisualSettingsPanel(): JSX.Element {
   const dispatch = useDispatch();
@@ -87,6 +89,19 @@ export default function VisualSettingsPanel(): JSX.Element {
           options={["small", "normal", "large"]}
           current={settings.cardsQuality}
           callback={setCardQuality}
+        />
+      </div>
+      <div className="centered-setting-container">
+        <label>UI effects</label>
+        <Select
+          options={["web", "high"]}
+          current={getLocalSetting("css")}
+          optionFormatter={(mode) => {
+            if (mode === "web") return "Low";
+            if (mode === "high") return "High";
+            return "";
+          }}
+          callback={(mode) => setLocalSetting("css", mode)}
         />
       </div>
       <div className="centered-setting-container">
