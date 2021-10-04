@@ -81,7 +81,6 @@
       "artifactName": "${productName}-${version}.${ext}"
     },
     "mac": {
-      "target": "pkg",
       "icon": "public/icons/icon.icns",
       "artifactName": "${productName}-${version}.${ext}",
       "extendInfo": {
