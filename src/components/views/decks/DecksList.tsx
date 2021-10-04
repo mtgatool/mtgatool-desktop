@@ -31,6 +31,45 @@ export default function DecksList() {
     },
   };
 
+  const getDeckWithStats = useCallback(
+    (id: string): StatsDeck | undefined => {
+      if (!fullStats) return undefined;
+
+      const hashes = fullStats.decks[id];
+      let latestTimestamp = fullStats.deckIndex[hashes[0]].lastUsed;
+      let latestHash = hashes[0];
+
+      const deckStats = {
+        gameWins: 0,
+        gameLosses: 0,
+        matchWins: 0,
+        matchLosses: 0,
+      };
+
+      hashes.forEach((h) => {
+        const d = fullStats.deckIndex[h];
+        deckStats.gameWins += d.stats.gameWins;
+        deckStats.gameLosses += d.stats.gameLosses;
+        deckStats.matchWins += d.stats.matchWins;
+        deckStats.matchLosses += d.stats.matchLosses;
+        if (latestTimestamp < d.lastUsed) {
+          latestTimestamp = d.lastUsed;
+          latestHash = h;
+        }
+      });
+
+      return {
+        ...fullStats.deckIndex[latestHash],
+        totalGames: deckStats.gameWins + deckStats.gameLosses,
+        winrate:
+          (100 / (deckStats.gameWins + deckStats.gameLosses)) *
+          deckStats.gameWins,
+        stats: deckStats,
+      };
+    },
+    [fullStats]
+  );
+
   const [filters, setFilters] = useState<Filters<StatsDeck>>([
     defaultDeckFilters,
   ]);
@@ -50,7 +89,8 @@ export default function DecksList() {
 
       hashes.forEach((h) => {
         if (latestTimestamp < fullStats.deckIndex[h].lastUsed) {
-          latestTimestamp = fullStats.deckIndex[h].lastUsed;
+          const d = fullStats.deckIndex[h];
+          latestTimestamp = d.lastUsed;
           latestHash = h;
         }
       });
@@ -128,12 +168,13 @@ export default function DecksList() {
               (pagingControlProps.pageIndex + 1) * pagingControlProps.pageSize
             )
             .map((deck) => {
-              if (deck) {
+              const fullDeck = getDeckWithStats(deck?.id || "");
+              if (fullDeck) {
                 return (
                   <DecksArtViewRow
                     clickDeck={openDeck}
                     key={deck.id}
-                    deck={deck}
+                    deck={fullDeck}
                   />
                 );
               }

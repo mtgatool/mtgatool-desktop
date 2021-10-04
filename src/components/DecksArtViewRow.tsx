@@ -1,6 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import { Colors, Deck, formatPercent } from "mtgatool-shared";
 import { useEffect, useState } from "react";
+
 import ManaCost from "./ManaCost";
 
 import WildcardsCost from "./WildcardsCost";
@@ -13,6 +14,7 @@ import timeAgo from "../utils/timeAgo";
 import getPreconDeckName from "../utils/getPreconDeckName";
 
 import squirrels from "../assets/images/squirrels.png";
+import { normalApproximationInterval } from "../utils/statsFns";
 
 export interface DecksArtViewRowProps {
   clickDeck: (deck: StatsDeck) => void;
@@ -39,14 +41,26 @@ export default function DecksArtViewRow(
   const deckColors = new Colors().addFromBits(deck.colors || 0);
 
   const totalMatches = deck.stats.matchLosses + deck.stats.matchWins;
-  const winrate = totalMatches > 0 ? deck.stats.matchWins / totalMatches : 0;
+  let totalWinrate = totalMatches > 0 ? deck.stats.matchWins / totalMatches : 0;
 
   // Deck winrates
   let winrateInterval = "???";
-  // let winrateTooltip = "play at least 20 matches to estimate actual winrate";
+  let winrateTooltip = "play at least 20 matches to estimate actual winrate";
   // let winrateEditTooltip = "no data yet";
   if (totalMatches >= 20) {
-    winrateInterval = formatPercent(winrate);
+    const { winrate, interval } = normalApproximationInterval(
+      totalMatches,
+      deck.stats.matchWins
+    );
+    const roundWinrate = (x: number): number => Math.round(x * 100) / 100;
+    totalWinrate = roundWinrate(winrate);
+    winrateInterval = `${formatPercent(interval)}`;
+    const winrateLow = roundWinrate(winrate - interval);
+    const winrateHigh = roundWinrate(winrate + interval);
+
+    winrateTooltip = `${formatPercent(winrateLow)} to ${formatPercent(
+      winrateHigh
+    )} with 95% confidence (estimated actual winrate bounds, assuming a normal distribution)`;
   }
 
   const lastTouch = new Date(deck.lastUsed).getTime();
@@ -81,12 +95,12 @@ export default function DecksArtViewRow(
         <div className="decks-table-deck-item">
           <ManaCost colors={deckColors.get()} />
         </div>
-        <div className="decks-table-deck-item">
+        <div className="decks-table-deck-item" title={winrateTooltip}>
           {totalMatches > 0 ? (
             <>
               {deck.stats.matchWins}:{deck.stats.matchLosses} (
-              <span className={getWinrateClass(winrate, true)}>
-                {formatPercent(winrate)}
+              <span className={getWinrateClass(totalWinrate, true)}>
+                {formatPercent(totalWinrate)}
               </span>{" "}
               <i style={{ opacity: 0.6 }}>&plusmn; {winrateInterval}</i>)
             </>
