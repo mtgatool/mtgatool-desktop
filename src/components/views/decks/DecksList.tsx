@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-bitwise */
-import { Fragment, useCallback, useMemo, useState } from "react";
+import { ChangeEvent, Fragment, useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
@@ -16,10 +16,13 @@ import ManaFilter from "../../ManaFilter";
 import PagingControls from "../../PagingControls";
 import SortControls, { Sort } from "../../SortControls";
 import getCssQuality from "../../../utils/getCssQuality";
+import useDebounce from "../../../hooks/useDebounce";
+import InputContainer from "../../InputContainer";
 
 export default function DecksList() {
   const history = useHistory();
   const [colorFilterState, setColorFilterState] = useState(31);
+  const [deckNameFilterState, setDeckNameFilterState] = useState("");
   const fullStats = useSelector((state: AppState) => state.mainData.fullStats);
 
   const defaultDeckFilters: StringFilterType<StatsDeck> = {
@@ -137,12 +140,38 @@ export default function DecksList() {
     [filters]
   );
 
+  const deckNameDebouncer = useDebounce(500);
+
+  const onDeckNameFilterChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const newFilters = setFilter(filters, {
+        type: "string",
+        id: "name",
+        value: {
+          string: event.target.value,
+          not: false,
+        },
+      });
+
+      deckNameDebouncer(() => setFilters(newFilters));
+      setDeckNameFilterState(event.target.value);
+    },
+    [deckNameDebouncer, filters]
+  );
+
   return (
     <>
       <div
         className={`section ${getCssQuality()}`}
         style={{ marginBottom: "0px" }}
       >
+        <InputContainer>
+          <input
+            value={deckNameFilterState}
+            placeholder="Search by name"
+            onChange={onDeckNameFilterChange}
+          />
+        </InputContainer>
         <ManaFilter initialState={colorFilterState} callback={setColorFilter} />
       </div>
       <div
