@@ -102,7 +102,7 @@ export default function DecksArtViewRow(
               <span className={getWinrateClass(totalWinrate, true)}>
                 {formatPercent(totalWinrate)}
               </span>{" "}
-              <i style={{ opacity: 0.6 }}>&plusmn; {winrateInterval}</i>)
+              <i style={{ opacity: 0.6 }}> &plusmn; {winrateInterval}</i>)
             </>
           ) : totalMissing > 0 ? (
             <WildcardsCost deck={deckObj} shrink />

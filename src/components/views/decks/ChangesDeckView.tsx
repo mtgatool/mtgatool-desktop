@@ -152,10 +152,10 @@ export default function ChangesDeckView(
           const winrate =
             totalMatches > 0 ? d.stats.matchWins / totalMatches : 0;
 
-          let winrateInterval = "???";
-          if (totalMatches >= 20) {
-            winrateInterval = formatPercent(winrate);
-          }
+          // let winrateInterval = "???";
+          // if (totalMatches >= 20) {
+          //   winrateInterval = formatPercent(winrate);
+          // }
 
           return (
             <Section
@@ -181,7 +181,7 @@ export default function ChangesDeckView(
                   <span className={getWinrateClass(winrate, true)}>
                     {formatPercent(winrate)}
                   </span>{" "}
-                  <i style={{ opacity: 0.6 }}>&plusmn; {winrateInterval}</i>)
+                  <i style={{ opacity: 0.6 }} />)
                 </div>
               </Flex>
               <Flex style={{ justifyContent: "space-between" }}>
