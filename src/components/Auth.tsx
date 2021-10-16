@@ -65,9 +65,13 @@ export default function Auth(props: AuthProps) {
     getLocalSetting("rememberme") == "true"
   );
 
-  const { loginState, logCompletion, loading } = useSelector(
-    (state: AppState) => state.renderer
+  const loginState = useSelector(
+    (state: AppState) => state.renderer.loginState
   );
+  const logCompletion = useSelector(
+    (state: AppState) => state.renderer.logCompletion
+  );
+  const loading = useSelector((state: AppState) => state.renderer.loading);
 
   useEffect(() => {
     setLocalSetting("rememberme", rememberme ? "true" : "false");

@@ -12,7 +12,9 @@ export default function ViewDecks() {
   const { url } = useRouteMatch();
   const [, loggedIn] = useDbUser();
 
-  const { decksIndex } = useSelector((state: AppState) => state.mainData);
+  const decksIndex = useSelector(
+    (state: AppState) => state.mainData.decksIndex
+  );
 
   return (
     <>

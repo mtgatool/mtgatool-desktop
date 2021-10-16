@@ -118,7 +118,7 @@ export default function MatchView(): JSX.Element {
   useEffect(() => {
     window.toolDb
       .getData<DbMatch>(decodeURIComponent(params.id))
-      .then((match) => {
+      .then((match: DbMatch | null) => {
         if (match) {
           setMatchData(match);
         }

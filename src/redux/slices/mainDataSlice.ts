@@ -19,21 +19,28 @@ const mainState = {
   matchesIndex: [] as string[],
   decksIndex: {} as Record<string, number>,
   fullStats: null as AggregatedStats | null,
+  historyStats: null as AggregatedStats | null,
 };
 
-export type PlayerData = typeof mainState;
+export type MainState = typeof mainState;
 
 const mainDataSlice = createSlice({
   name: "mainData",
   initialState: mainState,
   reducers: {
     setFullStats: (
-      state: PlayerData,
+      state: MainState,
       action: PayloadAction<AggregatedStats>
     ): void => {
-      state.fullStats = action.payload;
+      state.fullStats = { ...action.payload };
     },
-    addLiveFeed: (state: PlayerData, action: PayloadAction<DbMatch>): void => {
+    setHistoryStats: (
+      state: MainState,
+      action: PayloadAction<AggregatedStats>
+    ): void => {
+      state.historyStats = { ...action.payload };
+    },
+    addLiveFeed: (state: MainState, action: PayloadAction<DbMatch>): void => {
       const matches = state.liveFeed.filter(
         (v) => v.matchId === action.payload.matchId
       );
@@ -42,11 +49,11 @@ const mainDataSlice = createSlice({
           ? [action.payload, ...state.liveFeed].slice(0, 10)
           : state.liveFeed;
     },
-    setUUID: (state: PlayerData, action: PayloadAction<string>): void => {
+    setUUID: (state: MainState, action: PayloadAction<string>): void => {
       state.currentUUID = action.payload;
     },
     setUUIDData: (
-      state: PlayerData,
+      state: MainState,
       action: PayloadAction<{ data: DbUUIDData; uuid: string }>
     ): void => {
       state.uuidData = {
@@ -57,24 +64,24 @@ const mainDataSlice = createSlice({
         },
       };
     },
-    setCards: (state: PlayerData, action: PayloadAction<Cards>): void => {
+    setCards: (state: MainState, action: PayloadAction<Cards>): void => {
       state.cardsPrev = { ...state.cards };
       state.cards = action.payload;
     },
     setForceCollection: (
-      state: PlayerData,
+      state: MainState,
       _action: PayloadAction<undefined>
     ): void => {
       state.forceCollection = new Date().getTime();
     },
     setDecksIndex: (
-      state: PlayerData,
+      state: MainState,
       action: PayloadAction<Record<string, number>>
     ): void => {
       state.decksIndex = { ...state.decksIndex, ...action.payload };
     },
     setMatchesIndex: (
-      state: PlayerData,
+      state: MainState,
       action: PayloadAction<string[]>
     ): void => {
       state.matchesIndex = _.uniq([...state.matchesIndex, ...action.payload]);
@@ -84,6 +91,7 @@ const mainDataSlice = createSlice({
 
 export const {
   setFullStats,
+  setHistoryStats,
   addLiveFeed,
   setUUID,
   setCards,

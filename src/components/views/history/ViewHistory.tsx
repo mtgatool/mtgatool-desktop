@@ -10,11 +10,18 @@ import MatchView from "./MatchView";
 import { AppState } from "../../../redux/stores/rendererStore";
 import getMatchesData, { MatchData } from "./getMatchesData";
 
-export default function ViewHistory() {
+interface ViewHistoryProps {
+  openHistoryStatsPopup: () => void;
+}
+
+export default function ViewHistory(props: ViewHistoryProps) {
+  const { openHistoryStatsPopup } = props;
   const { url } = useRouteMatch();
   const [, loggedIn] = useDbUser();
 
-  const { matchesIndex } = useSelector((state: AppState) => state.mainData);
+  const matchesIndex = useSelector(
+    (state: AppState) => state.mainData.matchesIndex
+  );
   const [matchesData, setMatchesData] = useState<MatchData[]>([]);
 
   useEffect(() => {
@@ -29,7 +36,12 @@ export default function ViewHistory() {
           <Route
             exact
             path={`${url}/`}
-            component={() => <HistoryList matchesData={matchesData} />}
+            component={() => (
+              <HistoryList
+                openHistoryStatsPopup={openHistoryStatsPopup}
+                matchesData={matchesData}
+              />
+            )}
           />
         </Switch>
       ) : (

@@ -167,9 +167,11 @@ export default function TopNav(props: TopNavProps): JSX.Element {
   const { openSettings } = props;
 
   const [compact, setCompact] = useState(false);
-  const { uuidData, currentUUID } = useSelector(
-    (state: AppState) => state.mainData
+  const currentUUID = useSelector(
+    (state: AppState) => state.mainData.currentUUID
   );
+
+  const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
 
   const topNavIconsRef: any = useRef(null);
   const dispatcher = useDispatch();

@@ -56,7 +56,7 @@ export default function AboutSettingsPanel(): JSX.Element {
         <div
           className="git-link"
           onClick={(): void =>
-            openExternal("https://github.com/Manuel-777/MTG-Arena-Tool")
+            openExternal("https://github.com/mtgatool/mtgatool-desktop")
           }
         />
       </div>

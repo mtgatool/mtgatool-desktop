@@ -31,7 +31,7 @@ import isElectron from "../utils/electron/isElectron";
 import info from "../info.json";
 import overlayHandler from "../common/overlayHandler";
 import login from "../toolDb/login";
-import { DEFAULT_SERVERS } from "../constants";
+// import { DEFAULT_SERVERS } from "../constants";
 import Welcome from "./Welcome";
 import liveDraftVerification from "../toolDb/liveDraftVerification";
 import { DbMatch } from "../types/dbTypes";
@@ -57,7 +57,7 @@ function App(props: AppProps) {
       const storedPeers = JSON.parse(getLocalSetting("peers"));
       const mergedPeers = [
         ...storedPeers.map((p: string) => `http://${p}:8765/gun`),
-        ...DEFAULT_SERVERS,
+        // ...DEFAULT_SERVERS,
       ];
       window.toolDb = new ToolDbClient(mergedPeers);
       window.toolDbInitialized = true;

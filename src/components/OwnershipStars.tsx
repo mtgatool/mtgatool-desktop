@@ -85,7 +85,9 @@ export default function OwnershipStars(props: {
   wanted?: number;
 }): JSX.Element {
   const { card, wanted } = props;
-  const { cards, cardsNew } = useSelector((state: AppState) => state.mainData);
+  const cards = useSelector((state: AppState) => state.mainData.cards);
+  const cardsNew = useSelector((state: AppState) => state.mainData.cardsNew);
+
   if (!card) {
     return <></>;
   }

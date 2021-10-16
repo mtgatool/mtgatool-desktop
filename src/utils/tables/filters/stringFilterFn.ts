@@ -15,7 +15,9 @@ export default function stringFilterFn<D>(
 
     const keyVal = row[key] as unknown as string;
 
-    res = res || keyVal.toLowerCase().indexOf(F) !== -1;
+    res = filterValue.exact
+      ? keyVal.toLowerCase() === F
+      : res || keyVal.toLowerCase().indexOf(F) !== -1;
 
     return filterValue.not ? !res : res;
   });

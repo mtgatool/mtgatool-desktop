@@ -30,6 +30,6 @@ export const defaultSettings: Record<SettingKey, string> = {
   settings: JSON.stringify(defaultConfig),
   welcome: "false",
   lang: "en",
-  peers: JSON.stringify(["api.mtgatool.com"]),
+  peers: JSON.stringify(["127.0.0.1"]),
   css: isElectron() ? "high" : "web",
 };

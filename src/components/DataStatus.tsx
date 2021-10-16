@@ -29,8 +29,17 @@ export default function DataStatus() {
   const openAltRef = useRef<() => void>(vodiFn);
   const positionRef = useRef<HTMLDivElement>(null);
 
-  const { cards, uuidData, matchesIndex, decksIndex, currentUUID } =
-    useSelector((state: AppState) => state.mainData);
+  const currentUUID = useSelector(
+    (state: AppState) => state.mainData.currentUUID
+  );
+  const decksIndex = useSelector(
+    (state: AppState) => state.mainData.decksIndex
+  );
+  const matchesIndex = useSelector(
+    (state: AppState) => state.mainData.matchesIndex
+  );
+  const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
+  const cards = useSelector((state: AppState) => state.mainData.cards);
 
   return (
     <>

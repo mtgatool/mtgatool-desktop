@@ -16,6 +16,7 @@ export type FilterModes =
 export interface StringFilter {
   string: string;
   not: boolean;
+  exact: boolean;
 }
 
 export type ColorBitsFilter = {

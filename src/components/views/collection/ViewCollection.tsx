@@ -42,11 +42,14 @@ export default function ViewCollection(props: ViewCollectionProps) {
     sort: 1,
   });
 
-  const { collectionQuery, forceQuery } = useSelector(
-    (state: AppState) => state.renderer
+  const forceQuery = useSelector(
+    (state: AppState) => state.renderer.forceQuery
+  );
+  const collectionQuery = useSelector(
+    (state: AppState) => state.renderer.collectionQuery
   );
 
-  const { cardsSize } = useSelector((state: AppState) => state.settings);
+  const cardsSize = useSelector((state: AppState) => state.settings.cardsSize);
 
   const filteredData = useMemo(
     () =>

@@ -31,6 +31,7 @@ export default function DecksList() {
     value: {
       string: getLocalSetting("playerId") || "",
       not: false,
+      exact: true,
     },
   };
 
@@ -150,6 +151,7 @@ export default function DecksList() {
         value: {
           string: event.target.value,
           not: false,
+          exact: false,
         },
       });
 

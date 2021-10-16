@@ -20,7 +20,7 @@ interface CraftingCostProps {
 
 export default function CraftingCost(props: CraftingCostProps): JSX.Element {
   const { deck } = props;
-  const { mainData } = useSelector((state: AppState) => state);
+  const mainData = useSelector((state: AppState) => state.mainData);
 
   const uuid = mainData.currentUUID;
   if (!mainData?.uuidData || !mainData.uuidData[uuid]) return <></>;

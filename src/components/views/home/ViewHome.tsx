@@ -10,7 +10,7 @@ import { convertDbMatchToData } from "../history/getMatchesData";
 import getCssQuality from "../../../utils/getCssQuality";
 
 export default function ViewHome() {
-  const { liveFeed } = useSelector((state: AppState) => state.mainData);
+  const liveFeed = useSelector((state: AppState) => state.mainData.liveFeed);
 
   return (
     <>

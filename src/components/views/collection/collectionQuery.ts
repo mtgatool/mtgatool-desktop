@@ -90,7 +90,7 @@ function getTokenVal(
         const newFilter: StringFilterType<CardsData> = {
           type: "string",
           id: "name",
-          value: { string: val, not: isNegative },
+          value: { string: val, not: isNegative, exact: false },
         };
         return newFilter;
       }
@@ -100,7 +100,7 @@ function getTokenVal(
         const newFilter: StringFilterType<CardsData> = {
           type: "string",
           id: "type",
-          value: { string: val, not: isNegative },
+          value: { string: val, not: isNegative, exact: false },
         };
         return newFilter;
       }
@@ -110,7 +110,7 @@ function getTokenVal(
         const newFilter: StringFilterType<CardsData> = {
           type: "string",
           id: "artist",
-          value: { string: val, not: isNegative },
+          value: { string: val, not: isNegative, exact: false },
         };
         return newFilter;
       }
@@ -438,7 +438,7 @@ export default function getFiltersFromQuery(query: string): Filters<CardsData> {
     filters.push({
       type: "string",
       id: "name",
-      value: { string: query, not: false },
+      value: { string: query, not: false, exact: false },
     });
   }
 

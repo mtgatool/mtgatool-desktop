@@ -7,6 +7,7 @@ export const actions = {
   SET_HOVER_IN: HoverSlice.setHoverIn,
   SET_HOVER_OUT: HoverSlice.setHoverOut,
   SET_FULL_STATS: MainDataSlice.setFullStats,
+  SET_HISTORY_STATS: MainDataSlice.setHistoryStats,
   ADD_LIVEFEED: MainDataSlice.addLiveFeed,
   SET_UUID: MainDataSlice.setUUID,
   SET_UUID_DATA: MainDataSlice.setUUIDData,

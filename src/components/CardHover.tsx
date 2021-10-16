@@ -11,7 +11,8 @@ import isCardDfc from "../utils/isCardDfc";
 import { CARD_SIZE_RATIO } from "../common/static";
 
 export default function CardHover(): JSX.Element {
-  const { grpId, opacity } = useSelector((state: AppState) => state.hover);
+  const opacity = useSelector((state: AppState) => state.hover.opacity);
+  const grpId = useSelector((state: AppState) => state.hover.grpId);
 
   const quality = useSelector((state: AppState) => state.settings.cardsQuality);
   const hoverSize = useSelector(

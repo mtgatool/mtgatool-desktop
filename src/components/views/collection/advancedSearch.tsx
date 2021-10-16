@@ -95,7 +95,9 @@ export default function AdvancedSearch(
   const { closeCallback } = props;
   const history = useHistory();
   const dispatch = useDispatch();
-  const { collectionQuery } = useSelector((state: AppState) => state.renderer);
+  const collectionQuery = useSelector(
+    (state: AppState) => state.renderer.collectionQuery
+  );
   const defaultFilters = getFiltersFromQuery(collectionQuery);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(0);

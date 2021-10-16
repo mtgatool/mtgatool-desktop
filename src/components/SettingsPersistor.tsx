@@ -6,7 +6,7 @@ import { AppState } from "../redux/stores/rendererStore";
 import setLocalSetting from "../utils/setLocalSetting";
 
 export default function SettingsPersistor() {
-  const { settings } = useSelector((state: AppState) => state);
+  const settings = useSelector((state: AppState) => state.settings);
 
   useEffect(() => {
     if (overlayHandler) {

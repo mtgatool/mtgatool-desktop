@@ -19,6 +19,8 @@ import { DbMatch } from "../types/dbTypes";
 import reduxAction from "../redux/reduxAction";
 import aggregateStats from "../utils/aggregateStats";
 import getCssQuality from "../utils/getCssQuality";
+import HistoryStats from "./views/history/HistoryStats";
+import { convertDbMatchToData } from "./views/history/getMatchesData";
 
 const views = {
   home: ViewHome,
@@ -37,13 +39,18 @@ function delay(transition: any, timeout: number): any {
   };
 }
 
-export default function ContentWrapper() {
+const ContentWrapper = () => {
   const dispatch = useDispatch();
   const params = useParams<{ page: string }>();
   const paths = useRef<string[]>([params.page]);
 
-  const { cards, cardsNew, forceCollection, matchesIndex } = useSelector(
-    (state: AppState) => state.mainData
+  const cards = useSelector((state: AppState) => state.mainData.cards);
+  const cardsNew = useSelector((state: AppState) => state.mainData.cardsNew);
+  const forceCollection = useSelector(
+    (state: AppState) => state.mainData.forceCollection
+  );
+  const matchesIndex = useSelector(
+    (state: AppState) => state.mainData.matchesIndex
   );
 
   const collectionData = useMemo(() => {
@@ -59,7 +66,9 @@ export default function ContentWrapper() {
     Promise.all(promises).then((matches: any) => {
       reduxAction(dispatch, {
         type: "SET_FULL_STATS",
-        arg: aggregateStats(matches.filter((m: any) => m)),
+        arg: aggregateStats(
+          matches.filter((m: any) => m).map(convertDbMatchToData)
+        ),
       });
     });
   }, [dispatch, matchesIndex]);
@@ -94,6 +103,9 @@ export default function ContentWrapper() {
   const openAdvancedCollectionSearch = useRef<() => void>(vodiFn);
   const closeAdvancedCollectionSearch = useRef<() => void>(vodiFn);
 
+  const openHistoryStatsPopup = useRef<() => void>(vodiFn);
+  const closeHistoryStatsPopup = useRef<() => void>(vodiFn);
+
   const CurrentPage = Object.values(views)[viewIndex];
 
   return (
@@ -106,6 +118,16 @@ export default function ContentWrapper() {
         closeFnRef={closeAdvancedCollectionSearch}
       >
         <AdvancedSearch closeCallback={closeAdvancedCollectionSearch.current} />
+      </PopupComponent>
+
+      <PopupComponent
+        open={false}
+        width="1000px"
+        height="600px"
+        openFnRef={openHistoryStatsPopup}
+        closeFnRef={closeHistoryStatsPopup}
+      >
+        <HistoryStats />
       </PopupComponent>
 
       <div className="wrapper">
@@ -128,6 +150,7 @@ export default function ContentWrapper() {
                       openAdvancedCollectionSearch={
                         openAdvancedCollectionSearch.current
                       }
+                      openHistoryStatsPopup={openHistoryStatsPopup.current}
                     />
                   </animated.div>
                 );
@@ -143,6 +166,7 @@ export default function ContentWrapper() {
                   openAdvancedCollectionSearch={
                     openAdvancedCollectionSearch.current
                   }
+                  openHistoryStatsPopup={openHistoryStatsPopup.current}
                 />
               </div>
             )}
@@ -151,4 +175,8 @@ export default function ContentWrapper() {
       </div>
     </>
   );
-}
+};
+
+ContentWrapper.whyDidYouRender = true;
+
+export default ContentWrapper;

@@ -71,9 +71,8 @@ export default function TopBar(props: TopBarProps): JSX.Element {
   const { forceOs, closeCallback } = props;
   const [hoverControls, setHoverControls] = useState(false);
 
-  const { topArtist, offline } = useSelector(
-    (state: AppState) => state.renderer
-  );
+  const offline = useSelector((state: AppState) => state.renderer.offline);
+  const topArtist = useSelector((state: AppState) => state.renderer.topArtist);
 
   const os = forceOs || process.platform;
 
