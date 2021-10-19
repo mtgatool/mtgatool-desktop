@@ -9,7 +9,7 @@ import {
 } from "mtgatool-shared/dist/shared/constants";
 
 export const initialRendererState = {
-  peers: ["127.0.0.1"],
+  peers: ["api.mtgatool.com"],
   archivedCache: {} as Record<string, boolean>,
   backgroundGrpid: null as number | null,
   loading: false,
