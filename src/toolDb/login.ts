@@ -1,86 +1,58 @@
+import { base64ToBinaryDocument, CrdtMessage, PutMessage } from "tool-db";
+import Automerge from "automerge";
 import reduxAction from "../redux/reduxAction";
 import { setCards } from "../redux/slices/mainDataSlice";
 import store from "../redux/stores/rendererStore";
 import { DbUUIDData } from "../types/dbTypes";
+import globalData from "../utils/globalData";
 
-import getLocalDbValue from "./getLocalDbValue";
+function handleMatchesIndex(msg: CrdtMessage | PutMessage<any>) {
+  if (msg && msg.type === "crdt") {
+    // console.log("Key Listener matchesIndex ", msg);
+    if (msg.type === "crdt" && globalData.matchesIndex) {
+      const doc = Automerge.load<{ index: string[] }>(
+        base64ToBinaryDocument(msg.doc)
+      );
 
-function handleDecksIndex(data: Record<string, number> | undefined) {
-  if (data) {
-    Object.keys(data).forEach((id: string) => {
-      if (
-        !Object.keys(store.getState().mainData.decksIndex).includes(
-          `${id}-v${data[id]}`
-        )
-      ) {
-        window.toolDb.getData(`decks-${id}-v${data[id]}`, true, 5000);
-      }
-    });
+      globalData.matchesIndex = Automerge.merge(globalData.matchesIndex, doc);
 
-    reduxAction(store.dispatch, {
-      type: "SET_DECKS_INDEX",
-      arg: data,
-    });
-    console.log("decksIndex", data);
-  }
-}
+      reduxAction(store.dispatch, {
+        type: "SET_MATCHES_INDEX",
+        arg: globalData.matchesIndex.index,
+      });
 
-function handleMatchesIndex(data: string[] | undefined) {
-  if (data) {
-    data.forEach((id: string) => {
-      if (!store.getState().mainData.matchesIndex.includes(id)) {
-        window.toolDb.getData(`matches-${id}`, true, 5000);
-      }
-    });
-
-    reduxAction(store.dispatch, {
-      type: "SET_MATCHES_INDEX",
-      arg: data,
-    });
-
-    console.log("matchesIndex", data);
+      // Fetch any match we dont have locally
+      globalData.matchesIndex.index.forEach((id: string) => {
+        window.toolDb.store.get(
+          window.toolDb.getUserNamespacedKey(`matches-${id}`),
+          (err, data) => {
+            if (!data) {
+              window.toolDb.getData(`matches-${id}`, true, 2000);
+            }
+          }
+        );
+      });
+      // console.log("matchesIndex", globalData.matchesIndex.index);
+    }
   }
 }
 
 export function afterLogin() {
   const { dispatch } = store;
-  const pubKey = window.toolDb.user?.pubKey || "";
-  // window.toolDb.addKeyListener(`:${pubKey}.matches-`, (data) => {
-  //   if (data) {
-  //     reduxAction(dispatch, {
-  //       type: "SET_MATCH",
-  //       arg: data,
-  //     });
-  //   }
-  // });
 
-  // window.toolDb.addKeyListener(`:${pubKey}.decks-`, (data) => {
-  //   if (data) {
-  //     reduxAction(dispatch, {
-  //       type: "SET_DECK",
-  //       arg: data,
-  //     });
-  //   }
-  // });
+  window.toolDb.subscribeData("cards", true);
+  window.toolDb.subscribeData("userids", true);
+  window.toolDb.subscribeData("matchesIndex", true);
+  window.toolDb.subscribeData("matches-livefeed");
 
-  window.toolDb.addKeyListener(`:${pubKey}.matchesIndex`, handleMatchesIndex);
-
-  window.toolDb.addKeyListener(`:${pubKey}.decksIndex`, handleDecksIndex);
-
-  window.toolDb.getData("matchesIndex", true, 5000).catch(console.warn);
-
-  window.toolDb.getData("decksIndex", true, 5000).catch(console.warn);
-
-  getLocalDbValue<string[]>(`:${pubKey}.matchesIndex`).then(handleMatchesIndex);
-
-  getLocalDbValue<Record<string, number>>(`:${pubKey}.decksIndex`).then(
-    handleDecksIndex
+  window.toolDb.addKeyListener(
+    window.toolDb.getUserNamespacedKey("matchesIndex"),
+    handleMatchesIndex
   );
 
   window.toolDb
     .getData("userids", true, 5000)
     .then((data) => {
-      console.log("Userids", data);
       let newest = "";
       let newestDate = 0;
       Object.keys(data).forEach((uuid) => {
@@ -88,17 +60,20 @@ export function afterLogin() {
           newestDate = data[uuid];
           newest = uuid;
         }
-        window.toolDb
-          .getData<DbUUIDData>(`${uuid}-data`, true, 5000)
-          .then((uuidData) => {
-            if (uuidData) {
+
+        window.toolDb.subscribeData(`${uuid}-data`, true);
+
+        window.toolDb.addKeyListener<DbUUIDData>(
+          window.toolDb.getUserNamespacedKey(`${uuid}-data`),
+          (msg) => {
+            if (msg.type === "put") {
               reduxAction(dispatch, {
                 type: "SET_UUID_DATA",
-                arg: { data: uuidData, uuid },
+                arg: { data: msg.v, uuid },
               });
             }
-          })
-          .catch(console.warn);
+          }
+        );
 
         reduxAction(dispatch, {
           type: "SET_UUID",
@@ -112,7 +87,6 @@ export function afterLogin() {
     .getData("cards", true)
     .then((data) => {
       setCards(data);
-      console.log("cards", data);
     })
     .catch(console.warn);
 }

@@ -1,6 +1,5 @@
 import {
   Cards,
-  InternalDeck,
   InternalDraftv2,
   InternalMatch,
   InventoryUpdate,
@@ -26,7 +25,6 @@ export type MessageType =
   | "GAME_STATS"
   | "GAME_START"
   | "SET_SCENE"
-  | "UPSERT_DB_DECK"
   | "UPSERT_DB_CARDS"
   | "UPSERT_DB_RANK"
   | "INVENTORY_UPDATED"
@@ -105,11 +103,6 @@ export interface SetSceneMessage extends ChannelMessageBase {
   value: ClientSceneChange;
 }
 
-export interface UpsertDbDeckMessage extends ChannelMessageBase {
-  type: "UPSERT_DB_DECK";
-  value: InternalDeck;
-}
-
 export interface UpsertDbCardsMessage extends ChannelMessageBase {
   type: "UPSERT_DB_CARDS";
   value: Cards;
@@ -164,7 +157,6 @@ export type ChannelMessage =
   | GameStatsMessage
   | GameStartMessage
   | SetSceneMessage
-  | UpsertDbDeckMessage
   | UpsertDbCardsMessage
   | UpsertDbRankMessage
   | InventoryUpdatedMessage

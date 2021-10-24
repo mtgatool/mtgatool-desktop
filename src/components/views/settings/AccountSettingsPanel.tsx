@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import reduxAction from "../../../redux/reduxAction";
-import { DbAccount } from "../../../types/dbTypes";
+// import { DbAccount } from "../../../types/dbTypes";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
 import PassphraseGenerate from "../../PassphraseGenerate";
@@ -45,10 +45,10 @@ export default function AccountSettingsPanel(
   const history = useHistory();
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [avatar, setAvatar] = useState("");
-  const [_accountInfo, setAccountInfo] = useState<DbAccount>({
-    displayName: "",
-    bio: "",
-  });
+  // const [_accountInfo, setAccountInfo] = useState<DbAccount>({
+  //   displayName: "",
+  //   bio: "",
+  // });
 
   const changeAvatar = useCallback((e) => {
     if (e && e.target.files && e.target.files[0]) {
@@ -65,14 +65,14 @@ export default function AccountSettingsPanel(
     }
   }, []);
 
-  useEffect(() => {
-    window.toolDb
-      .getData<DbAccount>("avatar", true, 10000)
-      .then((a) => {
-        if (a) setAccountInfo(a);
-      })
-      .catch(console.warn);
-  }, [changeAvatar, avatarInputRef]);
+  // useEffect(() => {
+  //   window.toolDb
+  //     .getData<DbAccount>("avatar", true, 10000)
+  //     .then((a) => {
+  //       if (a) setAccountInfo(a);
+  //     })
+  //     .catch(console.warn);
+  // }, [changeAvatar, avatarInputRef]);
 
   useEffect(() => {
     if (avatarInputRef.current) {
@@ -111,7 +111,7 @@ export default function AccountSettingsPanel(
         onClick={() => {
           window.toolDb.user = undefined;
           doClose();
-          setLocalSetting("savedPassword", "");
+          setLocalSetting("savedPass", "");
           setLocalSetting("autoLogin", "false");
           reduxAction(dispatch, {
             type: "SET_LOGIN_STATE",

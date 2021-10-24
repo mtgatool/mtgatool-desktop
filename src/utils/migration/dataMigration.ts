@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { Deck, InternalMatch } from "mtgatool-shared";
 
-import getLocalDbValue from "../../toolDb/getLocalDbValue";
+// import getLocalDbValue from "../../toolDb/getLocalDbValue";
 import { DbMatch } from "../../types/dbTypes";
 import getLocalSetting from "../getLocalSetting";
 
@@ -62,8 +62,6 @@ export default async function dataMigration(
   // Nedb does not really explain how their format works so I assume
   // dupes are a possibility.
 
-  const pubkey = window.toolDb.user?.pubKey || "";
-
   const promises: Promise<DbMatch | undefined>[] = dbString
     .split(`\n`)
     .map((str) => {
@@ -73,15 +71,16 @@ export default async function dataMigration(
           if (parsed && parsed.type === "match") {
             const match = convertOldInternalToDbMatch(parsed);
             if (match) {
-              getLocalDbValue<DbMatch>(
-                `:${pubkey}.matches-${match.matchId}`
-              ).then((previousMatch) => {
-                if (!previousMatch) {
-                  resolve(match);
-                } else {
-                  resolve(undefined);
-                }
-              });
+              resolve(match);
+              // getLocalDbValue<DbMatch>(
+              //   window.toolDb.getUserNamespacedKey(`matches-${match.matchId}`)
+              // ).then((previousMatch) => {
+              //   if (!previousMatch) {
+              //     resolve(match);
+              //   } else {
+              //     resolve(undefined);
+              //   }
+              // });
             } else {
               resolve(undefined);
             }
@@ -94,7 +93,6 @@ export default async function dataMigration(
       });
     });
 
-  console.log(promises);
   return Promise.all(promises)
     .then((matches: any) => {
       console.log(matches);

@@ -1,3 +1,5 @@
+import Automerge from "automerge";
+
 export type CRDT = Record<string, number>;
 
 const globalData = {
@@ -8,7 +10,7 @@ const globalData = {
   mouseX: 0,
   mouseY: 0,
   CRDTList: {} as CRDT,
-  idb: null as IDBDatabase | null,
+  matchesIndex: Automerge.init<{ index: string[] }>(),
 };
 
 (window as any).globalData = globalData;

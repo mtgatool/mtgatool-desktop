@@ -4,7 +4,6 @@ import { InternalDraftv2 } from "mtgatool-shared";
 import { overlayTitleToId } from "../common/maps";
 import setDbMatch from "../toolDb/setDbMatch";
 import upsertDbCards from "../toolDb/upsertDbCards";
-import upsertDbDeck from "../toolDb/upsertDbDeck";
 import upsertDbInventory from "../toolDb/upsertDbInventory";
 import upsertDbRank from "../toolDb/upsertDbRank";
 import reduxAction from "../redux/reduxAction";
@@ -139,10 +138,6 @@ export default function mainChannelListeners() {
           arg: { settings: { ...msg.data.value.settings }, id: id },
         });
       }
-    }
-
-    if (msg.data.type === "UPSERT_DB_DECK") {
-      upsertDbDeck(msg.data.value);
     }
 
     if (msg.data.type === "UPSERT_DB_CARDS") {

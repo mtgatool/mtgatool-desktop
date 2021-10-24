@@ -43,9 +43,10 @@ export function convertDbMatchToData(match: DbMatch): MatchData {
 export default function getMatchesData(
   matchesIds: string[]
 ): Promise<MatchData[]> {
-  const pubkey = window.toolDb.user?.pubKey || "";
   const promises = matchesIds.map((id) => {
-    return getLocalDbValue<DbMatch>(`:${pubkey}.matches-${id}`);
+    return getLocalDbValue<DbMatch>(
+      window.toolDb.getUserNamespacedKey(`matches-${id}`)
+    );
   });
 
   return Promise.all(promises).then((matches) =>

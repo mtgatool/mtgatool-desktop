@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 import { Switch, Route, useHistory } from "react-router-dom";
 
-import { ToolDbClient } from "tool-db";
+import { ToolDb } from "tool-db";
 
 import Auth from "./Auth";
 import CardHover from "./CardHover";
@@ -34,9 +34,6 @@ import login from "../toolDb/login";
 // import { DEFAULT_SERVERS } from "../constants";
 import Welcome from "./Welcome";
 import liveDraftVerification from "../toolDb/liveDraftVerification";
-import { DbMatch } from "../types/dbTypes";
-import incomingLiveFeed from "../toolDb/incomingLiveFeed";
-import getGunDb from "../toolDb/getGunDb";
 
 export interface AppProps {
   forceOs?: string;
@@ -54,24 +51,18 @@ function App(props: AppProps) {
 
   useEffect(() => {
     if (!window.toolDbInitialized) {
-      const storedPeers = JSON.parse(getLocalSetting("peers"));
+      // const storedPeers = JSON.parse(getLocalSetting("peers"));
       const mergedPeers = [
-        ...storedPeers.map((p: string) => `http://${p}:8765/gun`),
+        "http://127.0.0.1:8765",
+        // ...storedPeers.map((p: string) => `http://${p}:8765/gun`),
         // ...DEFAULT_SERVERS,
       ];
-      window.toolDb = new ToolDbClient(mergedPeers);
+      window.toolDb = new ToolDb({ peers: mergedPeers, debug: false });
       window.toolDbInitialized = true;
-      window.toolDb.debug = true;
       window.toolDb.addCustomVerification(
         "live-draft-v1-",
         liveDraftVerification
       );
-
-      window.toolDb.addKeyListener<DbMatch | null>(
-        "matches-livefeed",
-        incomingLiveFeed
-      );
-      getGunDb();
     }
   }, [peers]);
 
@@ -86,7 +77,7 @@ function App(props: AppProps) {
     if (!welcome || welcome === "false") {
       history.push("/welcome");
     } else if (!electron) {
-      const pwd = getLocalSetting("savedPassword");
+      const pwd = getLocalSetting("savedPass");
       const user = getLocalSetting("username");
 
       login(user, pwd)
@@ -103,7 +94,7 @@ function App(props: AppProps) {
             history.push("/auth");
           }
         })
-        .catch((e) => {
+        .catch((e: Error) => {
           console.error(e);
           history.push("/auth");
         });

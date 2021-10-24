@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ToolDbClient } from "tool-db";
+import { ToolDb } from "tool-db";
 
-export default function useDbUser(): [ToolDbClient["user"], boolean] {
+export default function useDbUser(): [ToolDb["user"], boolean] {
   const userRef = useMemo(() => window.toolDb.user, []);
   const [loggedIn, setLoggedIn] = useState(!!window.toolDb.user);
 

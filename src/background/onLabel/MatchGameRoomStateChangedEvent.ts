@@ -90,10 +90,10 @@ export default function onLabelMatchGameRoomStateChangedEvent(
 
       if (deck) {
         selectDeck(new Deck(deck));
-        postChannelMessage({
-          type: "UPSERT_DB_DECK",
-          value: deck,
-        });
+        // postChannelMessage({
+        //   type: "UPSERT_DB_DECK",
+        //   value: deck,
+        // });
       }
     }
 

@@ -5,7 +5,7 @@ export default async function createLiveDraft(draft: InternalDraftv2) {
   if (window.toolDb.user) {
     const newLiveDraft: DbliveDraftV1 = {
       owner: window.toolDb.user.pubKey,
-      ref: `:${window.toolDb.user.pubKey}.${draft.id}`,
+      ref: window.toolDb.getUserNamespacedKey(`${draft.id}`),
       currentVotes: {},
     };
 

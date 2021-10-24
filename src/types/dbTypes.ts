@@ -2,11 +2,10 @@
 import {
   Cards,
   DatabaseClass,
-  InternalDeck,
   InternalMatch,
   v2cardsList,
 } from "mtgatool-shared";
-import ToolDbClient from "tool-db/dist/toolDbClient";
+import { ToolDb } from "tool-db";
 
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { InventoryInfo } from "../background/onLabel/InStartHook";
@@ -14,7 +13,7 @@ import { OverlayHandler } from "../common/overlayHandler";
 
 declare global {
   interface Window {
-    toolDb: ToolDbClient;
+    toolDb: ToolDb;
     toolDbInitialized: boolean;
     database: DatabaseClass;
     overlayHandler: OverlayHandler | undefined;
@@ -48,23 +47,6 @@ export interface StatsDeck {
   };
   totalGames: number;
   winrate: number;
-}
-
-export interface DbDeck extends InternalDeck {
-  playerId: string;
-  deckHash: string;
-  version: number;
-  matches: Record<string, boolean>;
-  colors: number;
-  hidden: boolean;
-  lastUsed: number;
-  // lastModified: number;
-  stats: {
-    gameWins: number;
-    gameLosses: number;
-    matchWins: number;
-    matchLosses: number;
-  };
 }
 
 export interface DbMatch {

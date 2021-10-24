@@ -1,5 +1,5 @@
 import { convertDeckFromV3, PlayerCourse } from "mtgatool-shared";
-import postChannelMessage from "../../broadcastChannel/postChannelMessage";
+// import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import LogEntry from "../../types/logDecoder";
 import selectDeck from "../selectDeck";
 
@@ -19,8 +19,8 @@ export default function onLabelInEventDeckSubmitV3(entry: Entry): void {
 
   selectDeck(selectedDeck);
 
-  postChannelMessage({
-    type: "UPSERT_DB_DECK",
-    value: selectedDeck.getSave(),
-  });
+  // postChannelMessage({
+  //   type: "UPSERT_DB_DECK",
+  //   value: selectedDeck.getSave(),
+  // });
 }

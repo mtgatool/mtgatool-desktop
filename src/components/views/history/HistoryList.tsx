@@ -91,9 +91,10 @@ export default function HistoryList(props: HistoryListProps) {
 
   const openMatch = useCallback(
     (match: MatchData) => {
-      const pubKey = window.toolDb.user?.pubKey || "";
       history.push(
-        `/history/${encodeURIComponent(`:${pubKey}.matches-${match.matchId}`)}`
+        `/history/${encodeURIComponent(
+          window.toolDb.getUserNamespacedKey(`matches-${match.matchId}`)
+        )}`
       );
     },
     [history]

@@ -1,6 +1,6 @@
 // PROBABLY DEPRECATED
 import { convertDeckFromV3, PlayerCourse } from "mtgatool-shared";
-import postChannelMessage from "../../broadcastChannel/postChannelMessage";
+// import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import LogEntry from "../../types/logDecoder";
 
 import selectDeck from "../selectDeck";
@@ -28,9 +28,9 @@ export default function InEventGetPlayerCourseV2(entry: Entry): void {
   if (deck) {
     selectDeck(deck);
 
-    postChannelMessage({
-      type: "UPSERT_DB_DECK",
-      value: deck.getSave(),
-    });
+    // postChannelMessage({
+    //   type: "UPSERT_DB_DECK",
+    //   value: deck.getSave(),
+    // });
   }
 }

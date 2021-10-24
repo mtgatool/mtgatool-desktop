@@ -11,6 +11,7 @@
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "@welldone-software/why-did-you-render": "^6.2.1",
+    "automerge": "^1.0.1-preview.5",
     "axios": "^0.21.1",
     "cypress": "^8.1.0",
     "date-fns": "^2.19.0",
@@ -38,7 +39,7 @@
     "react-table": "^7.7.0",
     "redux": "^4.0.5",
     "shortid": "^2.2.16",
-    "tool-db": "^1.0.24",
+    "tool-db": "../tool-chain",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1"
   },

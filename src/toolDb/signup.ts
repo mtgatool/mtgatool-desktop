@@ -6,8 +6,6 @@ export default function signup(username: string, password: string) {
       async function doSign() {
         await window.toolDb.signIn(username, password);
         await window.toolDb.putData<DbUserids>("userids", {}, true);
-        await window.toolDb.putData("decksIndex", {}, true);
-        await window.toolDb.putData("matchesIndex", [], true);
 
         resolve(msg);
       }

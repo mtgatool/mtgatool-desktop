@@ -8,7 +8,7 @@ import usePagingControls from "../../../hooks/usePagingControls";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { Filters, StringFilterType } from "../../../types/genericFilterTypes";
 import { StatsDeck } from "../../../types/dbTypes";
-import getLocalSetting from "../../../utils/getLocalSetting";
+
 import doDecksFilter from "../../../utils/tables/doDecksFilter";
 import setFilter from "../../../utils/tables/filters/setFilter";
 import DecksArtViewRow from "../../DecksArtViewRow";
@@ -24,12 +24,15 @@ export default function DecksList() {
   const [colorFilterState, setColorFilterState] = useState(31);
   const [deckNameFilterState, setDeckNameFilterState] = useState("");
   const fullStats = useSelector((state: AppState) => state.mainData.fullStats);
+  const currentUUID = useSelector(
+    (state: AppState) => state.mainData.currentUUID
+  );
 
   const defaultDeckFilters: StringFilterType<StatsDeck> = {
     type: "string",
     id: "playerId",
     value: {
-      string: getLocalSetting("playerId") || "",
+      string: currentUUID,
       not: false,
       exact: true,
     },
@@ -111,6 +114,7 @@ export default function DecksList() {
           colors: d.colors > 32 ? d.colors - 32 : d.colors,
         };
       });
+
     return doDecksFilter(decksForFiltering, filters, sortValue);
   }, [fullStats, filters, sortValue]);
 

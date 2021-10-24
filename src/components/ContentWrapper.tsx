@@ -14,13 +14,14 @@ import ViewCollection from "./views/collection/ViewCollection";
 import AdvancedSearch from "./views/collection/advancedSearch";
 import { AppState } from "../redux/stores/rendererStore";
 import getCollectionData from "./views/collection/cards/getCollectionData";
-import getLocalDbValue from "../toolDb/getLocalDbValue";
+
 import { DbMatch } from "../types/dbTypes";
 import reduxAction from "../redux/reduxAction";
 import aggregateStats from "../utils/aggregateStats";
 import getCssQuality from "../utils/getCssQuality";
 import HistoryStats from "./views/history/HistoryStats";
 import { convertDbMatchToData } from "./views/history/getMatchesData";
+import getLocalDbValue from "../toolDb/getLocalDbValue";
 
 const views = {
   home: ViewHome,
@@ -58,20 +59,23 @@ const ContentWrapper = () => {
   }, [cards, cardsNew, forceCollection]);
 
   useEffect(() => {
-    const pubkey = window.toolDb.user?.pubKey || "";
-    const promises = matchesIndex.map((id) => {
-      return getLocalDbValue<DbMatch>(`:${pubkey}.matches-${id}`);
-    });
-
-    Promise.all(promises).then((matches: any) => {
-      reduxAction(dispatch, {
-        type: "SET_FULL_STATS",
-        arg: aggregateStats(
-          matches.filter((m: any) => m).map(convertDbMatchToData)
-        ),
+    if (params.page === "decks") {
+      const promises = matchesIndex.map((id) => {
+        return getLocalDbValue<DbMatch>(
+          window.toolDb.getUserNamespacedKey(`matches-${id}`)
+        );
       });
-    });
-  }, [dispatch, matchesIndex]);
+
+      Promise.all(promises).then((matches: any) => {
+        reduxAction(dispatch, {
+          type: "SET_FULL_STATS",
+          arg: aggregateStats(
+            matches.filter((m: any) => m).map(convertDbMatchToData)
+          ),
+        });
+      });
+    }
+  }, [dispatch, params, matchesIndex]);
 
   const prevIndex = Object.keys(views).findIndex(
     (k) => k == paths.current[paths.current.length - 1]

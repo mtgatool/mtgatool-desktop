@@ -49,9 +49,7 @@ export default function Auth(props: AuthProps) {
   const dispatch = useDispatch();
   const [errorMessage, setErrorMessage] = useState("");
 
-  const [savedPass, setSavedPass] = useState(getLocalSetting("savedPassword"));
-
-  const [pass, setPass] = useState(savedPass || "");
+  const [pass, setPass] = useState(getLocalSetting("savedPass") || "");
   const [username, setUsername] = useState(getLocalSetting("username"));
   const [usernameRecover, setUsernameRecover] = useState("");
 
@@ -96,7 +94,6 @@ export default function Auth(props: AuthProps) {
   );
 
   const handlePassChange = useCallback((event: InputChange): void => {
-    setSavedPass("");
     setPass(event.target.value);
   }, []);
 
@@ -123,19 +120,10 @@ export default function Auth(props: AuthProps) {
     if (loginState === LOGIN_OK) {
       if (rememberme) {
         setLocalSetting("username", username);
-        console.log("savedPass: ", savedPass);
-        console.log("pass: ", pass);
-        console.log(
-          "getLocalSetting(savedPassword): ",
-          getLocalSetting("savedPassword")
-        );
-        console.log("sha1(pass)", sha1(pass));
-        if (savedPass === "" && pass != "" && pass !== savedPass) {
-          setLocalSetting("savedPassword", sha1(pass));
-        }
+        setLocalSetting("savedPass", pass);
       } else {
         setLocalSetting("username", "");
-        setLocalSetting("savedPassword", "");
+        setLocalSetting("savedPass", "");
       }
       history.push("/home");
     }
@@ -151,7 +139,7 @@ export default function Auth(props: AuthProps) {
           type: "SET_LOGIN_STATE",
           arg: LOGIN_WAITING,
         });
-        login(username, savedPass !== "" ? savedPass : sha1(pass))
+        login(username, sha1(pass))
           .then(() => {
             if (electron) {
               postChannelMessage({
@@ -172,7 +160,7 @@ export default function Auth(props: AuthProps) {
               });
             }
           })
-          .catch((err) => {
+          .catch((err: Error) => {
             reduxAction(dispatch, {
               type: "SET_LOGIN_STATE",
               arg: LOGIN_WAITING,
@@ -181,7 +169,7 @@ export default function Auth(props: AuthProps) {
           });
       }
     },
-    [username, savedPass, pass]
+    [username, pass]
   );
 
   const onSignup = useCallback(
@@ -221,7 +209,7 @@ export default function Auth(props: AuthProps) {
               });
             }
           })
-          .catch((err) => setErrorMessage(err.message));
+          .catch((err: Error) => setErrorMessage(err.message));
       }
     },
     [signupUsername, signupPass, signupPassConfirm]

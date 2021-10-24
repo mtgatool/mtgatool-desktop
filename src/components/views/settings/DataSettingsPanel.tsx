@@ -2,12 +2,13 @@ import _ from "lodash";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
+import Automerge from "automerge";
 import reduxAction from "../../../redux/reduxAction";
-import store from "../../../redux/stores/rendererStore";
 
 import { DbMatch } from "../../../types/dbTypes";
 import { loadDbFromCache } from "../../../utils/database-wrapper";
 import getLocalSetting from "../../../utils/getLocalSetting";
+import globalData from "../../../utils/globalData";
 import dataMigration from "../../../utils/migration/dataMigration";
 import setLocalSetting from "../../../utils/setLocalSetting";
 
@@ -75,16 +76,30 @@ export default function DataSettingsPanel(): JSX.Element {
           setToMigrate(data);
 
           const migrateIds = data.map((m) => m.matchId);
-          reduxAction(dispatch, {
-            type: "SET_MATCHES_INDEX",
-            arg: migrateIds,
+
+          const newDoc = Automerge.change(globalData.matchesIndex, (doc) => {
+            migrateIds.forEach((id) => {
+              if (!doc.index) {
+                // eslint-disable-next-line no-param-reassign
+                doc.index = [];
+              }
+              if (!doc.index.includes(id)) {
+                doc.index.push(id);
+              }
+            });
           });
 
-          window.toolDb.putData<string[]>(
-            "matchesIndex",
-            store.getState().mainData.matchesIndex,
-            true
-          );
+          if (window.toolDb.user) {
+            // Put the CRDT change to the database, as changes from our root document
+            window.toolDb
+              .putCrdt(
+                "matchesIndex",
+                Automerge.getChanges(globalData.matchesIndex, newDoc),
+                true
+              )
+              .catch(console.error);
+          }
+          globalData.matchesIndex = newDoc;
         });
       });
 

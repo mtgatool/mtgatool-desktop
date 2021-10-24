@@ -1,26 +1,27 @@
-import { GraphEntryValue } from "tool-db/dist/types/graph";
+import { VerificationData } from "tool-db";
+
 import { DbliveDraftV1 } from "../types/dbTypes";
 
 export default function liveDraftVerification(
-  msg: GraphEntryValue<DbliveDraftV1>
+  msg: VerificationData<DbliveDraftV1>
 ): Promise<boolean> {
   return new Promise((resolve) => {
     window.toolDb
-      .getData<DbliveDraftV1>(msg.key)
+      .getData<DbliveDraftV1>(msg.k)
       .then((originalDraft) => {
         if (originalDraft) {
-          if (originalDraft.owner === msg.pub) {
+          if (originalDraft.owner === msg.p) {
             // Check if we own this
             resolve(true);
           } else if (
             // Check if the owner data was not modified
-            msg.value.owner !== originalDraft.owner ||
-            msg.value.ref !== originalDraft.ref
+            msg.v.owner !== originalDraft.owner ||
+            msg.v.ref !== originalDraft.ref
           ) {
             resolve(false);
           } else if (
-            msg.pub !== msg.value.owner &&
-            Object.keys(msg.value.currentVotes).length <
+            msg.p !== msg.v.owner &&
+            Object.keys(msg.v.currentVotes).length <
               Object.keys(originalDraft.currentVotes).length
           ) {
             // If it was not, check if we are not removing any entry
