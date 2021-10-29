@@ -1,8 +1,25 @@
 .form-input-container {
   display: flex;
+  position: relative;
   height: 32px;
   width: 100%;
   padding: 4px 0 12px 0;
+
+  .show-password-icon {
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    right: 5px;
+    top: 10px;
+    display: flex;
+
+    svg {
+      margin: auto;
+      display: flex;
+      fill: var(--color-icon);
+    }
+  }
 
   input,
   textarea {
@@ -19,7 +36,8 @@
     font-family: var(--main-font-name);
   }
 
-  input:focus, textarea:focus {
+  input:focus,
+  textarea:focus {
     border: 1px solid var(--color-section-active);
     outline-style: none;
   }

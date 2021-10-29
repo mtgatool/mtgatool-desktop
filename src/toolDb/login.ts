@@ -1,9 +1,8 @@
 import { base64ToBinaryDocument, CrdtMessage, PutMessage } from "tool-db";
 import Automerge from "automerge";
 import reduxAction from "../redux/reduxAction";
-import { setCards } from "../redux/slices/mainDataSlice";
 import store from "../redux/stores/rendererStore";
-import { DbUUIDData } from "../types/dbTypes";
+import { DbCardsData, DbInventoryData, DbRankData } from "../types/dbTypes";
 import globalData from "../utils/globalData";
 
 function handleMatchesIndex(msg: CrdtMessage | PutMessage<any>) {
@@ -40,7 +39,6 @@ function handleMatchesIndex(msg: CrdtMessage | PutMessage<any>) {
 export function afterLogin() {
   const { dispatch } = store;
 
-  window.toolDb.subscribeData("cards", true);
   window.toolDb.subscribeData("userids", true);
   window.toolDb.subscribeData("matchesIndex", true);
   window.toolDb.subscribeData("matches-livefeed");
@@ -61,15 +59,40 @@ export function afterLogin() {
           newest = uuid;
         }
 
-        window.toolDb.subscribeData(`${uuid}-data`, true);
-
-        window.toolDb.addKeyListener<DbUUIDData>(
-          window.toolDb.getUserNamespacedKey(`${uuid}-data`),
+        window.toolDb.subscribeData(`${uuid}-cards`, true);
+        window.toolDb.addKeyListener<DbCardsData>(
+          window.toolDb.getUserNamespacedKey(`${uuid}-cards`),
           (msg) => {
             if (msg.type === "put") {
               reduxAction(dispatch, {
-                type: "SET_UUID_DATA",
-                arg: { data: msg.v, uuid },
+                type: "SET_UUID_CARDS_DATA",
+                arg: { cards: msg.v, uuid },
+              });
+            }
+          }
+        );
+
+        window.toolDb.subscribeData(`${uuid}-inventory`, true);
+        window.toolDb.addKeyListener<DbInventoryData>(
+          window.toolDb.getUserNamespacedKey(`${uuid}-inventory`),
+          (msg) => {
+            if (msg.type === "put") {
+              reduxAction(dispatch, {
+                type: "SET_UUID_INVENTORY_DATA",
+                arg: { inventory: msg.v, uuid },
+              });
+            }
+          }
+        );
+
+        window.toolDb.subscribeData(`${uuid}-rank`, true);
+        window.toolDb.addKeyListener<DbRankData>(
+          window.toolDb.getUserNamespacedKey(`${uuid}-rank`),
+          (msg) => {
+            if (msg.type === "put") {
+              reduxAction(dispatch, {
+                type: "SET_UUID_RANK_DATA",
+                arg: { rank: msg.v, uuid },
               });
             }
           }
@@ -80,13 +103,6 @@ export function afterLogin() {
           arg: newest,
         });
       });
-    })
-    .catch(console.warn);
-
-  window.toolDb
-    .getData("cards", true)
-    .then((data) => {
-      setCards(data);
     })
     .catch(console.warn);
 }

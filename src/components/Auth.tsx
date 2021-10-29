@@ -26,6 +26,8 @@ import electron from "../utils/electron/electronWrapper";
 
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
+import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
+import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
 
 type InputChange = ChangeEvent<HTMLInputElement>;
 
@@ -36,6 +38,7 @@ export interface AuthProps {
 export default function Auth(props: AuthProps) {
   const { defaultPage } = props;
   const [page, setPage] = useState(defaultPage || 1);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [_refresh, setRefresh] = useState(1);
 
@@ -329,10 +332,16 @@ export default function Auth(props: AuthProps) {
                     <div className="form-input-container">
                       <input
                         onChange={handlePassChange}
-                        type="password"
+                        type={showPassword ? "password" : "text"}
                         autoComplete="off"
                         value={pass}
                       />
+                      <div
+                        className="show-password-icon"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <ShowIcon /> : <HideIcon />}
+                      </div>
                     </div>
                     <div
                       style={{

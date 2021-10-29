@@ -31,9 +31,9 @@ import isElectron from "../utils/electron/isElectron";
 import info from "../info.json";
 import overlayHandler from "../common/overlayHandler";
 import login from "../toolDb/login";
-// import { DEFAULT_SERVERS } from "../constants";
 import Welcome from "./Welcome";
 import liveDraftVerification from "../toolDb/liveDraftVerification";
+import { DEFAULT_SERVERS } from "../constants";
 
 export interface AppProps {
   forceOs?: string;
@@ -44,27 +44,26 @@ function App(props: AppProps) {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const { loginState, loading, backgroundGrpid, matchInProgress, peers } =
-    useSelector((state: AppState) => state.renderer);
+  const { loginState, loading, backgroundGrpid, matchInProgress } = useSelector(
+    (state: AppState) => state.renderer
+  );
 
   const os = forceOs || (electron ? process.platform : "");
 
   useEffect(() => {
     if (!window.toolDbInitialized) {
-      // const storedPeers = JSON.parse(getLocalSetting("peers"));
-      const mergedPeers = [
-        "http://127.0.0.1:8765",
-        // ...storedPeers.map((p: string) => `http://${p}:8765/gun`),
-        // ...DEFAULT_SERVERS,
-      ];
-      window.toolDb = new ToolDb({ peers: mergedPeers, debug: false });
+      const storedPeers = JSON.parse(getLocalSetting("peers"));
+      const mergedPeers = isElectron()
+        ? [...storedPeers.map((p: string) => `http://${p}:9000`)] //  ["http://127.0.0.1:8765"] // For local server development
+        : DEFAULT_SERVERS;
+      window.toolDb = new ToolDb({ peers: mergedPeers, debug: true });
       window.toolDbInitialized = true;
       window.toolDb.addCustomVerification(
         "live-draft-v1-",
         liveDraftVerification
       );
     }
-  }, [peers]);
+  }, []);
 
   useEffect(() => {
     if (overlayHandler) {

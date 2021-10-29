@@ -70,14 +70,19 @@ export type DbInventoryInfo = Omit<
   "SeqId" | "Changes" | "CustomTokens" | "Vouchers" | "Cosmetics"
 >;
 
-export type DbUUIDData = {
-  inventory: DbInventoryInfo;
-  rank: CombinedRankInfo;
+export type DbCardsData = {
   cards: Cards;
   prevCards: Cards;
-  updatedCards: number;
   updated: number;
 };
+
+export interface DbInventoryData extends DbInventoryInfo {
+  updated: number;
+}
+
+export interface DbRankData extends CombinedRankInfo {
+  updated: number;
+}
 
 export interface DbState {
   [record: string]: any;
@@ -85,44 +90,45 @@ export interface DbState {
 
 export type DbUserids = Record<string, number>;
 
-export const defaultUUIDData: DbUUIDData = {
-  inventory: {
-    Gems: 0,
-    Gold: 0,
-    TotalVaultProgress: 0,
-    wcTrackPosition: 0,
-    WildCardCommons: 0,
-    WildCardUnCommons: 0,
-    WildCardRares: 0,
-    WildCardMythics: 0,
-    DraftTokens: 0,
-    SealedTokens: 0,
-    Boosters: [],
-  },
-  rank: {
-    playerId: "",
-    constructedSeasonOrdinal: 0,
-    constructedClass: "Unranked",
-    constructedLevel: 0,
-    constructedStep: 0,
-    constructedMatchesWon: 0,
-    constructedMatchesLost: 0,
-    constructedMatchesDrawn: 0,
-    limitedSeasonOrdinal: 0,
-    limitedClass: "Unranked",
-    limitedLevel: 0,
-    limitedStep: 0,
-    limitedMatchesWon: 0,
-    limitedMatchesLost: 0,
-    limitedMatchesDrawn: 0,
-    constructedPercentile: 0,
-    constructedLeaderboardPlace: 0,
-    limitedPercentile: 0,
-    limitedLeaderboardPlace: 0,
-  },
+export const defaultInventoryData: DbInventoryInfo = {
+  Gems: 0,
+  Gold: 0,
+  TotalVaultProgress: 0,
+  wcTrackPosition: 0,
+  WildCardCommons: 0,
+  WildCardUnCommons: 0,
+  WildCardRares: 0,
+  WildCardMythics: 0,
+  DraftTokens: 0,
+  SealedTokens: 0,
+  Boosters: [],
+};
+
+export const defaultRankData: CombinedRankInfo = {
+  playerId: "",
+  constructedSeasonOrdinal: 0,
+  constructedClass: "Unranked",
+  constructedLevel: 0,
+  constructedStep: 0,
+  constructedMatchesWon: 0,
+  constructedMatchesLost: 0,
+  constructedMatchesDrawn: 0,
+  limitedSeasonOrdinal: 0,
+  limitedClass: "Unranked",
+  limitedLevel: 0,
+  limitedStep: 0,
+  limitedMatchesWon: 0,
+  limitedMatchesLost: 0,
+  limitedMatchesDrawn: 0,
+  constructedPercentile: 0,
+  constructedLeaderboardPlace: 0,
+  limitedPercentile: 0,
+  limitedLeaderboardPlace: 0,
+};
+
+export const defaultCardsData: DbCardsData = {
   cards: {},
   prevCards: {},
-  updatedCards: new Date().getTime(),
   updated: new Date().getTime(),
 };
 

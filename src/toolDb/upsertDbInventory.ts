@@ -1,7 +1,12 @@
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
-import { DbInventoryInfo, DbUUIDData, defaultUUIDData } from "../types/dbTypes";
+import {
+  DbInventoryData,
+  DbInventoryInfo,
+  defaultInventoryData,
+} from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
+import getLocalDbValue from "./getLocalDbValue";
 
 export default async function upsertDbInventory(
   inventory: Partial<DbInventoryInfo>
@@ -11,31 +16,35 @@ export default async function upsertDbInventory(
   const uuid = getLocalSetting("playerId") || "default";
   const { dispatch } = store;
 
-  return window.toolDb
-    .getData<DbUUIDData>(`${uuid}-data`, true)
-    .then((uuidData) => {
+  getLocalDbValue(window.toolDb.getUserNamespacedKey(`${uuid}-inventory`)).then(
+    (uuidData) => {
       if (uuidData) {
-        const newData = {
-          ...uuidData,
-          inventory: { ...uuidData.inventory, ...inventory },
+        const newData: DbInventoryData = {
+          ...(uuidData as DbInventoryData),
+          ...inventory,
           updated: new Date().getTime(),
         };
 
         reduxAction(dispatch, {
-          type: "SET_UUID_DATA",
-          arg: { data: newData, uuid },
+          type: "SET_UUID_INVENTORY_DATA",
+          arg: { inventory: newData, uuid },
         });
 
-        window.toolDb.putData<DbUUIDData>(`${uuid}-data`, newData, true);
+        window.toolDb.putData<DbInventoryData>(
+          `${uuid}-inventory`,
+          newData,
+          true
+        );
       } else {
-        window.toolDb.putData<DbUUIDData>(
-          `${uuid}-data`,
+        window.toolDb.putData<DbInventoryData>(
+          `${uuid}-inventory`,
           {
-            ...defaultUUIDData,
+            ...defaultInventoryData,
             updated: new Date().getTime(),
           },
           true
         );
       }
-    });
+    }
+  );
 }

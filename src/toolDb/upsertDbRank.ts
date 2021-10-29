@@ -1,8 +1,9 @@
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
-import { DbUUIDData, defaultUUIDData } from "../types/dbTypes";
+import { DbRankData, defaultRankData } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
+import getLocalDbValue from "./getLocalDbValue";
 
 export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
   console.log("> Upsert rank", rank);
@@ -10,31 +11,31 @@ export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
   const uuid = getLocalSetting("playerId") || "default";
   const { dispatch } = store;
 
-  return window.toolDb
-    .getData<DbUUIDData>(`${uuid}-data`, true)
-    .then((uuidData) => {
+  getLocalDbValue(window.toolDb.getUserNamespacedKey(`${uuid}-rank`)).then(
+    (uuidData) => {
       if (uuidData) {
-        const newData = {
-          ...uuidData,
-          rank: { ...uuidData.rank, ...rank },
+        const newData: DbRankData = {
+          ...(uuidData as DbRankData),
+          ...rank,
           updated: new Date().getTime(),
         };
 
         reduxAction(dispatch, {
-          type: "SET_UUID_DATA",
-          arg: { data: newData, uuid },
+          type: "SET_UUID_RANK_DATA",
+          arg: { rank: newData, uuid },
         });
 
-        window.toolDb.putData<DbUUIDData>(`${uuid}-data`, newData, true);
+        window.toolDb.putData<DbRankData>(`${uuid}-rank`, newData, true);
       } else {
-        window.toolDb.putData<DbUUIDData>(
-          `${uuid}-data`,
+        window.toolDb.putData<DbRankData>(
+          `${uuid}-rank`,
           {
-            ...defaultUUIDData,
+            ...defaultRankData,
             updated: new Date().getTime(),
           },
           true
         );
       }
-    });
+    }
+  );
 }

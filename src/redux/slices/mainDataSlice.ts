@@ -3,7 +3,15 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import _ from "lodash";
 import { Cards } from "mtgatool-shared";
 
-import { DbMatch, DbUUIDData, defaultUUIDData } from "../../types/dbTypes";
+import {
+  DbCardsData,
+  DbInventoryData,
+  DbMatch,
+  DbRankData,
+  defaultCardsData,
+  defaultInventoryData,
+  defaultRankData,
+} from "../../types/dbTypes";
 import { AggregatedStats } from "../../utils/aggregateStats";
 
 const mainState = {
@@ -12,9 +20,14 @@ const mainState = {
   cardsPrev: {} as Cards,
   forceCollection: 1,
   currentUUID: "",
-  uuidData: {
-    "": defaultUUIDData,
-  } as Record<string, DbUUIDData>,
+  uuidData: {} as Record<
+    string,
+    {
+      rank: DbRankData;
+      inventory: DbInventoryData;
+      cards: DbCardsData;
+    }
+  >,
   liveFeed: [] as DbMatch[],
   matchesIndex: [] as string[],
   decksIndex: {} as Record<string, number>,
@@ -23,6 +36,14 @@ const mainState = {
 };
 
 export type MainState = typeof mainState;
+
+function makeDefaultUUIDData(): MainState["uuidData"][""] {
+  return {
+    rank: { ...defaultRankData, updated: 0 },
+    inventory: { ...defaultInventoryData, updated: 0 },
+    cards: defaultCardsData,
+  };
+}
 
 const mainDataSlice = createSlice({
   name: "mainData",
@@ -52,17 +73,45 @@ const mainDataSlice = createSlice({
     setUUID: (state: MainState, action: PayloadAction<string>): void => {
       state.currentUUID = action.payload;
     },
-    setUUIDData: (
+    setUUIDRank: (
       state: MainState,
-      action: PayloadAction<{ data: DbUUIDData; uuid: string }>
+      action: PayloadAction<{ rank: DbRankData; uuid: string }>
     ): void => {
-      state.uuidData = {
-        ...state.uuidData,
-        [action.payload.uuid]: {
-          ...(state.uuidData[action.payload.uuid] || {}),
-          ...action.payload.data,
-        },
-      };
+      if (!state.uuidData[action.payload.uuid]) {
+        state.uuidData[action.payload.uuid] = {
+          ...makeDefaultUUIDData(),
+          rank: action.payload.rank,
+        };
+      } else {
+        state.uuidData[action.payload.uuid].rank = action.payload.rank;
+      }
+    },
+    setUUIDInventory: (
+      state: MainState,
+      action: PayloadAction<{ inventory: DbInventoryData; uuid: string }>
+    ): void => {
+      if (!state.uuidData[action.payload.uuid]) {
+        state.uuidData[action.payload.uuid] = {
+          ...makeDefaultUUIDData(),
+          inventory: action.payload.inventory,
+        };
+      } else {
+        state.uuidData[action.payload.uuid].inventory =
+          action.payload.inventory;
+      }
+    },
+    setUUIDCards: (
+      state: MainState,
+      action: PayloadAction<{ cards: DbCardsData; uuid: string }>
+    ): void => {
+      if (!state.uuidData[action.payload.uuid]) {
+        state.uuidData[action.payload.uuid] = {
+          ...makeDefaultUUIDData(),
+          cards: action.payload.cards,
+        };
+      } else {
+        state.uuidData[action.payload.uuid].cards = action.payload.cards;
+      }
     },
     setCards: (state: MainState, action: PayloadAction<Cards>): void => {
       state.cardsPrev = { ...state.cards };
@@ -96,7 +145,9 @@ export const {
   setUUID,
   setCards,
   setForceCollection,
-  setUUIDData,
+  setUUIDRank,
+  setUUIDInventory,
+  setUUIDCards,
   setDecksIndex,
   setMatchesIndex,
 } = mainDataSlice.actions;

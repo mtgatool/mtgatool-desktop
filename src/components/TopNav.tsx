@@ -17,7 +17,7 @@ import { AppState } from "../redux/stores/rendererStore";
 import Alt from "./Alt";
 import vodiFn from "../utils/voidfn";
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
-import { defaultUUIDData } from "../types/dbTypes";
+import { defaultRankData } from "../types/dbTypes";
 
 interface TopNavItemProps {
   compact: boolean;
@@ -222,13 +222,13 @@ export default function TopNav(props: TopNavProps): JSX.Element {
 
   const contructedNav = {
     uri: "history",
-    rank: uuidData[currentUUID]?.rank || defaultUUIDData.rank,
+    rank: uuidData[currentUUID]?.rank || defaultRankData,
     rankClass: "top-constructed-rank",
   };
 
   const limitedNav = {
     uri: "history",
-    rank: uuidData[currentUUID]?.rank || defaultUUIDData.rank,
+    rank: uuidData[currentUUID]?.rank || defaultRankData,
     rankClass: "top-limited-rank",
   };
 

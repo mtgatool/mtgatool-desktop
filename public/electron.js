@@ -39,7 +39,7 @@ function sendInit() {
 
   const peers = [];
   const channel = DC();
-  channel.join("mtgatool-db-swarm");
+  channel.join("mtgatool-db-swarm-v2");
   channel.on("peer", (id, peer) => {
     console.log("Server peer found: ", peer);
     if (!peers.includes(peer.host)) {
