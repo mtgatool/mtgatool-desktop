@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 import { Switch, Route, useHistory } from "react-router-dom";
 
-import { ToolDb } from "tool-db";
+import { sha1, ToolDb } from "tool-db";
 
 import Auth from "./Auth";
 import CardHover from "./CardHover";
@@ -34,6 +34,7 @@ import login from "../toolDb/login";
 import Welcome from "./Welcome";
 import liveDraftVerification from "../toolDb/liveDraftVerification";
 import { DEFAULT_SERVERS } from "../constants";
+import { Peer } from "../redux/slices/rendererSlice";
 
 export interface AppProps {
   forceOs?: string;
@@ -54,7 +55,7 @@ function App(props: AppProps) {
     if (!window.toolDbInitialized) {
       const storedPeers = JSON.parse(getLocalSetting("peers"));
       const mergedPeers = isElectron()
-        ? [...storedPeers.map((p: string) => `http://${p}:9000`)] //  ["http://127.0.0.1:8765"] // For local server development
+        ? [...storedPeers.map((p: Peer) => `http://${p.host}:${p.port}`)] // ["http://127.0.0.1:8765"] //
         : DEFAULT_SERVERS;
       window.toolDb = new ToolDb({ peers: mergedPeers, debug: true });
       window.toolDbInitialized = true;
@@ -79,7 +80,7 @@ function App(props: AppProps) {
       const pwd = getLocalSetting("savedPass");
       const user = getLocalSetting("username");
 
-      login(user, pwd)
+      login(user, sha1(pwd))
         .then(async () => {
           reduxAction(dispatch, {
             type: "SET_LOGIN_STATE",

@@ -7,6 +7,7 @@ import {
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { OverlayUpdateMatchState } from "../background/store/types";
 import { OverlaySettings } from "../common/defaultConfig";
+import { Peer } from "../redux/slices/rendererSlice";
 import { DbInventoryInfo } from "../types/dbTypes";
 import { ClientSceneChange } from "../types/logDecoder";
 
@@ -40,7 +41,7 @@ export interface ChannelMessageBase {
 
 export interface DatabasePeersMessage extends ChannelMessageBase {
   type: "DATABASE_PEERS";
-  peers: string[];
+  peers: Peer[];
 }
 
 export interface StartLogReadingMessage extends ChannelMessageBase {

@@ -42,8 +42,8 @@ function sendInit() {
   channel.join("mtgatool-db-swarm-v2");
   channel.on("peer", (id, peer) => {
     console.log("Server peer found: ", peer);
-    if (!peers.includes(peer.host)) {
-      peers.push(peer.host);
+    if (!peers.map((p) => p.host).includes(peer.host)) {
+      peers.push(peer);
       mainGlobals.backgroundWindow.webContents.send("peersFound", peers);
     }
   });

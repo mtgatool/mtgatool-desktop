@@ -32,12 +32,10 @@ export default function DataStatus() {
   const currentUUID = useSelector(
     (state: AppState) => state.mainData.currentUUID
   );
-  const decksIndex = useSelector(
-    (state: AppState) => state.mainData.decksIndex
-  );
   const matchesIndex = useSelector(
     (state: AppState) => state.mainData.matchesIndex
   );
+  const fullStats = useSelector((state: AppState) => state.mainData.fullStats);
   const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
   const cards = useSelector((state: AppState) => state.mainData.cards);
 
@@ -59,8 +57,10 @@ export default function DataStatus() {
             status={matchesIndex.length > 0 ? "OK" : "LOADING"}
           />
           <StatusLine
-            title={`Decks (${Object.keys(decksIndex).length})`}
-            status={Object.keys(decksIndex).length > 0 ? "OK" : "LOADING"}
+            title={`Decks (${Object.keys(fullStats?.decks || {}).length})`}
+            status={
+              Object.keys(fullStats?.decks || {}).length > 0 ? "OK" : "LOADING"
+            }
           />
           <StatusLine
             title={`Cards database (${Object.keys(database.cards).length})`}

@@ -8,8 +8,13 @@ import {
   LOGIN_OK,
 } from "mtgatool-shared/dist/shared/constants";
 
+export interface Peer {
+  host: string;
+  port: number;
+}
+
 export const initialRendererState = {
-  peers: ["api.mtgatool.com"],
+  peers: [{ host: "api.mtgatool.com", port: 8765 }] as Peer[],
   archivedCache: {} as Record<string, boolean>,
   backgroundGrpid: null as number | null,
   loading: false,
@@ -44,8 +49,8 @@ const rendererSlice = createSlice({
   name: "renderer",
   initialState: initialRendererState,
   reducers: {
-    setPeers: (state: RendererState, action: PayloadAction<string[]>): void => {
-      state.peers = [...state.peers, ...action.payload];
+    setPeers: (state: RendererState, action: PayloadAction<Peer[]>): void => {
+      state.peers = action.payload;
     },
     setLoginState: (
       state: RendererState,

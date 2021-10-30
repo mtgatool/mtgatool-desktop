@@ -77,7 +77,7 @@ export default function AccountSettingsPanel(
   useEffect(() => {
     if (avatarInputRef.current) {
       window.toolDb
-        .getData<string>("avatar", true, 10000)
+        .getData<string>("avatar", true)
         .then((av) => {
           if (av) setAvatar(av);
         })

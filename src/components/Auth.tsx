@@ -332,7 +332,7 @@ export default function Auth(props: AuthProps) {
                     <div className="form-input-container">
                       <input
                         onChange={handlePassChange}
-                        type={showPassword ? "password" : "text"}
+                        type={showPassword ? "text" : "password"}
                         autoComplete="off"
                         value={pass}
                       />
@@ -340,7 +340,7 @@ export default function Auth(props: AuthProps) {
                         className="show-password-icon"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? <ShowIcon /> : <HideIcon />}
+                        {showPassword ? <HideIcon /> : <ShowIcon />}
                       </div>
                     </div>
                     <div
