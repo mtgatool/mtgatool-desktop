@@ -28,7 +28,8 @@ const mainState = {
       cards: DbCardsData;
     }
   >,
-  liveFeed: [] as DbMatch[],
+  liveFeed: [] as string[],
+  liveFeedMatches: {} as Record<string, DbMatch>,
   matchesIndex: [] as string[],
   decksIndex: {} as Record<string, number>,
   fullStats: null as AggregatedStats | null,
@@ -61,14 +62,14 @@ const mainDataSlice = createSlice({
     ): void => {
       state.historyStats = { ...action.payload };
     },
-    addLiveFeed: (state: MainState, action: PayloadAction<DbMatch>): void => {
-      const matches = state.liveFeed.filter(
-        (v) => v.matchId === action.payload.matchId
-      );
-      state.liveFeed =
-        matches.length === 0
-          ? [action.payload, ...state.liveFeed].slice(0, 10)
-          : state.liveFeed;
+    setLiveFeed: (state: MainState, action: PayloadAction<string[]>): void => {
+      state.liveFeed = action.payload;
+    },
+    setLiveFeedMatch: (
+      state: MainState,
+      action: PayloadAction<{ key: string; match: DbMatch }>
+    ): void => {
+      state.liveFeedMatches[action.payload.key] = action.payload.match;
     },
     setUUID: (state: MainState, action: PayloadAction<string>): void => {
       state.currentUUID = action.payload;
@@ -141,7 +142,8 @@ const mainDataSlice = createSlice({
 export const {
   setFullStats,
   setHistoryStats,
-  addLiveFeed,
+  setLiveFeed,
+  setLiveFeedMatch,
   setUUID,
   setCards,
   setForceCollection,

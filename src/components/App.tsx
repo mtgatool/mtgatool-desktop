@@ -55,7 +55,7 @@ function App(props: AppProps) {
     if (!window.toolDbInitialized) {
       const storedPeers = JSON.parse(getLocalSetting("peers"));
       const mergedPeers = isElectron()
-        ? [...storedPeers.map((p: Peer) => `http://${p.host}:${p.port}`)] // ["http://127.0.0.1:8765"] //
+        ? [...storedPeers.map((p: Peer) => `http://${p.host}:${p.port}`)]
         : DEFAULT_SERVERS;
       window.toolDb = new ToolDb({ peers: mergedPeers, debug: true });
       window.toolDbInitialized = true;

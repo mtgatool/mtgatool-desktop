@@ -14,7 +14,7 @@ export interface Peer {
 }
 
 export const initialRendererState = {
-  peers: [{ host: "api.mtgatool.com", port: 8765 }] as Peer[],
+  peers: [{ host: "66.97.46.144", port: 9000 }] as Peer[],
   archivedCache: {} as Record<string, boolean>,
   backgroundGrpid: null as number | null,
   loading: false,

@@ -11,6 +11,7 @@ const globalData = {
   mouseY: 0,
   CRDTList: {} as CRDT,
   matchesIndex: Automerge.init<{ index: string[] }>(),
+  liveFeed: Automerge.init<Record<string, number>>(),
 };
 
 (window as any).globalData = globalData;

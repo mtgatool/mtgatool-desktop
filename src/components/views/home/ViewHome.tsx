@@ -1,16 +1,20 @@
 import { useSelector } from "react-redux";
 
+import { Fragment } from "react";
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 import Button from "../../ui/Button";
 import createOverlay from "../../../overlay/createOverlay";
-import ListItemMatch from "../history/ListItemMatch";
 
 import { AppState } from "../../../redux/stores/rendererStore";
-import { convertDbMatchToData } from "../history/getMatchesData";
 import getCssQuality from "../../../utils/getCssQuality";
+import { convertDbMatchToData } from "../history/getMatchesData";
+import ListItemMatch from "../history/ListItemMatch";
 
 export default function ViewHome() {
   const liveFeed = useSelector((state: AppState) => state.mainData.liveFeed);
+  const liveFeedMatches = useSelector(
+    (state: AppState) => state.mainData.liveFeedMatches
+  );
 
   return (
     <>
@@ -42,14 +46,18 @@ export default function ViewHome() {
         </div>
         <h2 style={{ textAlign: "center" }}>Live Feed</h2>
         <div className="home-view">
-          {liveFeed.map((match) => {
-            const data = convertDbMatchToData(match);
-            return (
-              <ListItemMatch
-                key={`livefeed-match-${match.matchId}`}
-                match={data}
-              />
-            );
+          {liveFeed.map((matchId) => {
+            const match = liveFeedMatches[matchId] || undefined;
+            if (match) {
+              const data = convertDbMatchToData(match);
+              return (
+                <ListItemMatch
+                  key={`livefeed-match-${match.matchId}`}
+                  match={data}
+                />
+              );
+            }
+            return <Fragment key={`livefeed-match-${matchId}`} />;
           })}
         </div>
       </div>

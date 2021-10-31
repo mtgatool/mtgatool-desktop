@@ -34,7 +34,10 @@ export default async function setDbMatch(match: InternalMatch) {
 
   // Put this match
   window.toolDb.putData<DbMatch>(`matches-${match.id}`, newDbMatch, true);
-  pushToLiveFeed(newDbMatch);
+  pushToLiveFeed(
+    window.toolDb.getUserNamespacedKey(`matches-${match.id}`),
+    newDbMatch
+  );
 
   // Create CRDT document with the new match added to it
   const newDoc = Automerge.change(globalData.matchesIndex, (doc) => {

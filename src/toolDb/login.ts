@@ -8,12 +8,16 @@ import globalData from "../utils/globalData";
 function handleMatchesIndex(msg: CrdtMessage | PutMessage<any>) {
   if (msg && msg.type === "crdt") {
     // console.log("Key Listener matchesIndex ", msg);
-    if (msg.type === "crdt" && globalData.matchesIndex) {
+    if (globalData.matchesIndex) {
       const doc = Automerge.load<{ index: string[] }>(
         base64ToBinaryDocument(msg.doc)
       );
 
-      globalData.matchesIndex = Automerge.merge(globalData.matchesIndex, doc);
+      try {
+        globalData.matchesIndex = Automerge.merge(globalData.matchesIndex, doc);
+      } catch (e) {
+        console.warn(e);
+      }
 
       reduxAction(store.dispatch, {
         type: "SET_MATCHES_INDEX",
@@ -36,17 +40,73 @@ function handleMatchesIndex(msg: CrdtMessage | PutMessage<any>) {
   }
 }
 
+function handleLiveFeed(msg: CrdtMessage | PutMessage<any>) {
+  // console.log("Key Listener live feed ", msg);
+  if (msg && msg.type === "crdt") {
+    if (globalData.liveFeed) {
+      const doc = Automerge.load<Record<string, number>>(
+        base64ToBinaryDocument(msg.doc)
+      );
+
+      try {
+        globalData.liveFeed = Automerge.merge(globalData.liveFeed, doc);
+      } catch (e) {
+        console.warn(e);
+      }
+
+      const filteredLiveFeed = Object.keys(globalData.liveFeed)
+        .sort((a, b) => {
+          if (globalData.liveFeed[a] < globalData.liveFeed[b]) return -1;
+          if (globalData.liveFeed[a] < globalData.liveFeed[b]) return 1;
+          return 0;
+        })
+        .slice(-10);
+
+      reduxAction(store.dispatch, {
+        type: "SET_LIVE_FEED",
+        arg: filteredLiveFeed,
+      });
+
+      // Fetch any match we dont have locally
+      filteredLiveFeed.forEach((id: string) => {
+        window.toolDb.store.get(id, (err, data) => {
+          if (!data) {
+            window.toolDb.getData(id, false).then((match) => {
+              reduxAction(store.dispatch, {
+                type: "SET_LIVE_FEED_MATCH",
+                arg: { key: id, match: match },
+              });
+            });
+          } else {
+            reduxAction(store.dispatch, {
+              type: "SET_LIVE_FEED_MATCH",
+              arg: { key: id, match: JSON.parse(data).v },
+            });
+          }
+        });
+      });
+    }
+  }
+}
+
 export function afterLogin() {
   const { dispatch } = store;
-
-  window.toolDb.subscribeData("userids", true);
-  window.toolDb.subscribeData("matchesIndex", true);
-  window.toolDb.subscribeData("matches-livefeed");
+  const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
 
   window.toolDb.addKeyListener(
     window.toolDb.getUserNamespacedKey("matchesIndex"),
     handleMatchesIndex
   );
+
+  window.toolDb.addKeyListener(
+    `matches-livefeed-${currentDay}`,
+    handleLiveFeed
+  );
+
+  window.toolDb.subscribeData("userids", true);
+  window.toolDb.subscribeData("matchesIndex", true);
+
+  window.toolDb.subscribeData(`matches-livefeed-${currentDay}`);
 
   window.toolDb
     .getData("userids", true, 5000)
