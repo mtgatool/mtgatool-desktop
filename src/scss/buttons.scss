@@ -112,6 +112,52 @@
   }
 }
 
+.keys-button {
+  align-self: center;
+  cursor: pointer;
+  width: 64px;
+  height: 64px;
+  border-radius: 3px;
+  color: var(--color-text);
+  font-size: 16px;
+  text-align: center;
+  background-color: var(--color-section);
+  font-family: var(--main-font-name-it);
+  transform: translateY(0);
+  -webkit-transition: all .2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+
+  &.auth {
+    justify-content: center;
+    flex-direction: row;
+    height: 36px;
+    width: 130px;
+    line-height: 36px;
+    margin-left: 8px;
+
+    svg {
+      margin: auto 8px auto 0;
+    }
+  }
+
+  &:active {
+    background-color: var(--color-section-hover);
+  }
+  
+  &:hover {
+    color: var(--color-text-hover);
+    background-color: var(--color-section-hover);
+  }
+
+  svg {
+    margin: 8px auto 0 auto;
+    width: 32px;
+    height: 32px;
+    fill: var(--color-icon);
+  }
+}
+
 .button-simple-dark {
   align-self: center;
   cursor: pointer;

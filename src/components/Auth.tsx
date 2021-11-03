@@ -28,6 +28,9 @@ import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
 import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
 import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
+import { ReactComponent as PutKey } from "../assets/images/svg/put-key.svg";
+import Button from "./ui/Button";
+import keysLogin from "../toolDb/keysLogin";
 
 type InputChange = ChangeEvent<HTMLInputElement>;
 
@@ -51,6 +54,8 @@ export default function Auth(props: AuthProps) {
   const history = useHistory();
   const dispatch = useDispatch();
   const [errorMessage, setErrorMessage] = useState("");
+  const keysInputRef = useRef<HTMLInputElement>(null);
+  const keysFileRef = useRef<Blob | null>(null);
 
   const [pass, setPass] = useState(getLocalSetting("savedPass") || "");
   const [username, setUsername] = useState(getLocalSetting("username"));
@@ -175,6 +180,61 @@ export default function Auth(props: AuthProps) {
     [username, pass]
   );
 
+  const onKeyLogin = useCallback((): void => {
+    if (keysFileRef.current) {
+      const FR = new FileReader();
+      FR.addEventListener("load", (ev: any) => {
+        const keys = JSON.parse(ev.target.result);
+        reduxAction(dispatch, {
+          type: "SET_LOGIN_STATE",
+          arg: LOGIN_WAITING,
+        });
+        keysLogin(username, keys)
+          .then(() => {
+            if (electron) {
+              postChannelMessage({
+                type: "START_LOG_READING",
+              });
+              reduxAction(dispatch, {
+                type: "SET_LOADING",
+                arg: true,
+              });
+            } else {
+              reduxAction(dispatch, {
+                type: "SET_LOGIN_STATE",
+                arg: LOGIN_OK,
+              });
+              reduxAction(dispatch, {
+                type: "SET_LOADING",
+                arg: false,
+              });
+            }
+          })
+          .catch((err: Error) => {
+            reduxAction(dispatch, {
+              type: "SET_LOGIN_STATE",
+              arg: LOGIN_WAITING,
+            });
+            setErrorMessage(err.message);
+          });
+      });
+
+      FR.readAsText(keysFileRef.current);
+    }
+  }, [username, keysFileRef]);
+
+  const onKeysChange = useCallback(
+    (e: any) => {
+      if (e && e.target && e.target.files && e.target.files[0]) {
+        [keysFileRef.current] = e.target.files;
+        onKeyLogin();
+        e.target.value = null;
+        e.target.files = null;
+      }
+    },
+    [onKeyLogin, keysFileRef]
+  );
+
   const onSignup = useCallback(
     (e): void => {
       e.preventDefault();
@@ -189,6 +249,10 @@ export default function Auth(props: AuthProps) {
         setPass(signupPass);
         signup(signupUsername, sha1(signupPass))
           .then(() => {
+            reduxAction(dispatch, {
+              type: "SHOW_POST_SIGNUP",
+              arg: signupPass,
+            });
             if (electron) {
               postChannelMessage({
                 type: "START_LOG_READING",
@@ -357,13 +421,33 @@ export default function Auth(props: AuthProps) {
                         Forgot your password?
                       </a>
                     </div>
-                    <button
-                      className="form-button"
-                      type="submit"
-                      onClick={onLogin}
-                    >
-                      Login
-                    </button>
+                    <div style={{ display: "flex" }}>
+                      <button
+                        className="form-button"
+                        type="submit"
+                        onClick={onLogin}
+                      >
+                        Login
+                      </button>
+
+                      <label htmlFor="keysInput" style={{ margin: "0" }}>
+                        <Button
+                          className="keys-button auth"
+                          onClick={voidFn}
+                          text=""
+                        >
+                          <PutKey />
+                          <div>Use key</div>
+                        </Button>
+                        <input
+                          style={{ display: "none" }}
+                          onChange={onKeysChange}
+                          ref={keysInputRef}
+                          id="keysInput"
+                          type="file"
+                        />
+                      </label>
+                    </div>
                     <div className="form-error">{errorMessage}</div>
                     <div className="form-options">
                       <Checkbox

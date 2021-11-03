@@ -3,13 +3,19 @@ import { LOGIN_AUTH } from "mtgatool-shared/dist/shared/constants";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
+
+import { SettingsPanelProps } from "./ViewSettings";
+
 import reduxAction from "../../../redux/reduxAction";
-// import { DbAccount } from "../../../types/dbTypes";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
+
 import PassphraseGenerate from "../../PassphraseGenerate";
 import Button from "../../ui/Button";
-import { SettingsPanelProps } from "./ViewSettings";
+
+import { ReactComponent as KeysIcon } from "../../../assets/images/svg/keys.svg";
+
+import saveKeysCallback from "../../../toolDb/saveKeysCallback";
 
 function resizeBase64Img(
   base64: string,
@@ -65,15 +71,6 @@ export default function AccountSettingsPanel(
     }
   }, []);
 
-  // useEffect(() => {
-  //   window.toolDb
-  //     .getData<DbAccount>("avatar", true, 10000)
-  //     .then((a) => {
-  //       if (a) setAccountInfo(a);
-  //     })
-  //     .catch(console.warn);
-  // }, [changeAvatar, avatarInputRef]);
-
   useEffect(() => {
     if (avatarInputRef.current) {
       window.toolDb
@@ -104,6 +101,25 @@ export default function AccountSettingsPanel(
         </label>
       </div>
       <PassphraseGenerate />
+      <p
+        style={{
+          textAlign: "center",
+          borderTop: "1px solid var(--color-line-sep)",
+          paddingTop: "24px",
+          marginBottom: "16px",
+        }}
+      >
+        Download your keys for password-less access:
+      </p>
+      <Button
+        className="keys-button"
+        onClick={saveKeysCallback}
+        text=""
+        style={{ margin: "8px auto" }}
+      >
+        <KeysIcon />
+        <div>Save</div>
+      </Button>
       <Button
         style={{ margin: "128px auto 0 auto" }}
         text="Logout"

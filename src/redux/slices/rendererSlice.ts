@@ -40,6 +40,7 @@ export const initialRendererState = {
   forceQuery: 0,
   matchInProgress: false,
   draftInProgress: false,
+  showPostSignup: null as null | string,
   currentScene: "",
 };
 
@@ -51,6 +52,12 @@ const rendererSlice = createSlice({
   reducers: {
     setPeers: (state: RendererState, action: PayloadAction<Peer[]>): void => {
       state.peers = action.payload;
+    },
+    showPostSignup: (
+      state: RendererState,
+      action: PayloadAction<null | string>
+    ): void => {
+      state.showPostSignup = action.payload;
     },
     setLoginState: (
       state: RendererState,
@@ -165,6 +172,7 @@ const rendererSlice = createSlice({
 
 export const {
   setPeers,
+  showPostSignup,
   setLoginState,
   setLogCompletion,
   setBackgroundGrpid,

@@ -1,12 +1,33 @@
-import { ChangeEvent, useCallback, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { sha1, sha256 } from "tool-db";
 
 import newResetPassphrase from "../toolDb/newResetPassphrase";
 import copyToClipboard from "../utils/copyToClipboard";
 import Button from "./ui/Button";
 
+import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
+import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
+
 export default function PassphraseGenerate(): JSX.Element {
   const [phrase, setPhrase] = useState("-");
+  const [isValid, setIsValid] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+
   const [hint, setHint] = useState("");
+
+  useEffect(() => {
+    window.toolDb.store.get(
+      `==${window.toolDb.user?.name || ""}`,
+      (_err, data) => {
+        const userData = JSON.parse(data);
+        if (userData) {
+          setIsValid(sha256(sha1(hint)) === userData.v.pass);
+        } else {
+          setIsValid(false);
+        }
+      }
+    );
+  }, [hint]);
 
   const handleSetHint = useCallback(
     (event: ChangeEvent<HTMLInputElement>): void => {
@@ -24,13 +45,9 @@ export default function PassphraseGenerate(): JSX.Element {
       >
         <p>
           We encourage users to generate a randomized passphrase for account
-          recovery. You can use it later to gain access to the password hint
-          that you enter below. Keep it somewhere safe! Its the only way you can
-          recover your password in case you forget it.
-        </p>
-        <p>
-          It is not recommended to write your password in plaintext here, but
-          rather a hint to help you remember.
+          recovery. You can use it later to gain access to the password that you
+          enter below. Keep it safe! Its the only way you can recover your
+          password in case you forget it.
         </p>
         <p className="red" style={{ marginTop: "12px" }}>
           This passphrase will not be available once you close this dialog, but
@@ -45,25 +62,47 @@ export default function PassphraseGenerate(): JSX.Element {
           />
         </div>
         <div className="form-input-container">
-          <div className="hint-title">Password hint: </div>
-          <input
-            type="text"
-            autoComplete="off"
-            onChange={handleSetHint}
+          <div className="hint-title">Password: </div>
+          <div
             style={{
-              maxWidth: "600px",
+              display: "flex",
+              position: "relative",
               margin: "0 auto 0 0",
+              width: "calc(100% - 65px)",
+              maxWidth: "600px",
             }}
-            value={hint}
-          />
+          >
+            <input
+              type={showPass ? "text" : "password"}
+              autoComplete="off"
+              onChange={handleSetHint}
+              style={{
+                maxWidth: "600px",
+                margin: "0",
+              }}
+              value={hint}
+            />
+            <div
+              className="show-password-icon"
+              style={{ margin: "-4px 0" }}
+              onClick={() => setShowPass(!showPass)}
+            >
+              {showPass ? <HideIcon /> : <ShowIcon />}
+            </div>
+          </div>
         </div>
+        {isValid ? (
+          <p className="green">Password is OK</p>
+        ) : (
+          <p className="red">Password is not valid</p>
+        )}
 
         <Button
           text="Generate"
           style={{
             margin: "16px auto",
           }}
-          disabled={hint.length < 8}
+          disabled={!isValid}
           onClick={() => {
             newResetPassphrase(hint).then(setPhrase);
           }}

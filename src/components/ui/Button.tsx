@@ -1,3 +1,5 @@
+import { PropsWithChildren } from "react";
+
 export interface ButtonProps {
   onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   text: string;
@@ -6,8 +8,10 @@ export interface ButtonProps {
   disabled?: boolean;
 }
 
-export default function Button(props: ButtonProps): JSX.Element {
-  const { disabled, style, onClick, className, text } = props;
+export default function Button(
+  props: PropsWithChildren<ButtonProps>
+): JSX.Element {
+  const { disabled, style, onClick, className, text, children } = props;
 
   return (
     <div
@@ -19,7 +23,7 @@ export default function Button(props: ButtonProps): JSX.Element {
           : className ?? "button-simple"
       }
     >
-      {text}
+      {children || text}
     </div>
   );
 }

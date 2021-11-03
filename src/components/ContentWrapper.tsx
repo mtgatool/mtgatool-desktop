@@ -22,6 +22,7 @@ import getCssQuality from "../utils/getCssQuality";
 import HistoryStats from "./views/history/HistoryStats";
 import { convertDbMatchToData } from "./views/history/getMatchesData";
 import getLocalDbValue from "../toolDb/getLocalDbValue";
+import PostSignupPopup from "./PostSignupPopup";
 
 const views = {
   home: ViewHome,
@@ -47,6 +48,9 @@ const ContentWrapper = () => {
 
   const cards = useSelector((state: AppState) => state.mainData.cards);
   const cardsNew = useSelector((state: AppState) => state.mainData.cardsNew);
+  const showPostSignup = useSelector(
+    (state: AppState) => state.renderer.showPostSignup
+  );
   const forceCollection = useSelector(
     (state: AppState) => state.mainData.forceCollection
   );
@@ -104,16 +108,35 @@ const ContentWrapper = () => {
     paths.current.push(params.page);
   }, [params]);
 
+  const openPostSignup = useRef<() => void>(vodiFn);
+  const closePostSignup = useRef<() => void>(vodiFn);
+
   const openAdvancedCollectionSearch = useRef<() => void>(vodiFn);
   const closeAdvancedCollectionSearch = useRef<() => void>(vodiFn);
 
   const openHistoryStatsPopup = useRef<() => void>(vodiFn);
   const closeHistoryStatsPopup = useRef<() => void>(vodiFn);
 
+  useEffect(() => {
+    if (showPostSignup) {
+      openPostSignup.current();
+    }
+  }, [showPostSignup]);
+
   const CurrentPage = Object.values(views)[viewIndex];
 
   return (
     <>
+      <PopupComponent
+        open={false}
+        width="900px"
+        height="440px"
+        openFnRef={openPostSignup}
+        closeFnRef={closePostSignup}
+      >
+        <PostSignupPopup />
+      </PopupComponent>
+
       <PopupComponent
         open={false}
         width="1000px"
