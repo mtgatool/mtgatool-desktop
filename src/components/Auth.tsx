@@ -329,8 +329,8 @@ export default function Auth(props: AuthProps) {
           bottom: "8px",
         }}
       >
-        Due to a protocol upgrade in v6.1.0 all users will have to sign up
-        again, sorry for the inconvenience! -Manwë
+        Due to a api protocol and sotrage upgrade in v6.1.0 all users will have
+        to sign up again, sorry for the inconvenience! -Manwë
       </div>
       <PopupComponent
         open={false}
