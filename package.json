@@ -39,7 +39,7 @@
     "react-table": "^7.7.0",
     "redux": "^4.0.5",
     "shortid": "^2.2.16",
-    "tool-db": "^1.1.0",
+    "tool-db": "^1.1.2",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1"
   },
