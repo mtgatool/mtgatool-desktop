@@ -17,7 +17,9 @@ export default function AboutSettingsPanel(): JSX.Element {
         className="top-logo-about"
         onClick={(): void => openExternal("https://mtgatool.com")}
       />
-      <div className="message-sub15">By Manuel Etchegaray, 2021</div>
+      <div className="message-sub15">
+        By Manuel Etchegaray &quot;Manwë&quot;, 2021
+      </div>
       <div
         className="message-sub15 release-notes-link"
         onClick={(): void => {
