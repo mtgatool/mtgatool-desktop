@@ -49,14 +49,14 @@ function handleLiveFeed(msg: CrdtMessage | PutMessage<any>) {
       );
 
       try {
-        globalData.liveFeed = Automerge.merge(globalData.liveFeed, doc);
+        globalData.liveFeed = Automerge.merge(Automerge.init(), doc);
       } catch (e) {
         console.warn(e);
       }
 
       const filteredLiveFeed = Object.keys(globalData.liveFeed)
         .sort((a, b) => {
-          if (globalData.liveFeed[a] < globalData.liveFeed[b]) return -1;
+          if (globalData.liveFeed[a] > globalData.liveFeed[b]) return -1;
           if (globalData.liveFeed[a] < globalData.liveFeed[b]) return 1;
           return 0;
         })
