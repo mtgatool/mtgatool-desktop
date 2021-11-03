@@ -289,7 +289,12 @@ export default function Auth(props: AuthProps) {
         setErrorMessage("Passphrase needs to have 12 words");
       } else {
         checkPassphrase(usernameRecover, passphrase)
-          .then((hint) => setErrorMessage(`Your pasword hint is: ${hint}`))
+          .then((hint) => {
+            if (hint) {
+              setPass(hint);
+              setPage(1);
+            }
+          })
           .catch(setErrorMessage);
       }
     },
@@ -309,6 +314,24 @@ export default function Auth(props: AuthProps) {
 
   return (
     <>
+      <div
+        style={{
+          backgroundColor: "var(--color-section)",
+          color: "var(--color-w)",
+          borderRadius: "4px",
+          width: "600px",
+          textAlign: "center",
+          lineHeight: "20px",
+          padding: "12px",
+          margin: "auto",
+          position: "absolute",
+          left: "calc(50% - 300px)",
+          bottom: "8px",
+        }}
+      >
+        Due to a protocol upgrade in v6.1.0 all users will have to sign up
+        again, sorry for the inconvenience! -Manwë
+      </div>
       <PopupComponent
         open={false}
         width="calc(100% - 32px)"
