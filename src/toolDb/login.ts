@@ -14,7 +14,7 @@ function handleMatchesIndex(msg: CrdtMessage | PutMessage<any>) {
       );
 
       try {
-        globalData.matchesIndex = Automerge.merge(globalData.matchesIndex, doc);
+        globalData.matchesIndex = Automerge.merge(Automerge.init(), doc);
       } catch (e) {
         console.warn(e);
       }
