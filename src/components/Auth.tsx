@@ -330,7 +330,7 @@ export default function Auth(props: AuthProps) {
         }}
       >
         Due to an api protocol and sotrage upgrade in v6.1.0 all users will have
-        to sign up again, sorry for the inconvenience! - Manwë
+        to sign up again, sorry for the inconvenience! -Manwë
       </div>
       <PopupComponent
         open={false}
