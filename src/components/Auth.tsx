@@ -266,6 +266,7 @@ export default function Auth(props: AuthProps) {
                 arg: LOGIN_WAITING,
               });
             } else {
+              history.push("/home");
               reduxAction(dispatch, {
                 type: "SET_LOGIN_STATE",
                 arg: LOGIN_OK,
@@ -279,7 +280,7 @@ export default function Auth(props: AuthProps) {
           .catch((err: Error) => setErrorMessage(err.message));
       }
     },
-    [signupUsername, signupPass, signupPassConfirm]
+    [history, signupUsername, signupPass, signupPassConfirm]
   );
 
   const onRecover = useCallback(
