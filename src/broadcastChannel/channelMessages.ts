@@ -13,6 +13,7 @@ import { ClientSceneChange } from "../types/logDecoder";
 
 export type MessageType =
   | "DATABASE_PEERS"
+  | "POPUP"
   | "START_LOG_READING"
   | "STOP_LOG_READING"
   | "LOG_MESSAGE_RECV"
@@ -42,6 +43,11 @@ export interface ChannelMessageBase {
 export interface DatabasePeersMessage extends ChannelMessageBase {
   type: "DATABASE_PEERS";
   peers: Peer[];
+}
+
+export interface PopupMessage extends ChannelMessageBase {
+  type: "POPUP";
+  text: string;
 }
 
 export interface StartLogReadingMessage extends ChannelMessageBase {
@@ -146,6 +152,7 @@ export interface DraftEndMessage extends ChannelMessageBase {
 
 export type ChannelMessage =
   | DatabasePeersMessage
+  | PopupMessage
   | StartLogReadingMessage
   | StopLogReadingMessage
   | LogMessageRecvMessage
