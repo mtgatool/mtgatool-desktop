@@ -40,6 +40,10 @@ export interface AppProps {
   forceOs?: string;
 }
 
+const knownHosts: Record<string, string> = {
+  "66.97.46.144": "api.mtgatool.com",
+};
+
 function App(props: AppProps) {
   const { forceOs } = props;
   const history = useHistory();
@@ -55,8 +59,17 @@ function App(props: AppProps) {
     if (!window.toolDbInitialized) {
       const storedPeers = JSON.parse(getLocalSetting("peers"));
       const mergedPeers = isElectron()
-        ? [...storedPeers.map((p: Peer) => `http://${p.host}:${p.port}`)]
+        ? storedPeers
+            .map((p: Peer) => {
+              const host = knownHosts[p.host] ?? p.host;
+              return p.port === 443
+                ? `https://${host}`
+                : `http://${host}:${p.port}`;
+            })
+            .filter((p: string) => p)
         : DEFAULT_SERVERS;
+
+      console.log("Merged Peers: ", mergedPeers);
       window.toolDb = new ToolDb({ peers: mergedPeers, debug: true });
       window.toolDbInitialized = true;
       window.toolDb.addCustomVerification(
