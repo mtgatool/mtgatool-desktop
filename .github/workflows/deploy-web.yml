@@ -27,4 +27,3 @@ jobs:
         password: ${{ secrets.password }}
         local-dir: ./build/
         server-dir: /var/www/mtgatool-app/
-        dry-run: true
