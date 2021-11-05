@@ -33,7 +33,7 @@ export default function keysLogin(
                   }
                 });
             } else {
-              reject(new Error("Somwthing went wrong when importing the keys"));
+              reject(new Error("Something went wrong when importing the keys"));
             }
           });
         } else {

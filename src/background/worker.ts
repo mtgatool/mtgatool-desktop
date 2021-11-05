@@ -13,6 +13,7 @@ export default function start() {
     postChannelMessage({
       type: "POPUP",
       text: "Player log not found! please check your settings.",
+      duration: 15000,
     });
   } else {
     ArenaLogWatcher.start({

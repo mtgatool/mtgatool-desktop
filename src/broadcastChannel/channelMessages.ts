@@ -48,6 +48,7 @@ export interface DatabasePeersMessage extends ChannelMessageBase {
 export interface PopupMessage extends ChannelMessageBase {
   type: "POPUP";
   text: string;
+  duration: number;
 }
 
 export interface StartLogReadingMessage extends ChannelMessageBase {

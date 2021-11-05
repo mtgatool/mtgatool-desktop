@@ -31,6 +31,17 @@ export default function mainChannelListeners() {
       });
     }
 
+    if (msg.data.type === "POPUP") {
+      reduxAction(store.dispatch, {
+        type: "SET_POPUP",
+        arg: {
+          text: msg.data.text,
+          duration: msg.data.duration,
+          time: new Date().getTime(),
+        },
+      });
+    }
+
     if (msg.data.type === "LOG_MESSAGE_RECV") {
       const entry = msg.data.value as LogEntry;
 

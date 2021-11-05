@@ -35,6 +35,7 @@ import Welcome from "./Welcome";
 import liveDraftVerification from "../toolDb/liveDraftVerification";
 import { DEFAULT_SERVERS } from "../constants";
 import { Peer } from "../redux/slices/rendererSlice";
+import Popups from "./Popups";
 
 export interface AppProps {
   forceOs?: string;
@@ -152,6 +153,7 @@ function App(props: AppProps) {
           backgroundImage: backgroundImage,
         }}
       >
+        <Popups />
         <CardHover />
         {loading ? (
           <LoadingBar

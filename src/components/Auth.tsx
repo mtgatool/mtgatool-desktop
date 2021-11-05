@@ -296,7 +296,7 @@ export default function Auth(props: AuthProps) {
               setPage(1);
             }
           })
-          .catch(setErrorMessage);
+          .catch((err: Error) => setErrorMessage(err.message));
       }
     },
     [passphrase, usernameRecover]

@@ -13,6 +13,13 @@ export interface Peer {
   port: number;
 }
 
+export interface Popup {
+  text: string;
+  time: number;
+  color?: string;
+  duration: number;
+}
+
 export const initialRendererState = {
   peers: [{ host: "api.mtgatool.com", port: 443 }] as Peer[],
   archivedCache: {} as Record<string, boolean>,
@@ -26,11 +33,7 @@ export const initialRendererState = {
     patreon: false,
     patreonTier: -1,
   },
-  popup: {
-    text: "",
-    time: 0,
-    duration: 0,
-  },
+  popup: null as Popup | null,
   formats: {} as Record<string, Format>,
   rewards_daily_ends: "",
   rewards_weekly_ends: "",
@@ -104,10 +107,7 @@ const rendererSlice = createSlice({
     ): void => {
       state.patreon = action.payload;
     },
-    setPopup: (
-      state: RendererState,
-      action: PayloadAction<RendererState["popup"]>
-    ): void => {
+    setPopup: (state: RendererState, action: PayloadAction<Popup>): void => {
       state.popup = action.payload;
     },
     setFormats: (
