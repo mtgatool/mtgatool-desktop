@@ -20,8 +20,5 @@ jobs:
         username: ${{ secrets.username }}
         password: ${{ secrets.password }}
         local-dir: ./build/
-        exclude:
-          - **/.git*
-          - **/.git*/**
-          - **/node_modules/**
+        server-dir: /var/www/mtgatool-app/
         dry-run: true
