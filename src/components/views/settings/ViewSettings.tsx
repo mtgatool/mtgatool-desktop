@@ -8,8 +8,9 @@ import VisualSettingsPanel from "./VisualSettingsPanel";
 import ShortcutsSettingsPanel from "./ShortcutsSettingsPanel";
 import AccountSettingsPanel from "./AccountSettingsPanel";
 import DataSettingsPanel from "./DataSettingsPanel";
+import LogsSettingsPanel from "./LogsSettingsPanel";
 
-const SETTINGS_BEHAVIOUR = 10;
+const SETTINGS_LOGS = 10;
 const SETTINGS_DATA = 11;
 const SETTINGS_OVERLAY = 12;
 const SETTINGS_VISUAL = 13;
@@ -61,11 +62,11 @@ export default function ViewSettings(props: ViewSettingsProps) {
   };
 
   const tabs: SettingsNavProps[] = [];
-  tabs[SETTINGS_BEHAVIOUR] = {
+  tabs[SETTINGS_LOGS] = {
     ...defaultTab,
-    id: SETTINGS_BEHAVIOUR,
-    component: Fragment, // SectionBehaviour,
-    title: "Behaviour",
+    id: SETTINGS_LOGS,
+    component: LogsSettingsPanel,
+    title: "Logs",
   };
   tabs[SETTINGS_DATA] = {
     ...defaultTab,
@@ -124,7 +125,7 @@ export default function ViewSettings(props: ViewSettingsProps) {
             style={{ marginTop: "16px", marginLeft: "auto", maxWidth: "200px" }}
           >
             <SettingsNav {...tabs[SETTINGS_ACCOUNT]} />
-            {isElectron() && <SettingsNav {...tabs[SETTINGS_BEHAVIOUR]} />}
+            {isElectron() && <SettingsNav {...tabs[SETTINGS_LOGS]} />}
             <SettingsNav {...tabs[SETTINGS_DATA]} />
             {isElectron() && <SettingsNav {...tabs[SETTINGS_OVERLAY]} />}
             <SettingsNav {...tabs[SETTINGS_VISUAL]} />
