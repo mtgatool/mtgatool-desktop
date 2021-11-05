@@ -5,15 +5,21 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
+    - name: "Setup node"
+      uses: actions/setup-node@v1
+      with:
+        node-version: '16'
+
     - name: Get latest code
       uses: actions/checkout@v2
 
-    - name: Build Project
-      run: |
-        npm install
-        npm run build:web
+    - name: "Install modules"
+      run: "npm run install:ci"
 
-    - name: Sync files
+    - name: Build web
+      run: npm run build:web
+
+    - name: Deploy
       uses: SamKirkland/FTP-Deploy-Action@4.1.0
       with:
         server: ${{ secrets.server }}

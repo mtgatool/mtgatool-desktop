@@ -17,11 +17,15 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: '16'
+
     - name: "Checkout source code"
       uses: "actions/checkout@v2"
+
     - name: "Install modules"
       run: "npm run install:ci"
+
     - name: "Build (npm)"
       run: "npm run build"
+
     - name: "Test"
       run: "npm run jest:ci"
