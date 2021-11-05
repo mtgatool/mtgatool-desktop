@@ -60,7 +60,7 @@ function handleLiveFeed(msg: CrdtMessage | PutMessage<any>) {
           if (globalData.liveFeed[a] < globalData.liveFeed[b]) return 1;
           return 0;
         })
-        .slice(-10);
+        .slice(0, 10);
 
       reduxAction(store.dispatch, {
         type: "SET_LIVE_FEED",

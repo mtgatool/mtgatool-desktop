@@ -1,14 +1,11 @@
 import { useSelector } from "react-redux";
-
 import { Fragment } from "react";
-import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
-import Button from "../../ui/Button";
-import createOverlay from "../../../overlay/createOverlay";
 
 import { AppState } from "../../../redux/stores/rendererStore";
 import getCssQuality from "../../../utils/getCssQuality";
 import { convertDbMatchToData } from "../history/getMatchesData";
-import ListItemMatch from "../history/ListItemMatch";
+
+import LiveFeedMatch from "./LiveFeedMatch";
 
 export default function ViewHome() {
   const liveFeed = useSelector((state: AppState) => state.mainData.liveFeed);
@@ -22,7 +19,7 @@ export default function ViewHome() {
         className={`section ${getCssQuality()}`}
         style={{ flexDirection: "column" }}
       >
-        <div style={{ display: "flex" }}>
+        {/* <div style={{ display: "flex" }}>
           <Button
             style={{
               margin: "auto",
@@ -43,7 +40,7 @@ export default function ViewHome() {
             }
             text="Test overaly"
           />
-        </div>
+        </div> */}
         <h2 style={{ textAlign: "center" }}>Live Feed</h2>
         <div className="home-view">
           {liveFeed.map((matchId) => {
@@ -51,7 +48,7 @@ export default function ViewHome() {
             if (match) {
               const data = convertDbMatchToData(match);
               return (
-                <ListItemMatch
+                <LiveFeedMatch
                   key={`livefeed-match-${match.matchId}`}
                   match={data}
                 />
