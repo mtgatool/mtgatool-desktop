@@ -1,0 +1,27 @@
+on: push
+name: Deploy website
+jobs:
+  web-deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get latest code
+      uses: actions/checkout@v2
+
+    - name: Build Project
+      run: |
+        npm install
+        npm run build:web
+
+    - name: Sync files
+      uses: SamKirkland/FTP-Deploy-Action@4.1.0
+      with:
+        server: ${{ secrets.server }}
+        username: ${{ secrets.username }}
+        password: ${{ secrets.password }}
+        local-dir: ./build/
+        exclude:
+          - **/.git*
+          - **/.git*/**
+          - **/node_modules/**
+        dry-run: true
