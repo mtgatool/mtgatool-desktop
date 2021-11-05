@@ -1,5 +1,9 @@
-on: push
 name: Deploy website
+
+on:
+  push:
+    tags: 'v*'
+
 jobs:
   web-deploy:
     name: Deploy
