@@ -3,7 +3,11 @@ import { useHistory } from "react-router-dom";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { animated, useSpring } from "react-spring";
-import { LOGIN_OK, LOGIN_WAITING } from "mtgatool-shared/dist/shared/constants";
+import {
+  LOGIN_AUTH,
+  LOGIN_OK,
+  LOGIN_WAITING,
+} from "mtgatool-shared/dist/shared/constants";
 import { sha1 } from "tool-db";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 
@@ -171,7 +175,7 @@ export default function Auth(props: AuthProps) {
           .catch((err: Error) => {
             reduxAction(dispatch, {
               type: "SET_LOGIN_STATE",
-              arg: LOGIN_WAITING,
+              arg: LOGIN_AUTH,
             });
             setErrorMessage(err.message);
           });
@@ -213,7 +217,7 @@ export default function Auth(props: AuthProps) {
           .catch((err: Error) => {
             reduxAction(dispatch, {
               type: "SET_LOGIN_STATE",
-              arg: LOGIN_WAITING,
+              arg: LOGIN_AUTH,
             });
             setErrorMessage(err.message);
           });
@@ -247,6 +251,11 @@ export default function Auth(props: AuthProps) {
       } else {
         setUsername(signupUsername);
         setPass(signupPass);
+
+        reduxAction(dispatch, {
+          type: "SET_LOGIN_STATE",
+          arg: LOGIN_WAITING,
+        });
         signup(signupUsername, sha1(signupPass))
           .then(() => {
             reduxAction(dispatch, {
@@ -277,7 +286,13 @@ export default function Auth(props: AuthProps) {
               });
             }
           })
-          .catch((err: Error) => setErrorMessage(err.message));
+          .catch((err: Error) => {
+            reduxAction(dispatch, {
+              type: "SET_LOGIN_STATE",
+              arg: LOGIN_AUTH,
+            });
+            setErrorMessage(err.message);
+          });
       }
     },
     [history, signupUsername, signupPass, signupPassConfirm]
