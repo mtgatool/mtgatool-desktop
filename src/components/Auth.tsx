@@ -147,6 +147,7 @@ export default function Auth(props: AuthProps) {
       if (pass.length < 8) {
         setErrorMessage("Passwords must contain at least 8 characters.");
       } else {
+        setErrorMessage("");
         reduxAction(dispatch, {
           type: "SET_LOGIN_STATE",
           arg: LOGIN_WAITING,
@@ -187,6 +188,7 @@ export default function Auth(props: AuthProps) {
   const onKeyLogin = useCallback((): void => {
     if (keysFileRef.current) {
       const FR = new FileReader();
+      setErrorMessage("");
       FR.addEventListener("load", (ev: any) => {
         const keys = JSON.parse(ev.target.result);
         reduxAction(dispatch, {
@@ -249,6 +251,7 @@ export default function Auth(props: AuthProps) {
       } else if (signupPass !== signupPassConfirm) {
         setErrorMessage("Passwords must match");
       } else {
+        setErrorMessage("");
         setUsername(signupUsername);
         setPass(signupPass);
 
@@ -332,21 +335,28 @@ export default function Auth(props: AuthProps) {
     <>
       <div
         style={{
-          backgroundColor: "var(--color-section)",
+          width: "100%",
           color: "var(--color-w)",
-          borderRadius: "4px",
-          width: "600px",
-          textAlign: "center",
-          lineHeight: "20px",
-          padding: "12px",
-          margin: "auto",
+          display: "flex",
           position: "absolute",
-          left: "calc(50% - 300px)",
           bottom: "8px",
         }}
       >
-        Due to an api protocol and sotrage upgrade in v6.1.0 all users will have
-        to sign up again, sorry for the inconvenience! -Manwë
+        <div
+          style={{
+            maxWidth: "calc(100% - 16px)",
+            margin: "auto",
+            lineHeight: "20px",
+            padding: "12px",
+            borderRadius: "4px",
+            textAlign: "center",
+            backgroundColor: "var(--color-section)",
+            width: "600px",
+          }}
+        >
+          Due to an api protocol and sotrage upgrade in v6.1.0 all users will
+          have to sign up again, sorry for the inconvenience! -Manwë
+        </div>
       </div>
       <PopupComponent
         open={false}
