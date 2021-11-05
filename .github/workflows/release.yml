@@ -10,7 +10,7 @@ jobs:
     name: "Release (${{ matrix.os }})"
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [macos-latest]
 
     steps:
     - name: "Setup node"
