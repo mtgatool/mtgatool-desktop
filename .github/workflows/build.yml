@@ -24,8 +24,9 @@ jobs:
     - name: "Install modules"
       run: "npm run install:ci"
 
+    - name: "Test"
+      run: "npm run jest:ci"
+
     - name: "Build (npm)"
       run: "npm run build"
 
-    - name: "Test"
-      run: "npm run jest:ci"
