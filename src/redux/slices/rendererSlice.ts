@@ -7,6 +7,7 @@ import {
   LOGIN_FAILED,
   LOGIN_OK,
 } from "mtgatool-shared/dist/shared/constants";
+import { DEFAULT_PEERS } from "../../constants";
 
 export interface Peer {
   host: string;
@@ -21,7 +22,7 @@ export interface Popup {
 }
 
 export const initialRendererState = {
-  peers: [{ host: "api.mtgatool.com", port: 443 }] as Peer[],
+  peers: DEFAULT_PEERS,
   archivedCache: {} as Record<string, boolean>,
   backgroundGrpid: null as number | null,
   loading: false,

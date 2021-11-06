@@ -1,6 +1,12 @@
 import { DbUserids } from "../types/dbTypes";
 import login from "./login";
 
+function waitMs(ms: number): Promise<true> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(true), ms);
+  });
+}
+
 /**
  * Sign up process
  * @param username plaintext username
@@ -9,12 +15,17 @@ import login from "./login";
  */
 export default function signup(username: string, password: string) {
   return window.toolDb.signUp(username, password).then((msg) => {
-    return login(username, password).then((_keys) => {
-      return window.toolDb
-        .putData<DbUserids>("userids", {}, true)
-        .then((_put) => {
-          return msg;
-        });
+    // console.log("Sent signup! now wait");
+    return waitMs(1500).then(() => {
+      // console.log("wait finished, now login");
+      return login(username, password).then((_keys) => {
+        // console.log("login ok!?");
+        return window.toolDb
+          .putData<DbUserids>("userids", {}, true)
+          .then((_put) => {
+            return msg;
+          });
+      });
     });
   });
 }
