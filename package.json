@@ -60,7 +60,7 @@
     "electron": "electron .",
     "electron-start": "node src/start-react",
     "release": "npm run electron-rebuild && npm run react-build && electron-builder --publish=always",
-    "build:nopublish": "electron-builder --x64",
+    "build:nopublish": "electron-builder --x64 --publish=never",
     "build": "npm run electron-rebuild && npm run react-build && npm run build:nopublish",
     "electron-rebuild": "electron-rebuild",
     "semantic-release": "semantic-release",
