@@ -1,0 +1,33 @@
+name: Deploy website
+
+on:
+  push:
+    tags: 'v*'
+
+jobs:
+  web-deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: "Setup node"
+      uses: actions/setup-node@v1
+      with:
+        node-version: '16'
+
+    - name: Get latest code
+      uses: actions/checkout@v2
+
+    - name: "Install modules"
+      run: "npm run install:ci"
+
+    - name: Build web
+      run: npm run build:web
+
+    - name: Deploy
+      uses: SamKirkland/FTP-Deploy-Action@4.1.0
+      with:
+        server: ${{ secrets.server }}
+        username: ${{ secrets.username }}
+        password: ${{ secrets.password }}
+        local-dir: ./build/
+        server-dir: /var/www/mtgatool-app/
