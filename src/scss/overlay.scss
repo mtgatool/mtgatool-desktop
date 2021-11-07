@@ -491,6 +491,25 @@
   justify-content: flex-end;
 }
 
+.draft-card-tile-container {
+  min-width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.draft-vote {
+  height: 31px;
+  line-height: 32px;
+  min-width: 28px;
+  max-width: 28px;
+  font-family: var(--main-font-name-it);
+  vertical-align: middle;
+  text-align: center;
+  background-color: var(--color-card-tile);
+  margin-left: 1px;
+}
+
 .draft-title {
   margin: 16px auto;
   line-height: 20px;

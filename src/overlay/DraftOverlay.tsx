@@ -4,10 +4,13 @@ import {
   DRAFT_RANKS_LOLA,
 } from "mtgatool-shared/dist/shared/constants";
 import CardTile, { QuantityRank } from "../components/CardTile";
+
+import { DbDraftVote } from "../types/dbTypes";
 import getCardTypeSort from "../utils/getCardTypeSort";
 
 interface DraftOverlayProps {
   state: InternalDraftv2;
+  votes: Record<string, DbDraftVote>;
 }
 
 function getRank(cardId: number): number {
@@ -55,7 +58,24 @@ function compareDraftPicks(
 }
 
 export default function DraftOverlay(props: DraftOverlayProps) {
-  const { state } = props;
+  const { state, votes } = props;
+
+  const currentVotes: Record<number, number> = {};
+  let mostVoted = -1;
+
+  Object.keys(votes || {})
+    .filter((key) => key.endsWith(`-${state.currentPack}-${state.currentPick}`))
+    .forEach((key) => {
+      const keyData = votes[key];
+      if (keyData) {
+        const grpId = keyData.vote || 0;
+        if (!currentVotes[grpId]) currentVotes[grpId] = 0;
+        currentVotes[grpId] += 1;
+        if (currentVotes[grpId] > (currentVotes[mostVoted] || 0)) {
+          mostVoted = grpId;
+        }
+      }
+    });
 
   return (
     <>
@@ -78,16 +98,34 @@ export default function DraftOverlay(props: DraftOverlayProps) {
               : undefined;
 
           return (
-            <CardTile
-              card={fullCard}
-              dfcCard={dfcCard}
+            <div
+              className="draft-card-tile-container"
               key={`draft-card-tile-${fullCard.id}`}
-              indent="a"
-              isHighlighted={false}
-              isSideboard={false}
-              quantity={quantity}
-              showWildcards={false}
-            />
+            >
+              {Object.keys(votes).length > 0 && (
+                <div
+                  style={{
+                    color: fullCard.id === mostVoted ? "var(--color-g)" : "",
+                    fontFamily:
+                      fullCard.id === mostVoted
+                        ? "var(--main-font-name-bold-it)"
+                        : "",
+                  }}
+                  className="draft-vote"
+                >
+                  {currentVotes[fullCard.id] || 0}
+                </div>
+              )}
+              <CardTile
+                card={fullCard}
+                dfcCard={dfcCard}
+                indent="a"
+                isHighlighted={false}
+                isSideboard={false}
+                quantity={quantity}
+                showWildcards={false}
+              />
+            </div>
           );
         })}
     </>

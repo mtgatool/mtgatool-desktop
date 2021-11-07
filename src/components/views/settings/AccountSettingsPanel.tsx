@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { LOGIN_AUTH } from "mtgatool-shared/dist/shared/constants";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useCallback, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import { SettingsPanelProps } from "./ViewSettings";
@@ -16,6 +16,8 @@ import Button from "../../ui/Button";
 import { ReactComponent as KeysIcon } from "../../../assets/images/svg/keys.svg";
 
 import saveKeysCallback from "../../../toolDb/saveKeysCallback";
+import { AppState } from "../../../redux/stores/rendererStore";
+import useFetchAvatar from "../../../hooks/useFetchAvatar";
 
 function resizeBase64Img(
   base64: string,
@@ -46,37 +48,43 @@ function resizeBase64Img(
 export default function AccountSettingsPanel(
   props: SettingsPanelProps
 ): JSX.Element {
+  const avatars = useSelector((state: AppState) => state.avatars.avatars);
+  const fetchAvatar = useFetchAvatar();
+
   const { doClose } = props;
   const dispatch = useDispatch();
   const history = useHistory();
   const avatarInputRef = useRef<HTMLInputElement>(null);
-  const [avatar, setAvatar] = useState("");
-  // const [_accountInfo, setAccountInfo] = useState<DbAccount>({
-  //   displayName: "",
-  //   bio: "",
-  // });
 
-  const changeAvatar = useCallback((e) => {
-    if (e && e.target.files && e.target.files[0]) {
-      const FR = new FileReader();
+  const changeAvatar = useCallback(
+    (e) => {
+      if (e && e.target.files && e.target.files[0]) {
+        const FR = new FileReader();
 
-      FR.addEventListener("load", (ev: any) => {
-        resizeBase64Img(ev.target.result, 128, 128).then((img) => {
-          setAvatar(img);
-          window.toolDb.putData("avatar", img, true);
+        FR.addEventListener("load", (ev: any) => {
+          resizeBase64Img(ev.target.result, 128, 128).then((img) => {
+            window.toolDb.putData("avatar", img, true);
+            fetchAvatar(window.toolDb.user?.pubKey || "");
+          });
         });
-      });
 
-      FR.readAsDataURL(e.target.files[0]);
-    }
-  }, []);
+        FR.readAsDataURL(e.target.files[0]);
+      }
+    },
+    [fetchAvatar]
+  );
 
   useEffect(() => {
     if (avatarInputRef.current) {
       window.toolDb
         .getData<string>("avatar", true)
         .then((av) => {
-          if (av) setAvatar(av);
+          if (av && window.toolDb.user) {
+            reduxAction(dispatch, {
+              type: "SET_AVATAR",
+              arg: { pubKey: window.toolDb.user.pubKey, avatar: av },
+            });
+          }
         })
         .catch(console.warn);
       avatarInputRef.current.addEventListener("change", changeAvatar);
@@ -88,7 +96,11 @@ export default function AccountSettingsPanel(
       <div className="centered-setting-container">
         <div
           className="avatar-med"
-          style={{ backgroundImage: `url(${avatar})` }}
+          style={{
+            backgroundImage: `url(${
+              avatars[window.toolDb.user?.pubKey || ""]
+            })`,
+          }}
         />
         <label htmlFor="avatarInput" style={{ margin: "0" }}>
           <Button text="Edit Avatar" onClick={vodiFn} />

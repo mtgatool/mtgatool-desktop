@@ -8,7 +8,7 @@ import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankIn
 import { OverlayUpdateMatchState } from "../background/store/types";
 import { OverlaySettings } from "../common/defaultConfig";
 import { Peer } from "../redux/slices/rendererSlice";
-import { DbInventoryInfo } from "../types/dbTypes";
+import { DbDraftVote, DbInventoryInfo } from "../types/dbTypes";
 import { ClientSceneChange } from "../types/logDecoder";
 
 export type MessageType =
@@ -34,6 +34,7 @@ export type MessageType =
   | "HOVER_IN"
   | "HOVER_OUT"
   | "DRAFT_STATUS"
+  | "DRAFT_VOTES"
   | "DRAFT_END";
 
 export interface ChannelMessageBase {
@@ -147,6 +148,11 @@ export interface DraftStatusMessage extends ChannelMessageBase {
   value: InternalDraftv2;
 }
 
+export interface DraftVotesMessage extends ChannelMessageBase {
+  type: "DRAFT_VOTES";
+  value: Record<string, DbDraftVote>;
+}
+
 export interface DraftEndMessage extends ChannelMessageBase {
   type: "DRAFT_END";
 }
@@ -174,4 +180,5 @@ export type ChannelMessage =
   | HoverOutMessage
   | OverlaySettingsMessage
   | DraftStatusMessage
+  | DraftVotesMessage
   | DraftEndMessage;

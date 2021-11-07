@@ -166,7 +166,7 @@ export default function Hover() {
     const cardWidth = size;
     const cardHeight = size / CARD_SIZE_RATIO;
 
-    const width = Math.round(cardWidth + 64);
+    const width = Math.round(cardWidth * 2 + 64);
     const height = Math.round(cardHeight + 48);
 
     if (electron) {

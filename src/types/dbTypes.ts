@@ -137,13 +137,15 @@ export interface DbAccount {
   bio: string;
 }
 
-export interface DbVote {
+export interface DbDraftVote {
   pubKey: string;
   signature: string;
+  pack: number;
+  pick: number;
   vote: number;
 }
 
-// Key is livedraft-v1-${id}
+// Key is live-draft-v1-${id}
 // We use versioning to allow upgrades on the protocol
 // Verification will only allow owner to modify
 // Others can add votes (subject to verification and deduplication checks)
@@ -151,5 +153,7 @@ export interface DbVote {
 export interface DbliveDraftV1 {
   owner: string;
   ref: string;
-  currentVotes: Record<string, DbVote>;
+  // votes key should be unique per vote, like
+  // {pubKey}-{pack}-{pick}
+  votes: Record<string, DbDraftVote>;
 }

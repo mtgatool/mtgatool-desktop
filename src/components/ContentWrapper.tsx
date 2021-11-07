@@ -23,13 +23,14 @@ import HistoryStats from "./views/history/HistoryStats";
 import { convertDbMatchToData } from "./views/history/getMatchesData";
 import getLocalDbValue from "../toolDb/getLocalDbValue";
 import PostSignupPopup from "./PostSignupPopup";
+import ViewDrafts from "./views/drafts/ViewDrafts";
 
 const views = {
   home: ViewHome,
   decks: ViewDecks,
   history: ViewHistory,
   timeline: ViewWip,
-  drafts: ViewWip,
+  drafts: ViewDrafts,
   explore: ViewWip,
   collection: ViewCollection,
 };

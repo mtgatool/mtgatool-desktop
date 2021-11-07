@@ -74,15 +74,15 @@ export default function createOverlay(
     newWindow.webContents.once("dom-ready", () => {
       // eslint-disable-next-line func-names
       if (electron && process.env.NODE_ENV === "development") {
-        // const overlayDevtools = new electron.remote.BrowserWindow({
-        //   title: "MTG Arena Tool - overlay debug",
-        //   icon: path.join(__dirname, "logo512.png"),
-        // });
-        // overlayDevtools.removeMenu();
-        // newWindow.webContents.setDevToolsWebContents(
-        //   overlayDevtools.webContents
-        // );
-        // newWindow.webContents.openDevTools({ mode: "detach" });
+        const overlayDevtools = new electron.remote.BrowserWindow({
+          title: "MTG Arena Tool - overlay debug",
+          icon: path.join(__dirname, "logo512.png"),
+        });
+        overlayDevtools.removeMenu();
+        newWindow.webContents.setDevToolsWebContents(
+          overlayDevtools.webContents
+        );
+        newWindow.webContents.openDevTools({ mode: "detach" });
       }
 
       setTimeout(() => {

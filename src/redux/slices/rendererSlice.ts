@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Format } from "mtgatool-shared";
+import { Format, InternalDraftv2 } from "mtgatool-shared";
 import {
   LOGIN_WAITING,
   LOGIN_AUTH,
@@ -44,6 +44,7 @@ export const initialRendererState = {
   matchInProgress: false,
   draftInProgress: false,
   showPostSignup: null as null | string,
+  currentDraft: null as InternalDraftv2 | null,
   currentScene: "",
 };
 
@@ -164,6 +165,12 @@ const rendererSlice = createSlice({
     ): void => {
       state.draftInProgress = action.payload;
     },
+    setCurrentDraft: (
+      state: RendererState,
+      action: PayloadAction<InternalDraftv2>
+    ): void => {
+      state.currentDraft = action.payload;
+    },
     setScene: (state: RendererState, action: PayloadAction<string>): void => {
       state.currentScene = action.payload;
     },
@@ -189,6 +196,7 @@ export const {
   setCollectionQuery,
   setMatchInProgress,
   setDraftInProgress,
+  setCurrentDraft,
   setScene,
 } = rendererSlice.actions;
 

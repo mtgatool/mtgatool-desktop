@@ -23,6 +23,7 @@ import Clock from "./Clock";
 import { overlayTitleToId } from "../common/maps";
 import DraftOverlay from "./DraftOverlay";
 import getPlayerNameWithoutSuffix from "../utils/getPlayerNameWithoutSuffix";
+import { DbDraftVote } from "../types/dbTypes";
 
 function getCurrentOverlayId(): number {
   const title = electron?.remote.getCurrentWindow().getTitle() || "";
@@ -34,6 +35,7 @@ export default function Overlay() {
   const [settings, setSettings] = useState<OverlaySettings>();
   const [matchState, setMatchState] = useState<OverlayUpdateMatchState>();
   const [draftState, setDraftState] = useState<InternalDraftv2>();
+  const [draftVotes, setDraftVotes] = useState<Record<string, DbDraftVote>>({});
   const [odds, setOdds] = useState<Chances>();
   const heightDivAdjustRef = useRef<HTMLDivElement>(null);
 
@@ -81,6 +83,10 @@ export default function Overlay() {
 
       if (msg.data.type === "OVERLAY_UPDATE") {
         setMatchState(msg.data.value);
+      }
+
+      if (msg.data.type === "DRAFT_VOTES") {
+        setDraftVotes(msg.data.value);
       }
 
       if (msg.data.type === "DRAFT_STATUS") {
@@ -178,7 +184,7 @@ export default function Overlay() {
       >
         <div ref={heightDivAdjustRef} style={{ opacity: settings?.alpha || 0 }}>
           {settings && settings.mode === OVERLAY_DRAFT && draftState && (
-            <DraftOverlay state={draftState} />
+            <DraftOverlay state={draftState} votes={draftVotes} />
           )}
           {deck && settings && (
             <OverlayDeckList

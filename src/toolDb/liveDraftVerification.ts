@@ -12,6 +12,7 @@ export default function liveDraftVerification(
         if (originalDraft) {
           if (originalDraft.owner === msg.p) {
             // Check if we own this
+            // the owner has full control so we simply allow his writes
             resolve(true);
           } else if (
             // Check if the owner data was not modified
@@ -20,9 +21,8 @@ export default function liveDraftVerification(
           ) {
             resolve(false);
           } else if (
-            msg.p !== msg.v.owner &&
-            Object.keys(msg.v.currentVotes).length <
-              Object.keys(originalDraft.currentVotes).length
+            Object.keys(msg.v.votes).length <
+            Object.keys(originalDraft.votes).length
           ) {
             // If it was not, check if we are not removing any entry
             resolve(false);

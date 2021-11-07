@@ -1,6 +1,7 @@
 import * as HoverSlice from "./slices/hoverSlice";
 import * as MainDataSlice from "./slices/mainDataSlice";
 import * as RendererSlice from "./slices/rendererSlice";
+import * as avatarsSlice from "./slices/avatarsSlice";
 import * as SettingsSlice from "./slices/settingsSlice";
 
 export const actions = {
@@ -36,7 +37,9 @@ export const actions = {
   SET_COLLECTION_QUERY: RendererSlice.setCollectionQuery,
   SET_MATCH_IN_PROGRESS: RendererSlice.setMatchInProgress,
   SET_DRAFT_IN_PROGRESS: RendererSlice.setDraftInProgress,
+  SET_CURRENT_DRAFT: RendererSlice.setCurrentDraft,
   SET_SCENE: RendererSlice.setScene,
+  SET_AVATAR: avatarsSlice.setAvatar,
   SET_SETTINGS: SettingsSlice.setSettings,
   SET_OVERLAY_SETTINGS: SettingsSlice.setOverlaySettings,
 };

@@ -115,6 +115,10 @@ export default function mainChannelListeners() {
           msg.data.value.id &&
           msg.data.value.id !== ""
         ) {
+          reduxAction(store.dispatch, {
+            type: "SET_CURRENT_DRAFT",
+            arg: msg.data.value,
+          });
           window.toolDb.putData<InternalDraftv2>(
             `draft-${msg.data.value.id}`,
             msg.data.value,

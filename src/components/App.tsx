@@ -32,7 +32,7 @@ import info from "../info.json";
 import overlayHandler from "../common/overlayHandler";
 import login from "../toolDb/login";
 import Welcome from "./Welcome";
-import liveDraftVerification from "../toolDb/liveDraftVerification";
+// import liveDraftVerification from "../toolDb/liveDraftVerification";
 import { DEFAULT_SERVERS } from "../constants";
 import { Peer } from "../redux/slices/rendererSlice";
 import Popups from "./Popups";
@@ -73,10 +73,10 @@ function App(props: AppProps) {
       console.log("Merged Peers: ", mergedPeers);
       window.toolDb = new ToolDb({ peers: mergedPeers, debug: true });
       window.toolDbInitialized = true;
-      window.toolDb.addCustomVerification(
-        "live-draft-v1-",
-        liveDraftVerification
-      );
+      // window.toolDb.addCustomVerification(
+      //   "live-draft-v1-",
+      //   liveDraftVerification
+      // );
     }
   }, []);
 
