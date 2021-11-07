@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
-import { InternalDraftv2 } from "mtgatool-shared";
+import { database, InternalDraftv2 } from "mtgatool-shared";
 import Automerge, { FreezeObject } from "automerge";
 import { base64ToBinaryDocument, signData, toBase64 } from "tool-db";
 import { DbliveDraftV1 } from "../../../types/dbTypes";
@@ -10,6 +10,7 @@ import { AppState } from "../../../redux/stores/rendererStore";
 import CardLiveDraft from "./CardLiveDraft";
 
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
+import CardTile from "../../CardTile";
 
 export default function LiveDraftView() {
   const avatars = useSelector((state: AppState) => state.avatars.avatars);
@@ -144,43 +145,71 @@ export default function LiveDraftView() {
 
   return (
     <>
-      <p>{params.id}</p>
       {draftState ? (
         <div className="live-draft-container">
-          <p>{`Pack: ${draftState.currentPack}, Pick: ${draftState.currentPick}`}</p>
-          <div className="pack-container">
-            {draftState.packs[draftState.currentPack][
-              draftState.currentPick
-            ].map((grpId) => {
-              return (
-                <div key={`${grpId}-draft-pick`}>
-                  <CardLiveDraft
-                    grpId={grpId}
-                    onClick={() =>
-                      _voteFor(
-                        draftState.currentPack,
-                        draftState.currentPick,
-                        grpId
-                      )
-                    }
-                  />
-                  <div className="avatars-list">
-                    {currentVotes[grpId] &&
-                      currentVotes[grpId].map((pubKey) => {
-                        return (
-                          <div
-                            key={`${pubKey}-${grpId}-avatar`}
-                            className="vote-avatar"
-                            style={{
-                              backgroundImage: `url(${avatars[pubKey]})`,
-                            }}
-                          />
-                        );
-                      })}
+          <div className="title">
+            <h2>{`Pack: ${draftState.currentPack + 1}, Pick: ${
+              draftState.currentPick + 1
+            }`}</h2>
+          </div>
+          <div className="draft-container">
+            <div className="pack-container">
+              {draftState.packs[draftState.currentPack][
+                draftState.currentPick
+              ].map((grpId) => {
+                return (
+                  <div key={`${grpId}-draft-pick`}>
+                    <CardLiveDraft
+                      grpId={grpId}
+                      onClick={() =>
+                        _voteFor(
+                          draftState.currentPack,
+                          draftState.currentPick,
+                          grpId
+                        )
+                      }
+                    />
+                    <div className="avatars-list">
+                      {currentVotes[grpId] &&
+                        currentVotes[grpId].map((pubKey) => {
+                          return (
+                            <div
+                              key={`${pubKey}-${grpId}-avatar`}
+                              className="vote-avatar"
+                              style={{
+                                backgroundImage: `url(${avatars[pubKey]})`,
+                              }}
+                            />
+                          );
+                        })}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+            <div className="picks-container">
+              {draftState.pickedCards.map((id) => {
+                const fullCard = database.card(id);
+
+                const dfcCard =
+                  fullCard?.dfcId && fullCard.dfcId !== true
+                    ? database.card(fullCard.dfcId)
+                    : undefined;
+
+                return (
+                  <CardTile
+                    key={`draft-card-tile-${id}`}
+                    card={fullCard}
+                    dfcCard={dfcCard}
+                    indent="a"
+                    isHighlighted={false}
+                    isSideboard={false}
+                    quantity={{ type: "NUMBER", quantity: 1 }}
+                    showWildcards={false}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
       ) : (

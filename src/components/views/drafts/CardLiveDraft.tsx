@@ -59,6 +59,7 @@ export default function CardLiveDraft(props: CardLiveDraftProps) {
         onMouseEnter={hoverIn}
         onMouseLeave={hoverOut}
         style={{
+          margin: "0 6px",
           width: `${cardSize}px`,
           height: `${Math.round(cardSize / CARD_SIZE_RATIO)}px`,
         }}
