@@ -4,6 +4,7 @@ import { DEFAULT_AVATAR } from "../constants";
 import reduxAction from "../redux/reduxAction";
 
 import { AppState } from "../redux/stores/rendererStore";
+import globalData from "../utils/globalData";
 
 export default function useFetchAvatar() {
   const dispatch = useDispatch();
@@ -11,6 +12,7 @@ export default function useFetchAvatar() {
 
   const fetchAvatar = useCallback(
     (pubKey: string) => {
+      globalData.fetchedAvatars.push(pubKey);
       reduxAction(dispatch, {
         type: "SET_AVATAR",
         arg: { pubKey, avatar: "" },

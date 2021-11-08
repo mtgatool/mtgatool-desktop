@@ -13,7 +13,7 @@ const globalData = {
   documentKeyUpListeners: {} as Record<string, (e: KeyboardEvent) => void>,
   mouseX: 0,
   mouseY: 0,
-  CRDTList: {} as CRDT,
+  fetchedAvatars: [] as string[],
   matchesIndex: Automerge.init<{ index: string[] }>(),
   liveFeed: Automerge.init<Record<string, number>>(),
   idb,
