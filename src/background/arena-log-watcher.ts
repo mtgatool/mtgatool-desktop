@@ -6,6 +6,7 @@ import { promisify } from "util";
 import { StringDecoder } from "string_decoder";
 import queue from "queue";
 import ArenaLogDecoder from "./arena-log-decoder/arena-log-decoder";
+import postChannelMessage from "../broadcastChannel/postChannelMessage";
 
 const skipFirstpass = false;
 
@@ -66,6 +67,9 @@ function fsWatch(
   }
 
   async function checkFile(): Promise<void> {
+    postChannelMessage({
+      type: "LOG_CHECK",
+    });
     const size = await attemptSize();
     if (lastSize === size) return;
     lastSize = size;

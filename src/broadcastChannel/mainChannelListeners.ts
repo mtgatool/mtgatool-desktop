@@ -73,6 +73,13 @@ export default function mainChannelListeners() {
       switchPlayerUUID(msg.data.value);
     }
 
+    if (msg.data.type === "LOG_CHECK") {
+      reduxAction(store.dispatch, {
+        type: "SET_LAST_LOG_CHECK",
+        arg: new Date().getTime(),
+      });
+    }
+
     if (msg.data.type === "GAME_START") {
       reduxAction(store.dispatch, {
         type: "SET_MATCH_IN_PROGRESS",

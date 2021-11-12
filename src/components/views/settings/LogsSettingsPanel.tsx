@@ -1,5 +1,9 @@
 import { useCallback, useState } from "react";
+import { useSelector } from "react-redux";
+import fs from "fs";
+
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
+import { AppState } from "../../../redux/stores/rendererStore";
 
 import getLocalSetting from "../../../utils/getLocalSetting";
 import setLocalSetting from "../../../utils/setLocalSetting";
@@ -7,7 +11,13 @@ import showOpenLogDialog from "../../../utils/showOpenLogDialog";
 import Button from "../../ui/Button";
 
 export default function LogsSettingsPanel(): JSX.Element {
+  const lastLogUpdate = useSelector(
+    (state: AppState) => state.renderer.lastLogCheck
+  );
   const [path, setPath] = useState(getLocalSetting("logPath"));
+  const [_rerender, setRerender] = useState(0);
+
+  setTimeout(() => setRerender(new Date().getTime()), 500);
 
   // Arena log controls
   const arenaLogCallback = useCallback((value: string): void => {
@@ -26,14 +36,24 @@ export default function LogsSettingsPanel(): JSX.Element {
     });
   }, [arenaLogCallback]);
 
+  const isReading = new Date().getTime() - lastLogUpdate < 1000;
+
+  const logFileExists = fs.existsSync(path);
+
   return (
     <>
+      <div className="log-status-text">
+        Status:{" "}
+        <div
+          title={isReading ? "Reading" : "Not reading"}
+          className={isReading ? "log-status-ok" : "log-status-err"}
+        />
+      </div>
       <div className="input-container" style={{ height: "40px" }}>
         <label className="label">Arena Log:</label>
         <div
           style={{
             display: "flex",
-            maxWidth: "80%",
             width: "-webkit-fill-available",
             justifyContent: "flex-end",
           }}
@@ -43,17 +63,23 @@ export default function LogsSettingsPanel(): JSX.Element {
             <input autoComplete="off" readOnly value={path} />
           </div>
         </div>
+        <div
+          title={logFileExists ? "File exists" : "File does not exist"}
+          className={logFileExists ? "log-status-ok" : "log-status-err"}
+          style={{ marginLeft: "16px" }}
+        />
       </div>
+
       <Button
         style={{
           margin: "16px auto",
         }}
         onClick={() => {
           postChannelMessage({
-            type: "START_LOG_READING",
+            type: isReading ? "STOP_LOG_READING" : "START_LOG_READING",
           });
         }}
-        text="Re-read log"
+        text={isReading ? "Stop reading log" : "Re-read log"}
       />
     </>
   );

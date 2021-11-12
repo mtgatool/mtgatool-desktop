@@ -7,10 +7,18 @@ import postChannelMessage from "./postChannelMessage";
 export default function backgroundChannelListeners() {
   const channel = bcConnect() as any;
 
+  let stopFn: undefined | (() => void);
+
   channel.onmessage = (msg: MessageEvent<ChannelMessage>) => {
-    if (msg.data.type == "START_LOG_READING") {
+    if (msg.data.type == "START_LOG_READING" && stopFn === undefined) {
       console.log("START LOG READING");
-      start();
+      stopFn = start();
+    }
+
+    if (msg.data.type == "STOP_LOG_READING" && stopFn !== undefined) {
+      console.log("STOP LOG READING");
+      stopFn();
+      stopFn = undefined;
     }
   };
 

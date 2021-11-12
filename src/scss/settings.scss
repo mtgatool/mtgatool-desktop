@@ -162,7 +162,7 @@
     text-align: center;
     border-radius: 4px;
     margin: 16px auto;
-    
+
     &:hover {
       background-color: var(--color-section-active);
     }
@@ -225,7 +225,6 @@ input#flat.color-picker {
   width: 100%;
 }
 
-
 .line-lighter {
   background-color: var(--color-mid-66);
 }
@@ -248,7 +247,7 @@ input#flat.color-picker {
 }
 
 .keycomb-desc {
-  font-family:  var(--main-font-name-it);
+  font-family: var(--main-font-name-it);
   font-size: 20px;
   border-bottom: solid var(--color-line-sep) 2px;
   color: var(--color-text);
@@ -279,7 +278,8 @@ input#flat.color-picker {
   background-image: url(../assets/images/logo_big.png);
 }
 
-.release-notes-link, .link {
+.release-notes-link,
+.link {
   cursor: pointer;
   text-decoration: underline;
   color: var(--color-text-link);
@@ -315,7 +315,6 @@ input#flat.color-picker {
   background-repeat: no-repeat;
 }
 
-
 .twitter-link {
   cursor: pointer;
   align-self: center;
@@ -349,7 +348,7 @@ input#flat.color-picker {
 .message-sub {
   font-size: 20px;
   opacity: 0.9;
-  font-family:  var(--main-font-name-it);
+  font-family: var(--main-font-name-it);
   text-align: center;
   margin-bottom: 6px;
 }
@@ -357,7 +356,7 @@ input#flat.color-picker {
 .message-sub-15 {
   font-size: 15px;
   opacity: 0.9;
-  font-family:  var(--main-font-name-it);
+  font-family: var(--main-font-name-it);
   text-align: center;
   margin-bottom: 6;
 }
@@ -365,8 +364,34 @@ input#flat.color-picker {
 .message-updates {
   font-size: 18px;
   opacity: 0.9;
-  font-family:  var(--main-font-name-it);
+  font-family: var(--main-font-name-it);
   text-align: center;
   margin-top: 6;
   margin-bottom: 6;
+}
+
+.log-status-text {
+  display: flex;
+  line-height: 48px;
+  height: 48px;
+}
+
+.log-status-ok {
+  margin: auto 4px;
+  min-width: 16px;
+  width: 16px;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url(../assets/images/status_green.png);
+}
+
+.log-status-err {
+  margin: auto 4px;
+  min-width: 16px;
+  width: 16px;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url(../assets/images/status_red.png);
 }
