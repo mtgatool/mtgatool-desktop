@@ -60,8 +60,8 @@ export default function aggregateStats(
     } else {
       stats.matchesWinrate.losses += 1;
     }
-    stats.gamesWinrate.wins += match.playerWins;
-    stats.gamesWinrate.losses += match.playerLosses;
+    // stats.gamesWinrate.wins += match.playerWins;
+    // stats.gamesWinrate.losses += match.playerLosses;
 
     const { playerDeck } = match.internalMatch;
 
