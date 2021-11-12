@@ -3,6 +3,8 @@
 import { useCallback, useState } from "react";
 import { format, fromUnixTime } from "date-fns";
 import { database } from "mtgatool-shared";
+
+import fs from "fs";
 import info from "../info.json";
 
 import { ReactComponent as Close } from "../assets/images/svg/close.svg";
@@ -55,6 +57,8 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
     });
   }, [arenaLogCallback]);
 
+  const logFileExists = fs.existsSync(path);
+
   return (
     <>
       <div className="close-button" onClick={onClose}>
@@ -78,6 +82,11 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
                 <input autoComplete="off" readOnly value={path} />
               </div>
             </div>
+            <div
+              title={logFileExists ? "File exists" : "File does not exist"}
+              className={logFileExists ? "log-status-ok" : "log-status-err"}
+              style={{ marginLeft: "16px" }}
+            />
           </div>
         )}
         <Toggle
