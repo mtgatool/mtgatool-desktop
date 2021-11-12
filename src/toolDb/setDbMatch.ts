@@ -54,12 +54,13 @@ export default async function setDbMatch(match: InternalMatch) {
     arg: newDoc.index,
   });
 
-  if (window.toolDb.user) {
+  const { loading } = store.getState().renderer;
+  if (window.toolDb.user && !loading) {
     // Put the CRDT change to the database, as changes from our root document
     window.toolDb
       .putCrdt(
         `matchesIndex`,
-        Automerge.getChanges(globalData.matchesIndex, newDoc),
+        Automerge.getChanges(Automerge.init(), newDoc),
         true
       )
       .catch(console.error);
