@@ -1,5 +1,6 @@
 import { sha1, textRandom } from "tool-db";
 import { defaultConfig } from "../common/defaultConfig";
+import { DEFAULT_PEERS } from "../constants";
 import defaultLogUri from "../utils/defaultLogUri";
 import isElectron from "../utils/electron/isElectron";
 
@@ -32,7 +33,7 @@ export const defaultSettings: Record<SettingKey, string> = {
   settings: JSON.stringify(defaultConfig),
   welcome: "false",
   lang: "en",
-  peers: JSON.stringify([]),
+  peers: JSON.stringify(DEFAULT_PEERS),
   css: isElectron() ? "high" : "web",
   clientId: sha1(`${textRandom(100)}-${new Date().getTime()}`),
 };

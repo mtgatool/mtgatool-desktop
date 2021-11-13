@@ -12,7 +12,7 @@ export default function logEntrySwitch(entry: LogEntry): void {
       console.warn(e);
     }
   }
-  console.log("logEntrySwitch", entry.arrow, entry.label, entry.json);
+  // console.log("logEntrySwitch", entry.arrow, entry.label, entry.json);
   switch (entry.label) {
     case "GreToClientEvent":
       Labels.GreToClient(entry);
