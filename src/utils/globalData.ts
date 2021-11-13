@@ -16,6 +16,7 @@ const globalData = {
   fetchedAvatars: [] as string[],
   matchesIndex: Automerge.init<{ index: string[] }>(),
   liveFeed: Automerge.init<Record<string, number>>(),
+  lastLogCheck: 0,
   idb,
 };
 

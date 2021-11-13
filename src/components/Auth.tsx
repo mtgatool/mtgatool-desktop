@@ -162,6 +162,10 @@ export default function Auth(props: AuthProps) {
                 type: "SET_LOADING",
                 arg: true,
               });
+              reduxAction(dispatch, {
+                type: "SET_READING_LOG",
+                arg: true,
+              });
             } else {
               reduxAction(dispatch, {
                 type: "SET_LOGIN_STATE",
@@ -203,6 +207,10 @@ export default function Auth(props: AuthProps) {
               });
               reduxAction(dispatch, {
                 type: "SET_LOADING",
+                arg: true,
+              });
+              reduxAction(dispatch, {
+                type: "SET_READING_LOG",
                 arg: true,
               });
             } else {

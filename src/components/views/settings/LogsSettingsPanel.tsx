@@ -1,19 +1,20 @@
 import { useCallback, useState } from "react";
-import { useSelector } from "react-redux";
 import fs from "fs";
 
+import { useDispatch } from "react-redux";
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
-import { AppState } from "../../../redux/stores/rendererStore";
 
 import getLocalSetting from "../../../utils/getLocalSetting";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import showOpenLogDialog from "../../../utils/showOpenLogDialog";
 import Button from "../../ui/Button";
+import globalData from "../../../utils/globalData";
+
+import reduxAction from "../../../redux/reduxAction";
 
 export default function LogsSettingsPanel(): JSX.Element {
-  const lastLogUpdate = useSelector(
-    (state: AppState) => state.renderer.lastLogCheck
-  );
+  const dispatch = useDispatch();
+  const lastLogUpdate = globalData.lastLogCheck;
   const [path, setPath] = useState(getLocalSetting("logPath"));
   const [_rerender, setRerender] = useState(0);
 
@@ -45,8 +46,8 @@ export default function LogsSettingsPanel(): JSX.Element {
       <div className="log-status-text">
         Status:{" "}
         <div
-          title={isReading ? "Reading" : "Not reading"}
-          className={isReading ? "log-status-ok" : "log-status-err"}
+          title={isReading ? `Reading` : "Not reading"}
+          className={isReading ? `log-status-ok` : "log-status-err"}
         />
       </div>
       <div className="input-container" style={{ height: "40px" }}>
@@ -77,6 +78,10 @@ export default function LogsSettingsPanel(): JSX.Element {
         onClick={() => {
           postChannelMessage({
             type: isReading ? "STOP_LOG_READING" : "START_LOG_READING",
+          });
+          reduxAction(dispatch, {
+            type: "SET_READING_LOG",
+            arg: true,
           });
         }}
         text={isReading ? "Stop reading log" : "Re-read log"}

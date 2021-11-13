@@ -386,6 +386,16 @@ input#flat.color-picker {
   background-image: url(../assets/images/status_green.png);
 }
 
+.log-status-warn {
+  margin: auto 4px;
+  min-width: 16px;
+  width: 16px;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url(../assets/images/status_yellow.png);
+}
+
 .log-status-err {
   margin: auto 4px;
   min-width: 16px;

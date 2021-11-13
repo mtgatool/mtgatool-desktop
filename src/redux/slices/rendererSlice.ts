@@ -46,7 +46,7 @@ export const initialRendererState = {
   showPostSignup: null as null | string,
   currentDraft: null as InternalDraftv2 | null,
   currentScene: "",
-  lastLogCheck: 0,
+  readingLog: false,
 };
 
 type RendererState = typeof initialRendererState;
@@ -58,11 +58,11 @@ const rendererSlice = createSlice({
     setPeers: (state: RendererState, action: PayloadAction<Peer[]>): void => {
       state.peers = action.payload;
     },
-    setlastLogCheck: (
+    setReadingLog: (
       state: RendererState,
-      action: PayloadAction<number>
+      action: PayloadAction<boolean>
     ): void => {
-      state.lastLogCheck = action.payload;
+      state.readingLog = action.payload;
     },
     showPostSignup: (
       state: RendererState,
@@ -186,7 +186,7 @@ const rendererSlice = createSlice({
 
 export const {
   setPeers,
-  setlastLogCheck,
+  setReadingLog,
   showPostSignup,
   setLoginState,
   setLogCompletion,

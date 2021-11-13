@@ -13,6 +13,7 @@ import bcConnect from "../utils/bcConnect";
 import switchPlayerUUID from "../utils/switchPlayerUUID";
 import { ChannelMessage } from "./channelMessages";
 import setLocalSetting from "../utils/setLocalSetting";
+import globalData from "../utils/globalData";
 
 export default function mainChannelListeners() {
   const channel = bcConnect() as any;
@@ -66,6 +67,10 @@ export default function mainChannelListeners() {
           type: "SET_LOADING",
           arg: false,
         });
+        reduxAction(store.dispatch, {
+          type: "SET_READING_LOG",
+          arg: false,
+        });
       }
     }
 
@@ -74,10 +79,7 @@ export default function mainChannelListeners() {
     }
 
     if (msg.data.type === "LOG_CHECK") {
-      reduxAction(store.dispatch, {
-        type: "SET_LAST_LOG_CHECK",
-        arg: new Date().getTime(),
-      });
+      globalData.lastLogCheck = new Date().getTime();
     }
 
     if (msg.data.type === "GAME_START") {
