@@ -16,6 +16,7 @@ import setLocalSetting from "../utils/setLocalSetting";
 import getLocalSetting from "../utils/getLocalSetting";
 import openExternal from "../utils/openExternal";
 import isElectron from "../utils/electron/isElectron";
+import ActivePeers from "./ActivePeers";
 
 function clickBetaChannel(value: boolean): void {
   setLocalSetting("betaChannel", value ? "true" : "false");
@@ -129,6 +130,7 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
           >
             Check for Updates
           </button>
+          <ActivePeers />
         </div>
       </div>
     </>
