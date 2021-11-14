@@ -46,6 +46,14 @@ export default function logEntrySwitch(entry: LogEntry): void {
       }
       break;
 
+    case "Event_PlayerDraftMakePick":
+      if (entry.arrow == "==>") {
+        Labels.OutPlayerDraftMakePick(entry);
+      } else if (entry.arrow == "<==") {
+        Labels.InPlayerDraftMakePick(entry);
+      }
+      break;
+
     case "Client.SceneChange":
       Labels.onClientSceneChange(entry);
       break;
@@ -151,6 +159,12 @@ export default function logEntrySwitch(entry: LogEntry): void {
     case "Event.CompleteDraft":
       if (entry.arrow == "<==") {
         Labels.InEventCompleteDraft(entry);
+      }
+      break;
+
+    case "Draft_CompleteDraft":
+      if (entry.arrow == "<==") {
+        Labels.InDraftCompleteDraft(entry);
       }
       break;
 

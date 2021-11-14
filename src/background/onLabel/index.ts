@@ -22,6 +22,7 @@ export { default as outBotDraftDraftStatus } from "./outBotDraftDraftStatus";
 export { default as InDraftMakePick } from "./InDraftMakePick";
 export { default as OutDraftMakePick } from "./OutDraftMakePick";
 export { default as InEventCompleteDraft } from "./InEventCompleteDraft";
+export { default as InDraftCompleteDraft } from "./InDraftCompleteDraft";
 export { default as InEventGetActiveEventsV2 } from "./InEventGetActiveEventsV2";
 export { default as InEventGetActiveEventsV3 } from "./InEventGetActiveEventsV3";
 export { default as MatchGameRoomStateChangedEvent } from "./MatchGameRoomStateChangedEvent";
@@ -31,6 +32,8 @@ export { default as GetPlayerInventoryGetFormats } from "./GetPlayerInventoryGet
 export { default as InDraftNotify } from "./InDraftNotify";
 export { default as InMakeHumanDraftPick } from "./InMakeHumanDraftPick";
 export { default as outMakeHumanDraftPick } from "./OutMakeHumanDraftPick";
+export { default as InPlayerDraftMakePick } from "./InPlayerDraftMakePick";
+export { default as OutPlayerDraftMakePick } from "./OutPlayerDraftMakePick";
 export { default as onClientSceneChange } from "./onClientSceneChange";
 export { default as InEventJoinPodMaking } from "./InEventJoinPodMaking";
 export { default as onAuthenticateResponse } from "./onAuthenticateResponse";

@@ -1,6 +1,6 @@
 import getCssQuality from "../../../utils/getCssQuality";
 
-export default function ViewHome() {
+export default function ViewWip() {
   return (
     <>
       <div
