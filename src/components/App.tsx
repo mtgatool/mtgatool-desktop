@@ -34,16 +34,13 @@ import login from "../toolDb/login";
 import Welcome from "./Welcome";
 // import liveDraftVerification from "../toolDb/liveDraftVerification";
 import { DEFAULT_SERVERS } from "../constants";
-import { Peer } from "../redux/slices/rendererSlice";
+
 import Popups from "./Popups";
+import peerToUrl from "../utils/peerToUrl";
 
 export interface AppProps {
   forceOs?: string;
 }
-
-const knownHosts: Record<string, string> = {
-  "66.97.46.144": "api.mtgatool.com",
-};
 
 function App(props: AppProps) {
   const { forceOs } = props;
@@ -60,14 +57,7 @@ function App(props: AppProps) {
     if (!window.toolDbInitialized) {
       const storedPeers = JSON.parse(getLocalSetting("peers"));
       const mergedPeers = isElectron()
-        ? storedPeers
-            .map((p: Peer) => {
-              const host = knownHosts[p.host] ?? p.host;
-              return p.port === 443
-                ? `https://${host}`
-                : `http://${host}:${p.port}`;
-            })
-            .filter((p: string) => p)
+        ? storedPeers.map(peerToUrl).filter((p: string) => p)
         : DEFAULT_SERVERS;
 
       console.log("Merged Peers: ", mergedPeers);

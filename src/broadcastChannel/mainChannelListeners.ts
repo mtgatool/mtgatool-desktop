@@ -1,6 +1,7 @@
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 
 import { InternalDraftv2 } from "mtgatool-shared";
+import _ from "lodash";
 import { overlayTitleToId } from "../common/maps";
 import setDbMatch from "../toolDb/setDbMatch";
 import upsertDbCards from "../toolDb/upsertDbCards";
@@ -14,6 +15,7 @@ import switchPlayerUUID from "../utils/switchPlayerUUID";
 import { ChannelMessage } from "./channelMessages";
 import setLocalSetting from "../utils/setLocalSetting";
 import globalData from "../utils/globalData";
+import getLocalSetting from "../utils/getLocalSetting";
 
 export default function mainChannelListeners() {
   const channel = bcConnect() as any;
@@ -24,11 +26,14 @@ export default function mainChannelListeners() {
     // console.log(msg.data.type);
 
     if (msg.data.type === "DATABASE_PEERS") {
-      setLocalSetting("peers", JSON.stringify(msg.data.peers));
-      console.log("Peers: ", msg.data.peers);
+      const oldPeers = JSON.parse(getLocalSetting("peers"));
+      const newPeers = _.uniqWith([...oldPeers, ...msg.data.peers], _.isEqual);
+
+      setLocalSetting("peers", JSON.stringify(newPeers));
+      console.log("Peers: ", newPeers);
       reduxAction(store.dispatch, {
         type: "SET_PEERS",
-        arg: msg.data.peers,
+        arg: newPeers,
       });
     }
 

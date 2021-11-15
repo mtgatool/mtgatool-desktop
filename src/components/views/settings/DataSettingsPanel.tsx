@@ -79,10 +79,6 @@ export default function DataSettingsPanel(): JSX.Element {
 
           const newDoc = Automerge.change(globalData.matchesIndex, (doc) => {
             migrateIds.forEach((id) => {
-              if (!doc.index) {
-                // eslint-disable-next-line no-param-reassign
-                doc.index = [];
-              }
               if (!doc.index.includes(id)) {
                 doc.index.push(id);
               }

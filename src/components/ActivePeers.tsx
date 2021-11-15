@@ -40,8 +40,9 @@ export default function ActivePeers() {
                 height: "16px",
                 lineHeight: "16px",
                 margin: "0 auto",
-                maxWidth: "240px",
+                maxWidth: "400px",
                 width: "100%",
+                marginTop: "4px",
               }}
             >
               <div
@@ -49,7 +50,7 @@ export default function ActivePeers() {
                   connections[url].peer.readyState === 1 ? "ok" : "warn"
                 }`}
               />
-              <div style={{ marginLeft: "auto" }}>{url}</div>
+              <div style={{ margin: "auto" }}>{url}</div>
             </div>
           );
         })}
