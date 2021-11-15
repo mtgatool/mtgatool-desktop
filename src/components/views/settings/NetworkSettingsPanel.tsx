@@ -37,7 +37,9 @@ export default function NetworkSettingsPanel(): JSX.Element {
     const slicedPeers = [...peers];
     slicedPeers.splice(index, 1);
     const url = peerToUrl(peers[index]);
-    window.toolDb.websockets.close(url);
+    if (connections[url]) {
+      window.toolDb.websockets.close(url);
+    }
     setLocalSetting("peers", JSON.stringify(slicedPeers));
   };
 
@@ -62,7 +64,9 @@ export default function NetworkSettingsPanel(): JSX.Element {
 
   const disconnectPeer = (index: number) => {
     const url = peerToUrl(peers[index]);
-    window.toolDb.websockets.close(url);
+    if (connections[url]) {
+      window.toolDb.websockets.close(url);
+    }
   };
 
   return (
