@@ -32,4 +32,5 @@ jobs:
         username: ${{ secrets.username }}
         password: ${{ secrets.password }}
         local-dir: ./build/
+        dangerous-clean-slate: true
         server-dir: /var/www/mtgatool-app/
