@@ -3,6 +3,8 @@ name: Deploy website
 on:
   push:
     tags: 'v*'
+    branches:
+      - "dev"
 
 jobs:
   web-deploy:
