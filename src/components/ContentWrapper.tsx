@@ -66,9 +66,7 @@ const ContentWrapper = () => {
   useEffect(() => {
     if (params.page === "decks") {
       const promises = matchesIndex.map((id) => {
-        return getLocalDbValue<DbMatch>(
-          window.toolDb.getUserNamespacedKey(`matches-${id}`)
-        );
+        return getLocalDbValue<DbMatch>(id);
       });
 
       Promise.all(promises).then((matches: any) => {
