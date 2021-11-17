@@ -119,11 +119,11 @@ export default function NetworkSettingsPanel(): JSX.Element {
       })}
       <div style={{ marginTop: "24px" }}>
         <p>
-          You can add a custom peer URL here. Usually new peers will be acquired
-          automaticaly via DHT, but in rare exceptions you might want to deploy
-          your own server peers or conenct to a different URL.
+          You can add a custom server peer host here. Usually servers will be
+          acquired automaticaly via DHT, but you might want to deploy your own
+          servers or conenct to a different swarm.
         </p>
-        <p>You can use port 443 to upgrade connections to HTTPS.</p>
+        <p>Use port 443 to upgrade connections to HTTPS.</p>
       </div>
       <div>
         <div
