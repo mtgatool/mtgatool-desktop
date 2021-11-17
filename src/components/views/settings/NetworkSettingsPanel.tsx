@@ -19,7 +19,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
 
   const handleSetHost = useCallback(
     (event: ChangeEvent<HTMLInputElement>): void => {
-      setNewHost(event.target.value);
+      setNewHost(event.target.value.replace(/(^\w+:|^)\/\/|\//g, ""));
     },
     []
   );
