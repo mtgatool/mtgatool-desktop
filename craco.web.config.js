@@ -1,6 +1,6 @@
 const ModuleReplacement = require("./module-resolver-file");
 
-process.env.PORT = 3006;
+process.env.PORT = 4000;
 
 // https://www.npmjs.com/package/@craco/craco
 module.exports = {

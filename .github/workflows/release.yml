@@ -3,6 +3,8 @@ name: "Release"
 on:
   push:
     tags: 'v*'
+    branches:
+      - "dev"
 
 jobs:
   build-job:
