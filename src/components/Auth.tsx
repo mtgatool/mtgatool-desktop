@@ -362,7 +362,7 @@ export default function Auth(props: AuthProps) {
             width: "600px",
           }}
         >
-          Due to an api protocol and sotrage upgrade in v6.1.0 all users will
+          Due to an api protocol and storage upgrade in v6.1.0 all users will
           have to sign up again, sorry for the inconvenience! -Manwë
         </div>
       </div>
