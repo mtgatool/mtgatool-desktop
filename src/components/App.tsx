@@ -63,10 +63,6 @@ function App(props: AppProps) {
       console.log("Merged Peers: ", mergedPeers);
       window.toolDb = new ToolDb({ peers: mergedPeers, debug: true });
       window.toolDbInitialized = true;
-      // window.toolDb.addCustomVerification(
-      //   "live-draft-v1-",
-      //   liveDraftVerification
-      // );
     }
   }, []);
 

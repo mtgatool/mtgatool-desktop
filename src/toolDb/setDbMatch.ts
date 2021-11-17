@@ -1,7 +1,6 @@
 /* eslint-disable no-param-reassign */
 import _ from "lodash";
 import { Deck, InternalMatch } from "mtgatool-shared";
-import Automerge from "automerge";
 
 import { DbMatch } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
@@ -34,36 +33,18 @@ export default async function setDbMatch(match: InternalMatch) {
 
   // Put this match
   window.toolDb.putData<DbMatch>(`matches-${match.id}`, newDbMatch, true);
-  pushToLiveFeed(
-    window.toolDb.getUserNamespacedKey(`matches-${match.id}`),
-    newDbMatch
-  );
+
+  const remoteKey = window.toolDb.getUserNamespacedKey(`matches-${match.id}`);
+
+  pushToLiveFeed(remoteKey, newDbMatch);
 
   // Create CRDT document with the new match added to it
-  const newDoc = Automerge.change(globalData.matchesIndex, (doc) => {
-    if (!doc.index) {
-      doc.index = [];
-    }
-    if (!doc.index.includes(match.id)) {
-      doc.index.push(match.id);
-    }
-  });
+  if (!globalData.matchesIndex.includes(remoteKey)) {
+    globalData.matchesIndex.push(remoteKey);
+  }
 
   reduxAction(store.dispatch, {
     type: "SET_MATCHES_INDEX",
-    arg: newDoc.index,
+    arg: globalData.matchesIndex,
   });
-
-  const { loading } = store.getState().renderer;
-  if (window.toolDb.user && !loading) {
-    // Put the CRDT change to the database, as changes from our root document
-    window.toolDb
-      .putCrdt(
-        `matchesIndex`,
-        Automerge.getChanges(Automerge.init(), newDoc),
-        true
-      )
-      .catch(console.error);
-  }
-  globalData.matchesIndex = newDoc;
 }

@@ -44,9 +44,7 @@ export default function getMatchesData(
   matchesIds: string[]
 ): Promise<MatchData[]> {
   const promises = matchesIds.map((id) => {
-    return getLocalDbValue<DbMatch>(
-      window.toolDb.getUserNamespacedKey(`matches-${id}`)
-    );
+    return getLocalDbValue<DbMatch>(id);
   });
 
   return Promise.all(promises).then((matches) =>

@@ -2,7 +2,7 @@ import _ from "lodash";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import Automerge from "automerge";
+
 import reduxAction from "../../../redux/reduxAction";
 
 import { DbMatch } from "../../../types/dbTypes";
@@ -77,25 +77,11 @@ export default function DataSettingsPanel(): JSX.Element {
 
           const migrateIds = data.map((m) => m.matchId);
 
-          const newDoc = Automerge.change(globalData.matchesIndex, (doc) => {
-            migrateIds.forEach((id) => {
-              if (!doc.index.includes(id)) {
-                doc.index.push(id);
-              }
-            });
+          migrateIds.forEach((id) => {
+            if (!globalData.matchesIndex.includes(id)) {
+              globalData.matchesIndex.push(id);
+            }
           });
-
-          if (window.toolDb.user) {
-            // Put the CRDT change to the database, as changes from our root document
-            window.toolDb
-              .putCrdt(
-                "matchesIndex",
-                Automerge.getChanges(globalData.matchesIndex, newDoc),
-                true
-              )
-              .catch(console.error);
-          }
-          globalData.matchesIndex = newDoc;
         });
       });
 

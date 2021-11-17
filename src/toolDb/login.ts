@@ -1,43 +1,30 @@
 import { base64ToBinaryDocument, CrdtMessage, PutMessage } from "tool-db";
 import Automerge from "automerge";
+import _ from "lodash";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import { DbCardsData, DbInventoryData, DbRankData } from "../types/dbTypes";
 import globalData from "../utils/globalData";
 
-function handleMatchesIndex(msg: CrdtMessage | PutMessage<any>) {
-  if (msg && msg.type === "crdt") {
-    // console.log("Key Listener matchesIndex ", msg);
-    if (globalData.matchesIndex) {
-      const doc = Automerge.load<{ index: string[] }>(
-        base64ToBinaryDocument(msg.doc)
-      );
+function handleMatchesIndex(matchesIndex: string[] | null) {
+  globalData.matchesIndex = _.uniq([
+    ...globalData.matchesIndex,
+    ...(matchesIndex || []),
+  ]);
 
-      try {
-        globalData.matchesIndex = Automerge.merge(globalData.matchesIndex, doc);
-      } catch (e) {
-        console.warn(e);
+  // Fetch any match we dont have locally
+  globalData.matchesIndex.forEach((id: string) => {
+    window.toolDb.store.get(id, (err, data) => {
+      if (!data) {
+        window.toolDb.getData(id, false, 2000);
       }
+    });
+  });
 
-      reduxAction(store.dispatch, {
-        type: "SET_MATCHES_INDEX",
-        arg: globalData.matchesIndex.index,
-      });
-
-      // Fetch any match we dont have locally
-      globalData.matchesIndex.index.forEach((id: string) => {
-        window.toolDb.store.get(
-          window.toolDb.getUserNamespacedKey(`matches-${id}`),
-          (err, data) => {
-            if (!data) {
-              window.toolDb.getData(`matches-${id}`, true, 2000);
-            }
-          }
-        );
-      });
-      // console.log("matchesIndex", globalData.matchesIndex.index);
-    }
-  }
+  reduxAction(store.dispatch, {
+    type: "SET_MATCHES_INDEX",
+    arg: globalData.matchesIndex,
+  });
 }
 
 function handleLiveFeed(msg: CrdtMessage | PutMessage<any>) {
@@ -93,10 +80,11 @@ export function afterLogin() {
   const { dispatch } = store;
   const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
 
-  window.toolDb.addKeyListener(
-    window.toolDb.getUserNamespacedKey("matchesIndex"),
-    handleMatchesIndex
-  );
+  if (window.toolDb.user) {
+    window.toolDb
+      .queryKeys(`:${window.toolDb.user.pubKey}.matches-`)
+      .then(handleMatchesIndex);
+  }
 
   window.toolDb.addKeyListener(
     `matches-livefeed-${currentDay}`,

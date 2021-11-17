@@ -14,7 +14,7 @@ const globalData = {
   mouseX: 0,
   mouseY: 0,
   fetchedAvatars: [] as string[],
-  matchesIndex: Automerge.init<{ index: string[] }>(),
+  matchesIndex: [] as string[],
   liveFeed: Automerge.init<Record<string, number>>(),
   lastLogCheck: 0,
   idb,
