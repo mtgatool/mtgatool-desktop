@@ -96,6 +96,16 @@ export function afterLogin() {
 
   window.toolDb.subscribeData(`matches-livefeed-${currentDay}`);
 
+  window.toolDb.getData<string[]>("hiddenDecks", true, 5000).then((hidden) => {
+    if (hidden) {
+      globalData.hiddenDecks = hidden;
+      reduxAction(store.dispatch, {
+        type: "SET_HIDDEN_DECKS",
+        arg: hidden,
+      });
+    }
+  });
+
   window.toolDb
     .getData("userids", true, 5000)
     .then((data) => {

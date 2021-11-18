@@ -18,13 +18,14 @@ import SortControls, { Sort } from "../../SortControls";
 import getCssQuality from "../../../utils/getCssQuality";
 import useDebounce from "../../../hooks/useDebounce";
 import InputContainer from "../../InputContainer";
-import reduxAction from "../../../redux/reduxAction";
+
 import globalData from "../../../utils/globalData";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import Flex from "../../Flex";
 import Toggle from "../../ui/Toggle";
 import unsetFilter from "../../../utils/tables/filters/unsetFilter";
 import setLocalSetting from "../../../utils/setLocalSetting";
+import setDbHiddenDecks from "../../../toolDb/setDbHiddenDecks";
 
 export default function DecksList() {
   const dispatch = useDispatch();
@@ -197,11 +198,7 @@ export default function DecksList() {
     (id: string) => {
       const newList = [...hiddenDecks];
       newList.push(id);
-      reduxAction(dispatch, {
-        type: "SET_HIDDEN_DECKS",
-        arg: newList,
-      });
-      globalData.hiddenDecks = newList;
+      setDbHiddenDecks(newList);
     },
     [showHidden, dispatch]
   );
@@ -213,11 +210,7 @@ export default function DecksList() {
       if (pos !== -1) {
         newList.splice(pos, 1);
       }
-      reduxAction(dispatch, {
-        type: "SET_HIDDEN_DECKS",
-        arg: newList,
-      });
-      globalData.hiddenDecks = newList;
+      setDbHiddenDecks(newList);
     },
     [showHidden, dispatch]
   );
