@@ -18,6 +18,7 @@ export const settingKeys = [
   "peers",
   "css",
   "clientId",
+  "showHiddenDecks",
 ] as const;
 
 export type SettingKey = typeof settingKeys[number];
@@ -36,4 +37,5 @@ export const defaultSettings: Record<SettingKey, string> = {
   peers: JSON.stringify(DEFAULT_PEERS),
   css: isElectron() ? "high" : "web",
   clientId: sha1(`${textRandom(100)}-${new Date().getTime()}`),
+  showHiddenDecks: "false",
 };

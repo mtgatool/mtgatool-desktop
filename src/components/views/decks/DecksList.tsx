@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-bitwise */
 import { ChangeEvent, Fragment, useCallback, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import usePagingControls from "../../../hooks/usePagingControls";
@@ -18,12 +18,28 @@ import SortControls, { Sort } from "../../SortControls";
 import getCssQuality from "../../../utils/getCssQuality";
 import useDebounce from "../../../hooks/useDebounce";
 import InputContainer from "../../InputContainer";
+import reduxAction from "../../../redux/reduxAction";
+import globalData from "../../../utils/globalData";
+import getLocalSetting from "../../../utils/getLocalSetting";
+import Flex from "../../Flex";
+import Toggle from "../../ui/Toggle";
+import unsetFilter from "../../../utils/tables/filters/unsetFilter";
+import setLocalSetting from "../../../utils/setLocalSetting";
 
 export default function DecksList() {
+  const dispatch = useDispatch();
   const history = useHistory();
   const [colorFilterState, setColorFilterState] = useState(31);
   const [deckNameFilterState, setDeckNameFilterState] = useState("");
   const fullStats = useSelector((state: AppState) => state.mainData.fullStats);
+  const hiddenDecks = useSelector(
+    (state: AppState) => state.mainData.hiddenDecks
+  );
+
+  const [showHidden, setShowHidden] = useState(
+    getLocalSetting("showHiddenDecks")
+  );
+
   const currentUUID = useSelector(
     (state: AppState) => state.mainData.currentUUID
   );
@@ -115,8 +131,20 @@ export default function DecksList() {
         };
       });
 
-    return doDecksFilter(decksForFiltering, filters, sortValue);
-  }, [fullStats, filters, sortValue]);
+    let newFilters = unsetFilter(filters, "inarraystring");
+    if (showHidden !== "true") {
+      newFilters = setFilter(filters, {
+        type: "inarraystring",
+        id: "id",
+        value: {
+          value: [...hiddenDecks],
+          not: false,
+        },
+      });
+    }
+
+    return doDecksFilter(decksForFiltering, newFilters, sortValue);
+  }, [fullStats, showHidden, hiddenDecks, filters, sortValue]);
 
   const pagingControlProps = usePagingControls(filteredData.length, 25);
 
@@ -165,20 +193,65 @@ export default function DecksList() {
     [deckNameDebouncer, filters]
   );
 
+  const hideDeck = useCallback(
+    (id: string) => {
+      const newList = [...hiddenDecks];
+      newList.push(id);
+      reduxAction(dispatch, {
+        type: "SET_HIDDEN_DECKS",
+        arg: newList,
+      });
+      globalData.hiddenDecks = newList;
+    },
+    [showHidden, dispatch]
+  );
+
+  const unhideDeck = useCallback(
+    (id: string) => {
+      const newList = [...hiddenDecks];
+      const pos = newList.indexOf(id);
+      if (pos !== -1) {
+        newList.splice(pos, 1);
+      }
+      reduxAction(dispatch, {
+        type: "SET_HIDDEN_DECKS",
+        arg: newList,
+      });
+      globalData.hiddenDecks = newList;
+    },
+    [showHidden, dispatch]
+  );
+
   return (
     <>
       <div
         className={`section ${getCssQuality()}`}
-        style={{ marginBottom: "0px" }}
+        style={{ marginBottom: "0px", flexDirection: "column" }}
       >
-        <InputContainer>
-          <input
-            value={deckNameFilterState}
-            placeholder="Search by name"
-            onChange={onDeckNameFilterChange}
+        <Flex style={{ width: "100%" }}>
+          <InputContainer>
+            <input
+              value={deckNameFilterState}
+              placeholder="Search by name"
+              onChange={onDeckNameFilterChange}
+            />
+          </InputContainer>
+          <ManaFilter
+            initialState={colorFilterState}
+            callback={setColorFilter}
           />
-        </InputContainer>
-        <ManaFilter initialState={colorFilterState} callback={setColorFilter} />
+        </Flex>
+        <Flex>
+          <Toggle
+            style={{ maxWidth: "180px" }}
+            text="Show hidden"
+            value={showHidden === "true"}
+            callback={(val: boolean): void => {
+              setLocalSetting("showHiddenDecks", val ? "true" : "false");
+              setShowHidden(val ? "true" : "false");
+            }}
+          />
+        </Flex>
       </div>
       <div
         className={`section ${getCssQuality()}`}
@@ -208,6 +281,9 @@ export default function DecksList() {
                 return (
                   <DecksArtViewRow
                     clickDeck={openDeck}
+                    hidden={globalData.hiddenDecks.includes(deck?.id)}
+                    unhide={unhideDeck}
+                    hide={hideDeck}
                     key={deck.id}
                     deck={fullDeck}
                   />

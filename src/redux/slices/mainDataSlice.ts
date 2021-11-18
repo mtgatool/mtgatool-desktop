@@ -31,6 +31,7 @@ const mainState = {
   liveFeed: [] as string[],
   liveFeedMatches: {} as Record<string, DbMatch>,
   matchesIndex: [] as string[],
+  hiddenDecks: [] as string[],
   decksIndex: {} as Record<string, number>,
   fullStats: null as AggregatedStats | null,
   historyStats: null as AggregatedStats | null,
@@ -136,6 +137,12 @@ const mainDataSlice = createSlice({
     ): void => {
       state.matchesIndex = _.uniq([...state.matchesIndex, ...action.payload]);
     },
+    setHiddenDecks: (
+      state: MainState,
+      action: PayloadAction<string[]>
+    ): void => {
+      state.hiddenDecks = action.payload;
+    },
   },
 });
 
@@ -152,6 +159,7 @@ export const {
   setUUIDCards,
   setDecksIndex,
   setMatchesIndex,
+  setHiddenDecks,
 } = mainDataSlice.actions;
 
 export default mainDataSlice;

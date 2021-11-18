@@ -2,10 +2,11 @@ import {
   ArrayFilter,
   ColorBitsFilter,
   BitsFilter,
-  InBoolFilter,
   MinMaxFilter,
   RarityBitsFilter,
   StringFilter,
+  InBoolFilter,
+  InArrayStringFilter,
 } from "./filterTypes";
 import { FilterKeys } from "./utility";
 
@@ -19,7 +20,8 @@ export type filterType =
   | "array"
   | "set"
   | "minmax"
-  | "inbool";
+  | "inbool"
+  | "inarraystring";
 
 export type FilterTypeBase = {
   type: filterType;
@@ -85,6 +87,12 @@ export interface InBoolFilterType<D> extends FilterTypeBase {
   value: InBoolFilter;
 }
 
+export interface InArrayStringFilterType<D> extends FilterTypeBase {
+  type: "inarraystring";
+  id: FilterKeys<D, string>;
+  value: InArrayStringFilter;
+}
+
 export type AllFilterFunctions =
   | StringFilter
   | ColorBitsFilter
@@ -92,7 +100,8 @@ export type AllFilterFunctions =
   | BitsFilter
   | ArrayFilter
   | MinMaxFilter
-  | InBoolFilter;
+  | InBoolFilter
+  | InArrayStringFilter;
 
 export type AllFilters<D> =
   | StringFilterType<D>
@@ -104,6 +113,7 @@ export type AllFilters<D> =
   | ArrayFilterType<D>
   | SetFilterType<D>
   | MinMaxFilterType<D>
-  | InBoolFilterType<D>;
+  | InBoolFilterType<D>
+  | InArrayStringFilterType<D>;
 
 export type Filters<D> = AllFilters<D>[];

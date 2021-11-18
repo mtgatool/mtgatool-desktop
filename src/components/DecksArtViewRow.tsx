@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 
 import ManaCost from "./ManaCost";
 
+import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
+import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
+
 import WildcardsCost from "./WildcardsCost";
 import DeckColorsBar from "./DeckColorsBar";
 import getDeckMissing from "../utils/getDeckMissing";
@@ -19,6 +22,9 @@ import { normalApproximationInterval } from "../utils/statsFns";
 export interface DecksArtViewRowProps {
   clickDeck: (deck: StatsDeck) => void;
   deck: StatsDeck;
+  hidden: boolean;
+  unhide: (id: string) => void;
+  hide: (id: string) => void;
 }
 
 function isCached(src: string) {
@@ -30,7 +36,7 @@ function isCached(src: string) {
 export default function DecksArtViewRow(
   props: DecksArtViewRowProps
 ): JSX.Element {
-  const { clickDeck, deck } = props;
+  const { clickDeck, deck, hidden, unhide, hide } = props;
   const imageUrl = getCardArtCrop(deck.deckTileId);
   const [cardUrl, setCardUrl] = useState<string | undefined>(
     isCached(imageUrl) ? imageUrl : undefined
@@ -79,6 +85,8 @@ export default function DecksArtViewRow(
     };
   }, [deck]);
 
+  const clickHide = hidden ? unhide : hide;
+
   return (
     <div
       className="decks-table-deck-tile"
@@ -88,6 +96,16 @@ export default function DecksArtViewRow(
       }}
     >
       <DeckColorsBar deck={deckObj} />
+      <div
+        className="archive-icon-container"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          clickHide(deckObj.id);
+        }}
+      >
+        {hidden ? <ShowIcon /> : <HideIcon />}
+      </div>
       <div className="decks-table-deck-inner">
         <div className="decks-table-deck-item">
           {getPreconDeckName(deck.name)}
