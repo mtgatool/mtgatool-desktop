@@ -1,8 +1,9 @@
-import { sha1, textRandom } from "tool-db";
+import { sha1 } from "mtgatool-shared";
 import { defaultConfig } from "../common/defaultConfig";
 import { DEFAULT_PEERS } from "../constants";
 import defaultLogUri from "../utils/defaultLogUri";
 import isElectron from "../utils/electron/isElectron";
+import textRandom from "../utils/textRandom";
 
 export const settingKeys = [
   "autoLogin",

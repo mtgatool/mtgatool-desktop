@@ -11,10 +11,12 @@ function handleMatchesIndex(matchesIndex: string[] | null) {
     ...globalData.matchesIndex,
     ...(matchesIndex || []),
   ]);
+  console.log("handleMatchesIndex", globalData.matchesIndex);
 
   // Fetch any match we dont have locally
   globalData.matchesIndex.forEach((id: string) => {
     window.toolDb.store.get(id, (err, data) => {
+      console.log(`Do we have ${id}`, !!data);
       if (!data) {
         window.toolDb.getData(id, false, 2000);
       }

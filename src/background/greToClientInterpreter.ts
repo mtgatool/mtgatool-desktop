@@ -1041,16 +1041,19 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
 
 const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
   const { currentMatch } = globalStore;
-  if (
-    msg.msgId &&
-    (!currentMatch.msgId || msg.msgId === 1 || msg.msgId < currentMatch.msgId)
-  ) {
-    // New game, reset per-game fields.
-    resetCurrentGame();
-    setGameBeginTime(globalStore.currentMatch.logTime);
-  }
+
   if (msg.msgId) {
     setCurrentMatchMany({ msgId: msg.msgId });
+
+    if (
+      !currentMatch.msgId ||
+      msg.msgId === 1 ||
+      msg.msgId < currentMatch.msgId
+    ) {
+      // New game, reset per-game fields.
+      resetCurrentGame();
+      setGameBeginTime(globalStore.currentMatch.logTime);
+    }
   }
 
   const gameState = msg.gameStateMessage;
@@ -1099,7 +1102,6 @@ const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
 
   processAnnotations();
   checkForStartingLibrary(gameState);
-
   forceDeckUpdate();
   updateDeck();
 };

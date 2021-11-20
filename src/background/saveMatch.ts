@@ -82,7 +82,7 @@ function generateInternalMatch(): InternalMatch {
     duration,
     gameStats: currentMatch.matchGameStats,
     toolVersion: getToolVersion(),
-    toolRunFromSource: !electron.remote.app.isPackaged,
+    toolRunFromSource: !electron.remote?.app.isPackaged,
     arenaId: currentMatch.player.name,
     playerDeckHash: globalStore.currentMatch.originalDeck.getHash(),
     actionLog: globalStore.currentActionLog,
@@ -103,13 +103,13 @@ function generateInternalMatch(): InternalMatch {
   return newMatch;
 }
 
-export default function saveMatch(id: string): void {
-  const { currentMatch } = globalStore;
-  console.log(id, currentMatch);
+export default function saveMatch(_id: string): void {
+  // const { currentMatch } = globalStore;
+  // console.log(id, currentMatch);
 
   const match = generateInternalMatch();
 
-  console.log(`Save match: `, match);
+  // console.log(`Save match: `, match);
 
   // const gameNumberCompleted = currentMatch.gameInfo.results.filter(
   //   (res) => res.scope == "MatchScope_Game"

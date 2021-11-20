@@ -1,16 +1,15 @@
-import { objectClone } from "mtgatool-shared";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import forceDeckUpdate from "./forceDeckUpdate";
 import getOpponentDeck from "./getOpponentDeck";
 import globalStore from "./store";
-import { MatchState, OverlayUpdateMatchState } from "./store/types";
+import { OverlayUpdateMatchState } from "./store/types";
 
 function updateDeck(): void {
   forceDeckUpdate();
   const { currentMatch } = globalStore;
 
   const currentMatchCopy: OverlayUpdateMatchState = {
-    ...objectClone<MatchState>(currentMatch),
+    ...currentMatch,
     oppCards: getOpponentDeck(),
     playerCardsLeft: currentMatch.cardsLeft.getSave(),
     playerCardsOdds: currentMatch.cardsOdds,

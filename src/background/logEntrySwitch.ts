@@ -3,6 +3,7 @@ import * as Labels from "./onLabel";
 
 // eslint-disable-next-line complexity
 export default function logEntrySwitch(entry: LogEntry): void {
+  // console.log("logEntrySwitch", entry.arrow, entry.label, entry.json);
   if (typeof entry.json.Payload === "string") {
     try {
       const newJson = JSON.parse(entry.json.Payload);
@@ -12,7 +13,7 @@ export default function logEntrySwitch(entry: LogEntry): void {
       console.warn(e);
     }
   }
-  // console.log("logEntrySwitch", entry.arrow, entry.label, entry.json);
+
   switch (entry.label) {
     case "GreToClientEvent":
       Labels.GreToClient(entry);

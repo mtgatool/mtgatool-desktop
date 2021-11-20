@@ -54,6 +54,12 @@ function unleakRegExp(): void {
 }
 
 function tryDecodeJson(jsonString: string) {
+  if (
+    jsonString ===
+    "[Message summarized because one or more GameStateMessages exceeded the 50 GameObject or 50 Annotation limit.]"
+  ) {
+    return {};
+  }
   let json: any = {};
   try {
     // console.log(jsonString, jsonStart, jsonLen);

@@ -1,5 +1,10 @@
 import { SettingKey } from "../types/localSettings";
+import backGlobalData from "./backGlobalData";
 
 export default function setLocalSetting(key: SettingKey, value: string) {
-  window.localStorage.setItem(key, value);
+  if (typeof jest === "undefined") {
+    window.localStorage.setItem(key, value);
+  } else {
+    backGlobalData.localSettingsProxy[key] = value;
+  }
 }

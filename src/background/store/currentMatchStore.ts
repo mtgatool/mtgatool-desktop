@@ -67,7 +67,9 @@ export const matchStateObject = {
   player: {} as InternalPlayer,
   players: [] as PlayerInfo[],
   turnInfo: {} as TurnInfo,
-  gameInfo: {} as GameInfo,
+  gameInfo: {
+    results: [],
+  } as GameInfo,
   // Time stuff
   beginTime: new Date(),
   priorityTimers: {
@@ -147,7 +149,9 @@ export function resetCurrentGame(): void {
   Object.assign(globalStore.currentMatch, {
     msgId: 0,
     turnInfo: {},
-    gameInfo: {},
+    gameInfo: {
+      results: [],
+    },
     players: [],
     priorityTimers: {
       last: 0,
