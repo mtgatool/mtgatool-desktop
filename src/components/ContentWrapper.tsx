@@ -139,7 +139,7 @@ const ContentWrapper = () => {
       <PopupComponent
         open={false}
         width="1000px"
-        height="500px"
+        height="540px"
         openFnRef={openAdvancedCollectionSearch}
         closeFnRef={closeAdvancedCollectionSearch}
       >
