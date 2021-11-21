@@ -1,12 +1,13 @@
 /* eslint-disable react/no-array-index-key */
 import { Deck, CardObject, database } from "mtgatool-shared";
 import { Fragment } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import reduxAction from "../../../redux/reduxAction";
 import { getCardImage } from "../../../utils/getCardArtCrop";
 import DeckTypesStats from "../../DeckTypesStats";
 import Section from "../../ui/Section";
 import Button from "../../ui/Button";
+import { AppState } from "../../../redux/stores/rendererStore";
 
 interface VisualDeckViewProps {
   deck: Deck;
@@ -29,8 +30,13 @@ export default function VisualDeckView(
   props: VisualDeckViewProps
 ): JSX.Element {
   const { deck, setRegularView } = props;
-  const sz = 170; /// ///
-  const cardQuality = "normal"; /// /
+
+  const sz = useSelector(
+    (state: AppState) => 100 + state.settings.cardsSize * 15
+  );
+  const cardQuality = useSelector(
+    (state: AppState) => state.settings.cardsQuality
+  );
   const dispatcher = useDispatch();
 
   const hoverCard = (id: number, hover: boolean): void => {
@@ -74,7 +80,12 @@ export default function VisualDeckView(
 
   return (
     <div className="visual-view-grid">
-      <Section style={{ padding: "16px", gridArea: "controls" }}>
+      <Section
+        style={{
+          padding: "16px",
+          gridArea: "controls",
+        }}
+      >
         <Button
           style={{ margin: "auto" }}
           text="Normal View"
@@ -84,7 +95,13 @@ export default function VisualDeckView(
       <Section style={{ gridArea: "types" }}>
         <DeckTypesStats deck={deck} />
       </Section>
-      <Section style={{ padding: "16px", gridArea: "main" }}>
+      <Section
+        style={{
+          padding: "16px",
+          paddingBottom: `${52 + sz / 2}px`,
+          gridArea: "main",
+        }}
+      >
         <div className="visual-mainboard">
           {splitDeck.map((idsList: SplitIds, index: number) => {
             const cards = idsList.map((grpId: number, cindex: number) => {
