@@ -15,6 +15,7 @@ import defaultLocalSettings from "./utils/defaultLocalSettings";
 import mainChannelListeners from "./broadcastChannel/mainChannelListeners";
 import { loadDbFromCache } from "./utils/database-wrapper";
 import getLocalSetting from "./utils/getLocalSetting";
+import reduxAction from "./redux/reduxAction";
 
 defaultLocalSettings();
 mainChannelListeners();
@@ -45,7 +46,9 @@ if (module.hot && process.env.NODE_ENV === "development") {
   );
 }
 
-loadDbFromCache(getLocalSetting("lang"));
+loadDbFromCache(getLocalSetting("lang")).then(() =>
+  reduxAction(store.dispatch, { type: "FORCE_COLLECTION", arg: undefined })
+);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

@@ -88,12 +88,14 @@ export function loadDbFromCache(
             console.log("New DB version: ", latestRes.data.latest);
             database.setDatabaseUnsafely(res.data);
             updateCache(JSON.stringify(res.data));
+            return Promise.resolve();
           })
           .catch((e) => {
             console.info(
               "There was a problem updating cards database from https://mtgatool.com/database/"
             );
             console.info(e);
+            return Promise.resolve();
           });
       }
       console.log(`Database up to date. (v${latestRes.data.latest})`);
@@ -104,6 +106,7 @@ export function loadDbFromCache(
         "There was a problem updating cards database from https://mtgatool.com/database/latest"
       );
       console.info(e);
+      return Promise.resolve();
     });
 }
 

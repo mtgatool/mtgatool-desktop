@@ -29,6 +29,7 @@ import {
 import Updater from "./updater";
 import getLocalSetting from "./utils/getLocalSetting";
 import registerShortcuts from "./utils/registerShortcuts";
+import reduxAction from "./redux/reduxAction";
 
 const title = getWindowTitle();
 
@@ -129,7 +130,9 @@ if (title == WINDOW_UPDATER) {
 }
 
 if (title !== WINDOW_UPDATER) {
-  loadDbFromCache(getLocalSetting("lang"));
+  loadDbFromCache(getLocalSetting("lang")).then(() =>
+    reduxAction(store.dispatch, { type: "FORCE_COLLECTION", arg: undefined })
+  );
 }
 
 // If you want your app to work offline and load faster, you can change
