@@ -44,7 +44,6 @@ function parseFilterValue(filterValue: string): ParsedToken[] {
   let match;
   const results: ParsedToken[] = [];
   while ((match = filterPattern.exec(filterValue))) {
-    console.log("filterPattern match: ", match);
     let token;
     let separator: QuerySeparators | undefined;
     let value;
@@ -418,7 +417,7 @@ const tokenToKeys: Record<string, QueryKeys | undefined> = {
 export default function getFiltersFromQuery(query: string): Filters<CardsData> {
   let filters: Filters<CardsData> = [];
   const results = parseFilterValue(query);
-  console.log(results);
+
   let keysAdded = 0;
   results.forEach((match) => {
     const [tokenKey, separator, tokenVal] = match;
@@ -448,6 +447,5 @@ export default function getFiltersFromQuery(query: string): Filters<CardsData> {
     });
   }
 
-  console.log(filters);
   return filters;
 }
