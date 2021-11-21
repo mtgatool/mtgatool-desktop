@@ -109,6 +109,14 @@ export default function DeckView(): JSX.Element {
     deck.sortSideboard(compareCards);
     const list = deck.getExportArena();
     copyToClipboard(list);
+    reduxAction(dispatch, {
+      type: "SET_POPUP",
+      arg: {
+        text: "Deck copied to clipboard.",
+        duration: 5000,
+        time: new Date().getTime(),
+      },
+    });
   };
 
   const colorCounts = getDeckColorsAmmount(deck);

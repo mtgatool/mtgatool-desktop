@@ -244,7 +244,14 @@ export default function MatchView(): JSX.Element {
       deck.sortMainboard(compareCards);
       deck.sortSideboard(compareCards);
       copyToClipboard(deck.getExportArena());
-      // popup => Decklist copied to clipboard.
+      reduxAction(dispatch, {
+        type: "SET_POPUP",
+        arg: {
+          text: "Deck copied to clipboard.",
+          duration: 5000,
+          time: new Date().getTime(),
+        },
+      });
     }
   };
 
