@@ -1,0 +1,88 @@
+.cards-wr-view-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  grid-template-rows: auto auto auto;
+  grid-template-areas: "controls" "desc" "table";
+
+  .card-wr-stats {
+    display: flex;
+    margin: 0 auto;
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .card-wr-line {
+    margin-top: 1px;
+    display: grid;
+    grid-template-columns:
+      minmax(300px, 30%)
+      minmax(48px, 1fr)
+      minmax(56px, 1.2fr)
+      minmax(48px, 1fr)
+      minmax(48px, 1fr)
+      minmax(48px, 1fr)
+      minmax(48px, 1fr)
+      minmax(56px, 1.2fr)
+      minmax(48px, 1fr)
+      minmax(56px, 1.2fr);
+  }
+
+  .card-wr-item {
+    position: relative;
+    margin-right: 1px;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: var(--color-light);
+    font-size: 14px;
+    line-height: 32px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+
+    .sort-asc, .sort-desc {
+      right: 4px;
+    }
+  }
+
+  .card-wr-line-card {
+    grid-area: 1 / 1 / 1 / 2;
+  }
+
+  .card-wr-line-wr {
+    grid-area: 1 / 2 / 1 / 3;
+  }
+
+  .card-wr-line-hand-wr {
+    grid-area: 1 / 3 / 1 / 4;
+  }
+
+  .card-wr-line-mulls {
+    grid-area: 1 / 4 / 1 / 5;
+  }
+
+  .card-wr-line-sided-in {
+    grid-area: 1 / 5 / 1 / 6;
+  }
+
+  .card-wr-line-sided-out {
+    grid-area: 1 / 6 / 1 / 7;
+  }
+
+  .card-wr-line-sided-in-wr {
+    grid-area: 1 / 7 / 1 / 8;
+  }
+
+  .card-wr-line-sided-out-wr {
+    grid-area: 1 / 8 / 1 / 9;
+  }
+
+  .card-wr-line-avg-turn {
+    grid-area: 1 / 9 / 1 / 10;
+  }
+
+  .card-wr-line-avg-first {
+    grid-area: 1 / 10 / 1 / 11;
+  }
+}

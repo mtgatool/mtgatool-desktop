@@ -28,6 +28,24 @@ export interface UserRecoveryData {
   iv: string;
 }
 
+export interface CardWinrateData {
+  name: string;
+  wins: number;
+  losses: number;
+  turnsUsed: number[];
+  turnsFirstUsed: number[];
+  sidedIn: number;
+  sidedOut: number;
+  sideInWins: number;
+  sideInLosses: number;
+  sideOutWins: number;
+  sideOutLosses: number;
+  initHandWins: number;
+  initHandsLosses: number;
+  mulligans: number;
+  colors: { [key: number]: { wins: number; losses: number } };
+}
+
 export interface StatsDeck {
   id: string;
   deckTileId: number;
@@ -46,6 +64,7 @@ export interface StatsDeck {
     matchLosses: number;
   };
   totalGames: number;
+  cardWinrates: Record<number, CardWinrateData>;
   winrate: number;
 }
 

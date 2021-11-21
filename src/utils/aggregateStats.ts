@@ -1,11 +1,31 @@
 /* eslint-disable radix */
-import { Colors } from "mtgatool-shared";
+import { Colors, database } from "mtgatool-shared";
 import { MatchData } from "../components/views/history/getMatchesData";
-import { StatsDeck } from "../types/dbTypes";
+import { CardWinrateData, StatsDeck } from "../types/dbTypes";
 
 export interface Winrate {
   wins: number;
   losses: number;
+}
+
+function newCardWinrate(grpId: number): CardWinrateData {
+  return {
+    name: database.card(grpId)?.name || "",
+    wins: 0,
+    losses: 0,
+    turnsUsed: [],
+    turnsFirstUsed: [],
+    sidedIn: 0,
+    sidedOut: 0,
+    sideInWins: 0,
+    sideInLosses: 0,
+    sideOutWins: 0,
+    sideOutLosses: 0,
+    initHandWins: 0,
+    initHandsLosses: 0,
+    colors: {},
+    mulligans: 0,
+  };
 }
 
 export interface AggregatedStats {
@@ -159,6 +179,7 @@ export default function aggregateStats(
           matchLosses: hasWon ? 0 : 1,
         },
         totalGames: match.playerWins + match.playerLosses,
+        cardWinrates: {},
         winrate:
           match.playerWins > 0
             ? (100 / (match.playerWins + match.playerLosses)) * match.playerWins
@@ -187,6 +208,88 @@ export default function aggregateStats(
           ? (100 / deckToUpdate.totalGames) * deckToUpdate.stats.gameWins
           : 0;
     }
+
+    const winrates =
+      stats.deckIndex[match.internalMatch.playerDeckHash].cardWinrates;
+    // Cards winrates
+    let addDelta: number[] = [];
+    let remDelta: number[] = [];
+    Object.values(match.internalMatch.gameStats).forEach((game) => {
+      if (game) {
+        const gameCards: number[] = [];
+        const wins = game.winner === playerSeat ? 1 : 0;
+        const losses = game.winner === playerSeat ? 0 : 1;
+        // For each card cast
+        game.cardsCast?.forEach((cardCast) => {
+          const { grpId, player, turn } = cardCast;
+          // Only if we casted it
+          if (player == playerSeat) {
+            // define
+            if (!winrates[grpId]) winrates[grpId] = newCardWinrate(grpId);
+            // Only once per card cast!
+            if (!gameCards.includes(grpId)) {
+              winrates[grpId].turnsFirstUsed.push(Math.ceil(turn / 2));
+              winrates[grpId].wins += wins;
+              winrates[grpId].losses += losses;
+
+              if (!winrates[grpId].colors[oColorBits]) {
+                winrates[grpId].colors[oColorBits] = {
+                  wins: 0,
+                  losses: 0,
+                };
+              }
+              winrates[grpId].colors[oColorBits].wins += wins;
+              winrates[grpId].colors[oColorBits].losses += losses;
+              gameCards.push(grpId);
+            }
+            // Do this for every card cast in the game
+            winrates[grpId].turnsUsed.push(Math.ceil(turn / 2));
+          }
+        });
+
+        game.handsDrawn?.forEach((hand, index) => {
+          // Initial hand
+          if (index == game.handsDrawn.length - 1) {
+            hand.forEach((grpId) => {
+              // define
+              if (!winrates[grpId]) winrates[grpId] = newCardWinrate(grpId);
+              winrates[grpId].initHandWins += wins;
+              winrates[grpId].initHandsLosses += losses;
+            });
+          } else {
+            hand.forEach((grpId) => {
+              if (!winrates[grpId]) winrates[grpId] = newCardWinrate(grpId);
+              winrates[grpId].mulligans += 1;
+            });
+          }
+        });
+
+        // Add the previos changes to the current ones
+        addDelta = [...addDelta, ...(game.sideboardChanges?.added || [])];
+        remDelta = [...remDelta, ...(game.sideboardChanges?.removed || [])];
+
+        addDelta.forEach((grpId) => {
+          // define
+          if (!winrates[grpId]) winrates[grpId] = newCardWinrate(grpId);
+          winrates[grpId].sidedIn += 1;
+          // Only add if the card was used
+          if (gameCards.includes(grpId)) {
+            winrates[grpId].sideInWins += wins;
+            winrates[grpId].sideInLosses += losses;
+          }
+        });
+        remDelta.forEach((grpId) => {
+          // define
+          if (!winrates[grpId]) winrates[grpId] = newCardWinrate(grpId);
+          winrates[grpId].sidedOut += 1;
+          // Only add if the card was not used
+          if (!gameCards.includes(grpId)) {
+            winrates[grpId].sideOutWins += wins;
+            winrates[grpId].sideOutLosses += losses;
+          }
+        });
+      }
+    });
   });
 
   // ..

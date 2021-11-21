@@ -16,23 +16,23 @@
 
   .text {
   }
+}
 
-  .sort-asc,
-  .sort-desc {
-    background-image: url(../assets/images/icon_sort.png);
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    width: 16px;
-    height: 32px;
-    position: absolute;
-    right: 24px;
-  }
+.sort-asc,
+.sort-desc {
+  background-image: url(../assets/images/icon_sort.png);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 16px;
+  height: 32px;
+  position: absolute;
+  right: 24px;
+}
 
-  .sort-asc {
-  }
+.sort-asc {
+}
 
-  .sort-desc {
-    transform: rotate(180deg);
-  }
+.sort-desc {
+  transform: rotate(180deg);
 }

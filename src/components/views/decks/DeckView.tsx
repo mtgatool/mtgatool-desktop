@@ -40,6 +40,7 @@ import reduxAction from "../../../redux/reduxAction";
 import { StatsDeck } from "../../../types/dbTypes";
 import { AppState } from "../../../redux/stores/rendererStore";
 import ChangesDeckView from "./ChangesDeckView";
+import CardsWinratesView from "./CardsWinrateView";
 
 // const { MANA_COLORS } = constants;
 
@@ -101,7 +102,7 @@ export default function DeckView(): JSX.Element {
 
   useEffect(() => {
     setDeckView(VIEW_REGULAR);
-  }, [deck.id]);
+  }, [dbDeck]);
 
   const arenaExport = (): void => {
     deck.sortMainboard(compareCards);
@@ -181,6 +182,13 @@ export default function DeckView(): JSX.Element {
         )}
         {deckView == VIEW_CHANGES && (
           <ChangesDeckView setRegularView={regularView} />
+        )}
+        {deckView == VIEW_WINRATES && dbDeck && fullStats && (
+          <CardsWinratesView
+            fullStats={fullStats}
+            dbDeck={dbDeck}
+            setRegularView={regularView}
+          />
         )}
         {deckView == VIEW_REGULAR && (
           <div className="regular-view-grid">

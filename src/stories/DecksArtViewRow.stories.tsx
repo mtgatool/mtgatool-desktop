@@ -85,6 +85,7 @@ const TestDeck = {
     matchLosses: 0,
   },
   totalGames: 0,
+  cardWinrates: {},
   winrate: 0,
 };
 
