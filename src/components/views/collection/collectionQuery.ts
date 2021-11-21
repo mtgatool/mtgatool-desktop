@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable radix */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-case-declarations */
@@ -36,10 +37,9 @@ const { WHITE, BLUE, RED, BLACK, GREEN, COLORLESS } = constants;
  * @param filterValue Query string
  */
 function parseFilterValue(filterValue: string): ParsedToken[] {
-  const filterPattern = new RegExp(
-    /(?<normal>(?<tok>[^\s"]+)(?<sep>\b[>=|<=|:|=|!=|>|<]{1,2})(?<val>[^\s"]+))|(?<quoted>(?<qtok>[^\s"]+)(?<qsep>\b[>=|<=|:|=|!=|>|<]{1,2})(?<qval>"[^"]*"))|(?<name>([^\s"]+))|(?<qname>("[^"]*"+))/,
-    "g"
-  );
+  const reg =
+    /(([^\s"]+)(\b[>=|<=|:|=|!=|>|<]{1,2})([^\s"]+))|(([^\s"]+)(\b[>=|<=|:|=|!=|>|<]{1,2})("[^"]*"))|(([^\s"]+))|(("[^"]*"+))/;
+  const filterPattern = new RegExp(reg, "g");
 
   let match;
   const results: ParsedToken[] = [];
@@ -48,22 +48,26 @@ function parseFilterValue(filterValue: string): ParsedToken[] {
     let token;
     let separator: QuerySeparators | undefined;
     let value;
-    if (match.groups?.normal) {
-      token = match.groups.tok;
-      separator = match.groups.sep as QuerySeparators;
-      value = match.groups.val;
-    } else if (match.groups?.quoted) {
-      token = match.groups.qtok;
-      separator = match.groups.qsep as QuerySeparators;
-      value = match.groups.qval.slice(1, -1);
-    } else if (match.groups?.name) {
+    if (match[1]) {
+      // normal
+      token = match[2];
+      separator = match[3] as QuerySeparators;
+      value = match[4];
+    } else if (match[5]) {
+      // quoted
+      token = match[6];
+      separator = match[7] as QuerySeparators;
+      value = match[8].slice(1, -1);
+    } else if (match[9]) {
+      // name
       token = "name";
       separator = ":";
-      value = match.groups.name;
-    } else if (match.groups?.qname) {
+      value = match[10];
+    } else if (match[11]) {
+      // quoted name
       token = "name";
       separator = ":";
-      value = match.groups.qname.slice(1, -1);
+      value = match[12].slice(1, -1);
     }
     if (token && separator && value) {
       results.push([token, separator, value]);
@@ -414,8 +418,9 @@ const tokenToKeys: Record<string, QueryKeys | undefined> = {
 export default function getFiltersFromQuery(query: string): Filters<CardsData> {
   let filters: Filters<CardsData> = [];
   const results = parseFilterValue(query);
+  console.log(results);
   let keysAdded = 0;
-  results.forEach((match: any) => {
+  results.forEach((match) => {
     const [tokenKey, separator, tokenVal] = match;
     const isNeg = tokenKey.startsWith("-");
     const nKey = tokenKey.startsWith("-") ? tokenKey.slice(1) : tokenKey;
