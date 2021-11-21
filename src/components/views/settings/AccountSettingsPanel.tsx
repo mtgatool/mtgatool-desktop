@@ -132,8 +132,17 @@ export default function AccountSettingsPanel(
         <KeysIcon />
         <div>Save</div>
       </Button>
+      <p
+        style={{
+          borderTop: "1px solid var(--color-line-sep)",
+          paddingTop: "24px",
+          marginBottom: "24px",
+        }}
+      />
       <Button
-        style={{ margin: "128px auto 0 auto" }}
+        style={{
+          margin: "24px auto",
+        }}
         text="Logout"
         className="button-simple-red"
         onClick={() => {
