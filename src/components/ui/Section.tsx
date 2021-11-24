@@ -12,7 +12,7 @@ export default function Section(props: SectionProps): JSX.Element {
     <div
       style={{
         display: "flex",
-        borderRadius: "2px",
+        borderRadius: "3px",
         backgroundColor: `var(--color-section)`,
         ...style,
       }}
