@@ -11,7 +11,6 @@ import {
   Deck,
   getEventPrettyName,
   MatchGameStats,
-  InternalMatch,
   compareCards,
 } from "mtgatool-shared";
 
@@ -211,27 +210,28 @@ export default function MatchView(): JSX.Element {
     }
   }
 
-  const existsPrev = useCallback((game: number): boolean => {
-    return game > 0;
-  }, []);
+  const existsPrev = useCallback((): boolean => {
+    return gameSeen > 0;
+  }, [gameSeen]);
 
-  const existsNext = useCallback(
-    (game: number, _match: InternalMatch): boolean => {
-      return (
-        _match && arrayGameStats !== undefined && game < arrayGameStats.length
-      );
-    },
-    []
-  );
+  const existsNext = useCallback((): boolean => {
+    return (
+      matchData !== undefined &&
+      matchData.internalMatch &&
+      arrayGameStats !== undefined &&
+      gameSeen < arrayGameStats.length
+    );
+  }, [gameSeen, matchData]);
 
   const gamePrev = useCallback(() => {
-    if (existsPrev(gameSeen)) setGameSeen(gameSeen - 1);
+    if (existsPrev()) {
+      setGameSeen(gameSeen - 1);
+    }
   }, [existsPrev, gameSeen]);
 
   const gameNext = useCallback(() => {
-    if (matchData) {
-      if (existsNext(gameSeen, matchData.internalMatch))
-        setGameSeen(gameSeen + 1);
+    if (matchData && existsNext()) {
+      setGameSeen(gameSeen + 1);
     }
   }, [existsNext, gameSeen, matchData]);
 
@@ -264,17 +264,17 @@ export default function MatchView(): JSX.Element {
   const copyOppName = useCallback((): void => {
     if (matchData) {
       copyToClipboard(matchData.internalMatch.opponent.name);
-      // popup => Opponent's name copied to clipboard
+      reduxAction(dispatch, {
+        type: "SET_POPUP",
+        arg: {
+          text: "Opponent's name copied to clipboard.",
+          duration: 5000,
+          time: new Date().getTime(),
+        },
+      });
     }
   }, [matchData]);
 
-  /*
-  const mulliganType =
-    match.eventId === "Lore_WAR3_Singleton" ||
-    match.date > new Date("2019-07-02T15:00:00.000Z").getTime()
-      ? "london"
-      : "vancouver";
-  */
   const duration = arrayGameStats
     ? arrayGameStats.reduce((acc, cur) => acc + cur.time, 0)
     : 0;
@@ -421,11 +421,7 @@ export default function MatchView(): JSX.Element {
               }}
             >
               <SvgButton
-                style={
-                  !existsPrev(gameSeen)
-                    ? { cursor: "default", opacity: 0.5 }
-                    : {}
-                }
+                style={!existsPrev() ? { cursor: "default", opacity: 0.5 } : {}}
                 svg={BackIcon}
                 onClick={gamePrev}
               />
@@ -436,13 +432,13 @@ export default function MatchView(): JSX.Element {
                   width: "-webkit-fill-available",
                 }}
               >
-                {gameSeen == arrayGameStats?.length || 0
+                {gameSeen == arrayGameStats?.length
                   ? `Combined`
                   : `Seen in game ${gameSeen + 1}`}
               </div>
               <SvgButton
                 style={
-                  !existsNext(gameSeen, matchData.internalMatch)
+                  !existsNext()
                     ? {
                         cursor: "default",
                         opacity: 0.5,
