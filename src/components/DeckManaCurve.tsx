@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import { constants, database, Deck } from "mtgatool-shared";
 
 const { MANA_COLORS } = constants;
@@ -83,8 +84,7 @@ export default function DeckManaCurve(props: {
             return (
               <div
                 className="mana-curve-column"
-                // eslint-disable-next-line react/no-array-index-key
-                key={`mana_curve_column_${i}`}
+                key={`mana-curve-column-${i}`}
                 style={{ height: `${(total * 100) / curveMax}%` }}
               >
                 <div className="mana-curve-number">
@@ -95,8 +95,7 @@ export default function DeckManaCurve(props: {
                     return (
                       <div
                         className="mana_curve_column_color"
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={`mana_curve_column_color_${ind}`}
+                        key={`mana-curve-column-color-${i}-${ind}`}
                         style={{
                           height: `${Math.round(
                             (cost[ind + 1] / manaTotal) * 100

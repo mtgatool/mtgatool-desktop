@@ -358,7 +358,7 @@ export default function CardsWinratesView(
               return headerGroup.headers.map((column: any) => {
                 return (
                   <div
-                    key={`header-${column.class}`}
+                    key={`header-line-${column.class}`}
                     className={`card-wr-item ${column.class}`}
                   >
                     {column.Header == "Mainboard" ? "Sideboard" : ""}

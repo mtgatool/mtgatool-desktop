@@ -169,7 +169,7 @@ export default function HistoryList(props: HistoryListProps) {
     "%%Drafts",
     ...drafts,
     "%%Other Events",
-    ...transformedEvents,
+    ...new Set(transformedEvents),
   ];
 
   return (
@@ -195,6 +195,7 @@ export default function HistoryList(props: HistoryListProps) {
               width: "140px",
               cursor: "pointer",
             }}
+            readOnly
             type="date"
             value={pickerDate.toISOString().substring(0, 10)}
           />

@@ -281,6 +281,7 @@ function createUpdaterWindow() {
         slashes: true,
       })
   );
+
   win.on("close", (e) => {
     win.hide();
     e.preventDefault();

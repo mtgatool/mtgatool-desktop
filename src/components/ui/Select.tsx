@@ -66,7 +66,7 @@ export default function Select<K>({
                 className={`select-option ${className} ${
                   option === currentOption ? "disabled" : ""
                 }`}
-                key={`${option}--option-key`}
+                key={`${option}-option-key`}
                 value={i}
                 disabled={option === currentOption}
                 onClick={onClickOption}

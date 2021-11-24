@@ -105,12 +105,12 @@ function GameStats(props: GameStatsProps): JSX.Element {
           <Fragment key={`gsh-${index}-${i}`}>
             <div className="gamestats-subtitle">#{i + 1}</div>
             <div className="card-lists-list">
-              {hand.map((grpId) => {
+              {hand.map((grpId, ind) => {
                 const cardObj = database.card(grpId);
                 if (cardObj) {
                   return (
                     <img
-                      key={`hand-drawn-${i}-${grpId}`}
+                      key={`hand-drawn-${i}-${grpId}-${ind}`}
                       onMouseEnter={(): void => {
                         hoverCard(grpId, true);
                       }}
