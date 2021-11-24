@@ -12,6 +12,7 @@ import {
   getEventPrettyName,
   MatchGameStats,
   compareCards,
+  database,
 } from "mtgatool-shared";
 
 import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
@@ -30,7 +31,7 @@ import ResultDetails from "../../ResultDetails";
 import Button from "../../ui/Button";
 import RankIcon from "../../RankIcon";
 import DeckList from "../../DeckList";
-import { getCardArtCrop } from "../../../utils/getCardArtCrop";
+import { getCardImage, getCardArtCrop } from "../../../utils/getCardArtCrop";
 import CardList from "../../CardList";
 import { toMMSS } from "../../../utils/dateTo";
 import ActionLog from "../../ActionLog";
@@ -45,6 +46,15 @@ interface GameStatsProps {
 
 function GameStats(props: GameStatsProps): JSX.Element {
   const { game, index } = props;
+
+  const dispatch = useDispatch();
+
+  const hoverCard = (id: number, hover: boolean): void => {
+    reduxAction(dispatch, {
+      type: hover ? "SET_HOVER_IN" : "SET_HOVER_OUT",
+      arg: { grpId: id },
+    });
+  };
 
   const addedCards = new CardsList(
     game.sideboardChanges ? game.sideboardChanges.added : []
@@ -90,12 +100,31 @@ function GameStats(props: GameStatsProps): JSX.Element {
         <></>
       )}
       <div className="card-tile-separator">Game {index + 1} Hands Drawn</div>
-      {game.handsDrawn.map((hand: any, i: number) => {
+      {game.handsDrawn.map((hand: number[], i: number) => {
         return (
           <Fragment key={`gsh-${index}-${i}`}>
             <div className="gamestats-subtitle">#{i + 1}</div>
             <div className="card-lists-list">
-              <CardList list={new CardsList(hand)} />
+              {hand.map((grpId) => {
+                const cardObj = database.card(grpId);
+                if (cardObj) {
+                  return (
+                    <img
+                      key={`hand-drawn-${i}-${grpId}`}
+                      onMouseEnter={(): void => {
+                        hoverCard(grpId, true);
+                      }}
+                      onMouseLeave={(): void => {
+                        hoverCard(grpId, false);
+                      }}
+                      style={{ width: `calc(${Math.floor(100 / 7)}% - 1px)` }}
+                      src={getCardImage(cardObj, "normal")}
+                      className="mulligan-card-img"
+                    />
+                  );
+                }
+                return <></>;
+              })}
             </div>
           </Fragment>
         );
