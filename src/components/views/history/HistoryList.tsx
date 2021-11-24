@@ -1,6 +1,12 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { getEventPrettyName } from "mtgatool-shared";
-import { useCallback, useMemo, useState } from "react";
+import {
+  MutableRefObject,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import usePagingControls from "../../../hooks/usePagingControls";
@@ -21,11 +27,15 @@ import { MatchData } from "./getMatchesData";
 import ListItemMatch from "./ListItemMatch";
 import aggregateStats from "../../../utils/aggregateStats";
 import reduxAction from "../../../redux/reduxAction";
+import useDatePicker from "../../../hooks/useDatePicker";
+import InputContainer from "../../InputContainer";
 
 interface HistoryListProps {
   openHistoryStatsPopup: () => void;
   matchesData: MatchData[];
 }
+
+const dateOptions = ["All Time", "Custom", "Last 30 days", "Last Year"];
 
 export default function HistoryList(props: HistoryListProps) {
   const fullStats = useSelector((state: AppState) => state.mainData.fullStats);
@@ -34,6 +44,9 @@ export default function HistoryList(props: HistoryListProps) {
   const { openHistoryStatsPopup, matchesData } = props;
 
   const [eventFilter, setEventFilterState] = useState("");
+  const [fromDateOption, setFromDateOption] = useState(dateOptions[0]);
+
+  const containerRef: MutableRefObject<HTMLInputElement | null> = useRef(null);
 
   const defaultHistoryFilters: StringFilterType<MatchData> = {
     type: "string",
@@ -66,6 +79,29 @@ export default function HistoryList(props: HistoryListProps) {
     },
     [filters]
   );
+
+  const setDateFilter = useCallback(
+    (date: Date) => {
+      const newFilters = setFilter(filters, {
+        type: "minmax",
+        id: "timestamp",
+        value: {
+          value: date.getTime(),
+          mode: ">",
+          not: false,
+        },
+      });
+
+      setFilters(newFilters);
+    },
+    [filters]
+  );
+
+  const [pickerDate, pickerDoShow, pickerElement, setPickerDate] =
+    useDatePicker(new Date(0), undefined, (date) => {
+      setDateFilter(date);
+      setFromDateOption(dateOptions[1]);
+    });
 
   const [sortValue, setSortValue] = useState<Sort<MatchData>>({
     key: "timestamp",
@@ -100,7 +136,41 @@ export default function HistoryList(props: HistoryListProps) {
     [history]
   );
 
-  const allEvents = fullStats ? ["", ...fullStats.eventsIndex] : [""];
+  const allEvents = fullStats ? [...fullStats.eventsIndex] : [""];
+
+  let transformedEvents = allEvents.sort();
+
+  const rankedEvents: string[] = [
+    "Ladder",
+    "Historic_Ladder",
+    "Traditional_Ladder",
+    "Traditional_Historic_Ladder",
+  ];
+
+  const drafts: string[] = [];
+
+  allEvents.forEach((ev) => {
+    if (rankedEvents.includes(ev)) {
+      transformedEvents.splice(transformedEvents.indexOf(ev), 1);
+    }
+    if (ev.indexOf("Draft") !== -1) {
+      transformedEvents.splice(transformedEvents.indexOf(ev), 1);
+      drafts.push(ev);
+    }
+  });
+
+  transformedEvents = [
+    "",
+    "%%Ranked",
+    "Ladder",
+    "Historic_Ladder",
+    "Traditional_Ladder",
+    "Traditional_Historic_Ladder",
+    "%%Drafts",
+    ...drafts,
+    "%%Other Events",
+    ...transformedEvents,
+  ];
 
   return (
     <>
@@ -109,10 +179,46 @@ export default function HistoryList(props: HistoryListProps) {
         style={{ marginBottom: "0px" }}
       >
         <Select
-          options={allEvents.sort()}
+          style={{ width: "280px" }}
+          options={transformedEvents}
           optionFormatter={(e) => (e === "" ? "All" : getEventPrettyName(e))}
           current={eventFilter}
           callback={setEventFilter}
+        />
+        <div style={{ lineHeight: "32px", marginLeft: "16px" }}>From: </div>
+        <InputContainer style={{ width: "auto" }} title="">
+          <input
+            onClick={pickerDoShow}
+            ref={containerRef}
+            style={{
+              backgroundColor: "var(--color-base)",
+              width: "140px",
+              cursor: "pointer",
+            }}
+            type="date"
+            value={pickerDate.toISOString().substring(0, 10)}
+          />
+        </InputContainer>
+        {pickerElement}
+        <Select
+          options={dateOptions}
+          current={fromDateOption}
+          callback={(opt) => {
+            const now = new Date().getTime();
+            if (opt === dateOptions[0]) {
+              setPickerDate(new Date(0));
+              setDateFilter(new Date(0));
+            }
+            if (opt === dateOptions[2]) {
+              setPickerDate(new Date(now - 2592000000));
+              setDateFilter(new Date(now - 2592000000));
+            }
+            if (opt === dateOptions[3]) {
+              setPickerDate(new Date(now - 31560000000));
+              setDateFilter(new Date(now - 31560000000));
+            }
+            setFromDateOption(opt);
+          }}
         />
 
         <SvgButton

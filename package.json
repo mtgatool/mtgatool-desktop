@@ -29,6 +29,7 @@
     "react": "^17.0.2",
     "react-autosuggest": "^10.1.0",
     "react-color": "^2.19.3",
+    "react-day-picker": "^7.4.10",
     "react-dom": "^17.0.2",
     "react-minimal-pie-chart": "^8.2.0",
     "react-redux": "^7.2.2",
