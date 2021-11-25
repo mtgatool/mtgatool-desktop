@@ -233,7 +233,7 @@ function createWindow() {
 
   mainGlobals.mainWindow.on("close", (e) => {
     e.preventDefault();
-    quit();
+    mainGlobals.mainWindow.hide();
   });
 
   mainGlobals.mainWindow.webContents.once("dom-ready", () => {
