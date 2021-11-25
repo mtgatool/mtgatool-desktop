@@ -3,7 +3,7 @@
   "version": "6.1.12",
   "private": true,
   "main": "public/electron.js",
-  "homepage": "http://localhost:4000",
+  "homepage": "./",
   "dependencies": {
     "@reduxjs/toolkit": "^1.5.0",
     "@storybook/react": "^6.2.9",

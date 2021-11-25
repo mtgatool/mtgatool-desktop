@@ -306,6 +306,10 @@ function startUpdater() {
 }
 
 function installUpdate() {
+  app.on("before-quit", () => {
+    quit();
+  });
+
   autoUpdater.quitAndInstall(true, true);
 }
 
@@ -364,10 +368,6 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     quit();
   }
-});
-
-app.on("before-quit", () => {
-  quit();
 });
 
 app.on("activate", () => {

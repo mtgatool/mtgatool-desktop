@@ -13,7 +13,6 @@ module.exports = {
             use: "native-addon-loader",
           },
         ],
-        noParse: /gun\.js$/,
       },
       node: {
         fs: "empty",
