@@ -366,6 +366,10 @@ app.on("window-all-closed", () => {
   }
 });
 
+app.on("before-quit", () => {
+  quit();
+});
+
 app.on("activate", () => {
   if (mainGlobals.mainWindow === null) {
     preCreateWindow();
