@@ -4,7 +4,7 @@ import logEntrySwitch from "../logEntrySwitch";
 
 // const originalLog = console.error
 // const originalWarn = console.warn
-jest.setTimeout(15000);
+jest.setTimeout(20000);
 
 beforeEach(() => {
   console.log = jest.fn();
@@ -30,5 +30,5 @@ function tryParseOnce() {
 it("Can parse logs fast", async () => {
   const parsedA = await tryParseOnce();
 
-  expect(parsedA).toBeLessThanOrEqual(5000);
+  expect(parsedA).toBeLessThanOrEqual(15000);
 });
