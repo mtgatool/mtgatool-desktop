@@ -93,8 +93,6 @@ export function afterLogin() {
   );
 
   window.toolDb.subscribeData("userids", true);
-  window.toolDb.subscribeData("matchesIndex", true);
-
   window.toolDb.subscribeData(`matches-livefeed-${currentDay}`);
 
   window.toolDb.getData<string[]>("hiddenDecks", true, 5000).then((hidden) => {

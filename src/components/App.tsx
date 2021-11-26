@@ -1,6 +1,6 @@
 /* eslint-disable import/no-webpack-loader-syntax */
 /* eslint-disable no-nested-ternary */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 import { Switch, Route, useHistory } from "react-router-dom";
@@ -46,6 +46,7 @@ function App(props: AppProps) {
   const { forceOs } = props;
   const history = useHistory();
   const dispatch = useDispatch();
+  const [canLogin, setCanLogin] = useState(false);
 
   const { loginState, loading, backgroundGrpid, matchInProgress } = useSelector(
     (state: AppState) => state.renderer
@@ -62,6 +63,12 @@ function App(props: AppProps) {
 
       console.log("Merged Peers: ", mergedPeers);
       window.toolDb = new ToolDb({ peers: mergedPeers, debug: true });
+      window.toolDb.onConnect = () => {
+        window.toolDb.onConnect = () => {
+          //
+        };
+        setCanLogin(true);
+      };
       window.toolDbInitialized = true;
     }
   }, []);
@@ -76,7 +83,7 @@ function App(props: AppProps) {
     const welcome = getLocalSetting("welcome");
     if (!welcome || welcome === "false") {
       history.push("/welcome");
-    } else if (!electron) {
+    } else if (!electron && canLogin) {
       const pwd = getLocalSetting("savedPass");
       const user = getLocalSetting("username");
 
@@ -101,7 +108,7 @@ function App(props: AppProps) {
     } else {
       history.push("/auth");
     }
-  }, [history, dispatch]);
+  }, [canLogin, history, dispatch]);
 
   let wrapperClass = "app-wrapper-back";
   if (os == "linux") {
