@@ -2,7 +2,7 @@
 import _ from "lodash";
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useHistory, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { getRankIndex, InternalRankData } from "mtgatool-shared";
 
 import formatRank from "../utils/formatRank";
@@ -21,7 +21,7 @@ import { defaultRankData } from "../types/dbTypes";
 
 interface TopNavItemProps {
   compact: boolean;
-  icon: string;
+  icon?: string;
   uri: string;
   title: string;
 }
@@ -34,24 +34,22 @@ function TopNavItem(props: TopNavItemProps): JSX.Element {
 
   return compact ? (
     <div
-      className={`${
-        params.page === uri ? "item-selected" : ""
-      } item-no-label item`}
+      className={`${params.page === uri ? "selected" : ""} item-compact`}
       onClick={() => history.push(`/${uri}`)}
     >
-      <div className={`icon ${icon}`} title={_.camelCase(title)} />
+      <span className="item-text">{title}</span>
     </div>
   ) : (
     <div
-      className={`${params.page === uri ? "item-selected" : ""} item ${
-        title == "" ? ` ${"item-no-label"}` : ""
+      className={`${params.page === uri ? "selected" : ""} item ${
+        title == "" ? " item-no-label" : ""
       }`}
       onClick={() => history.push(`/${uri}`)}
     >
       {title !== "" ? (
         <span className="item-text">{title}</span>
       ) : (
-        <div className={`icon ${icon}`} title={_.camelCase(title)} />
+        <div className={`icon ${icon || ""}`} title={_.camelCase(title)} />
       )}
     </div>
   );
@@ -174,49 +172,46 @@ export default function TopNav(props: TopNavProps): JSX.Element {
   const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
 
   const topNavIconsRef: any = useRef(null);
-  const dispatcher = useDispatch();
   const windowSize = useWindowSize();
 
   const defaultTab = {
-    dispatcher: dispatcher,
     compact: compact,
   };
 
-  const homeTab = { ...defaultTab, uri: "home", icon: "icon-home", title: "" };
+  const homeTab = {
+    compact: false,
+    uri: "home",
+    icon: "icon-home",
+    title: "",
+  };
   const myDecksTab = {
     ...defaultTab,
     uri: "decks",
-    icon: "icon-my-decks",
     title: "MY DECKS",
   };
   const historyTab = {
     ...defaultTab,
     uri: "history",
-    icon: "icon-history",
     title: "HISTORY",
   };
   const timelineTab = {
     ...defaultTab,
     uri: "timeline",
-    icon: "icon-timeline",
     title: "TIMELINE",
   };
   const draftsTab = {
     ...defaultTab,
     uri: "drafts",
-    icon: "icon-drafts",
     title: "DRAFTS",
   };
   const exploreTab = {
     ...defaultTab,
     uri: "explore",
-    icon: "icon-explore",
     title: "EXPLORE",
   };
   const collectionTab = {
     ...defaultTab,
     uri: "collection",
-    icon: "icon-collection",
     title: "COLLECTION",
   };
 
@@ -245,34 +240,53 @@ export default function TopNav(props: TopNavProps): JSX.Element {
   const userName = getLocalSetting("username"); // playerData.playerName.slice(0, -6);
   const userNumerical = ""; // playerData.playerName.slice(-6);
 
+  const items = (
+    <>
+      <TopNavItem {...myDecksTab} />
+      <TopNavItem {...historyTab} />
+      <TopNavItem {...timelineTab} />
+      <TopNavItem {...draftsTab} />
+      <TopNavItem {...exploreTab} />
+      <TopNavItem {...collectionTab} />
+    </>
+  );
+
   return (
-    <div className="top-nav-container">
-      <div ref={topNavIconsRef} className="icons">
-        <TopNavItem {...homeTab} />
-        <TopNavItem {...myDecksTab} />
-        <TopNavItem {...historyTab} />
-        <TopNavItem {...timelineTab} />
-        <TopNavItem {...draftsTab} />
-        <TopNavItem {...exploreTab} />
-        <TopNavItem {...collectionTab} />
-      </div>
-      <div className="info">
-        <div className="userdata-container">
-          <TopRankIcon type="constructed" {...contructedNav} />
-          <TopRankIcon type="limited" {...limitedNav} />
-          <div className="top-username" title="Arena username">
-            {userName}
+    <div className={`top-nav-container ${compact ? "compact" : ""}`}>
+      <div className="top-nav">
+        <div className="icons" style={{ flexGrow: 0 }}>
+          <TopNavItem {...homeTab} />
+        </div>
+        {!compact && (
+          <div ref={topNavIconsRef} className="icons">
+            {items}
           </div>
-          <div className="top-username-id" title="Arena user ID">
-            {userNumerical}
+        )}
+        <div className="info">
+          <div className="userdata-container">
+            <TopRankIcon type="constructed" {...contructedNav} />
+            <TopRankIcon type="limited" {...limitedNav} />
+            <div className="top-username" title="Arena username">
+              {userName}
+            </div>
+            <div className="top-username-id" title="Arena user ID">
+              {userNumerical}
+            </div>
+            <IconButton
+              style={{ margin: `auto 8px` }}
+              onClick={openSettings}
+              icon={settingsIcon}
+            />
           </div>
-          <IconButton
-            style={{ margin: `auto 8px` }}
-            onClick={openSettings}
-            icon={settingsIcon}
-          />
         </div>
       </div>
+      {compact && (
+        <div className="top-nav">
+          <div ref={topNavIconsRef} className="icons-compact">
+            {items}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
