@@ -25,6 +25,9 @@ jobs:
     - name: "Generate build information json"
       run: "node generateInfo.js"
 
+    - name: "Edit package.json for web deployment"
+      run: "node editPackageWeb.js"
+
     - name: Build web
       run: npm run build:web
 
