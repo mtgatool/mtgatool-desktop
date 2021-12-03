@@ -38,8 +38,8 @@ jobs:
         cp dist/*.AppImage linux-installer
         chmox -x linux-installer/*.AppImage
         chmox -x linux-installer/*.sh
-        tar czf Mtg-Arena-Tool-Linux-Installer.tar.gz linux-installer
-        cp Mtg-Arena-Tool-Linux-Installer.tar.gz dist
+        tar czvf "Mtg-Arena-Tool-Linux-Installer.tar.gz" linux-installer
+        cp "Mtg-Arena-Tool-Linux-Installer.tar.gz" dist
 
     - name: Upload dist as artifact
       uses: actions/upload-artifact@v2
