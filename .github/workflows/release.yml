@@ -36,6 +36,7 @@ jobs:
         CI_BUILD_TAG: 1
 
     - name: Create installer
+      if: matrix.os == 'ubuntu-latest'
       run: |
         cp dist/*.AppImage linux-installer
         cd linux-installer
