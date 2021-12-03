@@ -26,6 +26,30 @@ function quit() {
   app.exit();
 }
 
+// const { spawn } = require("child_process");
+// const winDaemon = path.join(
+//   __dirname,
+//   "extra",
+//   "win",
+//   "mtga-tracker-daemon.exe"
+// );
+// const linuxDaemon = path.join(
+//   __dirname,
+//   "extra",
+//   "linux",
+//   "mtga-tracker-daemon.exe"
+// );
+
+// const daemonProcess = spawn(winDaemon, [], {});
+
+// daemonProcess.on("exit", (code) => {
+//   console.log("MtgaTrackerDaemon exit", code);
+// });
+
+// daemonProcess.on("error", (error) => {
+//   console.log("MtgaTrackerDaemon error", error);
+// });
+
 const singleLock = app.requestSingleInstanceLock();
 
 if (!singleLock) {

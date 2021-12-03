@@ -30,6 +30,8 @@ import Updater from "./updater";
 import getLocalSetting from "./utils/getLocalSetting";
 import registerShortcuts from "./utils/registerShortcuts";
 import reduxAction from "./redux/reduxAction";
+import globalData from "./utils/globalData";
+import MtgaTrackerDaemon from "./daemon/mtgaTrackerDaemon";
 
 const title = getWindowTitle();
 
@@ -99,6 +101,8 @@ if (title == WINDOW_UPDATER) {
 
   const settings = JSON.parse(getLocalSetting("settings"));
   registerShortcuts(settings);
+
+  globalData.daemon = new MtgaTrackerDaemon();
 
   mainChannelListeners();
   ReactDOM.render(

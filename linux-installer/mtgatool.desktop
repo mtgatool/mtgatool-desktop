@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=MTG Arena Tool
+Comment=Tracker based on electron
+GenericName=MTG Arena Tracker
+Exec=/usr/share/mtgatool/start.sh
+Terminal=false
+Type=Application
+Icon=/usr/share/mtgatool/mtgatool.png
+Categories=Games
+startupNotify=true
