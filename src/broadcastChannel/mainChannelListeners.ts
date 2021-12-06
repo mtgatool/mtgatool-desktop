@@ -16,11 +16,28 @@ import { ChannelMessage } from "./channelMessages";
 import setLocalSetting from "../utils/setLocalSetting";
 import globalData from "../utils/globalData";
 import getLocalSetting from "../utils/getLocalSetting";
+import electron from "../utils/electron/electronWrapper";
 
 export default function mainChannelListeners() {
   const channel = bcConnect() as any;
 
   let last = Date.now();
+
+  if (electron) {
+    electron.ipcRenderer.on(
+      "mtgaTrackerDaemonVersion",
+      (event: any, d: any) => {
+        globalData.latestDaemon = d;
+        if (globalData.daemon) {
+          globalData.daemon.downloadLatestDaemon().finally(() => {
+            if (globalData.daemon) {
+              globalData.daemon.startDaemon();
+            }
+          });
+        }
+      }
+    );
+  }
 
   channel.onmessage = (msg: MessageEvent<ChannelMessage>) => {
     // console.log(msg.data.type);

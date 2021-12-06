@@ -7,6 +7,7 @@ import tar from "tar-fs";
 import zlib from "zlib";
 import electron from "../utils/electron/electronWrapper";
 import downloadFile from "../utils/downloadFile";
+import globalData from "../utils/globalData";
 
 interface DaemonInventory {
   gems: number;
@@ -58,6 +59,7 @@ export default class MtgaTrackerDaemon {
   }
 
   public downloadLatestDaemon() {
+    console.log("mtgaTrackerDaemon downloadLatestDaemon");
     return new Promise((resolve, reject) => {
       if (!electron) {
         reject();
@@ -87,40 +89,49 @@ export default class MtgaTrackerDaemon {
         fs.unlinkSync(downloadPath);
       }
 
-      axios
-        .get(
-          "https://api.github.com/repos/frcaton/mtga-tracker-daemon/releases/latest"
-        )
-        .then((result) => {
-          const downloadUrl = result.data.assets.filter(
-            (a: any) => a.name === zipName
-          )[0].browser_download_url;
+      console.log(
+        "mtgaTrackerDaemon update?",
+        globalData.latestDaemon?.tag_name,
+        this._version
+      );
+      if (
+        globalData.latestDaemon &&
+        globalData.latestDaemon.tag_name > this._version
+      ) {
+        const downloadUrl = globalData.latestDaemon.assets.filter(
+          (a: any) => a.name === zipName
+        )[0].browser_download_url;
 
-          downloadFile(downloadUrl, downloadPath)
-            .then(() => {
-              if (os === "win32") {
-                extract(downloadPath, { dir: daemonDir })
-                  .then(resolve)
-                  .catch(reject);
-              } else {
-                const untar = fs
-                  .createReadStream(downloadPath)
-                  .pipe(zlib.createGunzip())
-                  .pipe(tar.extract(daemonDir));
+        downloadFile(downloadUrl, downloadPath)
+          .then(() => {
+            this.shutdown()
+              .then(() => {
+                if (os === "win32") {
+                  extract(downloadPath, { dir: daemonDir })
+                    .then(resolve)
+                    .catch(reject);
+                } else {
+                  const untar = fs
+                    .createReadStream(downloadPath)
+                    .pipe(zlib.createGunzip())
+                    .pipe(tar.extract(daemonDir));
 
-                untar.on("end", resolve);
-                untar.on("error", reject);
-              }
-            })
-            .catch(reject);
-        })
-        .catch(reject);
+                  untar.on("end", resolve);
+                  untar.on("error", reject);
+                }
+              })
+              .catch(reject);
+          })
+          .catch(reject);
+      } else {
+        reject();
+      }
     });
   }
 
   public setupDaemon() {
     if (!electron) return;
-    console.log("Setup MTGA Tracker Daemon");
+    console.log("mtgaTrackerDaemon Setup Daemon");
 
     const electronApp =
       electron.app || (electron.remote && electron.remote.app);
@@ -132,62 +143,66 @@ export default class MtgaTrackerDaemon {
       os === "win32" ? "mtga-tracker-daemon.exe" : "mtga-tracker-daemon"
     );
 
-    if (!fs.existsSync(this._daemonExecutablePath)) {
-      this.downloadLatestDaemon().then(this.startDaemon);
-    } else {
-      this.startDaemon();
-    }
+    this.startDaemon();
   }
 
   // eslint-disable-next-line class-methods-use-this
   public startDaemon() {
     if (os !== "win32") return;
 
-    // Start the process
-    if (this._daemonExecutablePath && !this._daemonProcess) {
-      console.log("Starting Daemon..");
-      this._daemonProcess = spawn(this._daemonExecutablePath, [], {});
+    if (this._daemonExecutablePath) {
+      const daemonExists = fs.existsSync(this._daemonExecutablePath);
 
-      if (this._daemonProcess) {
-        this._daemonProcess.on("exit", (code) => {
-          console.log("MtgaTrackerDaemon exit", code);
-        });
+      if (daemonExists) {
+        // Start the process
+        if (this._daemonExecutablePath && !this._daemonProcess) {
+          console.log("mtgaTrackerDaemon Starting Daemon..");
+          this._daemonProcess = spawn(this._daemonExecutablePath, [], {});
 
-        this._daemonProcess.on("error", (error) => {
-          console.log("MtgaTrackerDaemon error", error);
-        });
+          if (this._daemonProcess) {
+            this._daemonProcess.on("exit", (code) => {
+              console.log("MtgaTrackerDaemon exit", code);
+            });
 
-        setTimeout(() => {
-          this.getStatus().then((status) => {
-            if (status) {
-              if (
-                this._version !== "0.0.0.0" &&
-                status.daemonVersion > this._version
-              ) {
-                if (os === "win32") {
-                  this.downloadLatestDaemon().then(this.startDaemon);
-                } else {
-                  this.checkForUpdates();
+            this._daemonProcess.on("error", (error) => {
+              console.log("MtgaTrackerDaemon error", error);
+            });
+
+            setTimeout(() => {
+              this.getStatus().then((status) => {
+                if (status) {
+                  this._version = status.daemonVersion;
+                  if (os === "win32") {
+                    this.downloadLatestDaemon().then(() => this.startDaemon);
+                  } else {
+                    this.checkForUpdates();
+                  }
                 }
-              }
-              this._version = status.daemonVersion;
-            }
-          });
-        }, 200);
+              });
+            }, 200);
+          }
+        }
+      } else {
+        this.downloadLatestDaemon().then(() => this.startDaemon);
       }
     }
   }
 
   public shutdown() {
+    console.log("mtgaTrackerDaemon shutdown()");
     return axios
       .post(`${this._url}/shutdown`)
-      .then((d) => d.data.result)
+      .then((d) => {
+        this._daemonProcess = undefined;
+        return d.data.result;
+      })
       .catch((e) => {
         return { result: e.message };
       });
   }
 
   public checkForUpdates(): Promise<boolean> {
+    console.log("mtgaTrackerDaemon checkForUpdates()");
     return axios
       .get<{ updatesAvailable: boolean }>(`${this._url}/checkForUpdates`)
       .then((d) => d.data.updatesAvailable)
@@ -195,6 +210,7 @@ export default class MtgaTrackerDaemon {
   }
 
   public getCards(): Promise<Card[]> {
+    console.log("mtgaTrackerDaemon getCards()");
     return axios
       .get<DaemonCards>(`${this._url}/cards`)
       .then((d) => d.data.cards)
@@ -202,6 +218,7 @@ export default class MtgaTrackerDaemon {
   }
 
   public getPlayerId(): Promise<string | null> {
+    console.log("mtgaTrackerDaemon getPlayerId()");
     return axios
       .get(`${this._url}/playerId`)
       .then((d) => d.data.playerId)
@@ -209,6 +226,7 @@ export default class MtgaTrackerDaemon {
   }
 
   public getInventory(): Promise<DaemonInventory | null> {
+    console.log("mtgaTrackerDaemon getInventory()");
     return axios
       .get<DaemonInventory>(`${this._url}/inventory`)
       .then((d) => d.data)
@@ -216,6 +234,7 @@ export default class MtgaTrackerDaemon {
   }
 
   public isDaemonRunning(): Promise<boolean> {
+    console.log("mtgaTrackerDaemon isDaemonRunning()");
     return axios
       .get<boolean>(`${this._url}/status`)
       .then(() => true)
@@ -223,6 +242,7 @@ export default class MtgaTrackerDaemon {
   }
 
   public getStatus(): Promise<DaemonStatus | null> {
+    console.log("mtgaTrackerDaemon getStatus()");
     return axios
       .get<DaemonStatus>(`${this._url}/status`)
       .then((d) => d.data)

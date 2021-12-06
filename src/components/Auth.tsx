@@ -9,6 +9,7 @@ import {
   LOGIN_WAITING,
 } from "mtgatool-shared/dist/shared/constants";
 import { sha1 } from "tool-db";
+
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 
 import AuthSettings from "./AuthSettings";
@@ -35,6 +36,7 @@ import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
 import { ReactComponent as PutKey } from "../assets/images/svg/put-key.svg";
 import Button from "./ui/Button";
 import keysLogin from "../toolDb/keysLogin";
+import fetchCards from "../daemon/fetchCards";
 
 type InputChange = ChangeEvent<HTMLInputElement>;
 
@@ -138,6 +140,7 @@ export default function Auth(props: AuthProps) {
         setLocalSetting("savedPass", "");
       }
       history.push("/home");
+      fetchCards();
     }
   }, [loginState, username, pass, rememberme, history]);
 
@@ -295,6 +298,7 @@ export default function Auth(props: AuthProps) {
                 type: "SET_LOADING",
                 arg: false,
               });
+              fetchCards();
             }
           })
           .catch((err: Error) => {

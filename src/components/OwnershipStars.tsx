@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import { cardHasType, DbCardData } from "mtgatool-shared";
 import { AppState } from "../redux/stores/rendererStore";
+import { defaultCardsData } from "../types/dbTypes";
 
 interface OwnershipProps {
   owned: number;
@@ -85,14 +86,22 @@ export default function OwnershipStars(props: {
   wanted?: number;
 }): JSX.Element {
   const { card, wanted } = props;
-  const cards = useSelector((state: AppState) => state.mainData.cards);
-  const cardsNew = useSelector((state: AppState) => state.mainData.cardsNew);
+  // const cards = useSelector((state: AppState) => state.mainData.cards);
+  // const cardsNew = useSelector((state: AppState) => state.mainData.cardsNew);
+
+  const currentUUID = useSelector(
+    (state: AppState) => state.mainData.currentUUID
+  );
+
+  const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
+  const cards = uuidData[currentUUID]?.cards || defaultCardsData;
 
   if (!card) {
     return <></>;
   }
-  let owned = cards[card.id] ?? 0;
-  const acquired = cardsNew[card.id] ?? 0;
+  let owned = cards.cards[card.id] ?? 0;
+  const acquired =
+    (cards.cards[card.id] || 0) - (cards.prevCards[card.id] || 0);
   const isWanted = wanted ?? 0;
 
   const infinitePlaysetCards = [69172, 67306, 76490];
