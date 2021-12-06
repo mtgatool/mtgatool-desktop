@@ -103,7 +103,7 @@
     "publish": [
       {
         "provider": "github",
-        "releaseType": "prerelease"
+        "releaseType": "release"
       }
     ],
     "extraResources": [

@@ -50,7 +50,7 @@ jobs:
         chmod +x *.sh
         chmod +x mtga-tracker-daemon/*.sh
         chmod +x mtga-tracker-daemon/bin/mtga-tracker-daemon
-        tar czvf "../dist/Mtg-Arena-Tool-Linux-Installer.tar.gz" *
+        tar czvf "../dist/mtgatool-desktop-linux-installer.tar.gz" *
         cd ..
 
     - name: Upload Release Asset
@@ -60,6 +60,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.latest_release_info.outputs.upload_url }}
-        asset_path: ./dist/Mtg-Arena-Tool-Linux-Installer.tar.gz
-        asset_name: Mtg-Arena-Tool-Linux-Installer.tar.gz
+        asset_path: ./dist/mtgatool-desktop-linux-installer.tar.gz
+        asset_name: mtgatool-desktop-linux-installer.tar.gz
         asset_content_type: application/gzip
