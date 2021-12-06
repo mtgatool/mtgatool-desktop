@@ -45,6 +45,7 @@ jobs:
         chmod +x mtga-tracker-daemon/*.sh
         chmod +x mtga-tracker-daemon/bin/mtga-tracker-daemon
         tar czvf "../dist/Mtg-Arena-Tool-Linux-Installer.tar.gz" *
+        cd ..
 
     - name: Upload dist as artifact
       uses: actions/upload-artifact@v2
