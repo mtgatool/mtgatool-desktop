@@ -1,4 +1,6 @@
 import Automerge from "automerge";
+
+import MtgaTrackerDaemon from "../daemon/mtgaTrackerDaemon";
 import setupIdb from "../toolDb/setupIdb";
 
 export type CRDT = Record<string, number>;
@@ -19,6 +21,8 @@ const globalData = {
   liveFeed: Automerge.init<Record<string, number>>(),
   lastLogCheck: 0,
   idb,
+  daemon: null as MtgaTrackerDaemon | null,
+  latestDaemon: null as any | null,
 };
 
 (window as any).globalData = globalData;

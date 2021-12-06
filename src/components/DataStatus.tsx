@@ -37,7 +37,6 @@ export default function DataStatus() {
   );
   const fullStats = useSelector((state: AppState) => state.mainData.fullStats);
   const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
-  const cards = useSelector((state: AppState) => state.mainData.cards);
 
   return (
     <>
@@ -67,8 +66,10 @@ export default function DataStatus() {
             status={database.cards ? "OK" : "LOADING"}
           />
           <StatusLine
-            title={`Owned cards (${Object.keys(cards).length})`}
-            status={Object.keys(cards).length > 0 ? "OK" : "LOADING"}
+            title={`Owned cards (${Object.values(
+              uuidData[currentUUID]?.cards.cards || {}
+            ).reduce((p, c) => p + c, 0)})`}
+            status={uuidData[currentUUID]?.cards ? "OK" : "LOADING"}
           />
           <StatusLine
             title="User data"

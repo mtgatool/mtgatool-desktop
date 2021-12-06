@@ -94,6 +94,7 @@ function App(props: AppProps) {
             arg: LOGIN_OK,
           });
 
+          console.log("pathname", history.location.pathname);
           if (
             history.location.pathname === "" ||
             history.location.pathname === "/"

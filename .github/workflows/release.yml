@@ -21,18 +21,31 @@ jobs:
       uses: "actions/checkout@v2"
     - name: "Install modules"
       run: "npm run install:ci"
+
     - name: "Test"
       run: "npm run jest:ci"
+
     - name: "Generate build information json"
       run: "node generateInfo.js"
+
     - name: "Build release, create GitHub release and upload assets (electron-builder)"
       run: "npm run release"
       env:
         GH_TOKEN: ${{ github.token }}
         # create release if it doesn't exist
         CI_BUILD_TAG: 1
-    - name: "Print dist dir"
-      run: "ls dist/"
+
+    - name: Create installer
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        cp dist/*.AppImage linux-installer
+        cd linux-installer
+        chmod +x *.AppImage
+        chmod +x *.sh
+        chmod +x mtga-tracker-daemon/*.sh
+        chmod +x mtga-tracker-daemon/bin/mtga-tracker-daemon
+        tar czvf "../dist/Mtg-Arena-Tool-Linux-Installer.tar.gz" *
+
     - name: Upload dist as artifact
       uses: actions/upload-artifact@v2
       with:

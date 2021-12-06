@@ -1,7 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import _ from "lodash";
-import { Cards } from "mtgatool-shared";
 
 import {
   DbCardsData,
@@ -15,9 +14,6 @@ import {
 import { AggregatedStats } from "../../utils/aggregateStats";
 
 const mainState = {
-  cards: {} as Cards,
-  cardsNew: {} as Cards,
-  cardsPrev: {} as Cards,
   forceCollection: 1,
   currentUUID: "",
   uuidData: {} as Record<
@@ -115,10 +111,6 @@ const mainDataSlice = createSlice({
         state.uuidData[action.payload.uuid].cards = action.payload.cards;
       }
     },
-    setCards: (state: MainState, action: PayloadAction<Cards>): void => {
-      state.cardsPrev = { ...state.cards };
-      state.cards = action.payload;
-    },
     setForceCollection: (
       state: MainState,
       _action: PayloadAction<undefined>
@@ -152,7 +144,6 @@ export const {
   setLiveFeed,
   setLiveFeedMatch,
   setUUID,
-  setCards,
   setForceCollection,
   setUUIDRank,
   setUUIDInventory,

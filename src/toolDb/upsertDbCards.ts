@@ -36,6 +36,7 @@ export default async function upsertDbCards(cards: Cards) {
           `${uuid}-cards`,
           {
             ...defaultCardsData,
+            cards,
             updated: new Date().getTime(),
           },
           true
