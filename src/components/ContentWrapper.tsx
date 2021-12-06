@@ -15,7 +15,7 @@ import AdvancedSearch from "./views/collection/advancedSearch";
 import { AppState } from "../redux/stores/rendererStore";
 import getCollectionData from "./views/collection/cards/getCollectionData";
 
-import { DbMatch } from "../types/dbTypes";
+import { DbMatch, defaultCardsData } from "../types/dbTypes";
 import reduxAction from "../redux/reduxAction";
 import aggregateStats from "../utils/aggregateStats";
 import getCssQuality from "../utils/getCssQuality";
@@ -47,8 +47,12 @@ const ContentWrapper = () => {
   const params = useParams<{ page: string }>();
   const paths = useRef<string[]>([params.page]);
 
-  const cards = useSelector((state: AppState) => state.mainData.cards);
-  const cardsNew = useSelector((state: AppState) => state.mainData.cardsNew);
+  const currentUUID = useSelector(
+    (state: AppState) => state.mainData.currentUUID
+  );
+
+  const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
+
   const showPostSignup = useSelector(
     (state: AppState) => state.renderer.showPostSignup
   );
@@ -60,8 +64,8 @@ const ContentWrapper = () => {
   );
 
   const collectionData = useMemo(() => {
-    return getCollectionData(cards, cardsNew);
-  }, [cards, cardsNew, forceCollection]);
+    return getCollectionData(uuidData[currentUUID]?.cards || defaultCardsData);
+  }, [uuidData, currentUUID, forceCollection]);
 
   useEffect(() => {
     if (params.page === "decks") {

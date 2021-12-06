@@ -1,7 +1,5 @@
 import { Cards } from "mtgatool-shared";
 
-import reduxAction from "../redux/reduxAction";
-import store from "../redux/stores/rendererStore";
 import upsertDbCards from "../toolDb/upsertDbCards";
 import globalData from "../utils/globalData";
 import fetchPlayerId from "./fetchPlayerId";
@@ -17,10 +15,6 @@ export default function fetchCards() {
           });
 
           upsertDbCards(parsedCards);
-          reduxAction(store.dispatch, {
-            type: "SET_CARDS",
-            arg: parsedCards,
-          });
         }
       });
     }

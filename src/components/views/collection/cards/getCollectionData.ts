@@ -1,4 +1,4 @@
-import { Cards, Colors, constants } from "mtgatool-shared";
+import { Colors, constants } from "mtgatool-shared";
 
 import database from "../../../../utils/database-wrapper";
 import {
@@ -15,6 +15,7 @@ import getCardIsCraftable from "./getCardIsCraftable";
 import getCardSuspended from "./getCardSuspended";
 import getRarityFilterVal from "./getRarityFilterVal";
 import { CardsData } from "../../../../types/collectionTypes";
+import { DbCardsData } from "../../../../types/dbTypes";
 
 const {
   DRAFT_RANKS,
@@ -31,10 +32,7 @@ const {
  * @param cardsNew New Cards added to collection
  * @returns Cards Data
  */
-export default function getCollectionData(
-  cards: Cards,
-  cardsNew: Cards
-): CardsData[] {
+export default function getCollectionData(cards: DbCardsData): CardsData[] {
   return database.cardList
     .filter(
       (card) =>
@@ -52,8 +50,9 @@ export default function getCollectionData(
       const type = card.type.toLowerCase();
       const artist = card.artist?.toLowerCase() || "";
 
-      const owned = cards[card.id] ?? 0;
-      const acquired = cardsNew[card.id] ?? 0;
+      const owned = cards.cards[card.id] ?? 0;
+      const acquired =
+        (cards.cards[card.id] || 0) - (cards.prevCards[card.id] || 0);
 
       const colorsObj = new Colors();
       colorsObj.addFromCost(card.cost);

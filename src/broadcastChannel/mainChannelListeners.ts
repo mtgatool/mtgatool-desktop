@@ -188,10 +188,6 @@ export default function mainChannelListeners() {
 
     if (msg.data.type === "UPSERT_DB_CARDS") {
       upsertDbCards(msg.data.value);
-      reduxAction(store.dispatch, {
-        type: "SET_CARDS",
-        arg: msg.data.value,
-      });
     }
 
     if (msg.data.type === "UPSERT_DB_RANK") {
