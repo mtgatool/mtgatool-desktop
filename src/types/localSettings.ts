@@ -20,6 +20,7 @@ export const settingKeys = [
   "css",
   "clientId",
   "showHiddenDecks",
+  "daemonPort",
 ] as const;
 
 export type SettingKey = typeof settingKeys[number];
@@ -39,4 +40,5 @@ export const defaultSettings: Record<SettingKey, string> = {
   css: isElectron() ? "high" : "web",
   clientId: sha1(`${textRandom(100)}-${new Date().getTime()}`),
   showHiddenDecks: "false",
+  daemonPort: "6842",
 };

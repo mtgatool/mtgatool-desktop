@@ -1,6 +1,7 @@
+/* eslint-disable radix */
 /* eslint-disable no-alert */
 /* eslint-disable no-restricted-globals */
-import { useCallback, useState } from "react";
+import { ChangeEvent, useCallback, useState } from "react";
 import { format, fromUnixTime } from "date-fns";
 import { database } from "mtgatool-shared";
 
@@ -18,6 +19,7 @@ import openExternal from "../utils/openExternal";
 import isElectron from "../utils/electron/isElectron";
 
 import NetworkSettingsPanel from "./views/settings/NetworkSettingsPanel";
+import Button from "./ui/Button";
 
 function clickBetaChannel(value: boolean): void {
   setLocalSetting("betaChannel", value ? "true" : "false");
@@ -30,6 +32,18 @@ interface AuthSettingsProps {
 export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
   const { onClose } = props;
   const [path, setPath] = useState(getLocalSetting("logPath"));
+
+  const [daemonPort, setDaemonPort] = useState(
+    parseInt(getLocalSetting("daemonPort"))
+  );
+
+  const handleSetDaemonPort = useCallback(
+    (event: ChangeEvent<HTMLInputElement>): void => {
+      setLocalSetting("daemonPort", event.target.value);
+      setDaemonPort(parseInt(event.target.value));
+    },
+    []
+  );
 
   // Arena log controls
   const arenaLogCallback = useCallback((value: string): void => {
@@ -91,6 +105,43 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
             />
           </div>
         )}
+        <div style={{ marginTop: "16px" }} />
+        <div
+          className="input-container"
+          style={{
+            height: "40px",
+          }}
+        >
+          <label className="label">MTGA Tracker Daemon Port:</label>
+          <div
+            style={{
+              display: "flex",
+              width: "120px",
+              margin: "0 0 0 32px",
+            }}
+          >
+            <div
+              className="form-input-container"
+              style={{ padding: "0", margin: "auto" }}
+            >
+              <input
+                onChange={handleSetDaemonPort}
+                autoComplete="off"
+                type="text"
+                value={daemonPort}
+              />
+            </div>
+          </div>
+          <Button
+            text="Connect"
+            style={{ margin: "auto auto auto 32px" }}
+            onClick={() => {
+              //
+            }}
+          />
+          <div className={`log-status-${true ? "ok" : "err"}`} />
+        </div>
+
         <Toggle
           text="Beta updates channel"
           value={getLocalSetting("betaChannel") == "true"}
@@ -98,8 +149,9 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
           style={{ marginTop: "16px" }}
           margin={false}
         />
-        <div style={{ marginTop: "16px" }} />
+
         <NetworkSettingsPanel />
+
         <div className="about">
           <p
             style={{ margin: "4px", textDecoration: "underline" }}
