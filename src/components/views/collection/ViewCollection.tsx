@@ -72,6 +72,16 @@ export default function ViewCollection(props: ViewCollectionProps) {
   }, [forceQuery]);
 
   useEffect(() => {
+    if (filters) {
+      filters.forEach((f) => {
+        if (f.id === "setCodes" && f.type === "array") {
+          setFilterSets(f.value.arr);
+        }
+      });
+    }
+  }, [filters]);
+
+  useEffect(() => {
     if (match) {
       const { query } = match.params;
       reduxAction(dispatch, {
@@ -83,21 +93,40 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
   const setFilterSetsPre = useCallback(
     (sets: string[]) => {
-      setFilterSets(sets);
-      if (filters) {
-        const newFilters = setFilter(filters, {
-          type: "array",
-          id: "setCodes",
-          value: {
-            mode: ":",
-            arr: sets,
-            not: false,
-          },
-        });
-        setFilters(newFilters);
-      }
+      // if (filters) {
+      //   const newFilters = setFilter(filters, {
+      //     type: "array",
+      //     id: "setCodes",
+      //     value: {
+      //       mode: ":",
+      //       arr: sets,
+      //       not: false,
+      //     },
+      //   });
+      //   setFilters(newFilters);
+      // }
+
+      reduxAction(dispatch, {
+        type: "SET_COLLECTION_QUERY",
+        arg: {
+          query: sets.length > 0 ? `s:${sets.join(",")}` : "",
+          forceQuery: true,
+        },
+      });
+
+      const newFilters: Filters<CardsData> = setFilter([], {
+        type: "array",
+        id: "setCodes",
+        value: {
+          mode: ":",
+          arr: sets,
+          not: false,
+        },
+      });
+
+      setFilters(newFilters);
     },
-    [filters]
+    [dispatch, filters]
   );
 
   const handleChange = useCallback(
