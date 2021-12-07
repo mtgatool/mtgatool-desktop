@@ -35,6 +35,12 @@ jobs:
         # create release if it doesn't exist
         CI_BUILD_TAG: 1
 
+    - name: Gets latest created release info
+      id: latest_release_info
+      uses: jossef/action-latest-release-info@v1.1.0
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+  
     - name: Create installer
       if: matrix.os == 'ubuntu-latest'
       run: |
@@ -44,12 +50,16 @@ jobs:
         chmod +x *.sh
         chmod +x mtga-tracker-daemon/*.sh
         chmod +x mtga-tracker-daemon/bin/mtga-tracker-daemon
-        tar czvf "../dist/Mtg-Arena-Tool-Linux-Installer.tar.gz" *
+        tar czvf "../dist/mtgatool-desktop-linux-installer.tar.gz" *
+        cd ..
 
-    - name: Upload dist as artifact
-      uses: actions/upload-artifact@v2
+    - name: Upload Release Asset
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: release-${{ matrix.os }}
-        path: |
-          dist/*
-          !dist/*/**
+        upload_url: ${{ steps.latest_release_info.outputs.upload_url }}
+        asset_path: ./dist/mtgatool-desktop-linux-installer.tar.gz
+        asset_name: mtgatool-desktop-linux-installer.tar.gz
+        asset_content_type: application/gzip
