@@ -16,6 +16,7 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
   const filterable = Object.keys(database.sets).filter(
     (set) => database.sets[set].collation > 0
   );
+
   filterable.push(
     "Jumpstart",
     "Historic Anthology 1",

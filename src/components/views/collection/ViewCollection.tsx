@@ -64,6 +64,11 @@ export default function ViewCollection(props: ViewCollectionProps) {
       store.getState().renderer.collectionQuery
     );
     setFilters(newFilters);
+    newFilters.forEach((f) => {
+      if (f.id === "setCodes" && f.type === "array") {
+        setFilterSets(f.value.arr);
+      }
+    });
   }, [forceQuery]);
 
   useEffect(() => {

@@ -115,7 +115,7 @@ export default function AdvancedSearch(
   let defaultOwnedMax = null;
   let defaultBoosters = null;
   // Loop trough the setted filters to adjust defaults
-  // console.log(defaultFilters);
+  // console.log("defaultFilters", defaultFilters);
   defaultFilters.forEach((f: any) => {
     // Guess color filter
     if (f.id == "colors") {
@@ -135,7 +135,7 @@ export default function AdvancedSearch(
       );
       defaultCol = col.getBits();
     }
-    if (f.id == "set") {
+    if (f.id == "setCodes") {
       const filter: ArrayFilter = f.value;
       defaultSets = filter.arr;
     }

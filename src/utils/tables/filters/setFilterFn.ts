@@ -16,8 +16,8 @@ export default function setFilterFn(
     F.forEach((set) => {
       res =
         res ||
-        row.setCodes.includes(set) ||
-        row.set.toLowerCase().indexOf(set) !== -1;
+        (_key === "setCodes" && row.setCodes.includes(set)) ||
+        (_key === "set" && row.set.indexOf(set) !== -1);
     });
 
     return filterValue.not ? !res : res;
