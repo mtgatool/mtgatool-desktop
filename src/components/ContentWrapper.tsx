@@ -24,6 +24,7 @@ import { convertDbMatchToData } from "./views/history/getMatchesData";
 import getLocalDbValue from "../toolDb/getLocalDbValue";
 import PostSignupPopup from "./PostSignupPopup";
 import ViewDrafts from "./views/drafts/ViewDrafts";
+import useDatePicker from "../hooks/useDatePicker";
 
 const views = {
   home: ViewHome,
@@ -128,8 +129,24 @@ const ContentWrapper = () => {
 
   const CurrentPage = Object.values(views)[viewIndex];
 
+  const datePickerCallbackRef = useRef((_d: Date) => {
+    // nothiog here (yet!)
+  });
+
+  const [
+    datePickerDate,
+    datePickerDoShow,
+    datePickerElement,
+    setDatePickerDate,
+  ] = useDatePicker(
+    new Date(0),
+    undefined,
+    datePickerCallbackRef.current || vodiFn
+  );
+
   return (
     <>
+      {datePickerElement}
       <PopupComponent
         open={false}
         width="900px"
@@ -181,6 +198,10 @@ const ContentWrapper = () => {
                         openAdvancedCollectionSearch.current
                       }
                       openHistoryStatsPopup={openHistoryStatsPopup.current}
+                      datePickerDate={datePickerDate}
+                      datePickerDoShow={datePickerDoShow}
+                      setDatePickerDate={setDatePickerDate}
+                      datePickerCallbackRef={datePickerCallbackRef}
                     />
                   </animated.div>
                 );
@@ -197,6 +218,10 @@ const ContentWrapper = () => {
                     openAdvancedCollectionSearch.current
                   }
                   openHistoryStatsPopup={openHistoryStatsPopup.current}
+                  datePickerDate={datePickerDate}
+                  datePickerDoShow={datePickerDoShow}
+                  setDatePickerDate={setDatePickerDate}
+                  datePickerCallbackRef={datePickerCallbackRef}
                 />
               </div>
             )}

@@ -1,7 +1,7 @@
 import { Route, Switch, useRouteMatch } from "react-router-dom";
 
 import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { MutableRefObject, useEffect, useState } from "react";
 import useDbUser from "../../../hooks/useDbUser";
 
 import HistoryList from "./HistoryList";
@@ -12,10 +12,20 @@ import getMatchesData, { MatchData } from "./getMatchesData";
 
 interface ViewHistoryProps {
   openHistoryStatsPopup: () => void;
+  datePickerDate: Date;
+  datePickerDoShow: () => void;
+  setDatePickerDate: (newDate: Date) => void;
+  datePickerCallbackRef: MutableRefObject<(d: Date) => void>;
 }
 
 export default function ViewHistory(props: ViewHistoryProps) {
-  const { openHistoryStatsPopup } = props;
+  const {
+    openHistoryStatsPopup,
+    datePickerDate,
+    datePickerDoShow,
+    setDatePickerDate,
+    datePickerCallbackRef,
+  } = props;
   const { url } = useRouteMatch();
   const [, loggedIn] = useDbUser();
 
@@ -38,6 +48,10 @@ export default function ViewHistory(props: ViewHistoryProps) {
             path={`${url}/`}
             component={() => (
               <HistoryList
+                datePickerDate={datePickerDate}
+                datePickerDoShow={datePickerDoShow}
+                setDatePickerDate={setDatePickerDate}
+                datePickerCallbackRef={datePickerCallbackRef}
                 openHistoryStatsPopup={openHistoryStatsPopup}
                 matchesData={matchesData}
               />

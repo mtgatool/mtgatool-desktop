@@ -27,11 +27,15 @@ import { MatchData } from "./getMatchesData";
 import ListItemMatch from "./ListItemMatch";
 import aggregateStats from "../../../utils/aggregateStats";
 import reduxAction from "../../../redux/reduxAction";
-import useDatePicker from "../../../hooks/useDatePicker";
+
 import InputContainer from "../../InputContainer";
 
 interface HistoryListProps {
   openHistoryStatsPopup: () => void;
+  datePickerDate: Date;
+  datePickerDoShow: () => void;
+  setDatePickerDate: (newDate: Date) => void;
+  datePickerCallbackRef: MutableRefObject<(d: Date) => void>;
   matchesData: MatchData[];
 }
 
@@ -41,7 +45,14 @@ export default function HistoryList(props: HistoryListProps) {
   const fullStats = useSelector((state: AppState) => state.mainData.fullStats);
   const history = useHistory();
   const dispatch = useDispatch();
-  const { openHistoryStatsPopup, matchesData } = props;
+  const {
+    openHistoryStatsPopup,
+    matchesData,
+    datePickerDate,
+    datePickerDoShow,
+    setDatePickerDate,
+    datePickerCallbackRef,
+  } = props;
 
   const [eventFilter, setEventFilterState] = useState("");
   const [fromDateOption, setFromDateOption] = useState(dateOptions[0]);
@@ -96,12 +107,6 @@ export default function HistoryList(props: HistoryListProps) {
     },
     [filters]
   );
-
-  const [pickerDate, pickerDoShow, pickerElement, setPickerDate] =
-    useDatePicker(new Date(0), undefined, (date) => {
-      setDateFilter(date);
-      setFromDateOption(dateOptions[1]);
-    });
 
   const [sortValue, setSortValue] = useState<Sort<MatchData>>({
     key: "timestamp",
@@ -172,6 +177,11 @@ export default function HistoryList(props: HistoryListProps) {
     ...new Set(transformedEvents),
   ];
 
+  datePickerCallbackRef.current = (date: Date) => {
+    setDateFilter(date);
+    setFromDateOption(dateOptions[1]);
+  };
+
   return (
     <>
       <div
@@ -188,7 +198,7 @@ export default function HistoryList(props: HistoryListProps) {
         <div style={{ lineHeight: "32px", marginLeft: "16px" }}>From: </div>
         <InputContainer style={{ width: "auto" }} title="">
           <input
-            onClick={pickerDoShow}
+            onClick={datePickerDoShow}
             ref={containerRef}
             style={{
               backgroundColor: "var(--color-base)",
@@ -197,25 +207,24 @@ export default function HistoryList(props: HistoryListProps) {
             }}
             readOnly
             type="date"
-            value={pickerDate.toISOString().substring(0, 10)}
+            value={datePickerDate.toISOString().substring(0, 10)}
           />
         </InputContainer>
-        {pickerElement}
         <Select
           options={dateOptions}
           current={fromDateOption}
           callback={(opt) => {
             const now = new Date().getTime();
             if (opt === dateOptions[0]) {
-              setPickerDate(new Date(0));
+              setDatePickerDate(new Date(0));
               setDateFilter(new Date(0));
             }
             if (opt === dateOptions[2]) {
-              setPickerDate(new Date(now - 2592000000));
+              setDatePickerDate(new Date(now - 2592000000));
               setDateFilter(new Date(now - 2592000000));
             }
             if (opt === dateOptions[3]) {
-              setPickerDate(new Date(now - 31560000000));
+              setDatePickerDate(new Date(now - 31560000000));
               setDateFilter(new Date(now - 31560000000));
             }
             setFromDateOption(opt);
