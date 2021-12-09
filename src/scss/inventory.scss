@@ -1,5 +1,14 @@
 @import "./misc.scss";
 
+.rarity-symbol {
+  width: 24px;
+  height: 32px;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: 0 6px;
+  background-size: contain;
+}
+
 .wildcards-cost {
   width: 100%;
   display: flex;
@@ -49,8 +58,8 @@
   font-family: var(--sub-font-name);
   color: var(--color-light);
   width: 40px;
-  line-height: 96px;
-  height: 64px;
+  line-height: 32px;
+  height: 32px;
   text-align: center;
   background-position: center 2px;
   background-repeat: no-repeat;

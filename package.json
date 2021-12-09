@@ -25,7 +25,7 @@
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.0",
     "mathjs": "^9.3.0",
-    "mtgatool-shared": "^1.1.1",
+    "mtgatool-shared": "^1.1.2",
     "queue": "^6.0.2",
     "random-words": "^1.1.1",
     "react": "^17.0.2",

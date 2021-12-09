@@ -52,7 +52,7 @@ function App(props: AppProps) {
     (state: AppState) => state.renderer
   );
 
-  const os = forceOs || (electron ? process.platform : "");
+  const os = forceOs || (isElectron() ? process.platform : "");
 
   useEffect(() => {
     if (!window.toolDbInitialized) {

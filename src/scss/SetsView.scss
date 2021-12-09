@@ -1,0 +1,17 @@
+.sets-view-grid {
+  display: grid;
+  grid-template-columns: auto minmax(300px, 480px);
+  gap: 16px;
+  grid-template-rows: auto auto 1fr;
+  grid-template-areas:
+    "filters filters"
+    "set stats"
+    "chart stats";
+}
+
+.message {
+  color: var(--color-g);
+  font-size: 16px;
+  padding: 16px;
+  margin: auto;
+}

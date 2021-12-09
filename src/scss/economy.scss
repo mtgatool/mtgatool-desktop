@@ -1,0 +1,230 @@
+.economy-day-stats {
+  font-family: var(--main-font-name);
+  font-size: 16px;
+  margin: auto 16px auto auto;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.economy-metric {
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.economy-delta {
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 6px;
+  line-height: 64px;
+}
+
+.economy-up {
+  background-repeat: no-repeat;
+  margin: 4px;
+  width: 24px;
+  height: 24px;
+  // background-image: url(../assets/images/up_green.png);
+  background-size: contain;
+}
+
+.economy-down {
+  background-repeat: no-repeat;
+  margin: 4px;
+  width: 24px;
+  height: 24px;
+  // background-image: url(../assets/images/down_red.png);
+  background-size: contain;
+}
+
+.economy-title {
+  margin: 4px 0;
+  display: grid;
+  padding: 0px 8px;
+  grid-template-columns: auto 10% 15% 20% 20% 15%;
+  color: var(--color-text);
+  line-height: 64px;
+  font-size: 16px;
+}
+
+.economy-time {
+  -webkit-user-select: none;
+  white-space: nowrap;
+  margin-left: 8px;
+  margin-right: 16px;
+  margin-top: 2px;
+  color: var(--color-light);
+  line-height: 32px;
+  text-align: -webkit-left;
+  font-size: 16px;
+  font-family: var(--main-font-name-it);
+  opacity: 0.5;
+}
+
+.economy-sub {
+  margin-left: 2px;
+  font-family: var(--sub-font-name);
+  color: var(--color-text);
+  white-space: nowrap;
+  text-overflow: clip;
+  margin: auto 0;
+}
+
+.economy-sub.small {
+  line-height: 32px;
+}
+
+.economy-wc {
+  min-width: 24px;
+  height: 24px;
+  margin: 0 4px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.economy-ticket {
+  margin: auto 4px;
+  width: 28px;
+  height: 28px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-image: url(../assets/images/ticket.png);
+}
+
+.economy-ticket-med {
+  background-repeat: no-repeat;
+  margin: auto 4px;
+  width: 28px;
+  height: 28px;
+  // background-image: url(../assets/images/ticket.png);
+  background-size: contain;
+}
+
+.economy-gems {
+  background-repeat: no-repeat;
+  margin: auto 4px;
+  width: 28px;
+  height: 28px;
+  // background-image: url(../assets/images/gem.png);
+  background-size: contain;
+}
+
+.economy-wc-med {
+  background-repeat: no-repeat;
+  margin: auto 8px;
+  margin-left: 18px;
+  width: 28px;
+  height: 35px;
+  background-size: contain;
+}
+
+.economy-gold {
+  background-repeat: no-repeat;
+  margin: auto 4px;
+  width: 28px;
+  height: 28px;
+  // background-image: url(../assets/images/gold.png);
+  background-size: contain;
+}
+
+.economy-gold.marginLeft {
+  margin-left: 16px;
+}
+
+.economy-mastery-med {
+  background-repeat: no-repeat;
+  margin: auto 4px;
+  margin-left: 16px;
+  width: 28px;
+  height: 28px;
+  // background-image: url(../assets/images/mastery.png);
+  background-size: contain;
+}
+
+.economy-vault {
+  background-repeat: no-repeat;
+  margin: auto 4px;
+  width: 28px;
+  height: 28px;
+  // background-image: url(../assets/images/vault.png);
+  background-size: contain;
+}
+
+.economy-card {
+  background-repeat: no-repeat;
+  margin: auto 4px;
+  width: 28px;
+  height: 28px;
+  // background-image: url(../assets/images/card_icon.png);
+  background-position: center;
+  background-size: contain;
+}
+
+.economy-vanity {
+  background-repeat: no-repeat;
+  margin: auto 4px;
+  width: 28px;
+  height: 28px;
+  // background-image: url(../assets/images/egg.png);
+  background-position: center;
+  background-size: contain;
+}
+
+.economy-orb {
+  background-repeat: no-repeat;
+  margin: auto 4px auto 16px;
+  width: 20px;
+  height: 20px;
+  // background-image: url(../assets/images/orb.png);
+  background-size: contain;
+}
+
+.economy-exp {
+  background-repeat: no-repeat;
+  margin: auto 4px;
+  margin-left: 16px;
+  width: 28px;
+  height: 28px;
+  // background-image: url(../assets/images/skin.png);
+  background-size: contain;
+}
+
+.economy-skin-art {
+  background-repeat: no-repeat;
+  margin: auto 4px;
+  width: 40px;
+  height: 40px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 100%;
+  border: 2px solid var(--color-base);
+}
+
+.economy-icon-margin {
+  margin-left: 24px;
+}
+
+.economy-row-hidden {
+  height: 0px;
+  display: none;
+}
+
+.tiny_scroll::-webkit-scrollbar {
+  height: 3px;
+}
+
+.tiny_scroll::-webkit-scrollbar-track {
+  border-radius: 2px;
+  margin-left: 2px;
+  background: var(--color-section);
+}
+
+.tiny_scroll::-webkit-scrollbar-thumb {
+  background: var(--color-button);
+  border-radius: 3px;
+}
+
+.tiny_scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-button-hover);
+}

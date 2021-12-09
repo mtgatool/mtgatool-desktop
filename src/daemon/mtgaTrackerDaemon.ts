@@ -8,6 +8,7 @@ import zlib from "zlib";
 import electron from "../utils/electron/electronWrapper";
 import downloadFile from "../utils/downloadFile";
 import globalData from "../utils/globalData";
+import isElectron from "../utils/electron/isElectron";
 
 interface DaemonInventory {
   gems: number;
@@ -32,7 +33,7 @@ interface DaemonStatus {
   processId: number | -1;
 }
 
-const os: string = electron ? process.platform : "";
+const os: string = isElectron() ? process.platform : "";
 
 export default class MtgaTrackerDaemon {
   private _port = 6842;
@@ -49,7 +50,7 @@ export default class MtgaTrackerDaemon {
     this._port = port;
     this._url = `http://localhost:${this._port}`;
 
-    if (os === "win32") {
+    if (isElectron() && os === "win32") {
       this.setupDaemon();
     }
   }
@@ -85,7 +86,7 @@ export default class MtgaTrackerDaemon {
 
       const downloadPath = path.join(electronApp.getPath("userData"), zipName);
 
-      if (fs.existsSync(downloadPath)) {
+      if (isElectron() && fs.existsSync(downloadPath)) {
         fs.unlinkSync(downloadPath);
       }
 
@@ -151,7 +152,8 @@ export default class MtgaTrackerDaemon {
     if (os !== "win32") return;
 
     if (this._daemonExecutablePath) {
-      const daemonExists = fs.existsSync(this._daemonExecutablePath);
+      const daemonExists =
+        isElectron() && fs.existsSync(this._daemonExecutablePath);
 
       if (daemonExists) {
         // Start the process

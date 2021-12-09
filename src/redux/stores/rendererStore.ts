@@ -1,5 +1,6 @@
 import { combineReducers } from "redux";
 import { configureStore } from "@reduxjs/toolkit";
+import collectionSlice from "../slices/collectionSlice";
 import mainDataSlice from "../slices/mainDataSlice";
 import rendererSlice from "../slices/rendererSlice";
 import avatarsSlice from "../slices/avatarsSlice";
@@ -7,6 +8,7 @@ import settingsSlice from "../slices/settingsSlice";
 import hoverSlice from "../slices/hoverSlice";
 
 const rootReducer = combineReducers({
+  collection: collectionSlice.reducer,
   mainData: mainDataSlice.reducer,
   renderer: rendererSlice.reducer,
   avatars: avatarsSlice.reducer,

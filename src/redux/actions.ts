@@ -1,4 +1,5 @@
 import * as HoverSlice from "./slices/hoverSlice";
+import * as CollectionSlice from "./slices/collectionSlice";
 import * as MainDataSlice from "./slices/mainDataSlice";
 import * as RendererSlice from "./slices/rendererSlice";
 import * as avatarsSlice from "./slices/avatarsSlice";
@@ -7,6 +8,11 @@ import * as SettingsSlice from "./slices/settingsSlice";
 export const actions = {
   SET_HOVER_IN: HoverSlice.setHoverIn,
   SET_HOVER_OUT: HoverSlice.setHoverOut,
+  SET_BOOSTER_WIN_FACTOR: CollectionSlice.setBoosterWinFactor,
+  SET_COUNT_MODE: CollectionSlice.setCountMode,
+  SET_FUTURE_BOOSTERS: CollectionSlice.setFutureBoosters,
+  SET_MYTHIC_DRAFT_FACTOR: CollectionSlice.setMythicDraftFactor,
+  SET_RARE_DRAFT_FACTOR: CollectionSlice.setRareDraftFactor,
   SET_FULL_STATS: MainDataSlice.setFullStats,
   SET_HISTORY_STATS: MainDataSlice.setHistoryStats,
   SET_LIVE_FEED: MainDataSlice.setLiveFeed,

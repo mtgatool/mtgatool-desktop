@@ -3,8 +3,6 @@ import Automerge from "automerge";
 import MtgaTrackerDaemon from "../daemon/mtgaTrackerDaemon";
 import setupIdb from "../toolDb/setupIdb";
 
-export type CRDT = Record<string, number>;
-
 const idb: any = setupIdb();
 idb.start();
 

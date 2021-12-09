@@ -21,6 +21,8 @@ import SetsFilter from "../../SetsFilter";
 import setFilter from "../../../utils/tables/filters/setFilter";
 import { Filters } from "../../../types/genericFilterTypes";
 import getCssQuality from "../../../utils/getCssQuality";
+import SetsView from "./SetsView";
+import { getCollectionStats } from "./collectionStats";
 
 interface ViewCollectionProps {
   collectionData: CardsData[];
@@ -30,6 +32,8 @@ interface ViewCollectionProps {
 export default function ViewCollection(props: ViewCollectionProps) {
   const match = useRouteMatch<{ query: string }>("/collection/:query");
   const history = useHistory();
+
+  const [viewMode, setViewMode] = useState<"cards" | "set">("cards");
 
   const { collectionData, openAdvancedCollectionSearch } = props;
   const dispatch = useDispatch();
@@ -41,6 +45,11 @@ export default function ViewCollection(props: ViewCollectionProps) {
     key: "name",
     sort: 1,
   });
+
+  const toggleView = useCallback(() => {
+    if (viewMode === "cards") setViewMode("set");
+    else if (viewMode === "set") setViewMode("cards");
+  }, [viewMode]);
 
   const forceQuery = useSelector(
     (state: AppState) => state.renderer.forceQuery
@@ -90,6 +99,21 @@ export default function ViewCollection(props: ViewCollectionProps) {
       });
     }
   }, []);
+
+  const stats = useMemo(() => {
+    const cardIds = filteredData.map((row) => row.id);
+    return getCollectionStats(cardIds);
+  }, [filteredData]);
+
+  const setQuery = useCallback(
+    (query: string) => {
+      reduxAction(dispatch, {
+        type: "SET_COLLECTION_QUERY",
+        arg: { query, forceQuery: true },
+      });
+    },
+    [dispatch]
+  );
 
   const setFilterSetsPre = useCallback(
     (sets: string[]) => {
@@ -156,9 +180,10 @@ export default function ViewCollection(props: ViewCollectionProps) {
         className={`section ${getCssQuality()}`}
         style={{ flexDirection: "column" }}
       >
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "flex", width: "100%" }}>
           <Button
             onClick={openAdvancedCollectionSearch}
+            style={{ minWidth: "160px", margin: "auto 8px auto 0" }}
             text="Advanced Filters"
           />
           <InputContainer title="Search">
@@ -170,51 +195,67 @@ export default function ViewCollection(props: ViewCollectionProps) {
             />
           </InputContainer>
         </div>
-
-        <div>
-          <SetsFilter callback={setFilterSetsPre} filtered={filterSets} />
-        </div>
-      </div>
-      <div
-        className={`section ${getCssQuality()}`}
-        style={{ marginTop: "0px", flexDirection: "column" }}
-      >
-        <SortControls<CardsData>
-          defaultSort={sortValue}
-          setSortCallback={setSortValue}
-          columnKeys={["name", "rarityVal", "cmc", "cid", "set"]}
-          columnNames={["Name", "Rarity", "CMC", "Collector ID", "Set"]}
-        />
-        <div
-          style={{
-            gridTemplateColumns: `repeat(auto-fit, minmax(${
-              100 + cardsSize * 15 + 12
-            }px, 1fr))`,
-          }}
-          className="collection-table"
-        >
-          {filteredData
-            .slice(
-              pagingControlProps.pageIndex * pagingControlProps.pageSize,
-              (pagingControlProps.pageIndex + 1) * pagingControlProps.pageSize
-            )
-            .map((card) => {
-              return (
-                <CardCollection
-                  card={card}
-                  key={`collection-card-${card.id}`}
-                />
-              );
-            })}
-        </div>
-
-        <div style={{ marginTop: "10px" }}>
-          <PagingControls
-            {...pagingControlProps}
-            pageSizeOptions={[8, 16, 24, 32]}
+        <div style={{ display: "flex", width: "100%" }}>
+          <Button
+            onClick={toggleView}
+            style={{ minWidth: "160px", margin: "auto 8px 0 0" }}
+            text={viewMode === "set" ? "Cards view" : "Set view"}
           />
+          <div>
+            <SetsFilter callback={setFilterSetsPre} filtered={filterSets} />
+          </div>
         </div>
       </div>
+      {viewMode === "set" && (
+        <SetsView
+          setQuery={setQuery}
+          filterSets={filterSets}
+          filters={filters || []}
+          stats={stats}
+        />
+      )}
+      {viewMode === "cards" && (
+        <div
+          className={`section ${getCssQuality()}`}
+          style={{ marginTop: "16px", flexDirection: "column" }}
+        >
+          <SortControls<CardsData>
+            defaultSort={sortValue}
+            setSortCallback={setSortValue}
+            columnKeys={["name", "rarityVal", "cmc", "cid", "set"]}
+            columnNames={["Name", "Rarity", "CMC", "Collector ID", "Set"]}
+          />
+          <div
+            style={{
+              gridTemplateColumns: `repeat(auto-fit, minmax(${
+                100 + cardsSize * 15 + 12
+              }px, 1fr))`,
+            }}
+            className="collection-table"
+          >
+            {filteredData
+              .slice(
+                pagingControlProps.pageIndex * pagingControlProps.pageSize,
+                (pagingControlProps.pageIndex + 1) * pagingControlProps.pageSize
+              )
+              .map((card) => {
+                return (
+                  <CardCollection
+                    card={card}
+                    key={`collection-card-${card.id}`}
+                  />
+                );
+              })}
+          </div>
+
+          <div style={{ marginTop: "10px" }}>
+            <PagingControls
+              {...pagingControlProps}
+              pageSizeOptions={[8, 16, 24, 32]}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }
