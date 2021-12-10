@@ -3,10 +3,7 @@
   grid-template-columns: auto minmax(300px, 480px);
   gap: 16px;
   grid-template-rows: auto auto 1fr;
-  grid-template-areas:
-    "filters filters"
-    "set stats"
-    "chart stats";
+  grid-template-areas: "filters filters" "set stats" "chart stats";
 }
 
 .message {
