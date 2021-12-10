@@ -138,47 +138,51 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
           </div>
         )}
         <div style={{ marginTop: "16px" }} />
-        <div
-          className="input-container"
-          style={{
-            height: "40px",
-          }}
-        >
-          <label className="label">MTGA Tracker Daemon Port:</label>
-          <div
-            style={{
-              display: "flex",
-              width: "120px",
-              margin: "0 0 0 32px",
-            }}
-          >
+        {isElectron() && (
+          <>
+            {" "}
             <div
-              className="form-input-container"
-              style={{ padding: "0", margin: "auto" }}
+              className="input-container"
+              style={{
+                height: "40px",
+              }}
             >
-              <input
-                onChange={handleSetDaemonPort}
-                autoComplete="off"
-                type="text"
-                value={daemonPort}
+              <label className="label">MTGA Tracker Daemon Port:</label>
+              <div
+                style={{
+                  display: "flex",
+                  width: "120px",
+                  margin: "0 0 0 32px",
+                }}
+              >
+                <div
+                  className="form-input-container"
+                  style={{ padding: "0", margin: "auto" }}
+                >
+                  <input
+                    onChange={handleSetDaemonPort}
+                    autoComplete="off"
+                    type="text"
+                    value={daemonPort}
+                  />
+                </div>
+              </div>
+              <Button
+                text="Set and check"
+                style={{ margin: "auto auto auto 32px" }}
+                onClick={changeDaemonPort}
               />
+              <div className={`log-status-${daemonStatus}`} />
             </div>
-          </div>
-          <Button
-            text="Set and check"
-            style={{ margin: "auto auto auto 32px" }}
-            onClick={changeDaemonPort}
-          />
-          <div className={`log-status-${daemonStatus}`} />
-        </div>
-
-        <Toggle
-          text="Beta updates channel"
-          value={getLocalSetting("betaChannel") == "true"}
-          callback={clickBetaChannel}
-          style={{ marginTop: "16px" }}
-          margin={false}
-        />
+            <Toggle
+              text="Beta updates channel"
+              value={getLocalSetting("betaChannel") == "true"}
+              callback={clickBetaChannel}
+              style={{ marginTop: "16px" }}
+              margin={false}
+            />
+          </>
+        )}
 
         <NetworkSettingsPanel />
 
