@@ -201,7 +201,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
             style={{ minWidth: "160px", margin: "auto 8px 0 0" }}
             text={viewMode === "set" ? "Cards view" : "Set view"}
           />
-          <div>
+          <div style={{ width: "100%" }}>
             <SetsFilter callback={setFilterSetsPre} filtered={filterSets} />
           </div>
         </div>
