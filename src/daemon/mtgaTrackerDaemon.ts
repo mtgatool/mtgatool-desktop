@@ -1,3 +1,4 @@
+/* eslint-disable radix */
 import axios from "axios";
 import fs from "fs";
 import path from "path";
@@ -9,6 +10,8 @@ import electron from "../utils/electron/electronWrapper";
 import downloadFile from "../utils/downloadFile";
 import globalData from "../utils/globalData";
 import isElectron from "../utils/electron/isElectron";
+import getLocalSetting from "../utils/getLocalSetting";
+import setLocalSetting from "../utils/setLocalSetting";
 
 interface DaemonInventory {
   gems: number;
@@ -36,7 +39,7 @@ interface DaemonStatus {
 const os: string = isElectron() ? process.platform : "";
 
 export default class MtgaTrackerDaemon {
-  private _port = 6842;
+  private _port = parseInt(getLocalSetting("daemonPort"));
 
   private _version = "0.0.0.0";
 
@@ -46,8 +49,7 @@ export default class MtgaTrackerDaemon {
 
   private _daemonExecutablePath: string | null = null;
 
-  constructor(port = 6842) {
-    this._port = port;
+  constructor() {
     this._url = `http://localhost:${this._port}`;
 
     if (isElectron() && os === "win32") {
@@ -57,6 +59,12 @@ export default class MtgaTrackerDaemon {
 
   get version() {
     return this._version;
+  }
+
+  set port(port: number) {
+    this._port = port;
+    this._url = `http://localhost:${this._port}`;
+    setLocalSetting("daemonPort", `${port}`);
   }
 
   public downloadLatestDaemon() {

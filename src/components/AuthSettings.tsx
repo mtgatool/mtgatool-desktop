@@ -1,7 +1,7 @@
 /* eslint-disable radix */
 /* eslint-disable no-alert */
 /* eslint-disable no-restricted-globals */
-import { ChangeEvent, useCallback, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { format, fromUnixTime } from "date-fns";
 import { database } from "mtgatool-shared";
 
@@ -21,6 +21,8 @@ import isElectron from "../utils/electron/isElectron";
 import NetworkSettingsPanel from "./views/settings/NetworkSettingsPanel";
 import Button from "./ui/Button";
 
+import globalData from "../utils/globalData";
+
 function clickBetaChannel(value: boolean): void {
   setLocalSetting("betaChannel", value ? "true" : "false");
 }
@@ -32,18 +34,29 @@ interface AuthSettingsProps {
 export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
   const { onClose } = props;
   const [path, setPath] = useState(getLocalSetting("logPath"));
+  const [daemonStatus, setDaemonStatus] = useState("warn");
 
   const [daemonPort, setDaemonPort] = useState(
     parseInt(getLocalSetting("daemonPort"))
   );
 
+  const [daemonPortReal, setDaemonPortReal] = useState(
+    parseInt(getLocalSetting("daemonPort"))
+  );
+
   const handleSetDaemonPort = useCallback(
     (event: ChangeEvent<HTMLInputElement>): void => {
-      setLocalSetting("daemonPort", event.target.value);
       setDaemonPort(parseInt(event.target.value));
     },
     []
   );
+
+  const changeDaemonPort = useCallback((): void => {
+    if (globalData.daemon) {
+      globalData.daemon.port = daemonPort;
+    }
+    setDaemonPortReal(daemonPort);
+  }, [daemonPort]);
 
   // Arena log controls
   const arenaLogCallback = useCallback((value: string): void => {
@@ -74,6 +87,25 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
   }, [arenaLogCallback]);
 
   const logFileExists = fs.existsSync(path);
+
+  useEffect(() => {
+    if (globalData.daemon) {
+      globalData.daemon
+        .getStatus()
+        .then((s) => {
+          if (s && s.isRunning) {
+            setDaemonStatus("ok");
+          } else {
+            setDaemonStatus("err");
+          }
+        })
+        .catch(() => {
+          setDaemonStatus("warn");
+        });
+    } else {
+      setDaemonStatus("warn");
+    }
+  }, [daemonPortReal]);
 
   return (
     <>
@@ -133,13 +165,11 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
             </div>
           </div>
           <Button
-            text="Connect"
+            text="Set and check"
             style={{ margin: "auto auto auto 32px" }}
-            onClick={() => {
-              //
-            }}
+            onClick={changeDaemonPort}
           />
-          <div className={`log-status-${true ? "ok" : "err"}`} />
+          <div className={`log-status-${daemonStatus}`} />
         </div>
 
         <Toggle
