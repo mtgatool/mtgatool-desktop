@@ -19,6 +19,7 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
 
   filterable.push(
     "Jumpstart",
+    "Jumpstart: Historic Horizons",
     "Historic Anthology 1",
     "Historic Anthology 2",
     "Historic Anthology 3",
