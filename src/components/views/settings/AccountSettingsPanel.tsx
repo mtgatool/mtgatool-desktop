@@ -18,6 +18,7 @@ import { ReactComponent as KeysIcon } from "../../../assets/images/svg/keys.svg"
 import saveKeysCallback from "../../../toolDb/saveKeysCallback";
 import { AppState } from "../../../redux/stores/rendererStore";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
+import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 
 function resizeBase64Img(
   base64: string,
@@ -154,6 +155,10 @@ export default function AccountSettingsPanel(
             type: "SET_LOGIN_STATE",
             arg: LOGIN_AUTH,
           });
+          postChannelMessage({
+            type: "STOP_LOG_READING",
+          });
+
           history.push("/auth");
         }}
       />

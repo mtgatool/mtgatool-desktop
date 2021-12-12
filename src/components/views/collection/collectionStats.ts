@@ -1,7 +1,7 @@
 import { Colors, database } from "mtgatool-shared";
 import { customSets } from "../../../common/customSets";
+import { makeDefaultUUIDData } from "../../../redux/slices/mainDataSlice";
 import store from "../../../redux/stores/rendererStore";
-import { defaultCardsData } from "../../../types/dbTypes";
 
 import SetStats from "./SetsStats";
 
@@ -38,16 +38,17 @@ export function getCollectionStats(cardIds: number[]): CollectionStats {
   const { currentUUID } = state.mainData;
   const uuidData = state.mainData.uuidData[currentUUID];
 
+  const noUndefUuidData = uuidData || makeDefaultUUIDData();
   // uuidData[currentUUID]?.cards || defaultCardsData
 
   const stats: any = {
     complete: new SetStats("complete"),
   };
 
-  const { cards } = uuidData || defaultCardsData;
+  const { cards } = noUndefUuidData;
   Object.keys(database.sets).forEach((setName) => {
     const setStats = new SetStats(setName);
-    setStats.boosters = uuidData.inventory.Boosters.filter(
+    setStats.boosters = noUndefUuidData.inventory.Boosters.filter(
       ({ CollationId }) => database.sets[setName]?.collation === CollationId
     ).reduce(
       (accumulator: number, booster: { CollationId: number; Count: number }) =>

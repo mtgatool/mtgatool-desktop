@@ -17,6 +17,7 @@ import setLocalSetting from "../utils/setLocalSetting";
 import globalData from "../utils/globalData";
 import getLocalSetting from "../utils/getLocalSetting";
 import electron from "../utils/electron/electronWrapper";
+import fetchCards from "../daemon/fetchCards";
 
 export default function mainChannelListeners() {
   const channel = bcConnect() as any;
@@ -197,6 +198,7 @@ export default function mainChannelListeners() {
     if (msg.data.type === "PLAYER_INVENTORY") {
       const inventoryData = msg.data.value;
       upsertDbInventory(inventoryData);
+      fetchCards();
     }
   };
 }

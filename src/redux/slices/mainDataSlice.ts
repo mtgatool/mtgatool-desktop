@@ -35,7 +35,7 @@ const mainState = {
 
 export type MainState = typeof mainState;
 
-function makeDefaultUUIDData(): MainState["uuidData"][""] {
+export function makeDefaultUUIDData(): MainState["uuidData"][""] {
   return {
     rank: { ...defaultRankData, updated: 0 },
     inventory: { ...defaultInventoryData, updated: 0 },

@@ -12,6 +12,8 @@ import globalData from "../../../utils/globalData";
 
 import reduxAction from "../../../redux/reduxAction";
 
+import DaemonSettingsPanel from "./DaemonSettingsPanel";
+
 export default function LogsSettingsPanel(): JSX.Element {
   const dispatch = useDispatch();
   const lastLogUpdate = globalData.lastLogCheck;
@@ -86,6 +88,8 @@ export default function LogsSettingsPanel(): JSX.Element {
         }}
         text={isReading ? "Stop reading log" : "Re-read log"}
       />
+
+      <DaemonSettingsPanel />
     </>
   );
 }

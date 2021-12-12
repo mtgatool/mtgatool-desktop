@@ -93,6 +93,12 @@ export default function logEntrySwitch(entry: LogEntry): void {
       }
       break;
 
+    case "StartHook":
+      if (entry.arrow == "<==") {
+        Labels.InStartHook(entry);
+      }
+      break;
+
     case "Inventory.Updated":
       // handler works for both out and in arrows
       Labels.InventoryUpdated(entry);
