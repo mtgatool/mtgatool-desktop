@@ -42,8 +42,8 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
   const [filters, setFilters] = useState<Filters<CardsData>>();
   const [sortValue, setSortValue] = useState<Sort<CardsData>>({
-    key: "name",
-    sort: 1,
+    key: "set",
+    sort: -1,
   });
 
   const toggleView = useCallback(() => {

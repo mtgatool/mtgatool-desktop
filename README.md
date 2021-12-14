@@ -8,10 +8,25 @@
 
 MTG Arena Tool is a collection browser, a deck tracker and a statistics manager. Explore which decks you played against and what other players are brewing. MTG Arena Tool is all about improving your Magic Arena experience.
 
-***THIS IS PRELIMINARY, NOT FULLY TESTED version 6***
-
+***THIS IS PRELIMINARY version 6***
 
 Things are still unfinished, bugs will probably happen. Use at your own risk.
+
+
+### Install on Linux
+
+On Linux systems you can use the .AppImage as-is, but the recommended installer takes care of setting up the desktop integrations and daemon services; This is a one time setup; After that both the daemon and mtgatool appimage can update automatically.
+
+Head to the downloads page and download the latest `mtgatool-desktop-linux-installer.tar.gz`
+
+Navigate in terminal to the directory where the tar.gz was downloaded, then extract and install; _(requires sudo to install the daemon service)_
+```
+mkdir mtgatool &&
+tar -xf mtgatool-desktop-linux-installer.tar.gz -C mtgatool &&
+cd mtgatool &&
+sudo ./install.sh
+```
+
 
 ### Run from source
 
