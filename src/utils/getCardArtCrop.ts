@@ -26,7 +26,7 @@ export function getCardImage(
   } catch (e) {
     // eslint-disable-next-line no-console
     // debugLog(e, "error");
-    console.info(`Cant find card image: ${cardObj}, ${typeof cardObj}`);
+    console.info(`Cant find card image: (${typeof cardObj}) `, cardObj);
     return notFound;
   }
 }
