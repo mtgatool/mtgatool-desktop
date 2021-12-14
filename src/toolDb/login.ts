@@ -116,10 +116,10 @@ export function afterLogin() {
           newest = uuid;
         }
 
-        window.toolDb.subscribeData(`${uuid}-cards`, true);
         window.toolDb.addKeyListener<DbCardsData>(
           window.toolDb.getUserNamespacedKey(`${uuid}-cards`),
           (msg) => {
+            console.log("Cards trigger listener!");
             if (msg.type === "put") {
               reduxAction(dispatch, {
                 type: "SET_UUID_CARDS_DATA",
@@ -128,8 +128,8 @@ export function afterLogin() {
             }
           }
         );
+        window.toolDb.subscribeData(`${uuid}-cards`, true);
 
-        window.toolDb.subscribeData(`${uuid}-inventory`, true);
         window.toolDb.addKeyListener<DbInventoryData>(
           window.toolDb.getUserNamespacedKey(`${uuid}-inventory`),
           (msg) => {
@@ -141,8 +141,8 @@ export function afterLogin() {
             }
           }
         );
+        window.toolDb.subscribeData(`${uuid}-inventory`, true);
 
-        window.toolDb.subscribeData(`${uuid}-rank`, true);
         window.toolDb.addKeyListener<DbRankData>(
           window.toolDb.getUserNamespacedKey(`${uuid}-rank`),
           (msg) => {
@@ -154,6 +154,7 @@ export function afterLogin() {
             }
           }
         );
+        window.toolDb.subscribeData(`${uuid}-rank`, true);
 
         reduxAction(dispatch, {
           type: "SET_UUID",

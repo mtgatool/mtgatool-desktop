@@ -54,23 +54,27 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
         ...style,
       }}
     >
-      {filterSets.map((set) => {
-        const svgData = set.svg;
-        const setClass = `set-filter ${
-          filtered.indexOf(set.code.toLowerCase()) == -1 ? "set-filter-on" : ""
-        }`;
-        return (
-          <div
-            key={set.code.toLowerCase()}
-            style={{
-              backgroundImage: `url(data:image/svg+xml;base64,${svgData})`,
-            }}
-            title={set.name}
-            className={setClass}
-            onClick={(): void => setFilteredSet(set.code.toLowerCase())}
-          />
-        );
-      })}
+      {filterSets
+        .filter((s) => s?.code)
+        .map((set) => {
+          const svgData = set.svg;
+          const setClass = `set-filter ${
+            filtered.indexOf(set.code.toLowerCase()) == -1
+              ? "set-filter-on"
+              : ""
+          }`;
+          return (
+            <div
+              key={set.code.toLowerCase()}
+              style={{
+                backgroundImage: `url(data:image/svg+xml;base64,${svgData})`,
+              }}
+              title={set.name}
+              className={setClass}
+              onClick={(): void => setFilteredSet(set.code.toLowerCase())}
+            />
+          );
+        })}
     </div>
   );
 }

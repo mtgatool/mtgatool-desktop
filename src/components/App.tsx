@@ -80,6 +80,7 @@ function App(props: AppProps) {
   }, [matchInProgress]);
 
   useEffect(() => {
+    console.log("Can log in?", canLogin);
     const welcome = getLocalSetting("welcome");
     if (!welcome || welcome === "false") {
       history.push("/welcome");
@@ -88,7 +89,7 @@ function App(props: AppProps) {
       const user = getLocalSetting("username");
 
       login(user, sha1(pwd))
-        .then(async () => {
+        .then(() => {
           reduxAction(dispatch, {
             type: "SET_LOGIN_STATE",
             arg: LOGIN_OK,
@@ -106,7 +107,7 @@ function App(props: AppProps) {
           console.error(e);
           history.push("/auth");
         });
-    } else {
+    } else if (canLogin) {
       history.push("/auth");
     }
   }, [canLogin, history, dispatch]);
