@@ -27,6 +27,13 @@ cd mtgatool &&
 sudo ./install.sh
 ```
 
+You can check the mtga-tracker-daemon service status using systemctl;
+
+```systemctl status mtga-trackerd.service```
+
+Or simply [open a browser tab and try the api](http://localhost:6842/status)! You can find more information about it at [mtga-tracker-daemon](https://github.com/frcaton/mtga-tracker-daemon).
+
+
 
 ### Run from source
 
