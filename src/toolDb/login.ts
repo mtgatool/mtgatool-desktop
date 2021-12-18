@@ -119,7 +119,6 @@ export function afterLogin() {
         window.toolDb.addKeyListener<DbCardsData>(
           window.toolDb.getUserNamespacedKey(`${uuid}-cards`),
           (msg) => {
-            console.log("Cards trigger listener!");
             if (msg.type === "put") {
               reduxAction(dispatch, {
                 type: "SET_UUID_CARDS_DATA",

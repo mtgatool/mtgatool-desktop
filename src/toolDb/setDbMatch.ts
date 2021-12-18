@@ -10,6 +10,7 @@ import pushToLiveFeed from "./pushToLivefeed";
 import globalData from "../utils/globalData";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
+import pushToExplore from "./pushToExplore";
 
 export default async function setDbMatch(match: InternalMatch) {
   console.log("> Set match", match);
@@ -37,6 +38,7 @@ export default async function setDbMatch(match: InternalMatch) {
   const remoteKey = window.toolDb.getUserNamespacedKey(`matches-${match.id}`);
 
   pushToLiveFeed(remoteKey, newDbMatch);
+  pushToExplore(remoteKey, newDbMatch);
 
   // Create CRDT document with the new match added to it
   if (!globalData.matchesIndex.includes(remoteKey)) {
