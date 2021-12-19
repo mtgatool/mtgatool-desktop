@@ -57,6 +57,7 @@ function sendInit() {
       );
     });
   });
+  request.on("error", console.log);
   request.end();
 
   const peers = [];
