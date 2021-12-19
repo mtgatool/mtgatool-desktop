@@ -46,7 +46,7 @@ function App(props: AppProps) {
   const { forceOs } = props;
   const history = useHistory();
   const dispatch = useDispatch();
-  const [canLogin, setCanLogin] = useState(false);
+  const [canLogin, setCanLogin] = useState(isElectron());
 
   const { loginState, loading, backgroundGrpid, matchInProgress } = useSelector(
     (state: AppState) => state.renderer
