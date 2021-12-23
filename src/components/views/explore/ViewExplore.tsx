@@ -59,6 +59,17 @@ export default function ViewExplore() {
     sort: -1,
   });
 
+  useEffect(() => {
+    window.toolDb
+      .getData<DbExploreAggregated>(`exploredata-Ladder`)
+      .then((d) => {
+        if (d) {
+          setData(d);
+          fetchAvatar(d.aggregator);
+        }
+      });
+  }, []);
+
   const filteredData = useMemo(() => {
     if (!data) return [];
 
@@ -239,7 +250,7 @@ export default function ViewExplore() {
               </i>
             </Flex>
           </Section>
-          <Section style={{ flexDirection: "column" }}>
+          <Section style={{ flexDirection: "column", marginBottom: "16px" }}>
             {data ? (
               <>
                 <SortControls<ExploreDeckData>
