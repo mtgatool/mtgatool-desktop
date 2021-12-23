@@ -1,4 +1,3 @@
-/* eslint-disable no-bitwise */
 export const RANK_BRONZE = 1;
 export const RANK_SILVER = 2;
 export const RANK_GOLD = 4;

@@ -175,15 +175,9 @@ export default function logEntrySwitch(entry: LogEntry): void {
       }
       break;
 
-    case "Event.GetActiveEventsV2":
+    case "Event_GetActiveEvents":
       if (entry.arrow == "<==") {
-        Labels.InEventGetActiveEventsV2(entry);
-      }
-      break;
-
-    case "Event.GetActiveEventsV3":
-      if (entry.arrow == "<==") {
-        Labels.InEventGetActiveEventsV3(entry);
+        Labels.InEventGetActiveEvents(entry);
       }
       break;
 

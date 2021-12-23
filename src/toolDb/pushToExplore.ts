@@ -8,18 +8,21 @@ export default async function pushToExplore(key: string, match: DbMatch) {
   try {
     const docInit = Automerge.init<Record<string, number>>();
 
-    const newDocument = Automerge.change(docInit, (doc) => {
-      doc[key] = new Date(match.internalMatch.date).getTime();
-    });
+    const { eventId } = match;
+    if (!eventId.includes("NPE_") && !eventId.includes("ColorChallenge_")) {
+      const newDocument = Automerge.change(docInit, (doc) => {
+        doc[key] = new Date(match.internalMatch.date).getTime();
+      });
 
-    const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
-    window.toolDb
-      .putCrdt(
-        `explore-${currentDay}-${match.eventId}`,
-        Automerge.getChanges(docInit, newDocument),
-        false
-      )
-      .catch(console.error);
+      const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
+      window.toolDb
+        .putCrdt(
+          `explore-${currentDay}-${eventId}`,
+          Automerge.getChanges(docInit, newDocument),
+          false
+        )
+        .catch(console.error);
+    }
   } catch (e) {
     console.warn(e);
   }

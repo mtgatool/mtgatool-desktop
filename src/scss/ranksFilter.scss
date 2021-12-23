@@ -1,0 +1,24 @@
+.rank-filters {
+  display: flex;
+  margin: auto 8px;
+
+  .rank-filter {
+    align-self: center;
+    opacity: 0.4;
+    background-repeat: no-repeat;
+    margin: 0 4px;
+    cursor: pointer;
+    -webkit-transition: all .1s ease-in-out;
+    width: 16px;
+    height: 16px;
+    
+    &:hover {
+      opacity: 0.9;
+    }
+
+    &.filter-on {
+      opacity: 1;
+    }
+  }
+}
+

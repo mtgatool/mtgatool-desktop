@@ -36,7 +36,8 @@ export type MessageType =
   | "HOVER_OUT"
   | "DRAFT_STATUS"
   | "DRAFT_VOTES"
-  | "DRAFT_END";
+  | "DRAFT_END"
+  | "UPDATE_ACTIVE_EVENTS";
 
 export interface ChannelMessageBase {
   type: MessageType;
@@ -162,6 +163,11 @@ export interface DraftEndMessage extends ChannelMessageBase {
   type: "DRAFT_END";
 }
 
+export interface UpdateActiveEventsMessage extends ChannelMessageBase {
+  type: "UPDATE_ACTIVE_EVENTS";
+  value: string[];
+}
+
 export type ChannelMessage =
   | DatabasePeersMessage
   | PopupMessage
@@ -187,4 +193,5 @@ export type ChannelMessage =
   | OverlaySettingsMessage
   | DraftStatusMessage
   | DraftVotesMessage
-  | DraftEndMessage;
+  | DraftEndMessage
+  | UpdateActiveEventsMessage;

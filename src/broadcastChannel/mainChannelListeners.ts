@@ -200,5 +200,9 @@ export default function mainChannelListeners() {
       upsertDbInventory(inventoryData);
       fetchCards();
     }
+
+    if (msg.data.type === "UPDATE_ACTIVE_EVENTS") {
+      window.toolDb.putData("activeEvents", msg.data.value);
+    }
   };
 }

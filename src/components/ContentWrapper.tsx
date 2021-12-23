@@ -25,6 +25,7 @@ import getLocalDbValue from "../toolDb/getLocalDbValue";
 import PostSignupPopup from "./PostSignupPopup";
 import ViewDrafts from "./views/drafts/ViewDrafts";
 import useDatePicker from "../hooks/useDatePicker";
+import ViewExplore from "./views/explore/ViewExplore";
 
 const views = {
   home: ViewHome,
@@ -32,7 +33,7 @@ const views = {
   history: ViewHistory,
   timeline: ViewWip,
   drafts: ViewDrafts,
-  explore: ViewWip,
+  explore: ViewExplore,
   collection: ViewCollection,
 };
 

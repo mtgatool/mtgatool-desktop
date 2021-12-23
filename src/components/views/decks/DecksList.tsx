@@ -15,7 +15,7 @@ import DecksArtViewRow from "../../DecksArtViewRow";
 import ManaFilter from "../../ManaFilter";
 import PagingControls from "../../PagingControls";
 import SortControls, { Sort } from "../../SortControls";
-import getCssQuality from "../../../utils/getCssQuality";
+
 import useDebounce from "../../../hooks/useDebounce";
 import InputContainer from "../../InputContainer";
 
@@ -26,6 +26,7 @@ import Toggle from "../../ui/Toggle";
 import unsetFilter from "../../../utils/tables/filters/unsetFilter";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import setDbHiddenDecks from "../../../toolDb/setDbHiddenDecks";
+import Section from "../../ui/Section";
 
 export default function DecksList() {
   const dispatch = useDispatch();
@@ -217,10 +218,7 @@ export default function DecksList() {
 
   return (
     <>
-      <div
-        className={`section ${getCssQuality()}`}
-        style={{ marginBottom: "0px", flexDirection: "column" }}
-      >
+      <Section style={{ marginTop: "16px", flexDirection: "column" }}>
         <Flex style={{ width: "100%" }}>
           <InputContainer>
             <input
@@ -245,11 +243,8 @@ export default function DecksList() {
             }}
           />
         </Flex>
-      </div>
-      <div
-        className={`section ${getCssQuality()}`}
-        style={{ margin: "16px 0", flexDirection: "column" }}
-      >
+      </Section>
+      <Section style={{ margin: "16px 0", flexDirection: "column" }}>
         <SortControls<StatsDeck>
           setSortCallback={setSortValue}
           defaultSort={sortValue}
@@ -292,7 +287,7 @@ export default function DecksList() {
             pageSizeOptions={[10, 25, 50, 100]}
           />
         </div>
-      </div>
+      </Section>
     </>
   );
 }

@@ -1,6 +1,7 @@
 import { Switch, Route, useRouteMatch } from "react-router-dom";
 import useDbUser from "../../../hooks/useDbUser";
-import getCssQuality from "../../../utils/getCssQuality";
+
+import Section from "../../ui/Section";
 
 import DraftsHome from "./DraftsHome";
 import LiveDraftView from "./LiveDraftView";
@@ -10,9 +11,12 @@ export default function ViewDrafts() {
   const [, loggedIn] = useDbUser();
 
   return (
-    <div
-      className={`section ${getCssQuality()}`}
-      style={{ flexDirection: "column", textAlign: "center" }}
+    <Section
+      style={{
+        marginTop: "16px",
+        flexDirection: "column",
+        textAlign: "center",
+      }}
     >
       {loggedIn && (
         <Switch>
@@ -20,6 +24,6 @@ export default function ViewDrafts() {
           <Route exact path={`${url}/`} component={DraftsHome} />
         </Switch>
       )}
-    </div>
+    </Section>
   );
 }

@@ -1,4 +1,5 @@
 import { CSSProperties } from "react";
+import getCssQuality from "../../utils/getCssQuality";
 
 export type SectionProps = React.PropsWithChildren<{
   style?: CSSProperties;
@@ -10,10 +11,11 @@ export default function Section(props: SectionProps): JSX.Element {
 
   return (
     <div
+      className={`section ${getCssQuality()}`}
       style={{
-        display: "flex",
-        borderRadius: "3px",
-        backgroundColor: `var(--color-section)`,
+        // display: "flex",
+        // borderRadius: "3px",
+        // backgroundColor: `var(--color-section)`,
         ...style,
       }}
       onClick={onClick}

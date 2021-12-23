@@ -2,10 +2,11 @@ import { useSelector } from "react-redux";
 import { Fragment } from "react";
 
 import { AppState } from "../../../redux/stores/rendererStore";
-import getCssQuality from "../../../utils/getCssQuality";
+
 import { convertDbMatchToData } from "../history/getMatchesData";
 
 import LiveFeedMatch from "./LiveFeedMatch";
+import Section from "../../ui/Section";
 
 export default function ViewHome() {
   const liveFeed = useSelector((state: AppState) => state.mainData.liveFeed);
@@ -15,10 +16,7 @@ export default function ViewHome() {
 
   return (
     <>
-      <div
-        className={`section ${getCssQuality()}`}
-        style={{ flexDirection: "column" }}
-      >
+      <Section style={{ marginTop: "16px", flexDirection: "column" }}>
         {/* <div style={{ display: "flex" }}>
           <Button
             style={{
@@ -57,7 +55,7 @@ export default function ViewHome() {
             return <Fragment key={`livefeed-match-${matchId}`} />;
           })}
         </div>
-      </div>
+      </Section>
     </>
   );
 }

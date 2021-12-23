@@ -20,9 +20,10 @@ import SortControls, { Sort } from "../../SortControls";
 import SetsFilter from "../../SetsFilter";
 import setFilter from "../../../utils/tables/filters/setFilter";
 import { Filters } from "../../../types/genericFilterTypes";
-import getCssQuality from "../../../utils/getCssQuality";
+
 import SetsView from "./SetsView";
 import { getCollectionStats } from "./collectionStats";
+import Section from "../../ui/Section";
 
 interface ViewCollectionProps {
   collectionData: CardsData[];
@@ -176,10 +177,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
   return (
     <>
-      <div
-        className={`section ${getCssQuality()}`}
-        style={{ flexDirection: "column" }}
-      >
+      <Section style={{ flexDirection: "column", marginTop: "16px" }}>
         <div style={{ display: "flex", width: "100%" }}>
           <Button
             onClick={openAdvancedCollectionSearch}
@@ -205,7 +203,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
             <SetsFilter callback={setFilterSetsPre} filtered={filterSets} />
           </div>
         </div>
-      </div>
+      </Section>
       {viewMode === "set" && (
         <SetsView
           setQuery={setQuery}
@@ -215,10 +213,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
         />
       )}
       {viewMode === "cards" && (
-        <div
-          className={`section ${getCssQuality()}`}
-          style={{ marginTop: "16px", flexDirection: "column" }}
-        >
+        <Section style={{ flexDirection: "column", marginTop: "16px" }}>
           <SortControls<CardsData>
             defaultSort={sortValue}
             setSortCallback={setSortValue}
@@ -254,7 +249,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
               pageSizeOptions={[8, 16, 24, 32]}
             />
           </div>
-        </div>
+        </Section>
       )}
     </>
   );

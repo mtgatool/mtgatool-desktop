@@ -1,3 +1,4 @@
+import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import LogEntry from "../../types/logDecoder";
 
 interface ChestDescription {
@@ -125,8 +126,16 @@ interface ActiveEventV3 {
 }
 
 interface Entry extends LogEntry {
-  json: ActiveEventV3[];
+  json: { Events: ActiveEventV3[] };
 }
-export default function InEventGetActiveEventsV3(entry: Entry): void {
-  const _json = entry.json;
+
+export default function InEventGetActiveEvents(entry: Entry): void {
+  const { json } = entry;
+
+  const activeEventsList = json.Events.map((e) => e.InternalEventName);
+
+  postChannelMessage({
+    type: "UPDATE_ACTIVE_EVENTS",
+    value: activeEventsList,
+  });
 }

@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { getEventPrettyName } from "mtgatool-shared";
+
 import {
   MutableRefObject,
   useCallback,
@@ -9,10 +9,11 @@ import {
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
+import { getEventPrettyName } from "mtgatool-shared";
 import usePagingControls from "../../../hooks/usePagingControls";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { Filters, StringFilterType } from "../../../types/genericFilterTypes";
-import getCssQuality from "../../../utils/getCssQuality";
+
 import getLocalSetting from "../../../utils/getLocalSetting";
 
 import { ReactComponent as StatsIcon } from "../../../assets/images/svg/stats.svg";
@@ -29,6 +30,7 @@ import aggregateStats from "../../../utils/aggregateStats";
 import reduxAction from "../../../redux/reduxAction";
 
 import InputContainer from "../../InputContainer";
+import Section from "../../ui/Section";
 
 interface HistoryListProps {
   openHistoryStatsPopup: () => void;
@@ -146,9 +148,11 @@ export default function HistoryList(props: HistoryListProps) {
   let transformedEvents = allEvents.sort();
 
   const rankedEvents: string[] = [
+    "Alchemy_Ladder",
     "Ladder",
     "Historic_Ladder",
     "Traditional_Ladder",
+    "Traditional_Alchemy_Ladder",
     "Traditional_Historic_Ladder",
   ];
 
@@ -167,9 +171,12 @@ export default function HistoryList(props: HistoryListProps) {
   transformedEvents = [
     "",
     "%%Ranked",
+    "Alchemy_Ladder",
     "Ladder",
+    "Alchemy_Ladder",
     "Historic_Ladder",
     "Traditional_Ladder",
+    "Traditional_Alchemy_Ladder",
     "Traditional_Historic_Ladder",
     "%%Drafts",
     ...drafts,
@@ -184,10 +191,7 @@ export default function HistoryList(props: HistoryListProps) {
 
   return (
     <>
-      <div
-        className={`section ${getCssQuality()}`}
-        style={{ marginBottom: "0px" }}
-      >
+      <Section style={{ marginTop: "16px", marginBottom: "16px" }}>
         <Select
           style={{ width: "280px" }}
           options={transformedEvents}
@@ -241,8 +245,8 @@ export default function HistoryList(props: HistoryListProps) {
           }}
           onClick={openHistoryStatsPopup}
         />
-      </div>
-      <div className={`section ${getCssQuality()}`}>
+      </Section>
+      <Section>
         <div className="history-table-wrapper">
           <SortControls<MatchData>
             setSortCallback={setSortValue}
@@ -289,7 +293,7 @@ export default function HistoryList(props: HistoryListProps) {
             />
           </div>
         </div>
-      </div>
+      </Section>
     </>
   );
 }
