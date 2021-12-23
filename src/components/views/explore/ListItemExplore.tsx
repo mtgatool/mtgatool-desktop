@@ -5,6 +5,7 @@ import {
   CardsList,
   Colors,
   constants,
+  database,
   Deck,
   formatPercent,
 } from "mtgatool-shared";
@@ -34,7 +35,8 @@ import {
 } from "../history/getRankFilterVal";
 import WildcardsCostPreset from "../../WildcardsCostPreset";
 
-import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
+// import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
+import getWildcardsMissing from "../../../utils/getWildcardsMissing";
 
 const { DEFAULT_TILE } = constants;
 
@@ -64,31 +66,32 @@ export default function ListItemExplore({
     }
   };
 
-  // const wildcards = {
-  //   c: 0,
-  //   u: 0,
-  //   r: 0,
-  //   m: 0,
-  // };
+  const wildcards = {
+    c: 0,
+    u: 0,
+    r: 0,
+    m: 0,
+  };
 
-  // let totalWildcardsMissing = 0;
+  let totalWildcardsMissing = 0;
 
   const decklist = new Deck();
   decklist.setMainboard(new CardsList(data.deck));
-  const wildcards = getDeckRaritiesCount(decklist);
-  // data.deck.forEach((c) => {
-  //   const card = database.card(c.grpId || c.id);
-  //   if (card) {
-  //     const missing = getWildcardsMissing(decklist, c.grpId || c.id, false);
-  //     if (missing > 0) {
-  //       totalWildcardsMissing += missing;
-  //       if (card.rarity === "common") wildcards.c += missing;
-  //       if (card.rarity === "uncommon") wildcards.u += missing;
-  //       if (card.rarity === "rare") wildcards.r += missing;
-  //       if (card.rarity === "mythic") wildcards.m += missing;
-  //     }
-  //   }
-  // });
+  // const wildcards = getDeckRaritiesCount(decklist);
+  data.deck.forEach((c) => {
+    const card = database.card(c.grpId || c.id);
+    if (card) {
+      const missing = getWildcardsMissing(decklist, c.grpId || c.id, false);
+      if (missing > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        totalWildcardsMissing += missing;
+        if (card.rarity === "common") wildcards.c += missing;
+        if (card.rarity === "uncommon") wildcards.u += missing;
+        if (card.rarity === "rare") wildcards.r += missing;
+        if (card.rarity === "mythic") wildcards.m += missing;
+      }
+    }
+  });
 
   const winrate =
     data.wins + data.losses > 0

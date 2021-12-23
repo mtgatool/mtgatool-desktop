@@ -9,13 +9,19 @@ interface RaritiesCount {
 
 export default function getDeckRaritiesCount(deck: Deck): RaritiesCount {
   const cards = [...deck.getMainboard().get(), ...deck.getSideboard().get()];
-  const rarities = cards
+
+  const rarities: string[] = [];
+  cards
     .filter((c: CardObject) => {
       return c.quantity > 0;
     })
-    .map((c: CardObject) => {
+    .forEach((c: CardObject) => {
       const card = database.card(c.id);
-      return card?.rarity;
+      if (card && card.rarity !== "land" && card.rarity !== "token") {
+        for (let i = 0; i < c.quantity; i += 1) {
+          rarities.push(card.rarity);
+        }
+      }
     });
 
   return {
