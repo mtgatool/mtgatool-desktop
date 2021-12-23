@@ -13,7 +13,7 @@ import getDeckMissing from "../utils/getDeckMissing";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
 import getWinrateClass from "../utils/getWinrateClass";
 import { StatsDeck } from "../types/dbTypes";
-import timeAgo from "../utils/timeAgo";
+// import timeAgo from "../utils/timeAgo";
 import getPreconDeckName from "../utils/getPreconDeckName";
 
 import squirrels from "../assets/images/squirrels.png";
@@ -69,7 +69,7 @@ export default function DecksArtViewRow(
     )} with 95% confidence (estimated actual winrate bounds, assuming a normal distribution)`;
   }
 
-  const lastTouch = new Date(deck.lastUsed).getTime();
+  // const lastTouch = new Date(deck.lastUsed).getTime();
   const missingWildcards = getDeckMissing(deckObj);
   const totalMissing =
     missingWildcards.common +
@@ -128,11 +128,11 @@ export default function DecksArtViewRow(
             <span>---</span>
           )}
         </div>
-        {totalMissing == 0 ? (
+        {/* {totalMissing == 0 ? (
           <div className="decks-table-deck-item time">{timeAgo(lastTouch)}</div>
         ) : (
           <></>
-        )}
+        )} */}
       </div>
     </div>
   );
