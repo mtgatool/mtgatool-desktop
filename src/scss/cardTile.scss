@@ -69,6 +69,16 @@
   text-align: center;
 }
 
+.card-tile-rebalanced {
+  background-image: url(../assets/images/rebalanced-a.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 18px;
+  height: 18px;
+  margin: auto -4px auto 8px;
+}
+
 .card-tile-crop-flat {
   border-width: 2px;
   border-style: none none none solid;

@@ -337,6 +337,14 @@ export default function CardTile(props: CardTileProps): JSX.Element {
     };
   }, [deck]);
 
+  const isRebalanced = !isPhyrexian && card && card.name.startsWith("A-");
+
+  let finalName = isPhyrexian ? phyrexianName : card?.name || "Unknown Card";
+
+  if (isRebalanced) {
+    finalName = finalName.slice(2);
+  }
+
   return (
     <div className="card-tile-container-outer">
       <div
@@ -351,11 +359,12 @@ export default function CardTile(props: CardTileProps): JSX.Element {
       >
         <CardQuantityDisplay quantity={quantity} />
         <div className="card-tile-crop-flat" style={cardTileStyle} />
+        {isRebalanced ? <div className="card-tile-rebalanced" /> : <></>}
         <div
           className="card-tile-name-flat"
           style={isPhyrexian ? { fontFamily: "PhyrexianHorizontal" } : {}}
         >
-          {isPhyrexian ? phyrexianName : card?.name || "Unknown Card"}
+          {finalName}
         </div>
         <div className="cart-tile-mana-flat">
           {card ? <CostSymbols card={card} dfcCard={dfcCard} /> : <></>}
