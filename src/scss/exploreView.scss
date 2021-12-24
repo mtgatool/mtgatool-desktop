@@ -1,3 +1,11 @@
+.explore-deck-view-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  grid-template-rows: auto auto auto auto auto auto;
+  grid-template-areas: "controls controls" "stats-deck stats-cards" "deck types" "deck curves" "deck pies" "deck rarities" "deck hand" "deck hand";
+}
+
 .explore-aggregator {
   flex-direction: column;
   text-align: center;

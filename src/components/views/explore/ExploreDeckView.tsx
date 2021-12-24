@@ -1,8 +1,11 @@
-import { useState } from "react";
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable radix */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-nested-ternary */
+import { useState } from "react";
 import {
   compareCards,
+  database,
   DbCardData,
   Deck,
   getDeckColorsAmmount,
@@ -14,8 +17,9 @@ import {
   DEFAULT_TILE,
   MANA_COLORS,
 } from "mtgatool-shared/dist/shared/constants";
+import { useDispatch } from "react-redux";
 import copyToClipboard from "../../../utils/copyToClipboard";
-import { getCardArtCrop } from "../../../utils/getCardArtCrop";
+import { getCardArtCrop, getCardImage } from "../../../utils/getCardArtCrop";
 import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
 import DeckColorsBar from "../../DeckColorsBar";
 import SvgButton from "../../SvgButton";
@@ -36,8 +40,60 @@ import DeckList from "../../DeckList";
 
 import { ExploreDeckData } from "./doExploreAggregation";
 import VisualDeckView from "../decks/VisualDeckView";
+import getWinrateClass from "../../../utils/getWinrateClass";
+import reduxAction from "../../../redux/reduxAction";
+import Flex from "../../Flex";
+import { toMMSS } from "../../../utils/dateTo";
 
 // const { MANA_COLORS } = constants;
+
+interface CardsListComponentProps {
+  key: string;
+  cards: number[];
+}
+
+function CardsListComponent(props: CardsListComponentProps) {
+  const { key, cards } = props;
+
+  const dispatch = useDispatch();
+
+  const hoverCard = (id: number, hover: boolean): void => {
+    reduxAction(dispatch, {
+      type: hover ? "SET_HOVER_IN" : "SET_HOVER_OUT",
+      arg: { grpId: id },
+    });
+  };
+
+  return (
+    <div
+      className="card-lists-list"
+      style={{ marginBottom: "4px", marginLeft: "auto" }}
+    >
+      {cards.map((grpId, ind) => {
+        const cardObj = database.card(grpId);
+        if (cardObj) {
+          return (
+            <img
+              key={`${key}-cards-${grpId}-${ind}`}
+              onMouseEnter={(): void => {
+                hoverCard(grpId, true);
+              }}
+              onMouseLeave={(): void => {
+                hoverCard(grpId, false);
+              }}
+              style={{
+                height: `80px`,
+              }}
+              src={getCardImage(cardObj, "normal")}
+              className="mulligan-card-img"
+            />
+          );
+        }
+        return <></>;
+      })}
+    </div>
+  );
+}
 
 const VIEW_VISUAL = 0;
 const VIEW_REGULAR = 1;
@@ -95,6 +151,11 @@ export default function ExploreDeckView(
 
   const wildcardsCost = getDeckRaritiesCount(deck);
 
+  const winrate = Math.round((100 / (data.wins + data.losses)) * data.wins);
+  const gamesWinrate = Math.round(
+    (100 / (data.gWins + data.gLosses)) * data.gWins
+  );
+
   return (
     <>
       <div
@@ -136,7 +197,7 @@ export default function ExploreDeckView(
         )}
 
         {deckView == VIEW_REGULAR && (
-          <div className="regular-view-grid">
+          <div className="explore-deck-view-grid">
             <Section
               style={{
                 justifyContent: "space-between",
@@ -144,24 +205,89 @@ export default function ExploreDeckView(
               }}
             >
               <Button
-                style={{ margin: "16px" }}
                 className="button-simple"
                 text="Visual View"
                 onClick={visualView}
               />
               <Button
-                style={{ margin: "16px" }}
                 className="button-simple"
                 text="Export to Arena"
                 onClick={arenaExport}
               />
             </Section>
             <Section
+              style={{ flexDirection: "column", gridArea: "stats-deck" }}
+            >
+              <Flex style={{ marginBottom: "8px" }}>
+                <i>Winrate:</i>
+                <div style={{ marginLeft: "auto" }}>
+                  {data.wins}:{data.losses}
+                </div>
+                <div
+                  style={{ marginLeft: "4px" }}
+                  className={getWinrateClass(winrate, true)}
+                >
+                  ({winrate}%)
+                </div>
+              </Flex>
+              <Flex style={{ marginBottom: "8px" }}>
+                <i>Games Winrate:</i>
+                <div style={{ marginLeft: "auto" }}>
+                  {data.gWins}:{data.gLosses}
+                </div>
+                <div
+                  style={{ marginLeft: "4px" }}
+                  className={getWinrateClass(gamesWinrate, true)}
+                >
+                  ({gamesWinrate}%)
+                </div>
+              </Flex>
+              <Flex style={{ marginBottom: "8px" }}>
+                <i>Average duration:</i>
+                <div style={{ marginLeft: "auto" }}>
+                  {toMMSS(Math.round(data.avgDuration))}
+                </div>
+              </Flex>
+            </Section>
+            <Section
+              style={{
+                gridArea: "stats-cards",
+                flexDirection: "column",
+              }}
+            >
+              <Flex>
+                <div style={{ lineHeight: "80px" }}>Best Cards: </div>
+                <CardsListComponent
+                  key="best-cards"
+                  cards={Object.keys(data.bestCards).map((id) => parseInt(id))}
+                />
+              </Flex>
+              <Flex>
+                <div style={{ lineHeight: "80px" }}>Bad Matchup cards: </div>
+                <CardsListComponent
+                  key="worst-matchups"
+                  cards={Object.keys(data.worstMatchCards).map((id) =>
+                    parseInt(id)
+                  )}
+                />
+              </Flex>
+              <Flex>
+                <div style={{ lineHeight: "80px" }}>Good against: </div>
+                <CardsListComponent
+                  key="best-matchups"
+                  cards={Object.keys(data.bestMatchCards).map((id) =>
+                    parseInt(id)
+                  )}
+                />
+              </Flex>
+            </Section>
+            <Section
               style={{
                 flexDirection: "column",
                 gridArea: "deck",
                 paddingBottom: "16px",
-                paddingLeft: "24px",
+
+                marginBottom: "16px",
               }}
             >
               <DeckList deck={deck} showWildcards />
@@ -197,6 +323,7 @@ export default function ExploreDeckView(
             <Section
               style={{
                 padding: "0 0 24px 24px",
+                marginBottom: "16px",
                 flexDirection: "column",
                 gridArea: "hand",
               }}

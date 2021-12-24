@@ -3,6 +3,7 @@
 import { Colors, database, v2cardsList } from "mtgatool-shared";
 import { DEFAULT_TILE } from "mtgatool-shared/dist/shared/constants";
 import { DbMatch } from "../../../types/dbTypes";
+import { Winrate } from "../../../utils/aggregateStats";
 import getRankFilterVal from "../history/getRankFilterVal";
 
 export interface ExploreDeckData {
@@ -16,8 +17,7 @@ export interface ExploreDeckData {
   pilots: string[];
   durations?: number[];
   avgDuration: number;
-  cWins: Record<string, number>;
-  cLosses: Record<string, number>;
+  colorWinrates: Record<string, Winrate>;
   bestCards: Record<string, number>;
   worstMatchCards: Record<string, number>;
   bestMatchCards: Record<string, number>;
@@ -38,8 +38,7 @@ function newDefaultExploreData(): ExploreDeckData {
     pilots: [],
     durations: [],
     avgDuration: 0,
-    cWins: {},
-    cLosses: {},
+    colorWinrates: {},
     bestCards: {},
     worstMatchCards: {},
     bestMatchCards: {},
@@ -160,9 +159,17 @@ export default function doExploreAggregation(allData: DbMatch[]) {
         });
       }
 
+      if (!data.colorWinrates[oColorBits]) {
+        data.colorWinrates[oColorBits] = {
+          wins: 0,
+          losses: 0,
+        };
+      }
+
       //
       if (hasWon) {
-        data.cWins[oColorBits] = (data.cWins[oColorBits] || 0) + 1;
+        data.colorWinrates[oColorBits].wins =
+          (data.colorWinrates[oColorBits].wins || 0) + 1;
 
         match.internalMatch.player.cardsUsed.forEach((c) => {
           const dbObj = database.card(c);
@@ -179,7 +186,8 @@ export default function doExploreAggregation(allData: DbMatch[]) {
           }
         });
       } else {
-        data.cLosses[oColorBits] = (data.cLosses[oColorBits] || 0) + 1;
+        data.colorWinrates[oColorBits].losses =
+          (data.colorWinrates[oColorBits].losses || 0) + 1;
 
         match.internalMatch.oppDeck.mainDeck.forEach((c) => {
           const dbObj = database.card(c.id);
