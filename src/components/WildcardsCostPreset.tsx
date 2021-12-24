@@ -84,7 +84,10 @@ export default function WildcardsCostPreset(
       {showComplete && boostersNeeded == 0 ? (
         <div title="You can build this deck!" className="wc-complete" />
       ) : drawCost ? (
-        <div title="Boosters needed (estimated)" className="bo-explore-cost">
+        <div
+          title="Boosters needed (estimated)"
+          className="bo-explore-cost-large"
+        >
           {boostersNeeded}
         </div>
       ) : (
