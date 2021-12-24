@@ -66,6 +66,20 @@
   background-image: url(../assets/images/booster.png);
 }
 
+.bo-explore-cost-large {
+  font-family: var(--sub-font-name);
+  color: var(--color-light);
+  width: 40px;
+  line-height: 32px;
+  height: 32px;
+  height: 64px;
+  line-height: 96px;
+  text-align: center;
+  background-position: center 2px;
+  background-repeat: no-repeat;
+  background-image: url(../assets/images/booster.png);
+}
+
 .bo-deckstab-cost {
   font-family: var(--sub-font-name);
   color: var(--color-light);
