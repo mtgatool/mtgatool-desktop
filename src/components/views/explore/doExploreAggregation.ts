@@ -22,6 +22,7 @@ export interface ExploreDeckData {
   worstMatchCards: Record<string, number>;
   bestMatchCards: Record<string, number>;
   deck: v2cardsList;
+  side: v2cardsList;
   name: string;
   tile: number;
 }
@@ -43,6 +44,7 @@ function newDefaultExploreData(): ExploreDeckData {
     worstMatchCards: {},
     bestMatchCards: {},
     deck: [],
+    side: [],
     name: "",
     tile: DEFAULT_TILE,
   };
@@ -153,6 +155,13 @@ export default function doExploreAggregation(allData: DbMatch[]) {
         data.name = playerDeck.name;
         data.tile = playerDeck.deckTileId;
         data.deck = playerDeck.mainDeck.map((c) => {
+          // eslint-disable-next-line no-param-reassign
+          if (c.measurable) delete c.measurable;
+          return c;
+        });
+      }
+      if (playerDeck?.sideboard) {
+        data.side = playerDeck.sideboard.map((c) => {
           // eslint-disable-next-line no-param-reassign
           if (c.measurable) delete c.measurable;
           return c;

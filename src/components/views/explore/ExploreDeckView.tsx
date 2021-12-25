@@ -108,7 +108,7 @@ export default function ExploreDeckView(
 ): JSX.Element {
   const { data, goBack } = props;
 
-  const deck = new Deck({}, data.deck, []);
+  const deck = new Deck({}, data.deck || [], data.side || []);
 
   const [deckView, setDeckView] = useState(VIEW_REGULAR);
   const [shuffle, setShuffle] = useState([true]);
