@@ -70,6 +70,19 @@
   }
 }
 
+.explore-card-text {
+  font-size: 16px;
+  line-height: 20px;
+}
+
+.explore-card-sub {
+  font-size: 11px;
+  line-height: 13px;
+  font-family: var(--main-font-name-it);
+  margin-bottom: 4px;
+  color: var(--color-text-dark);
+}
+
 .maker-container {
   height: 24px;
   justify-content: center;

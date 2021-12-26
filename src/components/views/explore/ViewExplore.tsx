@@ -1,13 +1,16 @@
+/* eslint-disable radix */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/jsx-props-no-spreading */
 
-import { getEventPrettyName } from "mtgatool-shared";
+import { database, getEventPrettyName } from "mtgatool-shared";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import usePagingControls from "../../../hooks/usePagingControls";
+import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { Filters } from "../../../types/genericFilterTypes";
+import { getCardImage } from "../../../utils/getCardArtCrop";
 
 import doExploreFilter from "../../../utils/tables/doExploreFilter";
 import setFilter from "../../../utils/tables/filters/setFilter";
@@ -22,10 +25,20 @@ import Button from "../../ui/Button";
 
 import Section from "../../ui/Section";
 import Select from "../../ui/Select";
-import { DbExploreAggregated, ExploreDeckData } from "./doExploreAggregation";
+import {
+  DbExploreAggregated,
+  ExploreDeckData,
+  limitRecord,
+} from "./doExploreAggregation";
 import ExploreAggregator from "./ExploreAggregator";
 import ExploreDeckView from "./ExploreDeckView";
 import ListItemExplore from "./ListItemExplore";
+
+interface BestCards {
+  copies: number;
+  id: number;
+  rating: number;
+}
 
 const MODE_EXPLORE = 1;
 const MODE_AGGREGATOR = 2;
@@ -40,11 +53,22 @@ export default function ViewExplore() {
   const [mode, setMode] = useState<Modes>(MODE_EXPLORE);
   const [currentDeck, setCurrentDeck] = useState<ExploreDeckData | null>(null);
 
+  const [allBestCards, setAllBestCards] = useState<BestCards[]>([]);
+
   const avatars = useSelector((state: AppState) => state.avatars.avatars);
 
   const [eventsList, setEventsList] = useState<string[]>([]);
   const [eventFilter, setEventFilterState] = useState("Ladder");
   const [data, setData] = useState<DbExploreAggregated | null>(null);
+
+  const dispatch = useDispatch();
+
+  const hoverCard = (id: number, hover: boolean): void => {
+    reduxAction(dispatch, {
+      type: hover ? "SET_HOVER_IN" : "SET_HOVER_OUT",
+      arg: { grpId: id },
+    });
+  };
 
   const [colorFilterState, setColorFilterState] = useState(31);
 
@@ -81,6 +105,47 @@ export default function ViewExplore() {
           colors: d.colors > 32 ? d.colors - 32 : d.colors,
         };
       });
+
+    // get most played cards
+    const allCardsAverageCopies: Record<string, number> = {};
+    const allCardsCopies: Record<string, number[]> = {};
+    let allBest: Record<string, number> = {};
+
+    decksForFiltering.forEach((d) => {
+      d.deck.forEach((c) => {
+        const cardObj = database.card(c.id);
+        if (cardObj && !cardObj.type.toLowerCase().includes("land")) {
+          if (!allCardsCopies[cardObj.name]) {
+            allCardsCopies[cardObj.name] = [];
+          }
+          allCardsCopies[cardObj.name].push(c.quantity);
+        }
+      });
+      Object.keys(d.bestCards).forEach((c) => {
+        const cardObj = database.card(parseInt(c));
+        if (cardObj) {
+          if (!allBest[cardObj.name]) {
+            allBest[cardObj.name] = 0;
+          }
+          allBest[cardObj.name] += 1;
+        }
+      });
+    });
+    Object.keys(allCardsCopies).forEach((id) => {
+      allCardsAverageCopies[id] =
+        allCardsCopies[id].reduce((acc, c) => acc + c, 0) /
+        allCardsCopies[id].length;
+    });
+    allBest = limitRecord(allBest, 10);
+
+    const finalBestCards = Object.keys(allBest).map((name) => {
+      return {
+        copies: allCardsAverageCopies[name],
+        id: database.cardByName(name)?.id || 0,
+        rating: allBest[name],
+      };
+    });
+    setAllBestCards(finalBestCards);
 
     return doExploreFilter(decksForFiltering, filters, sortValue);
   }, [data, filters, sortValue]);
@@ -221,7 +286,6 @@ export default function ViewExplore() {
                 textAlign: "center",
                 flexDirection: "column",
                 lineHeight: "32px",
-                height: "96px",
               }}
             >
               {data && (
@@ -231,6 +295,60 @@ export default function ViewExplore() {
                     {new Date(data.from).toDateString()} and{" "}
                     {new Date(data.to).toDateString()}
                   </i>
+
+                  <i>Best cards</i>
+                  <div
+                    className="card-lists-list"
+                    style={{
+                      margin: "8px auto",
+                      flexWrap: "wrap",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {allBestCards
+                      .sort((a, b) => {
+                        if (a.rating > b.rating) return -1;
+                        if (a.rating < b.rating) return 1;
+                        return 0;
+                      })
+                      .map((b, ind) => {
+                        const grpId = b.id;
+                        const cardObj = database.card(grpId);
+                        if (cardObj) {
+                          return (
+                            <Flex style={{ flexDirection: "column" }}>
+                              <img
+                                key={`${b.id}-bestcards-${ind}`}
+                                onMouseEnter={(): void => {
+                                  hoverCard(grpId, true);
+                                }}
+                                onMouseLeave={(): void => {
+                                  hoverCard(grpId, false);
+                                }}
+                                style={{
+                                  width: `70px`,
+                                }}
+                                src={getCardImage(cardObj, "normal")}
+                                className="mulligan-card-img"
+                              />
+                              <div className="explore-card-text">
+                                {b.rating}
+                              </div>
+                              <div className="explore-card-sub">
+                                Decks using it
+                              </div>
+                              <div className="explore-card-text">
+                                {b.copies.toFixed(2)}
+                              </div>
+                              <div className="explore-card-sub">
+                                Avg. per deck.
+                              </div>
+                            </Flex>
+                          );
+                        }
+                        return <></>;
+                      })}
+                  </div>
                   <div className="maker-container">
                     <i className="maker-name">Pushed by</i>
                     <div

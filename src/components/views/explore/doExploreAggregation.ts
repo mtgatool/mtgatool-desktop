@@ -59,7 +59,7 @@ export interface DbExploreAggregated {
   data: Record<string, ExploreDeckData>;
 }
 
-function limitRecord(
+export function limitRecord(
   record: Record<string, number>,
   limit: number
 ): Record<string, number> {
