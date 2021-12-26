@@ -131,6 +131,7 @@ export default function ViewExplore() {
         }
       });
     });
+
     Object.keys(allCardsCopies).forEach((id) => {
       allCardsAverageCopies[id] =
         allCardsCopies[id].reduce((acc, c) => acc + c, 0) /
@@ -147,7 +148,11 @@ export default function ViewExplore() {
     });
     setAllBestCards(finalBestCards);
 
-    return doExploreFilter(decksForFiltering, filters, sortValue);
+    return doExploreFilter(
+      decksForFiltering.filter((d) => d.wins + d.losses > 2),
+      filters,
+      sortValue
+    );
   }, [data, filters, sortValue]);
 
   const pagingControlProps = usePagingControls(filteredData.length, 25);

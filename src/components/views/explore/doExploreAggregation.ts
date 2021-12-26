@@ -236,9 +236,9 @@ export default function doExploreAggregation(allData: DbMatch[]) {
     }
     delete data.durations;
 
-    if (total <= 3) {
-      delete aggregated.data[id];
-    }
+    // if (total <= 3) {
+    //   delete aggregated.data[id];
+    // }
   });
 
   return aggregated;
