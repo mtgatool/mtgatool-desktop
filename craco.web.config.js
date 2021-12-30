@@ -7,9 +7,6 @@ module.exports = {
   webpack: {
     configure: {
       target: "web",
-      module: {
-        noParse: /gun\.js$/,
-      },
       node: {
         fs: "empty",
       },

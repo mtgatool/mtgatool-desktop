@@ -149,19 +149,20 @@
     .top-username {
       color: var(--color-text);
       font-size: 20px;
-      margin-left: 8px;
+      height: 32px;
+      line-height: 32px;
+      margin: auto 0;
+      border-radius: 4px;
+      padding: 0 12px;
       align-self: center;
       font-family: "belerenbold";
-      cursor: default;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--color-section-hover);
+      }
     }
 
-    .top-username-id {
-      color: var(--color-text-disabled);
-      font-size: 20px;
-      align-self: center;
-      font-family: "belerenbold";
-      cursor: default;
-    }
   }
 
   .patreon {

@@ -37,6 +37,7 @@ import { DEFAULT_SERVERS } from "../constants";
 
 import Popups from "./Popups";
 import peerToUrl from "../utils/peerToUrl";
+import ArenaIdSelector from "./popups/ArenaIdSelector";
 
 export interface AppProps {
   forceOs?: string;
@@ -126,6 +127,9 @@ function App(props: AppProps) {
   const openSettings = useRef<() => void>(vodiFn);
   const closeSettings = useRef<() => void>(vodiFn);
 
+  const openArenaIdSelector = useRef<() => void>(vodiFn);
+  const closenArenaIdSelector = useRef<() => void>(vodiFn);
+
   return (
     <>
       <SettingsPersistor />
@@ -139,6 +143,17 @@ function App(props: AppProps) {
         persistent={false}
       >
         <ViewSettings onClose={closeSettings.current} />
+      </PopupComponent>
+      <PopupComponent
+        open={false}
+        className={isElectron() ? "settings-popup" : ""}
+        width="600px"
+        height="400px"
+        openFnRef={openArenaIdSelector}
+        closeFnRef={closenArenaIdSelector}
+        persistent={false}
+      >
+        <ArenaIdSelector onClose={closenArenaIdSelector.current} />
       </PopupComponent>
       {os !== "" && os !== "linux" && <TopBar forceOs={os} />}
       <div
@@ -169,7 +184,10 @@ function App(props: AppProps) {
             <Route exact path="/auth" component={Auth} />
             <Route path="/:page">
               <>
-                <TopNav openSettings={openSettings.current} />
+                <TopNav
+                  openArenaIdSelector={openArenaIdSelector.current}
+                  openSettings={openSettings.current}
+                />
                 {loginState == LOGIN_OK ? <ContentWrapper /> : <></>}
               </>
             </Route>

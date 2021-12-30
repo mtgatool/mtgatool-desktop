@@ -159,10 +159,11 @@ function TopRankIcon(props: TopRankProps): JSX.Element {
 
 interface TopNavProps {
   openSettings: () => void;
+  openArenaIdSelector: () => void;
 }
 
 export default function TopNav(props: TopNavProps): JSX.Element {
-  const { openSettings } = props;
+  const { openSettings, openArenaIdSelector } = props;
 
   const [compact, setCompact] = useState(false);
   const currentUUID = useSelector(
@@ -237,8 +238,7 @@ export default function TopNav(props: TopNavProps): JSX.Element {
     }
   }, [windowSize, compact]);
 
-  const userName = getLocalSetting("username"); // playerData.playerName.slice(0, -6);
-  const userNumerical = ""; // playerData.playerName.slice(-6);
+  const userName = getLocalSetting("username");
 
   const items = (
     <>
@@ -266,11 +266,8 @@ export default function TopNav(props: TopNavProps): JSX.Element {
           <div className="userdata-container">
             <TopRankIcon type="constructed" {...contructedNav} />
             <TopRankIcon type="limited" {...limitedNav} />
-            <div className="top-username" title="Arena username">
+            <div className="top-username" onClick={openArenaIdSelector}>
               {userName}
-            </div>
-            <div className="top-username-id" title="Arena user ID">
-              {userNumerical}
             </div>
             <IconButton
               style={{ margin: `auto 8px` }}

@@ -29,14 +29,20 @@ export default function ViewHistory(props: ViewHistoryProps) {
   const { url } = useRouteMatch();
   const [, loggedIn] = useDbUser();
 
+  const currentUUID = useSelector(
+    (state: AppState) => state.mainData.currentUUID
+  );
+
   const matchesIndex = useSelector(
     (state: AppState) => state.mainData.matchesIndex
   );
   const [matchesData, setMatchesData] = useState<MatchData[]>([]);
 
   useEffect(() => {
-    getMatchesData(matchesIndex).then(setMatchesData);
-  }, [matchesIndex]);
+    getMatchesData(matchesIndex).then((data) =>
+      setMatchesData(data.filter((m) => m.uuid === currentUUID))
+    );
+  }, [matchesIndex, currentUUID]);
 
   return (
     <>
