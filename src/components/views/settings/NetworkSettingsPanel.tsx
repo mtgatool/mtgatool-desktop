@@ -128,7 +128,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
         );
       })}
       {connections.map((s) => {
-        const { url } = s;
+        const url = s.origUrl;
 
         return (
           <div
