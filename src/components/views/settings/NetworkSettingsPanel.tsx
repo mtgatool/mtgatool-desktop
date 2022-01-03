@@ -1,6 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable radix */
 import { ChangeEvent, useCallback, useState } from "react";
+import { ToolDbWebSocket } from "tool-db/dist/wss";
 import { Peer } from "../../../redux/slices/rendererSlice";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import peerToUrl from "../../../utils/peerToUrl";
@@ -9,7 +10,7 @@ import setLocalSetting from "../../../utils/setLocalSetting";
 import Button from "../../ui/Button";
 
 export default function NetworkSettingsPanel(): JSX.Element {
-  const peers = JSON.parse(getLocalSetting("peers"));
+  const peers: Peer[] = JSON.parse(getLocalSetting("peers"));
   const [_rerender, setRerender] = useState(0);
 
   const [newHost, setNewHost] = useState("localhost");
@@ -31,16 +32,18 @@ export default function NetworkSettingsPanel(): JSX.Element {
     []
   );
 
-  const connections = (window.toolDb.websockets as any)._connections;
+  const connections = Object.values(window.toolDb.websockets.clientSockets);
 
-  const removePeer = (index: number) => {
+  const removePeer = (clientId: string) => {
     const slicedPeers = [...peers];
-    slicedPeers.splice(index, 1);
-    const url = peerToUrl(peers[index]);
-    if (connections[url]) {
-      window.toolDb.websockets.close(url);
+    const index = connections.findIndex((s) => s.toolDbId === clientId);
+    if (index !== -1) {
+      slicedPeers.splice(index, 1);
+      setLocalSetting("peers", JSON.stringify(slicedPeers));
     }
-    setLocalSetting("peers", JSON.stringify(slicedPeers));
+    if (connections) {
+      window.toolDb.websockets.close(clientId);
+    }
   };
 
   const addPeer = () => {
@@ -57,23 +60,30 @@ export default function NetworkSettingsPanel(): JSX.Element {
     setLocalSetting("peers", JSON.stringify(newPeers));
   };
 
-  const connectPeer = (index: number) => {
-    const url = peerToUrl(peers[index]);
+  const connectPeer = (url: string) => {
     window.toolDb.websockets.open(url);
   };
 
-  const disconnectPeer = (index: number) => {
-    const url = peerToUrl(peers[index]);
-    if (connections[url]) {
-      window.toolDb.websockets.close(url);
-    }
+  const disconnectPeer = (clientId: string) => {
+    console.log("Client ID disconnect", clientId);
+    window.toolDb.websockets.close(clientId);
   };
+
+  const connectionUrls = connections.map((c) => c.origUrl);
 
   return (
     <>
       <p>Peers:</p>
-      {peers.map((p: Peer, index: number) => {
+      {peers.map((p: Peer) => {
         const url = peerToUrl(p);
+        if (connectionUrls.includes(url)) {
+          return <div key={`${url}-active-peer`}>{url}</div>;
+        }
+
+        const connectionUrl: ToolDbWebSocket | undefined = connections.filter(
+          (s) => s.origUrl === url
+        )[0];
+
         return (
           <div
             key={`${url}-active-peer`}
@@ -87,8 +97,8 @@ export default function NetworkSettingsPanel(): JSX.Element {
           >
             <div
               className={`log-status-${
-                connections[url]
-                  ? connections[url].peer.readyState === 1
+                connectionUrl
+                  ? connectionUrl.readyState === 1
                     ? "ok"
                     : "warn"
                   : "err"
@@ -98,13 +108,13 @@ export default function NetworkSettingsPanel(): JSX.Element {
             <div style={{ width: "500px" }}>{url}</div>
 
             <Button
-              text={connections[url] ? "Disconnect" : "Connect"}
+              text={connectionUrl ? "Disconnect" : "Connect"}
               style={{ margin: "0 8px", minWidth: "100px", width: "100px" }}
               className="button-simple button-edit"
               onClick={
-                connections[url]
-                  ? () => disconnectPeer(index)
-                  : () => connectPeer(index)
+                connectionUrl
+                  ? () => disconnectPeer(connectionUrl.toolDbId || "")
+                  : () => connectPeer(url)
               }
             />
 
@@ -112,7 +122,47 @@ export default function NetworkSettingsPanel(): JSX.Element {
               text="Remove"
               style={{ margin: "0 8px", minWidth: "100px", width: "100px" }}
               className="button-simple button-edit"
-              onClick={() => removePeer(index)}
+              onClick={() => removePeer(connectionUrl.toolDbId || "")}
+            />
+          </div>
+        );
+      })}
+      {connections.map((s) => {
+        const { url } = s;
+
+        return (
+          <div
+            key={`${url}-active-peer`}
+            style={{
+              display: "flex",
+              height: "24px",
+              lineHeight: "24px",
+              maxWidth: "600px",
+              margin: "0px auto",
+            }}
+          >
+            <div
+              className={`log-status-${s.readyState === 1 ? "ok" : "warn"}`}
+            />
+
+            <div style={{ width: "500px" }}>{url}</div>
+
+            <Button
+              text={s.readyState === 1 ? "Disconnect" : "Connect"}
+              style={{ margin: "0 8px", minWidth: "100px", width: "100px" }}
+              className="button-simple button-edit"
+              onClick={
+                s.readyState === 1
+                  ? () => disconnectPeer(s.toolDbId || "")
+                  : () => connectPeer(url)
+              }
+            />
+
+            <Button
+              text="Remove"
+              style={{ margin: "0 8px", minWidth: "100px", width: "100px" }}
+              className="button-simple button-edit"
+              onClick={() => removePeer(s.toolDbId || "")}
             />
           </div>
         );
