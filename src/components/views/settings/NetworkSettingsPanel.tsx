@@ -34,15 +34,15 @@ export default function NetworkSettingsPanel(): JSX.Element {
 
   const connections = Object.values(window.toolDb.websockets.clientSockets);
 
-  const removePeer = (clientId: string) => {
+  const removePeer = (url: string) => {
+    const peerIndex = peers.map(peerToUrl).findIndex((u) => u === url);
     const slicedPeers = [...peers];
-    const index = connections.findIndex((s) => s.toolDbId === clientId);
-    if (index !== -1) {
-      slicedPeers.splice(index, 1);
-      setLocalSetting("peers", JSON.stringify(slicedPeers));
-    }
-    if (connections) {
-      window.toolDb.websockets.close(clientId);
+    slicedPeers.splice(peerIndex, 1);
+    setLocalSetting("peers", JSON.stringify(slicedPeers));
+
+    const connection = connections.filter((s) => s.origUrl === url)[0];
+    if (connection && connection.toolDbId) {
+      window.toolDb.websockets.close(connection.toolDbId);
     }
   };
 
@@ -122,13 +122,13 @@ export default function NetworkSettingsPanel(): JSX.Element {
               text="Remove"
               style={{ margin: "0 8px", minWidth: "100px", width: "100px" }}
               className="button-simple button-edit"
-              onClick={() => removePeer(connectionUrl.toolDbId || "")}
+              onClick={() => removePeer(url)}
             />
           </div>
         );
       })}
       {connections.map((s) => {
-        const { url } = s;
+        const url = s.origUrl;
 
         return (
           <div
@@ -162,7 +162,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
               text="Remove"
               style={{ margin: "0 8px", minWidth: "100px", width: "100px" }}
               className="button-simple button-edit"
-              onClick={() => removePeer(s.toolDbId || "")}
+              onClick={() => removePeer(url)}
             />
           </div>
         );
