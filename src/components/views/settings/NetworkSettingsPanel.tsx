@@ -77,7 +77,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
       {peers.map((p: Peer) => {
         const url = peerToUrl(p);
         if (connectionUrls.includes(url)) {
-          return <div key={`${url}-active-peer`}>{url}</div>;
+          return <></>;
         }
 
         const connectionUrl: ToolDbWebSocket | undefined = connections.filter(
