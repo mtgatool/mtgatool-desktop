@@ -343,7 +343,7 @@ export default function ViewExplore() {
                                 Decks using it
                               </div>
                               <div className="explore-card-text">
-                                {b.copies.toFixed(2)}
+                                {b.copies ? b.copies.toFixed(2) : "1.00"}
                               </div>
                               <div className="explore-card-sub">
                                 Avg. per deck.
