@@ -5,13 +5,15 @@ export default function getLocalDbValue<T>(
     window.toolDb.store.get(key, (err, data) => {
       if (err) {
         resolve(undefined);
-      } else {
+      } else if (data) {
         try {
           const json = JSON.parse(data);
           resolve(json.v);
         } catch (_e) {
           resolve(undefined);
         }
+      } else {
+        resolve(undefined);
       }
     });
   });

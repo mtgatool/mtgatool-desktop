@@ -1,13 +1,39 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable radix */
+import _ from "lodash";
 import { ChangeEvent, useCallback, useState } from "react";
+import { toolDbNetwork } from "tool-db";
 import { ToolDbWebSocket } from "tool-db/dist/wss";
 import { Peer } from "../../../redux/slices/rendererSlice";
 import getLocalSetting from "../../../utils/getLocalSetting";
-import peerToUrl from "../../../utils/peerToUrl";
+import peerToUrl, { knownHosts } from "../../../utils/peerToUrl";
 import setLocalSetting from "../../../utils/setLocalSetting";
+import vodiFn from "../../../utils/voidfn";
 
 import Button from "../../ui/Button";
+
+function getPeerFromUrl(url: string) {
+  const urlParseRegex = new RegExp(
+    /^((ftp|http[s]?|ws[s]?):\/\/)?([^/?:#]+)([:/])?([0-9]*)?(\/.*)?$/,
+    "g"
+  );
+  const result = urlParseRegex.exec(url);
+  if (!result) {
+    return {
+      host: "",
+      port: 0,
+    };
+  }
+  return {
+    host: result[3],
+    port:
+      result[2] === "https" || result[2] === "wss" ? 443 : parseInt(result[5]),
+  };
+}
+
+function getFinalHost(host: string) {
+  return knownHosts[host] || host;
+}
 
 export default function NetworkSettingsPanel(): JSX.Element {
   const peers: Peer[] = JSON.parse(getLocalSetting("peers"));
@@ -17,6 +43,8 @@ export default function NetworkSettingsPanel(): JSX.Element {
   const [newPort, setNewPort] = useState(3000);
 
   setTimeout(() => setRerender(new Date().getTime()), 500);
+
+  const networkModule = window.toolDb.network as toolDbNetwork;
 
   const handleSetHost = useCallback(
     (event: ChangeEvent<HTMLInputElement>): void => {
@@ -32,18 +60,22 @@ export default function NetworkSettingsPanel(): JSX.Element {
     []
   );
 
-  const connections = Object.values(window.toolDb.websockets.clientSockets);
+  const connections = Object.values(networkModule.clientSockets);
 
-  const removePeer = (url: string) => {
-    const peerIndex = peers.map(peerToUrl).findIndex((u) => u === url);
+  const removePeer = (host: string, port: number) => {
+    const peerIndex = peers.findIndex(
+      (p) => getFinalHost(p.host) === getFinalHost(host) && p.port === port
+    );
     const slicedPeers = [...peers];
     slicedPeers.splice(peerIndex, 1);
     setLocalSetting("peers", JSON.stringify(slicedPeers));
 
-    const connection = connections.filter((s) => s.origUrl === url)[0];
-    if (connection && connection.toolDbId) {
-      window.toolDb.websockets.close(connection.toolDbId);
-    }
+    connections.forEach((conn) => {
+      const p = getPeerFromUrl(conn.url);
+      if (getFinalHost(p.host) === getFinalHost(host) && p.port === port) {
+        networkModule.close(conn.clientId);
+      }
+    });
   };
 
   const addPeer = () => {
@@ -53,35 +85,42 @@ export default function NetworkSettingsPanel(): JSX.Element {
     };
     const newPeers = [...peers, p];
 
-    const url = peerToUrl(p);
-    window.toolDb.websockets.open(url);
+    networkModule.connectTo(getFinalHost(p.host), p.port);
     setNewHost("localhost");
     setNewPort(3000);
     setLocalSetting("peers", JSON.stringify(newPeers));
   };
 
-  const connectPeer = (url: string) => {
-    window.toolDb.websockets.open(url);
+  const connectPeer = (host: string, port: number) => {
+    networkModule.connectTo(getFinalHost(host), port);
   };
 
   const disconnectPeer = (clientId: string) => {
     console.log("Client ID disconnect", clientId);
-    window.toolDb.websockets.close(clientId);
+    networkModule.close(clientId);
   };
 
-  const connectionUrls = connections.map((c) => c.origUrl);
+  const connectionPeers = connections.map((c) => getPeerFromUrl(c.url));
 
   return (
     <>
       <p>Peers:</p>
       {peers.map((p: Peer) => {
         const url = peerToUrl(p);
-        if (connectionUrls.includes(url)) {
+        if (
+          connectionPeers.filter(
+            (c) =>
+              getFinalHost(p.host) === getFinalHost(c.host) && p.port === c.port
+          ).length > 0
+        ) {
           return <></>;
         }
 
         const connectionUrl: ToolDbWebSocket | undefined = connections.filter(
-          (s) => s.origUrl === url
+          (s) => {
+            const _peer = getPeerFromUrl(s.url);
+            return _.isEqual(_peer, p);
+          }
         )[0];
 
         return (
@@ -105,7 +144,9 @@ export default function NetworkSettingsPanel(): JSX.Element {
               }`}
             />
 
-            <div style={{ width: "500px" }}>{url}</div>
+            <div style={{ width: "500px" }}>
+              {getFinalHost(p.host)}:{p.port}
+            </div>
 
             <Button
               text={connectionUrl ? "Disconnect" : "Connect"}
@@ -114,7 +155,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
               onClick={
                 connectionUrl
                   ? () => disconnectPeer(connectionUrl.toolDbId || "")
-                  : () => connectPeer(url)
+                  : () => connectPeer(p.host, p.port)
               }
             />
 
@@ -122,17 +163,19 @@ export default function NetworkSettingsPanel(): JSX.Element {
               text="Remove"
               style={{ margin: "0 8px", minWidth: "100px", width: "100px" }}
               className="button-simple button-edit"
-              onClick={() => removePeer(url)}
+              onClick={() => removePeer(p.host, p.port)}
             />
           </div>
         );
       })}
       {connections.map((s) => {
-        const url = s.origUrl;
+        const { url } = s;
+
+        const { host, port } = getPeerFromUrl(url);
 
         return (
           <div
-            key={`${url}-active-peer`}
+            key={`${s.connId}-active-peer`}
             style={{
               display: "flex",
               height: "24px",
@@ -145,7 +188,9 @@ export default function NetworkSettingsPanel(): JSX.Element {
               className={`log-status-${s.readyState === 1 ? "ok" : "warn"}`}
             />
 
-            <div style={{ width: "500px" }}>{url}</div>
+            <div style={{ width: "500px" }}>
+              {getFinalHost(host)}:{port}
+            </div>
 
             <Button
               text={s.readyState === 1 ? "Disconnect" : "Connect"}
@@ -154,7 +199,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
               onClick={
                 s.readyState === 1
                   ? () => disconnectPeer(s.toolDbId || "")
-                  : () => connectPeer(url)
+                  : vodiFn
               }
             />
 
@@ -162,7 +207,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
               text="Remove"
               style={{ margin: "0 8px", minWidth: "100px", width: "100px" }}
               className="button-simple button-edit"
-              onClick={() => removePeer(url)}
+              onClick={() => removePeer(host, port)}
             />
           </div>
         );

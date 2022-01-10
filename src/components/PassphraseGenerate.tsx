@@ -19,9 +19,13 @@ export default function PassphraseGenerate(): JSX.Element {
     window.toolDb.store.get(
       `==${window.toolDb.user?.name || ""}`,
       (_err, data) => {
-        const userData = JSON.parse(data);
-        if (userData) {
-          setIsValid(sha256(sha1(hint)) === userData.v.pass);
+        if (data) {
+          const userData = JSON.parse(data);
+          if (userData) {
+            setIsValid(sha256(sha1(hint)) === userData.v.pass);
+          } else {
+            setIsValid(false);
+          }
         } else {
           setIsValid(false);
         }

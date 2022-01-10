@@ -1,6 +1,6 @@
 import { Peer } from "../redux/slices/rendererSlice";
 
-const knownHosts: Record<string, string> = {
+export const knownHosts: Record<string, string> = {
   "66.97.46.144": "api.mtgatool.com",
 };
 

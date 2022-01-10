@@ -1,6 +1,5 @@
 import { Peer } from "./redux/slices/rendererSlice";
 
-export const DEFAULT_SERVERS = ["https://api.mtgatool.com"];
 export const DEFAULT_PEERS: Peer[] = [{ host: "66.97.46.144", port: 443 }];
 
 export const DEFAULT_AVATAR =

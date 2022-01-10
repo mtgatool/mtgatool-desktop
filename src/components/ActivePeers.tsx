@@ -12,7 +12,7 @@ export default function ActivePeers() {
     return () => clearInterval(interval);
   });
 
-  const connections = (window.toolDb.websockets as any)._connections;
+  const connections = (window.toolDb.network as any)._connections;
 
   return (
     <>

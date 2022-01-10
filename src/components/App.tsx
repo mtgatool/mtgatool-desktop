@@ -7,6 +7,7 @@ import { Switch, Route, useHistory } from "react-router-dom";
 
 import { sha1, ToolDb } from "tool-db";
 
+import _ from "lodash";
 import Auth from "./Auth";
 import CardHover from "./CardHover";
 import ContentWrapper from "./ContentWrapper";
@@ -33,10 +34,10 @@ import overlayHandler from "../common/overlayHandler";
 import login from "../toolDb/login";
 import Welcome from "./Welcome";
 // import liveDraftVerification from "../toolDb/liveDraftVerification";
-import { DEFAULT_SERVERS } from "../constants";
+import { DEFAULT_PEERS } from "../constants";
 
 import Popups from "./Popups";
-import peerToUrl from "../utils/peerToUrl";
+
 import ArenaIdSelector from "./popups/ArenaIdSelector";
 
 export interface AppProps {
@@ -57,10 +58,14 @@ function App(props: AppProps) {
 
   useEffect(() => {
     if (!window.toolDbInitialized) {
-      const storedPeers = JSON.parse(getLocalSetting("peers"));
-      const mergedPeers = isElectron()
-        ? storedPeers.map(peerToUrl).filter((p: string) => p)
-        : DEFAULT_SERVERS;
+      const storedPeers = JSON.parse(getLocalSetting("peers")) as {
+        host: string;
+        port: number;
+      }[];
+      const mergedPeers = _.uniqWith(
+        isElectron() ? storedPeers : DEFAULT_PEERS,
+        _.isEqual
+      );
 
       console.log("Merged Peers: ", mergedPeers);
       window.toolDb = new ToolDb({ peers: mergedPeers, debug: true });
