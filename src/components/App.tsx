@@ -39,6 +39,7 @@ import { DEFAULT_PEERS } from "../constants";
 import Popups from "./Popups";
 
 import ArenaIdSelector from "./popups/ArenaIdSelector";
+import { getFinalHost } from "../utils/peerToUrl";
 
 export interface AppProps {
   forceOs?: string;
@@ -65,7 +66,12 @@ function App(props: AppProps) {
       const mergedPeers = _.uniqWith(
         isElectron() ? storedPeers : DEFAULT_PEERS,
         _.isEqual
-      );
+      ).map((p) => {
+        return {
+          ...p,
+          host: getFinalHost(p.host),
+        };
+      });
 
       console.log("Merged Peers: ", mergedPeers);
       window.toolDb = new ToolDb({ peers: mergedPeers, debug: true });

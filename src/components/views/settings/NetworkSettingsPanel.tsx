@@ -6,7 +6,7 @@ import { toolDbNetwork } from "tool-db";
 import { ToolDbWebSocket } from "tool-db/dist/wss";
 import { Peer } from "../../../redux/slices/rendererSlice";
 import getLocalSetting from "../../../utils/getLocalSetting";
-import peerToUrl, { knownHosts } from "../../../utils/peerToUrl";
+import peerToUrl, { getFinalHost } from "../../../utils/peerToUrl";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
 
@@ -29,10 +29,6 @@ function getPeerFromUrl(url: string) {
     port:
       result[2] === "https" || result[2] === "wss" ? 443 : parseInt(result[5]),
   };
-}
-
-function getFinalHost(host: string) {
-  return knownHosts[host] || host;
 }
 
 export default function NetworkSettingsPanel(): JSX.Element {
