@@ -4,6 +4,7 @@ import collectionSlice from "../slices/collectionSlice";
 import mainDataSlice from "../slices/mainDataSlice";
 import rendererSlice from "../slices/rendererSlice";
 import avatarsSlice from "../slices/avatarsSlice";
+import usernamesSlice from "../slices/usernamesSlice";
 import settingsSlice from "../slices/settingsSlice";
 import hoverSlice from "../slices/hoverSlice";
 
@@ -12,6 +13,7 @@ const rootReducer = combineReducers({
   mainData: mainDataSlice.reducer,
   renderer: rendererSlice.reducer,
   avatars: avatarsSlice.reducer,
+  usernames: usernamesSlice.reducer,
   settings: settingsSlice.reducer,
   hover: hoverSlice.reducer,
 });

@@ -6,6 +6,7 @@ import { database, getEventPrettyName } from "mtgatool-shared";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
+import useFetchUsername from "../../../hooks/useFetchUsername";
 import usePagingControls from "../../../hooks/usePagingControls";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
@@ -56,6 +57,7 @@ export default function ViewExplore() {
   const [allBestCards, setAllBestCards] = useState<BestCards[]>([]);
 
   const avatars = useSelector((state: AppState) => state.avatars.avatars);
+  const usernames = useSelector((state: AppState) => state.usernames.usernames);
 
   const [eventsList, setEventsList] = useState<string[]>([]);
   const [eventFilter, setEventFilterState] = useState("Ladder");
@@ -75,6 +77,7 @@ export default function ViewExplore() {
   const [ranksFilterState, setRanksFilterState] = useState(63);
 
   const fetchAvatar = useFetchAvatar();
+  const fetchUsername = useFetchUsername();
 
   const [filters, setFilters] = useState<Filters<ExploreDeckData>>([]);
 
@@ -89,6 +92,7 @@ export default function ViewExplore() {
       .then((d) => {
         if (d) {
           setData(d);
+          fetchUsername(d.aggregator);
           fetchAvatar(d.aggregator);
         }
       });
@@ -218,6 +222,7 @@ export default function ViewExplore() {
       .then((d) => {
         if (d) {
           setData(d);
+          fetchUsername(d.aggregator);
           fetchAvatar(d.aggregator);
         }
       });
@@ -355,7 +360,9 @@ export default function ViewExplore() {
                       })}
                   </div>
                   <div className="maker-container">
-                    <i className="maker-name">Pushed by</i>
+                    <i className="maker-name">
+                      {`Pushed by ${usernames[data.aggregator]}`}
+                    </i>
                     <div
                       className="maker-avatar"
                       style={{

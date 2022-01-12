@@ -11,7 +11,6 @@ import CardLiveDraft from "./CardLiveDraft";
 
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import CardTile from "../../CardTile";
-import globalData from "../../../utils/globalData";
 
 export default function LiveDraftView() {
   const avatars = useSelector((state: AppState) => state.avatars.avatars);
@@ -121,7 +120,8 @@ export default function LiveDraftView() {
       });
 
       pubKeys.forEach((key) => {
-        if (!avatars[key] && !globalData.fetchedAvatars.includes(key)) {
+        if (!avatars[key]) {
+          // && !globalData.fetchedAvatars.includes(key)) {
           fetchAvatar(key);
         }
       });

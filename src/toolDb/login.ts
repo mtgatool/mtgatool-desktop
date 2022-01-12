@@ -166,6 +166,7 @@ export function afterLogin() {
 
 export default function login(username: string, password: string) {
   return window.toolDb.signIn(username, password).then((keys) => {
+    window.toolDb.putData("username", username, true);
     afterLogin();
     return keys;
   });
