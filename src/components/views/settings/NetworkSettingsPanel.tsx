@@ -69,7 +69,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
     connections.forEach((conn) => {
       const p = getPeerFromUrl(conn.url);
       if (getFinalHost(p.host) === getFinalHost(host) && p.port === port) {
-        networkModule.close(conn.clientId);
+        networkModule.close(conn.toolDbId || "");
       }
     });
   };
@@ -171,7 +171,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
 
         return (
           <div
-            key={`${s.connId}-active-peer`}
+            key={`${s.toolDbId || ""}-active-peer`}
             style={{
               display: "flex",
               height: "24px",
