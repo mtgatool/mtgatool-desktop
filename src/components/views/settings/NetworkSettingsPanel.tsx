@@ -3,7 +3,8 @@
 import _ from "lodash";
 import { ChangeEvent, useCallback, useState } from "react";
 import { toolDbNetwork } from "tool-db";
-import { ToolDbWebSocket } from "tool-db/dist/wss";
+import { ToolDbWebSocket } from "tool-db/dist/toolDbNetwork";
+
 import { Peer } from "../../../redux/slices/rendererSlice";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import peerToUrl, { getFinalHost } from "../../../utils/peerToUrl";
