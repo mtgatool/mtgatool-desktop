@@ -74,7 +74,7 @@ function App(props: AppProps) {
       });
 
       console.log("Merged Peers: ", mergedPeers);
-      window.toolDb = new ToolDb({ peers: mergedPeers, debug: true });
+      window.toolDb = new ToolDb({ peers: mergedPeers, debug: false });
       window.toolDb.onConnect = () => {
         window.toolDb.onConnect = () => {
           //
