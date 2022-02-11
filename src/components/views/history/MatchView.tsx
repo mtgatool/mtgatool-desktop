@@ -172,7 +172,7 @@ export default function MatchView(): JSX.Element {
     : undefined;
 
   const goBack = (): void => {
-    history.goBack();
+    history.push("/history");
     reduxAction(dispatch, {
       type: "SET_BACK_GRPID",
       arg: null,

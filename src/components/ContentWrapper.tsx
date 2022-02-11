@@ -89,7 +89,8 @@ const ContentWrapper = () => {
   const prevIndex = Object.keys(views).findIndex(
     (k) => k == paths.current[paths.current.length - 1]
   );
-  const viewIndex = Object.keys(views).findIndex((k) => params.page == k);
+  let viewIndex = Object.keys(views).findIndex((k) => params.page == k);
+  if (viewIndex === -1) viewIndex = 0;
 
   const leftAnim = {
     from: { opacity: 0, transform: "translate3d(100%, 0, 0)" },

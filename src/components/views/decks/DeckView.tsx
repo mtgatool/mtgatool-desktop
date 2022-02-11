@@ -158,7 +158,7 @@ export default function DeckView(): JSX.Element {
               }}
               svg={BackIcon}
               onClick={() => {
-                history.goBack();
+                history.push("/decks");
                 reduxAction(dispatch, {
                   type: "SET_BACK_GRPID",
                   arg: null,
