@@ -1,8 +1,9 @@
+import { knownHosts } from "../constants";
 import { Peer } from "../redux/slices/rendererSlice";
 
-export const knownHosts: Record<string, string> = {
-  "66.97.46.144": "api.mtgatool.com",
-};
+export function getFinalHost(host: string) {
+  return knownHosts[host] || host;
+}
 
 export default function peerToUrl(peer: Peer): string {
   const host = knownHosts[peer.host] ?? peer.host;

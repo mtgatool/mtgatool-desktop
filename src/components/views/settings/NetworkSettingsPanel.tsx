@@ -3,10 +3,11 @@
 import _ from "lodash";
 import { ChangeEvent, useCallback, useState } from "react";
 import { toolDbNetwork } from "tool-db";
-import { ToolDbWebSocket } from "tool-db/dist/wss";
+import { ToolDbWebSocket } from "tool-db/dist/toolDbNetwork";
+
 import { Peer } from "../../../redux/slices/rendererSlice";
 import getLocalSetting from "../../../utils/getLocalSetting";
-import peerToUrl, { knownHosts } from "../../../utils/peerToUrl";
+import peerToUrl, { getFinalHost } from "../../../utils/peerToUrl";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
 
@@ -29,10 +30,6 @@ function getPeerFromUrl(url: string) {
     port:
       result[2] === "https" || result[2] === "wss" ? 443 : parseInt(result[5]),
   };
-}
-
-function getFinalHost(host: string) {
-  return knownHosts[host] || host;
 }
 
 export default function NetworkSettingsPanel(): JSX.Element {
@@ -73,7 +70,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
     connections.forEach((conn) => {
       const p = getPeerFromUrl(conn.url);
       if (getFinalHost(p.host) === getFinalHost(host) && p.port === port) {
-        networkModule.close(conn.clientId);
+        networkModule.close(conn.toolDbId || "");
       }
     });
   };
@@ -175,7 +172,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
 
         return (
           <div
-            key={`${s.connId}-active-peer`}
+            key={`${s.toolDbId || ""}-active-peer`}
             style={{
               display: "flex",
               height: "24px",

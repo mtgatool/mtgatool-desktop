@@ -3,6 +3,7 @@ import * as CollectionSlice from "./slices/collectionSlice";
 import * as MainDataSlice from "./slices/mainDataSlice";
 import * as RendererSlice from "./slices/rendererSlice";
 import * as avatarsSlice from "./slices/avatarsSlice";
+import * as usernamesSlice from "./slices/usernamesSlice";
 import * as SettingsSlice from "./slices/settingsSlice";
 
 export const actions = {
@@ -47,6 +48,7 @@ export const actions = {
   SET_CURRENT_DRAFT: RendererSlice.setCurrentDraft,
   SET_SCENE: RendererSlice.setScene,
   SET_AVATAR: avatarsSlice.setAvatar,
+  SET_USERNAME: usernamesSlice.setUsername,
   SET_SETTINGS: SettingsSlice.setSettings,
   SET_OVERLAY_SETTINGS: SettingsSlice.setOverlaySettings,
 };
