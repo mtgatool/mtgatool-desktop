@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 
 interface DialogProps {
   error: any;
@@ -8,11 +9,13 @@ interface DialogProps {
 
 export default function PatreonInfo(props: DialogProps): JSX.Element {
   const { closeCallback, error, errorInfo } = props;
+  const history = useHistory();
   const [open, setOpen] = useState(0);
 
   const handleClose = useCallback(
     (e) => {
       setOpen(0);
+      history.push("/home");
       e.stopPropagation();
       if (closeCallback) {
         closeCallback();
