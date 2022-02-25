@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { LOGIN_AUTH } from "mtgatool-shared/dist/shared/constants";
-import { useCallback, useEffect, useRef } from "react";
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
@@ -56,6 +56,33 @@ export default function AccountSettingsPanel(
   const dispatch = useDispatch();
   const history = useHistory();
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [newAlias, setNewAlias] = useState("");
+
+  const handleSetAlias = useCallback(
+    (event: ChangeEvent<HTMLInputElement>): void => {
+      setNewAlias(event.target.value);
+    },
+    []
+  );
+
+  const changeAlias = useCallback(() => {
+    if (window.toolDb.user) {
+      window.toolDb.getData(`==${window.toolDb.user.name}`).then((userData) => {
+        if (userData) {
+          window.toolDb
+            .putData(`==${newAlias}`, userData)
+            .then((newUserdata) => {
+              if (newUserdata && window.toolDb.user) {
+                window.toolDb.putData("username", newAlias, true);
+                window.toolDb.user.name = newAlias;
+                setLocalSetting("username", newAlias);
+                setNewAlias("");
+              }
+            });
+        }
+      });
+    }
+  }, [newAlias]);
 
   const changeAvatar = useCallback(
     (e) => {
@@ -103,6 +130,9 @@ export default function AccountSettingsPanel(
             })`,
           }}
         />
+        <h2 style={{ marginLeft: "32px", marginRight: "auto" }}>
+          {window.toolDb.user?.name || "???"}
+        </h2>
         <label htmlFor="avatarInput" style={{ margin: "0" }}>
           <Button text="Edit Avatar" onClick={vodiFn} />
           <input
@@ -112,6 +142,26 @@ export default function AccountSettingsPanel(
             type="file"
           />
         </label>
+      </div>
+      <div className="form-input-container" style={{ height: "36px" }}>
+        <label style={{ marginRight: "32px" }}>
+          Change alias <i>(old alias will still work)</i>
+        </label>
+        <input
+          type="text"
+          id="new-alias"
+          autoComplete="off"
+          onChange={handleSetAlias}
+          style={{
+            margin: "auto",
+          }}
+          value={newAlias}
+        />
+        <Button
+          style={{ minWidth: "200px", marginLeft: "32px" }}
+          text="Change"
+          onClick={changeAlias}
+        />
       </div>
       <PassphraseGenerate />
       <p
