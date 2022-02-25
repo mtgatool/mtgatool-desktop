@@ -19,6 +19,7 @@ export type MessageType =
   | "STOP_LOG_READING"
   | "LOG_MESSAGE_RECV"
   | "LOG_READ_FINISHED"
+  | "ACTION_LOG"
   | "SET_UUID"
   | "OVERLAY_UPDATE"
   | "OVERLAY_SET_SETTINGS"
@@ -64,6 +65,11 @@ export interface StartLogReadingMessage extends ChannelMessageBase {
 
 export interface StopLogReadingMessage extends ChannelMessageBase {
   type: "STOP_LOG_READING";
+}
+
+export interface ActionLogMessage extends ChannelMessageBase {
+  type: "ACTION_LOG";
+  value: string;
 }
 
 export interface LogMessageRecvMessage extends ChannelMessageBase {
@@ -174,6 +180,7 @@ export type ChannelMessage =
   | LogCheckMessage
   | StartLogReadingMessage
   | StopLogReadingMessage
+  | ActionLogMessage
   | LogMessageRecvMessage
   | LogFinishedMessage
   | SetUUIDMessage

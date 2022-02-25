@@ -10,6 +10,7 @@ export default function logEntrySwitch(entry: LogEntry): void {
       // eslint-disable-next-line no-param-reassign
       entry.json = newJson;
     } catch (e) {
+      console.log("Log entry json parse error: ", entry.json);
       console.warn(e);
     }
   }

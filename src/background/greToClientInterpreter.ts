@@ -64,7 +64,7 @@ function changePriority(previous: number, current: number, time: number): void {
   priorityTimers.timers[previous] += time - priorityTimers.last;
   priorityTimers.last = globalStore.currentMatch.logTime.getTime();
 
-  // console.log("changePriority", previous, priorityTimers, time);
+  console.log("changePriority", previous, priorityTimers, time);
 
   setCurrentMatchMany({
     priorityTimers: priorityTimers,
@@ -618,7 +618,7 @@ const AnnotationType_ManaPaid = (ann: Annotations): void => {
 };
 
 function annotationsSwitch(ann: Annotations, type: AnnotationType): void {
-  // debugLog(type, ann);
+  console.log(type, ann);
   switch (type) {
     case "AnnotationType_ObjectIdChanged":
       AnnotationType_ObjectIdChanged(ann);
@@ -1043,7 +1043,7 @@ const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
   const { currentMatch } = globalStore;
 
   if (msg.msgId) {
-    setCurrentMatchMany({ msgId: msg.msgId });
+    console.log(`Message id > ${msg.msgId} (${currentMatch.msgId})`);
 
     if (
       !currentMatch.msgId ||
@@ -1051,9 +1051,11 @@ const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
       msg.msgId < currentMatch.msgId
     ) {
       // New game, reset per-game fields.
+      console.warn("Reset current game");
       resetCurrentGame();
       setGameBeginTime(globalStore.currentMatch.logTime);
     }
+    setCurrentMatchMany({ msgId: msg.msgId });
   }
 
   const gameState = msg.gameStateMessage;
@@ -1150,7 +1152,7 @@ function GREMessagesSwitch(
   message: GREToClientMessage,
   type: GREMessageType | undefined
 ): void {
-  // debugLog(`Process: ${message.type} (${message.msgId})`);
+  console.log(`Process: ${message.type} (${message.msgId})`);
   switch (type) {
     case "GREMessageType_QueuedGameStateMessage":
       GREMessageType_QueuedGameStateMessage(message);

@@ -24,6 +24,7 @@ import { overlayTitleToId } from "../common/maps";
 import DraftOverlay from "./DraftOverlay";
 import getPlayerNameWithoutSuffix from "../utils/getPlayerNameWithoutSuffix";
 import { DbDraftVote } from "../types/dbTypes";
+import ActionLog from "../components/ActionLog";
 
 function getCurrentOverlayId(): number {
   const title = electron?.remote.getCurrentWindow().getTitle() || "";
@@ -36,6 +37,7 @@ export default function Overlay() {
   const [matchState, setMatchState] = useState<OverlayUpdateMatchState>();
   const [draftState, setDraftState] = useState<InternalDraftv2>();
   const [draftVotes, setDraftVotes] = useState<Record<string, DbDraftVote>>({});
+  const [actionLog, setActionLog] = useState<string>("");
   const [odds, setOdds] = useState<Chances>();
   const heightDivAdjustRef = useRef<HTMLDivElement>(null);
 
@@ -91,6 +93,10 @@ export default function Overlay() {
 
       if (msg.data.type === "DRAFT_STATUS") {
         setDraftState(msg.data.value);
+      }
+
+      if (msg.data.type === "ACTION_LOG") {
+        setActionLog(msg.data.value);
       }
     },
     [settings]
@@ -165,6 +171,7 @@ export default function Overlay() {
         allSettings.overlaysTransparency
           ? {
               padding: "6px",
+              height: settings?.mode == OVERLAY_LOG ? "calc(100% - 12px)" : "",
               // backgroundColor: `rgba(0,0,0,0.1)`,
             }
           : {
@@ -180,13 +187,14 @@ export default function Overlay() {
             allSettings.overlaysTransparency ? settings?.alphaBack || 0 : 0
           })`,
           height: "100%",
+          overflow: settings?.mode === OVERLAY_LOG ? "auto" : "",
         }}
       >
         <div ref={heightDivAdjustRef} style={{ opacity: settings?.alpha || 0 }}>
           {settings && settings.mode === OVERLAY_DRAFT && draftState && (
             <DraftOverlay state={draftState} votes={draftVotes} />
           )}
-          {deck && settings && (
+          {deck && settings && settings.mode !== OVERLAY_LOG && (
             <OverlayDeckList
               deck={deck}
               settings={settings}
@@ -196,6 +204,9 @@ export default function Overlay() {
                 //
               }}
             />
+          )}
+          {settings && settings.mode === OVERLAY_LOG && (
+            <ActionLog logStr={actionLog} />
           )}
           {settings &&
             !!settings.clock &&

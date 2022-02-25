@@ -1,4 +1,5 @@
 import format from "date-fns/format";
+import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import globalStore from "./store";
 
 const actionLog = (
@@ -15,6 +16,11 @@ const actionLog = (
     globalStore.currentActionLog += `${seat}\r\n`;
     globalStore.currentActionLog += `${format(time, "HH:mm:ss")}\r\n`;
     globalStore.currentActionLog += `${str}\r\n`;
+
+    postChannelMessage({
+      type: "ACTION_LOG",
+      value: globalStore.currentActionLog,
+    });
   }
 };
 
