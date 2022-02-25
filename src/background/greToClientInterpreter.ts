@@ -1152,7 +1152,7 @@ function GREMessagesSwitch(
   message: GREToClientMessage,
   type: GREMessageType | undefined
 ): void {
-  console.log(`Process: ${message.type} (${message.msgId})`);
+  // console.log(`Process: ${message.type} (${message.msgId})`);
   switch (type) {
     case "GREMessageType_QueuedGameStateMessage":
       GREMessageType_QueuedGameStateMessage(message);
