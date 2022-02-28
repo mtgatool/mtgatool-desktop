@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 import { database, InternalDraftv2 } from "mtgatool-shared";
 import Automerge, { FreezeObject } from "automerge";
-import { base64ToBinaryDocument, signData, toBase64 } from "tool-db";
+import { arrayBufferToBase64, base64ToBinaryDocument, signData } from "tool-db";
 import { DbliveDraftV1 } from "../../../types/dbTypes";
 import { AppState } from "../../../redux/stores/rendererStore";
 import CardLiveDraft from "./CardLiveDraft";
@@ -44,7 +44,7 @@ export default function LiveDraftView() {
               // eslint-disable-next-line no-param-reassign
               doc.votes[voteKey] = {
                 pubKey: window.toolDb.user?.pubKey || "",
-                signature: toBase64(signature),
+                signature: arrayBufferToBase64(signature),
                 pack,
                 pick,
                 vote,
