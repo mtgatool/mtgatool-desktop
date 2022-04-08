@@ -94,6 +94,12 @@ export default function logEntrySwitch(entry: LogEntry): void {
       }
       break;
 
+    case "Event_SetDeckV2":
+      if (entry.arrow == "==>") {
+        Labels.OutSetDeckV2(entry);
+      }
+      break;
+
     case "StartHook":
       if (entry.arrow == "<==") {
         Labels.InStartHook(entry);

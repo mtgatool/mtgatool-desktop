@@ -39,3 +39,4 @@ export { default as onAuthenticateResponse } from "./onAuthenticateResponse";
 export { default as InEventGetCourses } from "./InEventGetCourses";
 export { default as InGetFormats } from "./InGetFormats";
 export { default as InStartHook } from "./InStartHook";
+export { default as OutSetDeckV2 } from "./OutSetDeckV2";
