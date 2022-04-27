@@ -36,7 +36,11 @@ function handleIpcSwitch(_event, method, msg) {
         mainGlobals.mainWindow.minimize();
         break;
       case "setDevtoolsShortcut":
-        globalShortcut.register(msg.arg || "Alt+Shift+D", openDevTools);
+        try {
+          globalShortcut.register(msg.arg || "Alt+Shift+D", openDevTools);
+        } catch (e) {
+          console.warn(e);
+        }
         break;
       case "quit":
         app.quit();
