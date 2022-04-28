@@ -1,13 +1,6 @@
 import { database, DbCardData } from "mtgatool-shared";
+import findSetByCode from "./findSetByCode";
 import openExternal from "./openExternal";
-
-function findSetByCode(code: string) {
-  const name = Object.keys(database.sets).filter((k: string) => {
-    return database.sets[k].arenacode.toLowerCase() === code.toLowerCase();
-  })[0];
-
-  return name ? database.sets[name] : undefined;
-}
 
 export default function openScryfallCard(card?: DbCardData | number): void {
   const cardObj = typeof card == "number" ? database.card(card) : card;

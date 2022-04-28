@@ -22,6 +22,7 @@ export interface CardsData extends DbCardData {
   legal: string[];
   suspended: string[];
   craftable: boolean;
+  booster: boolean;
 }
 
 export type QueryKeys =

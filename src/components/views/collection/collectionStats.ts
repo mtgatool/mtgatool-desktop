@@ -51,7 +51,7 @@ export function getCollectionStats(cardIds: number[]): CollectionStats {
     const setCode = setObj.arenacode.toLowerCase();
     const setStats = new SetStats(setCode);
     setStats.boosters = noUndefUuidData.inventory.Boosters.filter(
-      ({ CollationId }) => database.sets[setCode]?.collation === CollationId
+      ({ CollationId }) => setObj.collation === CollationId
     ).reduce(
       (accumulator: number, booster: { CollationId: number; Count: number }) =>
         accumulator + booster.Count,
