@@ -1,11 +1,11 @@
-import fs from "fs";
-
 import ArenaLogWatcher from "./arena-log-watcher";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import logEntrySwitch from "./logEntrySwitch";
 import getLocalSetting from "../utils/getLocalSetting";
 
 export default function start(): undefined | (() => void) {
+  // eslint-disable-next-line global-require
+  const fs = require("fs");
   if (!fs.existsSync(getLocalSetting("logPath"))) {
     postChannelMessage({
       type: "LOG_READ_FINISHED",

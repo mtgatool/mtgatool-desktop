@@ -6,7 +6,7 @@
   "homepage": "./",
   "dependencies": {
     "@reduxjs/toolkit": "^1.5.0",
-    "@storybook/react": "^6.2.9",
+    "@storybook/react": "^6.5.0-beta.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -155,10 +155,11 @@
     ]
   },
   "devDependencies": {
-    "@storybook/addon-actions": "^6.2.9",
-    "@storybook/addon-essentials": "^6.2.9",
-    "@storybook/addon-links": "^6.2.9",
-    "@storybook/node-logger": "^6.2.9",
+    "@craco/craco": "^6.4.3",
+    "@storybook/addon-actions": "^6.5.0-beta.1",
+    "@storybook/addon-essentials": "^6.5.0-beta.1",
+    "@storybook/addon-links": "^6.5.0-beta.1",
+    "@storybook/node-logger": "^6.5.0-beta.1",
     "@storybook/preset-create-react-app": "^3.1.7",
     "@types/follow-redirects": "^1.13.1",
     "@types/jest": "^26.0.15",

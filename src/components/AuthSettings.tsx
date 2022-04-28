@@ -5,7 +5,6 @@ import { useCallback, useState } from "react";
 import { format, fromUnixTime } from "date-fns";
 import { database } from "mtgatool-shared";
 
-import fs from "fs";
 import info from "../info.json";
 
 import { ReactComponent as Close } from "../assets/images/svg/close.svg";
@@ -24,6 +23,12 @@ import DaemonSettingsPanel from "./views/settings/DaemonSettingsPanel";
 
 function clickBetaChannel(value: boolean): void {
   setLocalSetting("betaChannel", value ? "true" : "false");
+}
+
+function getLogExists(path: string) {
+  // eslint-disable-next-line global-require
+  const fs = require("fs");
+  return fs.existsSync(path);
 }
 
 interface AuthSettingsProps {
@@ -62,7 +67,7 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
     });
   }, [arenaLogCallback]);
 
-  const logFileExists = fs.existsSync(path);
+  const logFileExists = isElectron() ? getLogExists(path) : false;
 
   return (
     <>

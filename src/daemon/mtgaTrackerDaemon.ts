@@ -1,6 +1,6 @@
 /* eslint-disable radix */
 import axios from "axios";
-import fs from "fs";
+
 import path from "path";
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import extract from "extract-zip";
@@ -67,6 +67,9 @@ export default class MtgaTrackerDaemon {
     setLocalSetting("daemonPort", `${port}`);
   }
 
+  // eslint-disable-next-line global-require
+  fs = require("fs");
+
   public downloadLatestDaemon() {
     console.log("mtgaTrackerDaemon downloadLatestDaemon");
     return new Promise((resolve, reject) => {
@@ -94,6 +97,8 @@ export default class MtgaTrackerDaemon {
 
       const downloadPath = path.join(electronApp.getPath("userData"), zipName);
 
+      // eslint-disable-next-line global-require
+      const fs = require("fs");
       if (isElectron() && fs.existsSync(downloadPath)) {
         fs.unlinkSync(downloadPath);
       }
@@ -160,6 +165,8 @@ export default class MtgaTrackerDaemon {
     if (os !== "win32") return;
 
     if (this._daemonExecutablePath) {
+      // eslint-disable-next-line global-require
+      const fs = require("fs");
       const daemonExists =
         isElectron() && fs.existsSync(this._daemonExecutablePath);
 

@@ -1,5 +1,4 @@
 import { http, https } from "follow-redirects";
-import fs from "fs";
 
 export default async function downloadFile(
   url: string,
@@ -8,6 +7,8 @@ export default async function downloadFile(
   const proto = !url.charAt(4).localeCompare("s") ? https : http;
 
   return new Promise((resolve, reject) => {
+    // eslint-disable-next-line global-require
+    const fs = require("fs");
     const file = fs.createWriteStream(filePath);
     let fileInfo: any = null;
 
@@ -32,7 +33,7 @@ export default async function downloadFile(
       fs.unlink(filePath, () => reject(err));
     });
 
-    file.on("error", (err) => {
+    file.on("error", (err: any) => {
       fs.unlink(filePath, () => reject(err));
     });
 

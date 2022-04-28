@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import fs from "fs";
 
 import { useDispatch } from "react-redux";
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
@@ -13,6 +12,13 @@ import globalData from "../../../utils/globalData";
 import reduxAction from "../../../redux/reduxAction";
 
 import DaemonSettingsPanel from "./DaemonSettingsPanel";
+import isElectron from "../../../utils/electron/isElectron";
+
+function getLogExists(path: string) {
+  // eslint-disable-next-line global-require
+  const fs = require("fs");
+  return fs.existsSync(path);
+}
 
 export default function LogsSettingsPanel(): JSX.Element {
   const dispatch = useDispatch();
@@ -41,7 +47,7 @@ export default function LogsSettingsPanel(): JSX.Element {
 
   const isReading = new Date().getTime() - lastLogUpdate < 1000;
 
-  const logFileExists = fs.existsSync(path);
+  const logFileExists = isElectron() ? getLogExists(path) : false;
 
   return (
     <>
