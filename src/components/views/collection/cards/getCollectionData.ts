@@ -1,13 +1,7 @@
 import { Colors, constants } from "mtgatool-shared";
 
 import database from "../../../../utils/database-wrapper";
-import {
-  historicAnthology,
-  historicAnthology2,
-  historicAnthology3,
-  historicAnthology4,
-  historicAnthology5,
-} from "../../../../common/customSets";
+
 import getCardBanned from "./getCardBanned";
 import getCardFormats from "./getCardFormats";
 import getCardInBoosters from "./getCardInBoosters";
@@ -64,13 +58,10 @@ export default function getCollectionData(cards: DbCardsData): CardsData[] {
       const rarityVal = getRarityFilterVal(card.rarity);
       const rankSortVal = RANK_SOURCE[card.rank] ?? "?";
 
-      const setCodes = [database.sets[card.set]?.scryfall ?? card.set];
-
-      if (historicAnthology.includes(card.id)) setCodes.push("ha1");
-      if (historicAnthology2.includes(card.id)) setCodes.push("ha2");
-      if (historicAnthology3.includes(card.id)) setCodes.push("ha3");
-      if (historicAnthology4.includes(card.id)) setCodes.push("ha4");
-      if (historicAnthology5.includes(card.id)) setCodes.push("ha5");
+      const setCode =
+        card.set_digital === ""
+          ? [card.set.toLowerCase()]
+          : [card.set_digital.toLowerCase()];
 
       const { set } = card;
 
@@ -91,7 +82,7 @@ export default function getCollectionData(cards: DbCardsData): CardsData[] {
         colorSortVal,
         rankSortVal,
         rarityVal,
-        setCodes,
+        setCode,
         format,
         banned,
         suspended,

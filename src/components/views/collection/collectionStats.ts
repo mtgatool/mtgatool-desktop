@@ -1,5 +1,5 @@
 import { Colors, database } from "mtgatool-shared";
-import { customSets } from "../../../common/customSets";
+
 import { makeDefaultUUIDData } from "../../../redux/slices/mainDataSlice";
 import store from "../../../redux/stores/rendererStore";
 
@@ -46,10 +46,12 @@ export function getCollectionStats(cardIds: number[]): CollectionStats {
   };
 
   const { cards } = noUndefUuidData;
-  Object.keys(database.sets).forEach((setName) => {
-    const setStats = new SetStats(setName);
+
+  Object.values(database.sets).forEach((setObj) => {
+    const setCode = setObj.arenacode.toLowerCase();
+    const setStats = new SetStats(setCode);
     setStats.boosters = noUndefUuidData.inventory.Boosters.filter(
-      ({ CollationId }) => database.sets[setName]?.collation === CollationId
+      ({ CollationId }) => database.sets[setCode]?.collation === CollationId
     ).reduce(
       (accumulator: number, booster: { CollationId: number; Count: number }) =>
         accumulator + booster.Count,
@@ -57,25 +59,18 @@ export function getCollectionStats(cardIds: number[]): CollectionStats {
     );
     setStats.boosterRares = estimateBoosterRares(setStats.boosters);
     setStats.boosterMythics = estimateBoosterMythics(setStats.boosters);
-    stats[setName] = setStats;
-  });
-
-  // Hardcode cursom sets
-  customSets.forEach((s) => {
-    stats[s.name] = new SetStats(s.name);
+    stats[setCode] = setStats;
   });
 
   cardIds.forEach((cardId) => {
     const card = database.card(cardId);
     if (!card) return;
     if (card.rarity === "land" || card.rarity === "token") return;
-    if (!(card.set in stats)) return;
 
-    let cardSet = card.set;
-
-    customSets.forEach((s) => {
-      if (s.cards.includes(card.id)) cardSet = s.name;
-    });
+    const cardSet =
+      card.set_digital === ""
+        ? card.set.toLowerCase()
+        : card.set_digital.toLowerCase();
 
     const obj: CardStats = {
       id: card.id,
@@ -84,8 +79,8 @@ export function getCollectionStats(cardIds: number[]): CollectionStats {
     };
 
     // add to totals
-    if (stats[cardSet][card.rarity] == undefined) {
-      // debugLog(card, cardSet, card.rarity);
+    if (!stats[cardSet] || stats[cardSet][card.rarity] === undefined) {
+      console.log(card, cardSet, card.rarity);
       return;
     }
 

@@ -176,7 +176,7 @@ function getTokenVal(
     case "set":
       const newSetFilter: ArrayFilterType<CardsData> = {
         type: "array",
-        id: "setCodes",
+        id: "setCode",
         value: { arr: val.split(","), mode: separator, not: isNegative },
       };
       return newSetFilter;

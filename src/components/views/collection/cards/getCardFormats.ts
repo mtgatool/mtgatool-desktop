@@ -11,7 +11,10 @@ export default function getCardFormats(card: DbCardData): string[] {
     card.reprints.forEach((cid) => {
       const reprint = database.card(cid);
       if (reprint) {
-        const reprintSet = database.sets[reprint.set]?.arenacode || reprint.set;
+        const reprintSet =
+          database.sets[reprint.set]?.arenacode || reprint.set_digital === ""
+            ? reprint.set
+            : reprint.set_digital;
         arenaSetCode.push(reprintSet);
       }
     });

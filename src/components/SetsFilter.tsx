@@ -26,6 +26,7 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
     "Historic Anthology 4",
     "Historic Anthology 5"
   );
+
   const filterSets: (CardSet & { name: string })[] = filterable.map((set) => {
     return { name: set, ...database.sets[set] };
   });

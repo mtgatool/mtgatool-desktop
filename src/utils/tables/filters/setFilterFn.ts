@@ -7,7 +7,7 @@ import { ArrayFilter } from "../../../types/filterTypes";
 export default function setFilterFn(
   rows: CardsData[],
   filterValue: ArrayFilter,
-  _key: "setCodes" | "set"
+  _key: "setCode" | "set"
 ): CardsData[] {
   return rows.filter((row) => {
     const F = filterValue.arr;
@@ -16,7 +16,7 @@ export default function setFilterFn(
     F.forEach((set) => {
       res =
         res ||
-        (_key === "setCodes" && row.setCodes.includes(set)) ||
+        (_key === "setCode" && row.setCode.includes(set)) ||
         (_key === "set" && row.set.indexOf(set) !== -1);
     });
 

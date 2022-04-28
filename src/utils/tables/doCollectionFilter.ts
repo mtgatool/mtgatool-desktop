@@ -88,7 +88,7 @@ export default function doCollectionFilter(
         break;
 
       case "array":
-        if (element.id === "setCodes") {
+        if (element.id === "setCode") {
           filteredData = setFilterFn(filteredData, element.value, element.id);
         }
         break;

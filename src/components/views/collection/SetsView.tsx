@@ -32,9 +32,10 @@ export default function SetsView(props: SetsViewProps): JSX.Element {
     boosterWinFactor,
   } = useSelector((state: AppState) => state.collection);
 
-  // const currentSetData = database.sets[currentSetName];
+  const firstSet = filterSets[0] ? filterSets[0].toLowerCase() : "";
+
   const currentSetName = Object.keys(database.sets).filter(
-    (s) => database.sets[s].code.toLowerCase() == filterSets[0]
+    (s) => database.sets[s].arenacode.toLowerCase() == firstSet
   )[0];
 
   const iconSvg =
@@ -46,7 +47,7 @@ export default function SetsView(props: SetsViewProps): JSX.Element {
 
   return (
     <div className="sets-view-grid">
-      {stats[currentSetName] ? (
+      {stats[firstSet] ? (
         <>
           <Section
             style={{
@@ -64,7 +65,7 @@ export default function SetsView(props: SetsViewProps): JSX.Element {
             </Flex>
             {database.sets[currentSetName]?.collation !== -1 ? (
               <SetCompletionStats
-                setStats={stats[currentSetName]}
+                setStats={stats[firstSet]}
                 boosterMath
                 rareDraftFactor={rareDraftFactor}
                 mythicDraftFactor={mythicDraftFactor}
@@ -83,8 +84,8 @@ export default function SetsView(props: SetsViewProps): JSX.Element {
             }}
           >
             <CompletionHeatMap
-              key={currentSetName}
-              cardData={stats[currentSetName]?.cards}
+              key={firstSet}
+              cardData={stats[firstSet]?.cards}
             />
           </Section>
         </>

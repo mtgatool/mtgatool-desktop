@@ -14,7 +14,7 @@ export interface CardsData extends DbCardData {
   colorSortVal: string;
   rankSortVal: string;
   rarityVal: number;
-  setCodes: string[];
+  setCode: string[];
   owned: number;
   acquired: number;
   format: string[];

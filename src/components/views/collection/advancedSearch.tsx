@@ -135,7 +135,7 @@ export default function AdvancedSearch(
       );
       defaultCol = col.getBits();
     }
-    if (f.id == "setCodes") {
+    if (f.id == "setCode") {
       const filter: ArrayFilter = f.value;
       defaultSets = filter.arr;
     }

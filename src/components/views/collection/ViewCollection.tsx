@@ -75,7 +75,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
     );
     setFilters(newFilters);
     newFilters.forEach((f) => {
-      if (f.id === "setCodes" && f.type === "array") {
+      if (f.id === "setCode" && f.type === "array") {
         setFilterSets(f.value.arr);
       }
     });
@@ -84,7 +84,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
   useEffect(() => {
     if (filters) {
       filters.forEach((f) => {
-        if (f.id === "setCodes" && f.type === "array") {
+        if (f.id === "setCode" && f.type === "array") {
           setFilterSets(f.value.arr);
         }
       });
@@ -121,7 +121,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
       // if (filters) {
       //   const newFilters = setFilter(filters, {
       //     type: "array",
-      //     id: "setCodes",
+      //     id: "setCode",
       //     value: {
       //       mode: ":",
       //       arr: sets,
@@ -141,7 +141,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
       const newFilters: Filters<CardsData> = setFilter([], {
         type: "array",
-        id: "setCodes",
+        id: "setCode",
         value: {
           mode: ":",
           arr: sets,

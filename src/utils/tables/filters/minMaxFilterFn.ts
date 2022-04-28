@@ -49,7 +49,7 @@ export function arrayFilterFn<D>(
   const { arr, mode, not } = filterValue;
   const F = arr?.map((s) => s.toLowerCase()) || [];
   return rows.filter((row) => {
-    const S: string[] = row.setCodes;
+    const S: string[] = row.setCode;
 
     let ret: number | boolean = true;
     if (mode == "=") ret = isEqual(S, F);
