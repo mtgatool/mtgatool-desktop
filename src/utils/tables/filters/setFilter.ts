@@ -8,7 +8,7 @@ export default function setFilter<D>(
 
   let setToIndex: undefined | number;
   filters.forEach((element, index) => {
-    if (element.type === newFilter.type) {
+    if (element.id === newFilter.id) {
       setToIndex = index;
     }
   });

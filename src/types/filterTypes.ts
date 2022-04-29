@@ -60,3 +60,8 @@ export type InArrayStringFilter = {
   not: boolean;
   value: string[];
 };
+
+export type InStringArrayFilter = {
+  not: boolean;
+  value: string;
+};

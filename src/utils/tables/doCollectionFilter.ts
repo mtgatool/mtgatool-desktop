@@ -3,7 +3,7 @@ import { CardsData } from "../../types/collectionTypes";
 import { Sort } from "../../components/SortControls";
 import applySort from "./applySort";
 import colorsBitsFilterFn from "./filters/colorsBitsFilterFn";
-import formatFilterFn from "./filters/formatFilterFn";
+import inStringArrayFilterFn from "./filters/inStringArrayFilterFn";
 import inBoolFilterFn from "./filters/inBoolFilterFn";
 import minMaxFilterFn from "./filters/minMaxFilterFn";
 import rarityFilterFn from "./filters/rarityFilterFn";
@@ -33,14 +33,14 @@ export default function doCollectionFilter(
           );
         }
         break;
-      case "format":
+      case "instringarray":
         if (
           element.id === "format" ||
           element.id === "banned" ||
           element.id === "legal" ||
           element.id === "suspended"
         ) {
-          filteredData = formatFilterFn(
+          filteredData = inStringArrayFilterFn(
             filteredData,
             element.value,
             element.id

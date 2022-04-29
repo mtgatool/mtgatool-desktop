@@ -1,18 +1,15 @@
 /* eslint-disable no-bitwise */
 import _ from "lodash";
-import allFormats from "../../../common/allFormats";
 
-import { StringFilter } from "../../../types/filterTypes";
+import { InStringArrayFilter } from "../../../types/filterTypes";
 import { FilterKeys } from "../../../types/utility";
 
 export default function formatFilterFn<D>(
   rows: D[],
-  filterValue: StringFilter,
+  filterValue: InStringArrayFilter,
   key: FilterKeys<D, string[]>
 ): D[] {
-  const F: string = Object.keys(allFormats).filter(
-    (f) => f.toLowerCase() == filterValue.string.toLowerCase()
-  )[0];
+  const F: string = filterValue.value.toLowerCase();
 
   if (F) {
     return rows.filter((row) => {

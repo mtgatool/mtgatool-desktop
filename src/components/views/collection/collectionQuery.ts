@@ -24,6 +24,7 @@ import {
   ColorBitsFilterType,
   Filters,
   InBoolFilterType,
+  InStringArrayFilterType,
   MinMaxFilterType,
   RarityBitsFilterType,
   StringFilterType,
@@ -121,10 +122,10 @@ function getTokenVal(
       break;
     case "format":
       if (separator === "=" || separator === ":") {
-        const newFilter: ArrayFilterType<CardsData> = {
-          type: "array",
+        const newFilter: InStringArrayFilterType<CardsData> = {
+          type: "instringarray",
           id: "format",
-          value: { arr: val.split(","), not: isNegative, mode: ":" },
+          value: { value: val, not: isNegative },
         };
         return newFilter;
       }
