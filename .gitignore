@@ -28,3 +28,4 @@ yarn-error.log*
 build-storybook.log
 storybook-static/**
 src/info.json
+dist-worker

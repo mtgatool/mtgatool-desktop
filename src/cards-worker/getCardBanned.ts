@@ -1,7 +1,6 @@
-import { DbCardData } from "mtgatool-shared/dist";
-import allFormats from "../../../../common/allFormats";
+import allFormats from "./allFormats";
 
-export default function getCardBanned(card: DbCardData): string[] {
+export default function getCardBanned(card: any): string[] {
   const banned: string[] = [];
   Object.keys(allFormats).forEach((name) => {
     const format = allFormats[name];

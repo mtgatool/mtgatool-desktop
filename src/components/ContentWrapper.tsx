@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { animated, useTransition } from "react-spring";
 
 import { useDispatch, useSelector } from "react-redux";
+import { database } from "mtgatool-shared";
 import PopupComponent from "./PopupComponent";
 import vodiFn from "../utils/voidfn";
 
@@ -13,7 +14,6 @@ import ViewHistory from "./views/history/ViewHistory";
 import ViewCollection from "./views/collection/ViewCollection";
 import AdvancedSearch from "./views/collection/advancedSearch";
 import { AppState } from "../redux/stores/rendererStore";
-import getCollectionData from "./views/collection/cards/getCollectionData";
 
 import { DbMatch, defaultCardsData } from "../types/dbTypes";
 import reduxAction from "../redux/reduxAction";
@@ -26,6 +26,7 @@ import PostSignupPopup from "./PostSignupPopup";
 import ViewDrafts from "./views/drafts/ViewDrafts";
 import useDatePicker from "../hooks/useDatePicker";
 import ViewExplore from "./views/explore/ViewExplore";
+import { CardsData } from "../types/collectionTypes";
 
 const views = {
   home: ViewHome,
@@ -48,6 +49,13 @@ const ContentWrapper = () => {
   const dispatch = useDispatch();
   const params = useParams<{ page: string }>();
   const paths = useRef<string[]>([params.page]);
+  const [collectionData, setCollectionData] = useState<CardsData[]>([]);
+
+  const workerRef = useRef<Worker | null>(null);
+
+  useEffect(() => {
+    workerRef.current = new Worker("worker/index.js", { type: "module" });
+  }, []);
 
   const currentUUID = useSelector(
     (state: AppState) => state.mainData.currentUUID
@@ -65,8 +73,19 @@ const ContentWrapper = () => {
     (state: AppState) => state.mainData.matchesIndex
   );
 
-  const collectionData = useMemo(() => {
-    return getCollectionData(uuidData[currentUUID]?.cards || defaultCardsData);
+  useEffect(() => {
+    if (workerRef.current) {
+      workerRef.current.postMessage({
+        cards: uuidData[currentUUID]?.cards || defaultCardsData,
+        cardsList: database.cardList,
+        allCards: database.cards,
+        setNames: database.setNames,
+        sets: database.sets,
+      });
+      workerRef.current.onmessage = (e) => {
+        setCollectionData(e.data);
+      };
+    }
   }, [uuidData, currentUUID, forceCollection]);
 
   useEffect(() => {
