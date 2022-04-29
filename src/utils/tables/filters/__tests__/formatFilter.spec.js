@@ -1,4 +1,4 @@
-import formatFilterFn from "../formatFilterFn";
+import inStringArrayFilterFn from "../inStringArrayFilterFn";
 
 // Simulate and example with all 5 colors, one bit for each color
 const manyCards = [
@@ -12,7 +12,7 @@ const manyCards = [
 
 it("filters sets", () => {
   expect(
-    formatFilterFn(
+    inStringArrayFilterFn(
       manyCards,
       {
         string: "historic",
@@ -23,7 +23,7 @@ it("filters sets", () => {
   ).toStrictEqual([0, 1, 5]);
 
   expect(
-    formatFilterFn(
+    inStringArrayFilterFn(
       manyCards,
       {
         string: "historic",
@@ -34,7 +34,7 @@ it("filters sets", () => {
   ).toStrictEqual([2, 3, 4]);
 
   expect(
-    formatFilterFn(
+    inStringArrayFilterFn(
       manyCards,
       {
         string: "Standard",
@@ -46,7 +46,7 @@ it("filters sets", () => {
 
   // Pass trough the filter if format does not exist
   expect(
-    formatFilterFn(
+    inStringArrayFilterFn(
       manyCards,
       {
         string: "asdasj",
