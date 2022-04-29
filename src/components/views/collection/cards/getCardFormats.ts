@@ -23,8 +23,6 @@ export default function getCardFormats(card: DbCardData): string[] {
     });
   }
 
-  console.log(allFormats);
-
   Object.keys(allFormats).forEach((name) => {
     const format = allFormats[name];
     if (
