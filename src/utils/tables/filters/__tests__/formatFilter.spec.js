@@ -15,7 +15,7 @@ it("filters sets", () => {
     inStringArrayFilterFn(
       manyCards,
       {
-        string: "historic",
+        value: "historic",
         not: false,
       },
       "legal"
@@ -26,7 +26,7 @@ it("filters sets", () => {
     inStringArrayFilterFn(
       manyCards,
       {
-        string: "historic",
+        value: "historic",
         not: true,
       },
       "legal"
@@ -37,7 +37,7 @@ it("filters sets", () => {
     inStringArrayFilterFn(
       manyCards,
       {
-        string: "Standard",
+        value: "Standard",
         not: false,
       },
       "banned"
@@ -49,7 +49,7 @@ it("filters sets", () => {
     inStringArrayFilterFn(
       manyCards,
       {
-        string: "asdasj",
+        value: "asdasj",
         not: false,
       },
       "legal"
