@@ -43,16 +43,4 @@ it("filters sets", () => {
       "banned"
     ).map((c) => c.id)
   ).toStrictEqual([0, 2]);
-
-  // Pass trough the filter if format does not exist
-  expect(
-    inStringArrayFilterFn(
-      manyCards,
-      {
-        value: "asdasj",
-        not: false,
-      },
-      "legal"
-    ).map((c) => c.id)
-  ).toStrictEqual([0, 1, 2, 3, 4, 5]);
 });
