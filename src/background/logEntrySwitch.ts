@@ -16,6 +16,9 @@ export default function logEntrySwitch(entry: LogEntry): void {
   }
 
   switch (entry.label) {
+    case "detailedLogs":
+      Labels.DetailedLogs(entry);
+      break;
     case "GreToClientEvent":
       Labels.GreToClient(entry);
       break;
