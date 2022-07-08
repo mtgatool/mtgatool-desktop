@@ -38,7 +38,6 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-spring": "^8.0.27",
-    "react-svg-piechart": "^2.4.2",
     "react-table": "^7.7.0",
     "redux": "^4.0.5",
     "shortid": "^2.2.16",
