@@ -3,6 +3,12 @@
   flex-wrap: wrap;
   margin-top: 16px;
   justify-content: center;
+  flex-direction: column;
+
+  .set-division {
+    display: flex;
+    justify-content: center;
+  }
 
   .set-filter {
     margin: 4px;
