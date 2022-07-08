@@ -15,7 +15,7 @@ it("filters sets", () => {
     inStringArrayFilterFn(
       manyCards,
       {
-        string: "historic",
+        value: "historic",
         not: false,
       },
       "legal"
@@ -26,7 +26,7 @@ it("filters sets", () => {
     inStringArrayFilterFn(
       manyCards,
       {
-        string: "historic",
+        value: "historic",
         not: true,
       },
       "legal"
@@ -37,22 +37,21 @@ it("filters sets", () => {
     inStringArrayFilterFn(
       manyCards,
       {
-        string: "Standard",
+        value: "Standard",
         not: false,
       },
       "banned"
     ).map((c) => c.id)
   ).toStrictEqual([0, 2]);
 
-  // Pass trough the filter if format does not exist
   expect(
     inStringArrayFilterFn(
       manyCards,
       {
-        string: "asdasj",
+        value: "asdasj",
         not: false,
       },
       "legal"
     ).map((c) => c.id)
-  ).toStrictEqual([0, 1, 2, 3, 4, 5]);
+  ).toStrictEqual([3]);
 });
