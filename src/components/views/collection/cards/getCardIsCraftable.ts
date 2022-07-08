@@ -8,9 +8,16 @@ export default function getCardIsCraftable(card: DbCardData): boolean {
   if (
     formats.includes("Standard") ||
     formats.includes("Historic") ||
+    formats.includes("Alchemy") ||
+    formats.includes("Explorer") ||
     formats.includes("Singleton")
   ) {
     return true;
   }
+
+  if (card.dfc === 11) {
+    return false;
+  }
+
   return false;
 }

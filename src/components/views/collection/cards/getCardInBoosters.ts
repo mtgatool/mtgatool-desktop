@@ -9,5 +9,9 @@ export default function getCardInBoosters(card: DbCardData): boolean {
   if (card.rarity === "land" || card.rarity === "token") return false;
   if (set?.collation === -1) return false;
 
+  if (card.dfc === 11) {
+    return false;
+  }
+
   return true;
 }

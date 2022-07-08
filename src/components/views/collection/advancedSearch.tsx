@@ -30,9 +30,9 @@ import {
   ArrayFilter,
   ColorBitsFilter,
   InBoolFilter,
+  InStringArrayFilter,
   MinMaxFilter,
   RarityBitsFilter,
-  StringFilter,
 } from "../../../types/filterTypes";
 
 const { WHITE, BLUE, BLACK, RED, GREEN, COLORLESS } = constants;
@@ -60,7 +60,8 @@ const formatFilterOptions = [
   "Not set",
   "Standard",
   "Historic",
-  "Singleton",
+  "Alchemy",
+  "Explorer",
   "Brawl",
 ];
 
@@ -140,8 +141,8 @@ export default function AdvancedSearch(
       defaultSets = filter.arr;
     }
     if (f.id == "format") {
-      const filter: StringFilter = f.value;
-      defaultFormat = filter.string;
+      const filter: InStringArrayFilter = f.value;
+      defaultFormat = filter.value;
     }
     if (f.id == "rarity") {
       const filter: RarityBitsFilter = f.value;
