@@ -30,9 +30,9 @@ import {
   ArrayFilter,
   ColorBitsFilter,
   InBoolFilter,
+  InStringArrayFilter,
   MinMaxFilter,
   RarityBitsFilter,
-  StringFilter,
 } from "../../../types/filterTypes";
 
 const { WHITE, BLUE, BLACK, RED, GREEN, COLORLESS } = constants;
@@ -60,7 +60,8 @@ const formatFilterOptions = [
   "Not set",
   "Standard",
   "Historic",
-  "Singleton",
+  "Alchemy",
+  "Explorer",
   "Brawl",
 ];
 
@@ -99,6 +100,7 @@ export default function AdvancedSearch(
     (state: AppState) => state.renderer.collectionQuery
   );
   const defaultFilters = getFiltersFromQuery(collectionQuery);
+  console.log("defaultFilters", defaultFilters);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(0);
 
@@ -140,8 +142,8 @@ export default function AdvancedSearch(
       defaultSets = filter.arr;
     }
     if (f.id == "format") {
-      const filter: StringFilter = f.value;
-      defaultFormat = filter.string;
+      const filter: InStringArrayFilter = f.value;
+      defaultFormat = filter.value;
     }
     if (f.id == "rarity") {
       const filter: RarityBitsFilter = f.value;
@@ -186,6 +188,18 @@ export default function AdvancedSearch(
       defaultBoosters = !filter.not;
     }
   });
+
+  console.log("defaultCol", defaultCol);
+  console.log("defaultSets", defaultSets);
+  console.log("defaultColorFilter", defaultColorFilter);
+  console.log("defaultFormat", defaultFormat);
+  console.log("defaultRarity", defaultRarity);
+  console.log("defaultRaritySeparator", defaultRaritySeparator);
+  console.log("defaultCmcMin", defaultCmcMin);
+  console.log("defaultCmcMax", defaultCmcMax);
+  console.log("defaultOwnedMin", defaultOwnedMin);
+  console.log("defaultOwnedMax", defaultOwnedMax);
+  console.log("defaultBoosters", defaultBoosters);
 
   // Set filters state
   const [filterColors, setFilterColors] = useState<number>(defaultCol);

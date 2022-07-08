@@ -16,6 +16,7 @@ export default function doCollectionFilter(
   filters: Filters<CardsData>,
   sort: Sort<CardsData> = { key: "", sort: 1 }
 ): CardsData[] {
+  console.log("doCollectionFilter", filters);
   let filteredData = data;
 
   filters.forEach((element) => {

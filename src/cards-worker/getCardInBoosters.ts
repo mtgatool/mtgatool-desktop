@@ -10,8 +10,13 @@ export default function getCardInBoosters(
     setNames,
     sets
   );
+
   if (card.rarity === "land" || card.rarity === "token") return false;
   if (set?.collation === -1) return false;
+
+  if (card.dfc === 11) {
+    return false;
+  }
 
   return true;
 }

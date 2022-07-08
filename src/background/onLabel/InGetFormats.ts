@@ -1,21 +1,25 @@
 import LogEntry from "../../types/logDecoder";
 
-interface Format {
+export interface Format {
   name: string;
   sets: string[];
   bannedTitleIds: number[];
   suspendedTitleIds: number[];
   allowedTitleIds: number[];
-  cardCountRestriction: "None" | "Singleton" | "Limited";
-  mainDeckQuota: {
+  cardCountRestriction: string; // "None" | "Singleton" | "Limited";
+  supressedTitleIds: number[];
+  FormatType: string;
+  useRebalancedCards?: boolean;
+  sideboardBehavior?: string;
+  mainDeckQuota?: {
     min: number;
     max: number;
   };
-  sideBoardQuota: {
-    min: number;
+  sideBoardQuota?: {
+    min?: number;
     max: number;
   };
-  commandZoneQuota: {
+  commandZoneQuota?: {
     min: number;
     max: number;
   };
