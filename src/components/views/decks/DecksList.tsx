@@ -107,14 +107,15 @@ export default function DecksList() {
   const filteredData = useMemo(() => {
     if (!fullStats) return [];
 
-      const isDefined = (item: StatsDeck | undefined): item is StatsDeck => {  return !!item}
+    const isDefined = (item: StatsDeck | undefined): item is StatsDeck => {
+      return !!item;
+    };
 
-      const decksForFiltering = Object.keys(fullStats.decks)
-          .map((id) => {
-            return getDeckWithStats(id);
-          })
-          .filter(isDefined);
-
+    const decksForFiltering = Object.keys(fullStats.decks)
+      .map((id) => {
+        return getDeckWithStats(id);
+      })
+      .filter(isDefined);
 
     let newFilters = unsetFilter(filters, "inarraystring");
     if (showHidden !== "true") {
