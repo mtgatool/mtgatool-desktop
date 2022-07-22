@@ -107,31 +107,14 @@ export default function DecksList() {
   const filteredData = useMemo(() => {
     if (!fullStats) return [];
 
-    const latestDeckHashesArray = Object.keys(fullStats.decks).map((id) => {
-      const hashes = fullStats.decks[id];
-      let latestTimestamp = fullStats.deckIndex[hashes[0]].lastUsed;
-      let latestHash = hashes[0];
+      const isDefined = (item: StatsDeck | undefined): item is StatsDeck => {  return !!item}
 
-      hashes.forEach((h) => {
-        if (latestTimestamp < fullStats.deckIndex[h].lastUsed) {
-          const d = fullStats.deckIndex[h];
-          latestTimestamp = d.lastUsed;
-          latestHash = h;
-        }
-      });
+      const decksForFiltering = Object.keys(fullStats.decks)
+          .map((id) => {
+            return getDeckWithStats(id);
+          })
+          .filter(isDefined);
 
-      return latestHash;
-    });
-
-    const decksForFiltering = latestDeckHashesArray
-      .map((hash) => fullStats.deckIndex[hash])
-      .map((d) => {
-        return {
-          ...d,
-          lastUsed: new Date(d.lastUsed).getTime(),
-          colors: d.colors > 32 ? d.colors - 32 : d.colors,
-        };
-      });
 
     let newFilters = unsetFilter(filters, "inarraystring");
     if (showHidden !== "true") {
