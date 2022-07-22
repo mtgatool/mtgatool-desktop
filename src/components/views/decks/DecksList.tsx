@@ -201,7 +201,7 @@ export default function DecksList() {
       newList.push(id);
       setDbHiddenDecks(newList);
     },
-    [showHidden, dispatch]
+    [hiddenDecks, showHidden, dispatch]
   );
 
   const unhideDeck = useCallback(
@@ -213,7 +213,7 @@ export default function DecksList() {
       }
       setDbHiddenDecks(newList);
     },
-    [showHidden, dispatch]
+    [hiddenDecks, showHidden, dispatch]
   );
 
   return (
