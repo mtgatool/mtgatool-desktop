@@ -290,8 +290,6 @@ export default function CardsWinratesView(
         ? allVStats.cardWinrates
         : allDecksStats[currentDeckVersion].cardWinrates || {};
 
-    console.log(winrates);
-
     if (!winrates) return [];
     return Object.keys(winrates).map((grpid) => {
       const cardObj = database.card(parseInt(grpid));
