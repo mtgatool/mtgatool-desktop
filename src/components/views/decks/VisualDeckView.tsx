@@ -1,5 +1,13 @@
+/* eslint-disable no-loop-func */
 /* eslint-disable react/no-array-index-key */
-import { Deck, CardObject, database } from "mtgatool-shared";
+import _ from "lodash";
+import {
+  Deck,
+  CardObject,
+  database,
+  DbCardData,
+  cardType,
+} from "mtgatool-shared";
 import { Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import reduxAction from "../../../redux/reduxAction";
@@ -21,9 +29,98 @@ function cmcSort(a: CardObject, b: CardObject): number {
   const cb = database.card(b.id);
 
   if (ca && cb) {
-    return cb.cmc - ca.cmc;
+    return ca.cmc - cb.cmc;
   }
   return 0;
+}
+
+function groupsReorderLoop(groups: SplitIds[], forceFix = false) {
+  const finalGroups = [...groups];
+  let loop = true;
+  let phase = 2;
+  let loops = 0;
+  while (loop) {
+    let matchedIndex = -1;
+    let found = 0;
+    console.log([...finalGroups]);
+    finalGroups.forEach((g, i) => {
+      const fnz = g.filter((id) => id !== 0);
+      if (matchedIndex === -1) {
+        if (fnz.length === phase) {
+          matchedIndex = i;
+        }
+      } else if (matchedIndex > -1) {
+        if (phase === 2 && fnz.length === 2) {
+          finalGroups[matchedIndex] = [
+            ...finalGroups[matchedIndex],
+            ...finalGroups[i],
+          ].filter((id) => id !== 0) as unknown as SplitIds;
+          console.log(phase, fnz.length, finalGroups);
+          finalGroups[i] = [0, 0, 0, 0];
+          matchedIndex = -2;
+          found += 1;
+        } else if (phase === 2 && fnz.length === 1) {
+          finalGroups[matchedIndex] = [
+            ...finalGroups[matchedIndex],
+            ...finalGroups[i],
+          ].filter((id) => id !== 0) as unknown as SplitIds;
+          console.log(phase, fnz.length, finalGroups);
+          finalGroups[i] = [0, 0, 0, 0];
+          matchedIndex = -2;
+          found += 1;
+        } else if (phase === 3 && fnz.length === 1) {
+          finalGroups[matchedIndex] = [
+            ...finalGroups[matchedIndex],
+            ...finalGroups[i],
+          ].filter((id) => id !== 0) as unknown as SplitIds;
+          console.log(phase, fnz.length, finalGroups);
+          finalGroups[i] = [0, 0, 0, 0];
+          matchedIndex = -2;
+          phase = 2;
+          found += 1;
+        } else if (phase === 3 && fnz.length === 2 && forceFix) {
+          finalGroups[matchedIndex] = [
+            ...finalGroups[matchedIndex],
+            fnz[0],
+          ].filter((id) => id !== 0) as unknown as SplitIds;
+          console.log(phase, fnz.length, finalGroups);
+          finalGroups[i] = [fnz[1], 0, 0, 0];
+          phase = 2;
+          matchedIndex = -2;
+          found += 1;
+        } else if (phase === 3 && fnz.length === 3 && forceFix) {
+          finalGroups[matchedIndex] = [
+            ...finalGroups[matchedIndex],
+            fnz[0],
+          ].filter((id) => id !== 0) as unknown as SplitIds;
+          console.log(phase, fnz.length, finalGroups);
+          finalGroups[i] = [fnz[1], fnz[2], 0, 0];
+          matchedIndex = -2;
+          phase = 2;
+          found += 1;
+        } else if (phase === 1 && fnz.length === 1) {
+          finalGroups[matchedIndex] = [
+            ...finalGroups[matchedIndex],
+            ...finalGroups[i],
+          ].filter((id) => id !== 0) as unknown as SplitIds;
+          console.log(phase, fnz.length, finalGroups);
+          finalGroups[i] = [0, 0, 0, 0];
+          matchedIndex = -2;
+          phase = 2;
+          found += 1;
+        }
+      }
+    });
+
+    loops += 1;
+    if (loops > 100) loop = false;
+    if (!found) {
+      if (phase === 2) phase = 3;
+      else if (phase === 3) phase = 1;
+      else if (phase === 1) loop = false;
+    }
+  }
+  return finalGroups;
 }
 
 export default function VisualDeckView(
@@ -46,27 +143,68 @@ export default function VisualDeckView(
     });
   };
 
-  // attempt at sorting visually..
-  const newMainDeck: number[] = [];
-  deck
-    .getMainboard()
-    .get()
-    .sort(cmcSort)
-    .forEach((c: CardObject) => {
-      for (let i = 0; i < c.quantity; i += 1) {
-        newMainDeck.push(c.id);
+  const cardsByGroup = _(deck.getMainboard().get())
+    .map((card) => ({ data: database.card(card.id), ...card }))
+    .filter((card) => card.data !== undefined)
+    .groupBy((card) => {
+      const type = cardType(card.data as DbCardData);
+      switch (type) {
+        case "Creature":
+          return "Creatures";
+        case "Planeswalker":
+          return "Planeswalkers";
+        case "Instant":
+        case "Sorcery":
+          return "Spells";
+        case "Enchantment":
+          return "Enchantments";
+        case "Artifact":
+          return "Artifacts";
+        case "Land":
+        case "Basic Land":
+        case "Basic Snow Land":
+          return "Lands";
+        default:
+          throw new Error(`Unexpected card type: ${type}`);
       }
-    });
+    })
+    .value();
 
-  const splitDeck: SplitIds[] = [];
-  for (let i = 0; i < newMainDeck.length; i += 4) {
-    splitDeck.push([
-      newMainDeck[i] || 0,
-      newMainDeck[i + 1] || 0,
-      newMainDeck[i + 2] || 0,
-      newMainDeck[i + 3] || 0,
-    ]);
-  }
+  const groupsOrder = [
+    "Creatures",
+    "Artifacts",
+    "Enchantments",
+    "Spells",
+    "Planeswalkers",
+    "Lands",
+  ];
+
+  let finalSplits: SplitIds[] = [];
+
+  groupsOrder.forEach((group) => {
+    const splitGroup: SplitIds[] = [];
+
+    if (cardsByGroup[group]) {
+      cardsByGroup[group].sort(cmcSort).forEach((c) => {
+        for (let i = c.quantity; i > 0; i -= 4) {
+          if (c.id) {
+            splitGroup.push(new Array(Math.min(4, i)).fill(c.id) as any);
+          }
+        }
+      });
+
+      const rearrangedSplit = groupsReorderLoop(splitGroup);
+
+      rearrangedSplit.forEach((g) => {
+        const fnz = g.filter((id) => id !== 0);
+        if (fnz.length !== 0) {
+          finalSplits.push(g);
+        }
+      });
+    }
+  });
+
+  finalSplits = groupsReorderLoop(finalSplits, true);
 
   const newSideboard: number[] = [];
   deck
@@ -103,13 +241,13 @@ export default function VisualDeckView(
         }}
       >
         <div className="visual-mainboard">
-          {splitDeck.map((idsList: SplitIds, index: number) => {
+          {finalSplits.map((idsList: SplitIds, index: number) => {
             const cards = idsList.map((grpId: number, cindex: number) => {
               const cardObj = database.card(grpId);
               if (cardObj) {
                 return (
                   <div
-                    style={{ width: `${sz}px`, height: `${sz * 0.166}px` }}
+                    style={{ width: `${sz}px`, height: `${sz * 0.18}px` }}
                     key={`visual-main-${cindex}`}
                     className="deck-visual-card"
                   >
@@ -129,10 +267,11 @@ export default function VisualDeckView(
               }
               return <Fragment key={`visual-main-${cindex}`} />;
             });
+
             return (
               <div
                 key={`visual-${index}`}
-                style={{ marginBottom: `${sz * 0.5}px` }}
+                style={{ marginBottom: `${Math.round(sz + sz * 0.2)}px` }}
                 className="deck-visual-tile"
               >
                 {cards}
@@ -151,7 +290,7 @@ export default function VisualDeckView(
                   key={`visual-side-${_n}`}
                   style={{
                     width: `${sz}px`,
-                    height: `${sz * 0.166}px`,
+                    height: `${sz * 0.18}px`,
                     marginLeft: _n % 2 == 0 ? "60px" : "",
                   }}
                   className="deck-visual-card-side"
