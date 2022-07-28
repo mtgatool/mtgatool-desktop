@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import Automerge from "automerge";
-import { base64ToBinaryDocument } from "tool-db";
+import { base64ToBinaryDocument } from "mtgatool-db";
 
 import { getEventPrettyName } from "mtgatool-shared";
 import Button from "../../ui/Button";

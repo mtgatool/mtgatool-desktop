@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 import { Switch, Route, useHistory } from "react-router-dom";
 
-import { sha1, ToolDb } from "tool-db";
+import { sha1, ToolDb } from "mtgatool-db";
 
 import _ from "lodash";
 import Auth from "./Auth";
@@ -74,7 +74,11 @@ function App(props: AppProps) {
       });
 
       console.log("Merged Peers: ", mergedPeers);
-      window.toolDb = new ToolDb({ peers: mergedPeers, debug: false });
+      window.toolDb = new ToolDb({
+        peers: mergedPeers,
+        debug: true,
+        useWebrtc: true,
+      });
       window.toolDb.onConnect = () => {
         window.toolDb.onConnect = () => {
           //

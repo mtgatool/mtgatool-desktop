@@ -1,5 +1,5 @@
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
-import { sha1, sha256 } from "tool-db";
+import { sha1, sha256 } from "mtgatool-db";
 
 import newResetPassphrase from "../toolDb/newResetPassphrase";
 import copyToClipboard from "../utils/copyToClipboard";

@@ -4,7 +4,7 @@ import {
   fromBase64,
   proofOfWork,
   UserRootData,
-} from "tool-db";
+} from "mtgatool-db";
 import { UserRecoveryData } from "../types/dbTypes";
 
 /* eslint-disable prefer-promise-reject-errors */

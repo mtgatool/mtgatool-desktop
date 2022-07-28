@@ -1,4 +1,4 @@
-import { ParsedKeys, saveKeysComb } from "tool-db";
+import { ParsedKeys, saveKeysComb } from "mtgatool-db";
 
 function getKeysJson(): Promise<ParsedKeys | null> {
   return new Promise((resolve) => {

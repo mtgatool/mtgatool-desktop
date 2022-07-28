@@ -1,4 +1,4 @@
-import { VerificationData } from "tool-db";
+import { VerificationData } from "mtgatool-db";
 
 import { DbliveDraftV1 } from "../types/dbTypes";
 

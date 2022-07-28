@@ -5,7 +5,7 @@ import {
   InternalMatch,
   v2cardsList,
 } from "mtgatool-shared";
-import { ToolDb } from "tool-db";
+import { ToolDb } from "mtgatool-db";
 
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { InventoryInfo } from "../background/onLabel/InStartHook";
