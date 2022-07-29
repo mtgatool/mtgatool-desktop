@@ -17,10 +17,7 @@ export default function ViewDecks(props: ViewDecksProps) {
   const { url } = useRouteMatch();
   const [, loggedIn] = useDbUser();
 
-  const {
-    openHistoryStatsPopup,
-    datePickerDoShow,
-  } = props;
+  const { openHistoryStatsPopup, datePickerDoShow } = props;
 
   const decksIndex = useSelector(
     (state: AppState) => state.mainData.decksIndex
@@ -31,7 +28,16 @@ export default function ViewDecks(props: ViewDecksProps) {
       {loggedIn && decksIndex ? (
         <Switch>
           <Route exact path={`${url}/:id`} component={DeckView} />
-          <Route exact path={`${url}/`} component={() => <DecksList datePickerDoShow={datePickerDoShow} openHistoryStatsPopup={openHistoryStatsPopup}/>} />
+          <Route
+            exact
+            path={`${url}/`}
+            component={() => (
+              <DecksList
+                datePickerDoShow={datePickerDoShow}
+                openHistoryStatsPopup={openHistoryStatsPopup}
+              />
+            )}
+          />
         </Switch>
       ) : (
         <></>

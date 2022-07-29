@@ -46,5 +46,5 @@ export const defaultSettings: Record<SettingKey, string> = {
   daemonPort: "6842",
   filterDate: "0",
   filterDateOption: "All Time",
-  filterEventOptions: ""
+  filterEventOptions: "",
 };

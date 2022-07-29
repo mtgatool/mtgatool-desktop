@@ -26,7 +26,11 @@ import PostSignupPopup from "./PostSignupPopup";
 import ViewDrafts from "./views/drafts/ViewDrafts";
 import useDatePicker from "../hooks/useDatePicker";
 import ViewExplore from "./views/explore/ViewExplore";
-import { DateOption, setDate, setDateOption } from "../redux/slices/FilterSlice";
+import {
+  DateOption,
+  setDate,
+  setDateOption,
+} from "../redux/slices/FilterSlice";
 import doHistoryFilter from "../utils/tables/doHistoryFilter";
 
 const views = {
@@ -47,7 +51,9 @@ function delay(transition: any, timeout: number): any {
 }
 
 const ContentWrapper = () => {
-  const matchFilters = useSelector((state: AppState) => state.filter.matchDataFilters);
+  const matchFilters = useSelector(
+    (state: AppState) => state.filter.matchDataFilters
+  );
   const dispatch = useDispatch();
   const params = useParams<{ page: string }>();
   const paths = useRef<string[]>([params.page]);
@@ -81,7 +87,10 @@ const ContentWrapper = () => {
       Promise.all(promises).then((matches: any) => {
         reduxAction(dispatch, {
           type: "SET_FULL_STATS",
-          arg: aggregateStats(matches.filter((m: any) => m).map(convertDbMatchToData), matchFilters),
+          arg: aggregateStats(
+            matches.filter((m: any) => m).map(convertDbMatchToData),
+            matchFilters
+          ),
         });
 
         if (matchFilters) {
@@ -104,15 +113,15 @@ const ContentWrapper = () => {
   if (viewIndex === -1) viewIndex = 0;
 
   const leftAnim = {
-    from: {opacity: 0, transform: "translate3d(100%, 0, 0)"},
-    enter: delay({opacity: 1, transform: "translate3d(0%, 0, 0)"}, 100),
-    leave: {opacity: 0, transform: "translate3d(-100%, 0, 0)"},
+    from: { opacity: 0, transform: "translate3d(100%, 0, 0)" },
+    enter: delay({ opacity: 1, transform: "translate3d(0%, 0, 0)" }, 100),
+    leave: { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
   };
 
   const rightAnim = {
-    from: {opacity: 0, transform: "translate3d(-100%, 0, 0)"},
-    enter: delay({opacity: 1, transform: "translate3d(0%, 0, 0)"}, 100),
-    leave: {opacity: 0, transform: "translate3d(100%, 0, 0)"},
+    from: { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
+    enter: delay({ opacity: 1, transform: "translate3d(0%, 0, 0)" }, 100),
+    leave: { opacity: 0, transform: "translate3d(100%, 0, 0)" },
   };
 
   const transitions = useTransition(
@@ -148,11 +157,7 @@ const ContentWrapper = () => {
   });
 
   // noinspection JSUnusedLocalSymbols
-  const [
-    _,
-    datePickerDoShow,
-    datePickerElement,
-  ] = useDatePicker(
+  const [_, datePickerDoShow, datePickerElement] = useDatePicker(
     new Date(0),
     undefined,
     datePickerCallbackRef.current || vodiFn
@@ -168,7 +173,7 @@ const ContentWrapper = () => {
         openFnRef={openPostSignup}
         closeFnRef={closePostSignup}
       >
-        <PostSignupPopup/>
+        <PostSignupPopup />
       </PopupComponent>
 
       <PopupComponent
@@ -178,7 +183,7 @@ const ContentWrapper = () => {
         openFnRef={openAdvancedCollectionSearch}
         closeFnRef={closeAdvancedCollectionSearch}
       >
-        <AdvancedSearch closeCallback={closeAdvancedCollectionSearch.current}/>
+        <AdvancedSearch closeCallback={closeAdvancedCollectionSearch.current} />
       </PopupComponent>
 
       <PopupComponent
@@ -188,14 +193,14 @@ const ContentWrapper = () => {
         openFnRef={openHistoryStatsPopup}
         closeFnRef={closeHistoryStatsPopup}
       >
-        <HistoryStats/>
+        <HistoryStats />
       </PopupComponent>
 
       <div className="wrapper">
         <div className="wrapper-inner">
           <div className="overflow-ux">
             {getCssQuality() === "high" ? (
-              transitions.map(({item, props}) => {
+              transitions.map(({ item, props }) => {
                 const Page = Object.values(views)[item];
                 return (
                   <animated.div

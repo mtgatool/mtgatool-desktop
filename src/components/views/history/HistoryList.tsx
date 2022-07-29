@@ -1,20 +1,20 @@
 /* eslint-disable react/jsx-props-no-spreading */
 
-import { useCallback, useMemo, useState, } from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {useHistory} from "react-router-dom";
+import { useCallback, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import usePagingControls from "../../../hooks/usePagingControls";
-import {AppState} from "../../../redux/stores/rendererStore";
+import { AppState } from "../../../redux/stores/rendererStore";
 import doHistoryFilter from "../../../utils/tables/doHistoryFilter";
 import PagingControls from "../../PagingControls";
-import SortControls, {Sort} from "../../SortControls";
-import {MatchData} from "./getMatchesData";
+import SortControls, { Sort } from "../../SortControls";
+import { MatchData } from "./getMatchesData";
 import ListItemMatch from "./ListItemMatch";
 import aggregateStats from "../../../utils/aggregateStats";
 import reduxAction from "../../../redux/reduxAction";
 import Section from "../../ui/Section";
 import FilterSection from "../../ui/FilterSection";
-import {selectCurrentFilterDate} from "../../../redux/slices/FilterSlice";
+import { selectCurrentFilterDate } from "../../../redux/slices/FilterSlice";
 
 interface HistoryListProps {
   openHistoryStatsPopup: () => void;
@@ -23,15 +23,13 @@ interface HistoryListProps {
 }
 
 export default function HistoryList(props: HistoryListProps) {
-  const filters = useSelector((state: AppState) => state.filter.matchDataFilters);
+  const filters = useSelector(
+    (state: AppState) => state.filter.matchDataFilters
+  );
   const filterDate = useSelector(selectCurrentFilterDate);
   const history = useHistory();
   const dispatch = useDispatch();
-  const {
-    openHistoryStatsPopup,
-    matchesData,
-    datePickerDoShow,
-  } = props;
+  const { openHistoryStatsPopup, matchesData, datePickerDoShow } = props;
 
   const [sortValue, setSortValue] = useState<Sort<MatchData>>({
     key: "timestamp",
@@ -69,8 +67,9 @@ export default function HistoryList(props: HistoryListProps) {
   return (
     <>
       <FilterSection
-          openHistoryStatsPopup={ openHistoryStatsPopup }
-          datePickerDoShow={ datePickerDoShow }/>
+        openHistoryStatsPopup={openHistoryStatsPopup}
+        datePickerDoShow={datePickerDoShow}
+      />
       <Section>
         <div className="history-table-wrapper">
           <SortControls<MatchData>

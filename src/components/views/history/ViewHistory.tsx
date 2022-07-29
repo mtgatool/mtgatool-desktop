@@ -16,10 +16,7 @@ interface ViewHistoryProps {
 }
 
 export default function ViewHistory(props: ViewHistoryProps) {
-  const {
-    openHistoryStatsPopup,
-    datePickerDoShow,
-  } = props;
+  const { openHistoryStatsPopup, datePickerDoShow } = props;
   const { url } = useRouteMatch();
   const [, loggedIn] = useDbUser();
 

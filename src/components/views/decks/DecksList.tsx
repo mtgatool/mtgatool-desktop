@@ -30,8 +30,8 @@ import FilterSection from "../../ui/FilterSection";
 import { setDecksFilters } from "../../../redux/slices/FilterSlice";
 
 interface DeckListProps {
-    openHistoryStatsPopup: () => void;
-    datePickerDoShow: () => void;
+  openHistoryStatsPopup: () => void;
+  datePickerDoShow: () => void;
 }
 
 export default function DecksList(props: DeckListProps) {
@@ -45,10 +45,7 @@ export default function DecksList(props: DeckListProps) {
     (state: AppState) => state.mainData.hiddenDecks
   );
 
-    const {
-        openHistoryStatsPopup,
-        datePickerDoShow,
-    } = props;
+  const { openHistoryStatsPopup, datePickerDoShow } = props;
 
   const [showHidden, setShowHidden] = useState(
     getLocalSetting("showHiddenDecks")
@@ -196,9 +193,10 @@ export default function DecksList(props: DeckListProps) {
 
   return (
     <>
-        <FilterSection
-            openHistoryStatsPopup={ openHistoryStatsPopup }
-            datePickerDoShow={ datePickerDoShow }/>
+      <FilterSection
+        openHistoryStatsPopup={openHistoryStatsPopup}
+        datePickerDoShow={datePickerDoShow}
+      />
       <Section style={{ marginTop: "16px", flexDirection: "column" }}>
         <Flex style={{ width: "100%" }}>
           <InputContainer>
@@ -224,7 +222,6 @@ export default function DecksList(props: DeckListProps) {
             }}
           />
         </Flex>
-
       </Section>
       <Section style={{ margin: "16px 0", flexDirection: "column" }}>
         <SortControls<StatsDeck>

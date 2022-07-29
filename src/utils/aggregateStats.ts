@@ -45,7 +45,7 @@ export interface AggregatedStats {
 
 export default function aggregateStats(
   matchesList: MatchData[],
-  matchFilters?: Filters<MatchData>,
+  matchFilters?: Filters<MatchData>
 ): AggregatedStats {
   // Defaults
   const stats: AggregatedStats = {
@@ -74,7 +74,9 @@ export default function aggregateStats(
   };
 
   // Aggregate all matches
-  const filtered = matchFilters ? doHistoryFilter(matchesList, matchFilters, undefined) : matchesList
+  const filtered = matchFilters
+    ? doHistoryFilter(matchesList, matchFilters, undefined)
+    : matchesList;
   filtered.forEach((match) => {
     const playerSeat = match.internalMatch.player.seat;
     const hasWon = match.playerWins > match.playerLosses;
