@@ -4,7 +4,7 @@ import {
   loadKeysComb,
   ParsedKeys,
   UserRootData,
-} from "tool-db";
+} from "mtgatool-db";
 import { afterLogin } from "./login";
 
 export default function keysLogin(

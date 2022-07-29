@@ -8,7 +8,7 @@ import {
   LOGIN_OK,
   LOGIN_WAITING,
 } from "mtgatool-shared/dist/shared/constants";
-import { sha1 } from "tool-db";
+import { sha1 } from "mtgatool-db";
 
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 

@@ -81,12 +81,12 @@ export default function DecksList(props: DeckListProps) {
         }
       });
 
+      const totalGames = deckStats.matchWins + deckStats.matchLosses;
+
       return {
         ...fullStats.deckIndex[latestHash],
-        totalGames: deckStats.gameWins + deckStats.gameLosses,
-        winrate:
-          (100 / (deckStats.gameWins + deckStats.gameLosses)) *
-          deckStats.gameWins,
+        totalGames: totalGames,
+        winrate: totalGames > 0 ? (100 / totalGames) * deckStats.matchWins : 0,
         stats: deckStats,
       };
     },
@@ -101,14 +101,15 @@ export default function DecksList(props: DeckListProps) {
   const filteredData = useMemo(() => {
     if (!fullStats) return [];
 
-      const isDefined = (item: StatsDeck | undefined): item is StatsDeck => {  return !!item}
+    const isDefined = (item: StatsDeck | undefined): item is StatsDeck => {
+      return !!item;
+    };
 
-      const decksForFiltering = Object.keys(fullStats.decks)
-          .map((id) => {
-            return getDeckWithStats(id);
-          })
-          .filter(isDefined);
-
+    const decksForFiltering = Object.keys(fullStats.decks)
+      .map((id) => {
+        return getDeckWithStats(id);
+      })
+      .filter(isDefined);
 
     let newFilters = unsetFilter(filters, "inarraystring");
     if (showHidden !== "true") {
@@ -178,7 +179,7 @@ export default function DecksList(props: DeckListProps) {
       newList.push(id);
       setDbHiddenDecks(newList);
     },
-    [showHidden, dispatch]
+    [hiddenDecks, showHidden, dispatch]
   );
 
   const unhideDeck = useCallback(
@@ -190,7 +191,7 @@ export default function DecksList(props: DeckListProps) {
       }
       setDbHiddenDecks(newList);
     },
-    [showHidden, dispatch]
+    [hiddenDecks, showHidden, dispatch]
   );
 
   return (

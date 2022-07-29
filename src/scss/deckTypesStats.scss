@@ -1,7 +1,7 @@
 .types-container {
   margin: auto;
   max-width: 630px;
-  margin: 16px auto;
+  margin: 0 auto;
   padding-left: 16px;
   padding-right: 16px;
   width: calc(100% - 32px);
@@ -12,6 +12,10 @@
 .type-icon-cont {
   display: flex;
   flex-direction: column;
+
+  span {
+    margin-bottom: 0 !important;
+  }
 }
 
 .type-icon {

@@ -1,6 +1,6 @@
 {
   "name": "mtgatool-desktop",
-  "version": "6.1.33",
+  "version": "6.1.35",
   "private": true,
   "main": "public/electron.js",
   "homepage": "./",
@@ -25,6 +25,7 @@
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.0",
     "mathjs": "^9.3.0",
+    "mtgatool-db": "^1.6.1",
     "mtgatool-shared": "^1.1.7",
     "queue": "^6.0.2",
     "random-words": "^1.1.1",
@@ -42,7 +43,6 @@
     "redux": "^4.0.5",
     "shortid": "^2.2.16",
     "tar-fs": "^2.1.1",
-    "tool-db": "^1.4.5",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1",
     "zlib": "^1.0.5"
