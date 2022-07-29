@@ -6,7 +6,6 @@ import { useHistory } from "react-router-dom";
 
 import usePagingControls from "../../../hooks/usePagingControls";
 import { AppState } from "../../../redux/stores/rendererStore";
-import { Filters, StringFilterType } from "../../../types/genericFilterTypes";
 import { StatsDeck } from "../../../types/dbTypes";
 
 import doDecksFilter from "../../../utils/tables/doDecksFilter";
@@ -27,10 +26,18 @@ import unsetFilter from "../../../utils/tables/filters/unsetFilter";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import setDbHiddenDecks from "../../../toolDb/setDbHiddenDecks";
 import Section from "../../ui/Section";
+import FilterSection from "../../ui/FilterSection";
+import { setDecksFilters } from "../../../redux/slices/FilterSlice";
 
-export default function DecksList() {
+interface DeckListProps {
+    openHistoryStatsPopup: () => void;
+    datePickerDoShow: () => void;
+}
+
+export default function DecksList(props: DeckListProps) {
   const dispatch = useDispatch();
   const history = useHistory();
+  const filters = useSelector((state: AppState) => state.filter.deckFilters);
   const [colorFilterState, setColorFilterState] = useState(31);
   const [deckNameFilterState, setDeckNameFilterState] = useState("");
   const fullStats = useSelector((state: AppState) => state.mainData.fullStats);
@@ -38,23 +45,14 @@ export default function DecksList() {
     (state: AppState) => state.mainData.hiddenDecks
   );
 
+    const {
+        openHistoryStatsPopup,
+        datePickerDoShow,
+    } = props;
+
   const [showHidden, setShowHidden] = useState(
     getLocalSetting("showHiddenDecks")
   );
-
-  const currentUUID = useSelector(
-    (state: AppState) => state.mainData.currentUUID
-  );
-
-  const defaultDeckFilters: StringFilterType<StatsDeck> = {
-    type: "string",
-    id: "playerId",
-    value: {
-      string: currentUUID,
-      not: false,
-      exact: true,
-    },
-  };
 
   const getDeckWithStats = useCallback(
     (id: string): StatsDeck | undefined => {
@@ -94,10 +92,6 @@ export default function DecksList() {
     },
     [fullStats]
   );
-
-  const [filters, setFilters] = useState<Filters<StatsDeck>>([
-    defaultDeckFilters,
-  ]);
 
   const [sortValue, setSortValue] = useState<Sort<StatsDeck>>({
     key: "lastUsed",
@@ -152,7 +146,7 @@ export default function DecksList() {
         },
       });
 
-      setFilters(newFilters);
+      dispatch(setDecksFilters(newFilters));
       setColorFilterState(color);
     },
     [filters]
@@ -172,7 +166,7 @@ export default function DecksList() {
         },
       });
 
-      deckNameDebouncer(() => setFilters(newFilters));
+      deckNameDebouncer(() => dispatch(setDecksFilters(newFilters)));
       setDeckNameFilterState(event.target.value);
     },
     [deckNameDebouncer, filters]
@@ -201,6 +195,9 @@ export default function DecksList() {
 
   return (
     <>
+        <FilterSection
+            openHistoryStatsPopup={ openHistoryStatsPopup }
+            datePickerDoShow={ datePickerDoShow }/>
       <Section style={{ marginTop: "16px", flexDirection: "column" }}>
         <Flex style={{ width: "100%" }}>
           <InputContainer>
@@ -226,6 +223,7 @@ export default function DecksList() {
             }}
           />
         </Flex>
+
       </Section>
       <Section style={{ margin: "16px 0", flexDirection: "column" }}>
         <SortControls<StatsDeck>

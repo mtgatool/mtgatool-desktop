@@ -7,6 +7,7 @@ import avatarsSlice from "../slices/avatarsSlice";
 import usernamesSlice from "../slices/usernamesSlice";
 import settingsSlice from "../slices/settingsSlice";
 import hoverSlice from "../slices/hoverSlice";
+import filterSlice from "../slices/FilterSlice";
 
 const rootReducer = combineReducers({
   collection: collectionSlice.reducer,
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   usernames: usernamesSlice.reducer,
   settings: settingsSlice.reducer,
   hover: hoverSlice.reducer,
+  filter: filterSlice.reducer,
 });
 
 const store = configureStore({
