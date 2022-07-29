@@ -83,13 +83,16 @@ export default function DecksList() {
         }
       });
 
-      const totalGames = deckStats.matchWins + deckStats.matchLosses;
-
+      const d = fullStats.deckIndex[latestHash];
       return {
-        ...fullStats.deckIndex[latestHash],
-        totalGames: totalGames,
-        winrate: totalGames > 0 ? (100 / totalGames) * deckStats.matchWins : 0,
+        ...d,
+        totalGames: deckStats.gameWins + deckStats.gameLosses,
+        winrate:
+          (100 / (deckStats.gameWins + deckStats.gameLosses)) *
+          deckStats.gameWins,
         stats: deckStats,
+        lastUsed: new Date(d.lastUsed).getTime(),
+        colors: d.colors > 32 ? d.colors - 32 : d.colors,
       };
     },
     [fullStats]
