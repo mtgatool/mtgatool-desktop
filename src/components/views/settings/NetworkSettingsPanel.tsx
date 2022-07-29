@@ -11,6 +11,7 @@ import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
 
 import Button from "../../ui/Button";
+import { knownHosts } from "../../../constants";
 
 function _getPeerFromUrl(url: string) {
   const urlParseRegex = new RegExp(
@@ -84,7 +85,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
     <>
       <p>Peers:</p>
       {connections.map((peerId: string) => {
-        const host = window.toolDb.peers[peerId]?.host;
+        const host = window.toolDb.peers[peerId.slice(-20)]?.host;
         const peerHost =
           !host || host === "127.0.0.1" ? peerId.slice(-20) : host;
         return (
@@ -109,8 +110,8 @@ export default function NetworkSettingsPanel(): JSX.Element {
             />
 
             <div style={{ width: "500px" }}>
-              {peerHost}
-              {networkModule.isServer(peerId) ? <i>(server)</i> : ""}
+              {knownHosts[peerHost] || peerHost}
+              {networkModule.isServer(peerId) ? <i> (server)</i> : ""}
             </div>
 
             <Button
