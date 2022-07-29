@@ -84,6 +84,9 @@ export default function NetworkSettingsPanel(): JSX.Element {
     <>
       <p>Peers:</p>
       {connections.map((peerId: string) => {
+        const host = window.toolDb.peers[peerId]?.host;
+        const peerHost =
+          !host || host === "127.0.0.1" ? peerId.slice(-20) : host;
         return (
           <div
             key={`${peerId}-active-peer`}
@@ -106,7 +109,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
             />
 
             <div style={{ width: "500px" }}>
-              {peerId.slice(-20)}{" "}
+              {peerHost}
               {networkModule.isServer(peerId) ? <i>(server)</i> : ""}
             </div>
 
