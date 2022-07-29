@@ -77,6 +77,7 @@ function App(props: AppProps) {
       window.toolDb = new ToolDb({
         peers: mergedPeers,
         debug: true,
+        topic: "mtgatool-db-swarm-v3",
         useWebrtc: true,
       });
       window.toolDb.onConnect = () => {
