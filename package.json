@@ -50,7 +50,7 @@
   "scripts": {
     "start": "npm run build:worker && nf start -p 3001",
     "cm": "git-cz",
-    "build:worker": "tsc --p worker-tsconfig.json && browserify ./dist-worker/collectionDataWorker.js --standalone worker > ./dist-worker/index.js && uglifyjs ./dist-worker/index.js -c > ./public/worker/index.js",
+    "build:worker": "tsc --p worker-tsconfig.json && browserify ./dist-worker/cards-worker/collectionDataWorker.js --standalone worker > ./dist-worker/index.js && uglifyjs ./dist-worker/index.js -c > ./public/worker/index.js",
     "react-start": "node generateInfo.js && craco start",
     "react-build": "craco build",
     "start:web": "npm run build:worker && craco start --config craco.web.config.js",
