@@ -32,6 +32,8 @@ import {
   setDateOption,
 } from "../redux/slices/FilterSlice";
 import doHistoryFilter from "../utils/tables/doHistoryFilter";
+import isElectron from "../utils/electron/isElectron";
+import getPopupClass from "../utils/getPopupClass";
 
 const views = {
   home: ViewHome,
@@ -50,13 +52,22 @@ function delay(transition: any, timeout: number): any {
   };
 }
 
-const ContentWrapper = () => {
+export interface ContentWrapperProps {
+  forceOs?: string;
+}
+
+const ContentWrapper = (mainProps: ContentWrapperProps) => {
+  const { forceOs } = mainProps;
+
   const matchFilters = useSelector(
     (state: AppState) => state.filter.matchDataFilters
   );
+
   const dispatch = useDispatch();
   const params = useParams<{ page: string }>();
   const paths = useRef<string[]>([params.page]);
+
+  const os = forceOs || (isElectron() ? process.platform : "");
 
   const currentUUID = useSelector(
     (state: AppState) => state.mainData.currentUUID
@@ -168,6 +179,7 @@ const ContentWrapper = () => {
       {datePickerElement}
       <PopupComponent
         open={false}
+        className={getPopupClass(os)}
         width="900px"
         height="440px"
         openFnRef={openPostSignup}
@@ -178,6 +190,7 @@ const ContentWrapper = () => {
 
       <PopupComponent
         open={false}
+        className={getPopupClass(os)}
         width="1000px"
         height="540px"
         openFnRef={openAdvancedCollectionSearch}
@@ -188,6 +201,7 @@ const ContentWrapper = () => {
 
       <PopupComponent
         open={false}
+        className={getPopupClass(os)}
         width="1000px"
         height="600px"
         openFnRef={openHistoryStatsPopup}
