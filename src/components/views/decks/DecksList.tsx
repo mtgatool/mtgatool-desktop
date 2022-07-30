@@ -197,7 +197,7 @@ export default function DecksList(props: DeckListProps) {
         openHistoryStatsPopup={openHistoryStatsPopup}
         datePickerDoShow={datePickerDoShow}
       />
-      <Section style={{ marginTop: "16px", flexDirection: "column" }}>
+      <Section style={{ flexDirection: "column" }}>
         <Flex style={{ width: "100%" }}>
           <InputContainer>
             <input

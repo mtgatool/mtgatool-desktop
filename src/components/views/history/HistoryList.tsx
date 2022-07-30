@@ -70,7 +70,7 @@ export default function HistoryList(props: HistoryListProps) {
         openHistoryStatsPopup={openHistoryStatsPopup}
         datePickerDoShow={datePickerDoShow}
       />
-      <Section>
+      <Section style={{ marginBottom: "16px" }}>
         <div className="history-table-wrapper">
           <SortControls<MatchData>
             setSortCallback={setSortValue}
