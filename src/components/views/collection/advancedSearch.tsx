@@ -100,7 +100,7 @@ export default function AdvancedSearch(
     (state: AppState) => state.renderer.collectionQuery
   );
   const defaultFilters = getFiltersFromQuery(collectionQuery);
-  console.log("defaultFilters", defaultFilters);
+
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(0);
 
@@ -188,18 +188,6 @@ export default function AdvancedSearch(
       defaultBoosters = !filter.not;
     }
   });
-
-  console.log("defaultCol", defaultCol);
-  console.log("defaultSets", defaultSets);
-  console.log("defaultColorFilter", defaultColorFilter);
-  console.log("defaultFormat", defaultFormat);
-  console.log("defaultRarity", defaultRarity);
-  console.log("defaultRaritySeparator", defaultRaritySeparator);
-  console.log("defaultCmcMin", defaultCmcMin);
-  console.log("defaultCmcMax", defaultCmcMax);
-  console.log("defaultOwnedMin", defaultOwnedMin);
-  console.log("defaultOwnedMax", defaultOwnedMax);
-  console.log("defaultBoosters", defaultBoosters);
 
   // Set filters state
   const [filterColors, setFilterColors] = useState<number>(defaultCol);
