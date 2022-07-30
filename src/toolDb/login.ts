@@ -1,4 +1,4 @@
-import { base64ToBinaryDocument, CrdtMessage, PutMessage } from "tool-db";
+import { base64ToBinaryDocument, CrdtMessage, PutMessage } from "mtgatool-db";
 import Automerge from "automerge";
 import _ from "lodash";
 import reduxAction from "../redux/reduxAction";

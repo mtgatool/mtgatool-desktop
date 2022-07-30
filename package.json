@@ -1,6 +1,6 @@
 {
   "name": "mtgatool-desktop",
-  "version": "6.1.33",
+  "version": "6.1.35",
   "private": true,
   "main": "public/electron.js",
   "homepage": "./",
@@ -25,6 +25,7 @@
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.0",
     "mathjs": "^9.3.0",
+    "mtgatool-db": "^1.6.1",
     "mtgatool-shared": "^1.1.7",
     "queue": "^6.0.2",
     "random-words": "^1.1.1",
@@ -38,12 +39,10 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-spring": "^8.0.27",
-    "react-svg-piechart": "^2.4.2",
     "react-table": "^7.7.0",
     "redux": "^4.0.5",
     "shortid": "^2.2.16",
     "tar-fs": "^2.1.1",
-    "tool-db": "^1.4.5",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1",
     "zlib": "^1.0.5"
@@ -72,7 +71,7 @@
     "semantic-release": "semantic-release",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
-    "install:ci": "npm install && npm install @craco/craco",
+    "install:ci": "npm install --legacy-peer-deps && npm install @craco/craco",
     "chromatic": "npx chromatic --project-token=62e160e30516"
   },
   "build": {

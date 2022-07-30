@@ -167,6 +167,8 @@ function cardWinrateLine(line: LineData): JSX.Element {
   );
 }
 
+const ALL_VERSIONS = 99;
+
 interface CardsWinratesViewProps {
   dbDeck: StatsDeck;
   fullStats: AggregatedStats;
@@ -178,29 +180,116 @@ export default function CardsWinratesView(
 ): JSX.Element {
   const { dbDeck, fullStats, setRegularView } = props;
 
+  const allVStats: StatsDeck = {
+    id: "",
+    deckTileId: 0,
+    name: "",
+    mainDeck: [],
+    sideboard: [],
+    playerId: "",
+    deckHash: "",
+    matches: {},
+    colors: 0,
+    lastUsed: 0,
+    stats: {
+      gameWins: 0,
+      gameLosses: 0,
+      matchWins: 0,
+      matchLosses: 0,
+    },
+    totalGames: 0,
+    cardWinrates: {},
+    winrate: 0,
+  };
+
   const decks = fullStats.decks[dbDeck.id];
+
   const allDecksStats = decks
     .map((d) => fullStats.deckIndex[d])
     .sort(sortByLastUsed);
 
   const [currentDeckVersion, setCurrentDeckVersion] = useState(0);
 
+  let allGames = 0;
   const deckHashesToName = allDecksStats.map((v, index) => {
     const lastUsed = new Date(v.lastUsed);
+    allGames += v.totalGames;
+
+    allVStats.id = v.id;
+    allVStats.deckTileId = v.deckTileId;
+    allVStats.name = v.name;
+    v.mainDeck.forEach((c) => {
+      let found = false;
+      allVStats.mainDeck.forEach((cc) => {
+        if (cc.id === c.id) found = true;
+      });
+
+      if (!found) allVStats.mainDeck.push(c);
+    });
+
+    v.sideboard.forEach((c) => {
+      let found = false;
+      allVStats.sideboard.forEach((cc) => {
+        if (cc.id === c.id) found = true;
+      });
+
+      if (!found) allVStats.sideboard.push(c);
+    });
+
+    Object.keys(v.cardWinrates).forEach((cid: any) => {
+      if (!allVStats.cardWinrates[cid]) {
+        allVStats.cardWinrates[cid] = { ...v.cardWinrates[cid] };
+      } else {
+        allVStats.cardWinrates[cid].initHandWins +=
+          v.cardWinrates[cid].initHandWins;
+        allVStats.cardWinrates[cid].initHandsLosses +=
+          v.cardWinrates[cid].initHandsLosses;
+        allVStats.cardWinrates[cid].losses += v.cardWinrates[cid].losses;
+        allVStats.cardWinrates[cid].wins += v.cardWinrates[cid].losses;
+        allVStats.cardWinrates[cid].mulligans += v.cardWinrates[cid].mulligans;
+        allVStats.cardWinrates[cid].sideInLosses +=
+          v.cardWinrates[cid].sideInLosses;
+        allVStats.cardWinrates[cid].sideInWins +=
+          v.cardWinrates[cid].sideInWins;
+        allVStats.cardWinrates[cid].sideOutLosses +=
+          v.cardWinrates[cid].sideOutLosses;
+        allVStats.cardWinrates[cid].sideOutWins +=
+          v.cardWinrates[cid].sideOutWins;
+        allVStats.cardWinrates[cid].sidedIn += v.cardWinrates[cid].sidedIn;
+        allVStats.cardWinrates[cid].sidedOut += v.cardWinrates[cid].sidedOut;
+        allVStats.cardWinrates[cid].turnsFirstUsed = [
+          ...v.cardWinrates[cid].turnsFirstUsed,
+          ...allVStats.cardWinrates[cid].turnsFirstUsed,
+        ];
+        allVStats.cardWinrates[cid].turnsUsed = [
+          ...v.cardWinrates[cid].turnsUsed,
+          ...allVStats.cardWinrates[cid].turnsUsed,
+        ];
+      }
+    });
+
     return `v${allDecksStats.length - index} - ${lastUsed.toDateString()} - ${
       v.totalGames
     } games`;
   });
 
-  const deck = new Deck(
-    {},
-    allDecksStats[currentDeckVersion]?.mainDeck || [],
-    allDecksStats[currentDeckVersion]?.sideboard || []
-  );
+  deckHashesToName[ALL_VERSIONS] = `All versions - ${allGames} games`;
 
-  const winrates = allDecksStats[currentDeckVersion].cardWinrates || {};
+  const deck =
+    currentDeckVersion === ALL_VERSIONS
+      ? new Deck({}, allVStats.mainDeck || [], allVStats.sideboard || [])
+      : new Deck(
+          {},
+          allDecksStats[currentDeckVersion]?.mainDeck || [],
+          allDecksStats[currentDeckVersion]?.sideboard || []
+        );
 
   const data = useMemo(() => {
+    const winrates =
+      currentDeckVersion === ALL_VERSIONS
+        ? allVStats.cardWinrates
+        : allDecksStats[currentDeckVersion].cardWinrates || {};
+
     if (!winrates) return [];
     return Object.keys(winrates).map((grpid) => {
       const cardObj = database.card(parseInt(grpid));
@@ -210,7 +299,7 @@ export default function CardsWinratesView(
             cardObj: null,
           };
     });
-  }, [winrates]);
+  }, [fullStats, currentDeckVersion]);
 
   deck.sortMainboard(compareCards);
   deck.sortSideboard(compareCards);

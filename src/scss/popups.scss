@@ -295,6 +295,25 @@
   }
 }
 
+.electron-popup {
+  top: 24px;
+  height: calc(100% - 24px);
+
+  .popup-box {
+    max-width: 100%;
+    box-shadow: none;
+    pointer-events: all;
+  }
+}
+
+.electron-popup-noptop {
+  .popup-box {
+    max-width: 100%;
+    box-shadow: none;
+    pointer-events: all;
+  }
+}
+
 .info-popups {
   z-index: 50;
   pointer-events: none;

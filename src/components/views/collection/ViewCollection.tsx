@@ -196,7 +196,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
         <div style={{ display: "flex", width: "100%" }}>
           <Button
             onClick={toggleView}
-            style={{ minWidth: "160px", margin: "auto 8px 0 0" }}
+            style={{ minWidth: "160px", margin: "32px 8px auto 0px" }}
             text={viewMode === "set" ? "Cards view" : "Set view"}
           />
           <div style={{ width: "100%" }}>

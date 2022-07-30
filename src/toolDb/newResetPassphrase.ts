@@ -5,7 +5,7 @@ import {
   proofOfWork,
   toBase64,
   uint8ToBase64,
-} from "tool-db";
+} from "mtgatool-db";
 import { UserRecoveryData } from "../types/dbTypes";
 
 export default function newResetPassphrase(reminder: string) {

@@ -43,4 +43,15 @@ it("filters sets", () => {
       "banned"
     ).map((c) => c.id)
   ).toStrictEqual([0, 2]);
+
+  expect(
+    inStringArrayFilterFn(
+      manyCards,
+      {
+        value: "asdasj",
+        not: false,
+      },
+      "legal"
+    ).map((c) => c.id)
+  ).toStrictEqual([3]);
 });

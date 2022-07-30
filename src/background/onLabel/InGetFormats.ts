@@ -6,7 +6,7 @@ export interface Format {
   bannedTitleIds: number[];
   suspendedTitleIds: number[];
   allowedTitleIds: number[];
-  cardCountRestriction: string; // "None" | "Singleton" | "Limited";
+  cardCountRestriction: "None" | "Singleton" | "Limited";
   supressedTitleIds: number[];
   FormatType: string;
   useRebalancedCards?: boolean;
@@ -16,7 +16,7 @@ export interface Format {
     max: number;
   };
   sideBoardQuota?: {
-    min?: number;
+    min: number;
     max: number;
   };
   commandZoneQuota?: {

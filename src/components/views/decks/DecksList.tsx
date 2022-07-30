@@ -83,12 +83,12 @@ export default function DecksList() {
         }
       });
 
+      const totalGames = deckStats.matchWins + deckStats.matchLosses;
+
       return {
         ...fullStats.deckIndex[latestHash],
-        totalGames: deckStats.gameWins + deckStats.gameLosses,
-        winrate:
-          (100 / (deckStats.gameWins + deckStats.gameLosses)) *
-          deckStats.gameWins,
+        totalGames: totalGames,
+        winrate: totalGames > 0 ? (100 / totalGames) * deckStats.matchWins : 0,
         stats: deckStats,
       };
     },
@@ -107,31 +107,15 @@ export default function DecksList() {
   const filteredData = useMemo(() => {
     if (!fullStats) return [];
 
-    const latestDeckHashesArray = Object.keys(fullStats.decks).map((id) => {
-      const hashes = fullStats.decks[id];
-      let latestTimestamp = fullStats.deckIndex[hashes[0]].lastUsed;
-      let latestHash = hashes[0];
+    const isDefined = (item: StatsDeck | undefined): item is StatsDeck => {
+      return !!item;
+    };
 
-      hashes.forEach((h) => {
-        if (latestTimestamp < fullStats.deckIndex[h].lastUsed) {
-          const d = fullStats.deckIndex[h];
-          latestTimestamp = d.lastUsed;
-          latestHash = h;
-        }
-      });
-
-      return latestHash;
-    });
-
-    const decksForFiltering = latestDeckHashesArray
-      .map((hash) => fullStats.deckIndex[hash])
-      .map((d) => {
-        return {
-          ...d,
-          lastUsed: new Date(d.lastUsed).getTime(),
-          colors: d.colors > 32 ? d.colors - 32 : d.colors,
-        };
-      });
+    const decksForFiltering = Object.keys(fullStats.decks)
+      .map((id) => {
+        return getDeckWithStats(id);
+      })
+      .filter(isDefined);
 
     let newFilters = unsetFilter(filters, "inarraystring");
     if (showHidden !== "true") {
@@ -201,7 +185,7 @@ export default function DecksList() {
       newList.push(id);
       setDbHiddenDecks(newList);
     },
-    [showHidden, dispatch]
+    [hiddenDecks, showHidden, dispatch]
   );
 
   const unhideDeck = useCallback(
@@ -213,7 +197,7 @@ export default function DecksList() {
       }
       setDbHiddenDecks(newList);
     },
-    [showHidden, dispatch]
+    [hiddenDecks, showHidden, dispatch]
   );
 
   return (

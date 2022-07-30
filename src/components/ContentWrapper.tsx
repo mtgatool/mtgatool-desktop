@@ -27,6 +27,8 @@ import ViewDrafts from "./views/drafts/ViewDrafts";
 import useDatePicker from "../hooks/useDatePicker";
 import ViewExplore from "./views/explore/ViewExplore";
 import { CardsData } from "../types/collectionTypes";
+import isElectron from "../utils/electron/isElectron";
+import getPopupClass from "../utils/getPopupClass";
 
 const views = {
   home: ViewHome,
@@ -45,7 +47,12 @@ function delay(transition: any, timeout: number): any {
   };
 }
 
-const ContentWrapper = () => {
+export interface ContentWrapperProps {
+  forceOs?: string;
+}
+
+const ContentWrapper = (mainProps: ContentWrapperProps) => {
+  const { forceOs } = mainProps;
   const dispatch = useDispatch();
   const params = useParams<{ page: string }>();
   const paths = useRef<string[]>([params.page]);
@@ -56,6 +63,8 @@ const ContentWrapper = () => {
   useEffect(() => {
     workerRef.current = new Worker("worker/index.js", { type: "module" });
   }, []);
+
+  const os = forceOs || (isElectron() ? process.platform : "");
 
   const currentUUID = useSelector(
     (state: AppState) => state.mainData.currentUUID
@@ -170,6 +179,7 @@ const ContentWrapper = () => {
       {datePickerElement}
       <PopupComponent
         open={false}
+        className={getPopupClass(os)}
         width="900px"
         height="440px"
         openFnRef={openPostSignup}
@@ -180,6 +190,7 @@ const ContentWrapper = () => {
 
       <PopupComponent
         open={false}
+        className={getPopupClass(os)}
         width="1000px"
         height="540px"
         openFnRef={openAdvancedCollectionSearch}
@@ -190,6 +201,7 @@ const ContentWrapper = () => {
 
       <PopupComponent
         open={false}
+        className={getPopupClass(os)}
         width="1000px"
         height="600px"
         openFnRef={openHistoryStatsPopup}
