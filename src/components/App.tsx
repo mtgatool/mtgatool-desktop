@@ -40,6 +40,7 @@ import Popups from "./Popups";
 
 import ArenaIdSelector from "./popups/ArenaIdSelector";
 import { getFinalHost } from "../utils/peerToUrl";
+import getPopupClass from "../utils/getPopupClass";
 
 export interface AppProps {
   forceOs?: string;
@@ -162,13 +163,7 @@ function App(props: AppProps) {
       </PopupComponent>
       <PopupComponent
         open={false}
-        className={
-          isElectron()
-            ? os === "linux"
-              ? "electron-popup-notop"
-              : "electron-popup"
-            : ""
-        }
+        className={getPopupClass(os)}
         width="600px"
         height="400px"
         openFnRef={openArenaIdSelector}
@@ -210,7 +205,11 @@ function App(props: AppProps) {
                   openArenaIdSelector={openArenaIdSelector.current}
                   openSettings={openSettings.current}
                 />
-                {loginState == LOGIN_OK ? <ContentWrapper /> : <></>}
+                {loginState == LOGIN_OK ? (
+                  <ContentWrapper forceOs={forceOs} />
+                ) : (
+                  <></>
+                )}
               </>
             </Route>
           </Switch>
