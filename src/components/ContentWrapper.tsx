@@ -26,6 +26,12 @@ import PostSignupPopup from "./PostSignupPopup";
 import ViewDrafts from "./views/drafts/ViewDrafts";
 import useDatePicker from "../hooks/useDatePicker";
 import ViewExplore from "./views/explore/ViewExplore";
+import {
+  DateOption,
+  setDate,
+  setDateOption,
+} from "../redux/slices/FilterSlice";
+import doHistoryFilter from "../utils/tables/doHistoryFilter";
 import isElectron from "../utils/electron/isElectron";
 import getPopupClass from "../utils/getPopupClass";
 
@@ -52,6 +58,11 @@ export interface ContentWrapperProps {
 
 const ContentWrapper = (mainProps: ContentWrapperProps) => {
   const { forceOs } = mainProps;
+
+  const matchFilters = useSelector(
+    (state: AppState) => state.filter.matchDataFilters
+  );
+
   const dispatch = useDispatch();
   const params = useParams<{ page: string }>();
   const paths = useRef<string[]>([params.page]);
@@ -88,12 +99,23 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
         reduxAction(dispatch, {
           type: "SET_FULL_STATS",
           arg: aggregateStats(
-            matches.filter((m: any) => m).map(convertDbMatchToData)
+            matches.filter((m: any) => m).map(convertDbMatchToData),
+            matchFilters
           ),
         });
+
+        if (matchFilters) {
+          const filtered = doHistoryFilter(matches, matchFilters, undefined);
+
+          const newHistoryStats = aggregateStats(filtered);
+          reduxAction(dispatch, {
+            type: "SET_HISTORY_STATS",
+            arg: newHistoryStats,
+          });
+        }
       });
     }
-  }, [dispatch, params, matchesIndex]);
+  }, [dispatch, params, matchesIndex, matchFilters]);
 
   const prevIndex = Object.keys(views).findIndex(
     (k) => k == paths.current[paths.current.length - 1]
@@ -141,15 +163,12 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   const CurrentPage = Object.values(views)[viewIndex];
 
   const datePickerCallbackRef = useRef((_d: Date) => {
-    // nothiog here (yet!)
+    dispatch(setDate(_d));
+    dispatch(setDateOption("Custom" as DateOption));
   });
 
-  const [
-    datePickerDate,
-    datePickerDoShow,
-    datePickerElement,
-    setDatePickerDate,
-  ] = useDatePicker(
+  // noinspection JSUnusedLocalSymbols
+  const [_, datePickerDoShow, datePickerElement] = useDatePicker(
     new Date(0),
     undefined,
     datePickerCallbackRef.current || vodiFn
@@ -212,10 +231,7 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
                         openAdvancedCollectionSearch.current
                       }
                       openHistoryStatsPopup={openHistoryStatsPopup.current}
-                      datePickerDate={datePickerDate}
                       datePickerDoShow={datePickerDoShow}
-                      setDatePickerDate={setDatePickerDate}
-                      datePickerCallbackRef={datePickerCallbackRef}
                     />
                   </animated.div>
                 );
@@ -232,10 +248,7 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
                     openAdvancedCollectionSearch.current
                   }
                   openHistoryStatsPopup={openHistoryStatsPopup.current}
-                  datePickerDate={datePickerDate}
                   datePickerDoShow={datePickerDoShow}
-                  setDatePickerDate={setDatePickerDate}
-                  datePickerCallbackRef={datePickerCallbackRef}
                 />
               </div>
             )}

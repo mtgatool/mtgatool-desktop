@@ -8,9 +8,16 @@ import DeckView from "./DeckView";
 
 import { AppState } from "../../../redux/stores/rendererStore";
 
-export default function ViewDecks() {
+interface ViewDecksProps {
+  openHistoryStatsPopup: () => void;
+  datePickerDoShow: () => void;
+}
+
+export default function ViewDecks(props: ViewDecksProps) {
   const { url } = useRouteMatch();
   const [, loggedIn] = useDbUser();
+
+  const { openHistoryStatsPopup, datePickerDoShow } = props;
 
   const decksIndex = useSelector(
     (state: AppState) => state.mainData.decksIndex
@@ -21,7 +28,16 @@ export default function ViewDecks() {
       {loggedIn && decksIndex ? (
         <Switch>
           <Route exact path={`${url}/:id`} component={DeckView} />
-          <Route exact path={`${url}/`} component={DecksList} />
+          <Route
+            exact
+            path={`${url}/`}
+            component={() => (
+              <DecksList
+                datePickerDoShow={datePickerDoShow}
+                openHistoryStatsPopup={openHistoryStatsPopup}
+              />
+            )}
+          />
         </Switch>
       ) : (
         <></>

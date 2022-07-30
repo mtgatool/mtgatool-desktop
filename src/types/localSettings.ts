@@ -21,6 +21,9 @@ export const settingKeys = [
   "clientId",
   "showHiddenDecks",
   "daemonPort",
+  "filterDate",
+  "filterDateOption",
+  "filterEventOptions",
 ] as const;
 
 export type SettingKey = typeof settingKeys[number];
@@ -41,4 +44,7 @@ export const defaultSettings: Record<SettingKey, string> = {
   clientId: sha1(`${textRandom(100)}-${new Date().getTime()}`),
   showHiddenDecks: "false",
   daemonPort: "6842",
+  filterDate: "0",
+  filterDateOption: "All Time",
+  filterEventOptions: "",
 };

@@ -2,6 +2,8 @@
 import { Colors, database } from "mtgatool-shared";
 import { MatchData } from "../components/views/history/getMatchesData";
 import { CardWinrateData, StatsDeck } from "../types/dbTypes";
+import { Filters } from "../types/genericFilterTypes";
+import doHistoryFilter from "./tables/doHistoryFilter";
 
 export interface Winrate {
   wins: number;
@@ -42,7 +44,8 @@ export interface AggregatedStats {
 }
 
 export default function aggregateStats(
-  matchesList: MatchData[]
+  matchesList: MatchData[],
+  matchFilters?: Filters<MatchData>
 ): AggregatedStats {
   // Defaults
   const stats: AggregatedStats = {
@@ -71,7 +74,10 @@ export default function aggregateStats(
   };
 
   // Aggregate all matches
-  matchesList.forEach((match) => {
+  const filtered = matchFilters
+    ? doHistoryFilter(matchesList, matchFilters, undefined)
+    : matchesList;
+  filtered.forEach((match) => {
     const playerSeat = match.internalMatch.player.seat;
     const hasWon = match.playerWins > match.playerLosses;
 
