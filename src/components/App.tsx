@@ -151,7 +151,6 @@ function App(props: AppProps) {
       <SettingsPersistor />
       <PopupComponent
         open={false}
-        className={isElectron() ? "settings-popup" : ""}
         width="100%"
         height="100%"
         openFnRef={openSettings}
@@ -162,7 +161,6 @@ function App(props: AppProps) {
       </PopupComponent>
       <PopupComponent
         open={false}
-        className={isElectron() ? "settings-popup" : ""}
         width="600px"
         height="400px"
         openFnRef={openArenaIdSelector}
