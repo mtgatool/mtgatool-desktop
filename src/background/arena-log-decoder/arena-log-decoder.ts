@@ -14,6 +14,8 @@ function occurrences(text: string, re: RegExp): number {
   return matches ? matches.length : 0;
 }
 
+const DETAILED_LOGS_PATTERN = /DETAILED LOGS: (?<mode>.*)(?:\r\n|\n)/;
+
 const LABEL_JSON_PATTERNS = [
   /\[UnityCrossThreadLogger\](?<timestamp>.*): (?:Match to )?(?<playerId>\w*)(?: to Match)?: (?<label>.*)(?:\r\n|\n)/,
   /\[UnityCrossThreadLogger\](?<label>.*) /,
@@ -29,6 +31,7 @@ const LABEL_ARROW_JSON_PATTERN_NEW =
 const ALL_PATTERNS = [
   LABEL_ARROW_JSON_PATTERN,
   LABEL_ARROW_JSON_PATTERN_NEW,
+  DETAILED_LOGS_PATTERN,
   ...LABEL_JSON_PATTERNS,
 ];
 
@@ -114,6 +117,14 @@ function parseLogEntry(
         hash: sha1(jsonString + absPosition),
         json: tryDecodeJson(jsonString),
       },
+    ];
+  }
+
+  if ((rematches = matchText.match(DETAILED_LOGS_PATTERN))) {
+    return [
+      "full",
+      text.length,
+      { label: "detailedLogs", json: rematches.groups?.mode },
     ];
   }
 

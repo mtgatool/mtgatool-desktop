@@ -40,3 +40,4 @@ export { default as InEventGetCourses } from "./InEventGetCourses";
 export { default as InGetFormats } from "./InGetFormats";
 export { default as InStartHook } from "./InStartHook";
 export { default as OutSetDeckV2 } from "./OutSetDeckV2";
+export { default as DetailedLogs } from "./DetailedLogs";

@@ -100,6 +100,7 @@ export default function AdvancedSearch(
     (state: AppState) => state.renderer.collectionQuery
   );
   const defaultFilters = getFiltersFromQuery(collectionQuery);
+
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(0);
 

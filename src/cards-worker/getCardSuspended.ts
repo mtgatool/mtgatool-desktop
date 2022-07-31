@@ -1,7 +1,6 @@
-import { DbCardData } from "mtgatool-shared/dist";
-import allFormats from "../../../../common/allFormats";
+import allFormats from "./allFormats";
 
-export default function getCardSuspended(card: DbCardData): string[] {
+export default function getCardSuspended(card: any): string[] {
   const suspended: string[] = [];
   Object.keys(allFormats).forEach((name) => {
     const format = allFormats[name];

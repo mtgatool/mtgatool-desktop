@@ -48,12 +48,13 @@
     "zlib": "^1.0.5"
   },
   "scripts": {
-    "start": "nf start -p 3001",
+    "start": "npm run build:worker && nf start -p 3001",
     "cm": "git-cz",
+    "build:worker": "tsc --p worker-tsconfig.json && browserify ./dist-worker/cards-worker/collectionDataWorker.js --standalone worker > ./dist-worker/index.js && uglifyjs ./dist-worker/index.js -c > ./public/worker/index.js",
     "react-start": "node generateInfo.js && craco start",
     "react-build": "craco build",
-    "start:web": "craco start --config craco.web.config.js",
-    "build:web": "craco build --config craco.web.config.js",
+    "start:web": "npm run build:worker && craco start --config craco.web.config.js",
+    "build:web": "npm run build:worker && craco build --config craco.web.config.js",
     "jest-server": "http-server ./build -p 3000",
     "jest:watch": "craco test --env=jsdom",
     "jest:ci": "craco test --env=jsdom --watchAll=false --testPathIgnorePatterns \"src/__tests__/\"",
@@ -65,7 +66,7 @@
     "electron-start": "node src/start-react",
     "release": "npm run electron-rebuild && npm run react-build && electron-builder --publish=always",
     "build:nopublish": "electron-builder --x64 --publish=never",
-    "build": "npm run electron-rebuild && npm run react-build && npm run build:nopublish",
+    "build": "npm run build:worker && npm run electron-rebuild && npm run react-build && npm run build:nopublish",
     "electron-rebuild": "electron-rebuild",
     "semantic-release": "semantic-release",
     "storybook": "start-storybook -p 6006 -s public",
@@ -177,6 +178,7 @@
     "@types/secp256k1": "^4.0.1",
     "@types/tar-fs": "^2.0.1",
     "@types/webpack-env": "^1.16.0",
+    "browserify": "^17.0.0",
     "chromatic": "^5.9.2",
     "electron": "^13.0.0",
     "electron-builder": "^22.11.7",
@@ -193,7 +195,8 @@
     "file-loader": "^6.2.0",
     "foreman": "^3.0.1",
     "node-sass": "^6.0.1",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "uglify-js": "^3.15.4"
   },
   "config": {
     "commitizen": {
