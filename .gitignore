@@ -19,6 +19,7 @@
 .env.test.local
 .env.production.local
 ipfs
+.idea
 
 /public/worker.js
 
