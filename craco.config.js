@@ -1,4 +1,5 @@
 const ModuleReplacement = require("./module-resolver-file");
+const WebpackReactComponentNamePlugin = require("webpack-react-component-name");
 const eslintConfig = require("./.eslintrc");
 
 process.env.GENERATE_SOURCEMAP = true;
@@ -6,9 +7,6 @@ process.env.GENERATE_SOURCEMAP = true;
 // https://www.npmjs.com/package/@craco/craco
 module.exports = {
   webpack: {
-    optimization: {
-      minimize: false,
-    },
     configure: {
       target: "electron-renderer",
       module: {
@@ -23,7 +21,10 @@ module.exports = {
         fs: "empty",
       },
     },
-    plugins: [...ModuleReplacement({ webIndex: false, electronIndex: true })],
+    plugins: [
+      ...ModuleReplacement({ webIndex: false, electronIndex: true }),
+      new WebpackReactComponentNamePlugin()
+    ],
   },
   eslint: {
     configure: eslintConfig,
