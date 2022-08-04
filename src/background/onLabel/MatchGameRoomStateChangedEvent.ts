@@ -123,22 +123,26 @@ export default function onLabelMatchGameRoomStateChangedEvent(
 
     const metadata = (gameRoom.gameRoomConfig as any).clientMetadata;
 
-    const opponent = {
-      tier: parseInt(metadata[`${oppId}_RankTier`]),
-      rank: metadata[`${oppId}_RankClass`],
-      percentile: parseInt(metadata[`${oppId}_LeaderboardPercentile`]),
-      leaderboardPlace: parseInt(metadata[`${oppId}_LeaderboardPlacement`]),
-      // commanderGrpIds: json.opponentCommanderGrpIds,
-    };
-    setOpponent(opponent);
+    if (metadata) {
+      const opponent = {
+        tier: parseInt(metadata[`${oppId}_RankTier`]),
+        rank: metadata[`${oppId}_RankClass`],
+        percentile: parseInt(metadata[`${oppId}_LeaderboardPercentile`]),
+        leaderboardPlace: parseInt(metadata[`${oppId}_LeaderboardPlacement`]),
+        // commanderGrpIds: json.opponentCommanderGrpIds,
+      };
+      setOpponent(opponent);
 
-    const player = {
-      tier: parseInt(metadata[`${playerId}_RankTier`]),
-      rank: metadata[`${playerId}_RankClass`],
-      percentile: parseInt(metadata[`${playerId}_LeaderboardPercentile`]),
-      leaderboardPlace: parseInt(metadata[`${playerId}_LeaderboardPlacement`]),
-    };
-    setPlayer(player);
+      const player = {
+        tier: parseInt(metadata[`${playerId}_RankTier`]),
+        rank: metadata[`${playerId}_RankClass`],
+        percentile: parseInt(metadata[`${playerId}_LeaderboardPercentile`]),
+        leaderboardPlace: parseInt(
+          metadata[`${playerId}_LeaderboardPlacement`]
+        ),
+      };
+      setPlayer(player);
+    }
 
     setEventId(eventId);
 
