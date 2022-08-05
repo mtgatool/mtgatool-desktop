@@ -255,18 +255,20 @@ export default function aggregateStats(
 
         game.handsDrawn?.forEach((hand, index) => {
           // Initial hand
-          if (index == game.handsDrawn.length - 1) {
-            hand.forEach((grpId) => {
-              // define
-              if (!winrates[grpId]) winrates[grpId] = newCardWinrate(grpId);
-              winrates[grpId].initHandWins += wins;
-              winrates[grpId].initHandsLosses += losses;
-            });
-          } else {
-            hand.forEach((grpId) => {
-              if (!winrates[grpId]) winrates[grpId] = newCardWinrate(grpId);
-              winrates[grpId].mulligans += 1;
-            });
+          if (hand) {
+            if (index == game.handsDrawn.length - 1) {
+              hand.forEach((grpId) => {
+                // define
+                if (!winrates[grpId]) winrates[grpId] = newCardWinrate(grpId);
+                winrates[grpId].initHandWins += wins;
+                winrates[grpId].initHandsLosses += losses;
+              });
+            } else {
+              hand.forEach((grpId) => {
+                if (!winrates[grpId]) winrates[grpId] = newCardWinrate(grpId);
+                winrates[grpId].mulligans += 1;
+              });
+            }
           }
         });
 
