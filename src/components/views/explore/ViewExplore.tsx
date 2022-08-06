@@ -34,6 +34,7 @@ import {
 import ExploreAggregator from "./ExploreAggregator";
 import ExploreDeckView from "./ExploreDeckView";
 import ListItemExplore from "./ListItemExplore";
+import transformEventsList from "./transformEventsList";
 
 interface BestCards {
   copies: number;
@@ -199,21 +200,33 @@ export default function ViewExplore() {
 
   useEffect(() => {
     const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
-    const queryKey = `explore-${currentDay - 1}-`;
-    window.toolDb.queryKeys(queryKey).then((res) => {
-      if (res) {
-        const fixedList = res
-          .filter(
-            (k) =>
-              !k.includes("NPE_") &&
-              !k.includes("ColorChallenge_") &&
-              !k.includes("DirectGame")
-          )
-          .map((k) => k.slice(queryKey.length, -5));
 
-        setEventsList(Array.from(new Set(fixedList)));
+    const finalEventList: string[] = [];
+
+    async function queryDayKeys(day: number): Promise<string[]> {
+      const dayKeys = await window.toolDb.queryKeys(`explore-${day}-`);
+      return dayKeys?.map((k) => k.slice(`explore-${day}-`.length, -5)) || [];
+    }
+
+    async function doQueryLoop() {
+      for (let i = 0; i < 5; i += 1) {
+        const day = currentDay - i;
+        // eslint-disable-next-line no-await-in-loop
+        const dayKeys = await queryDayKeys(day);
+        finalEventList.push(...dayKeys);
       }
-    });
+
+      const fixedList = finalEventList.filter(
+        (k) =>
+          !k.includes("NPE_") &&
+          !k.includes("ColorChallenge_") &&
+          !k.includes("DirectGame")
+      );
+
+      setEventsList(Array.from(new Set(fixedList)));
+    }
+
+    doQueryLoop();
   }, []);
 
   const doSearch = useCallback(() => {
@@ -229,42 +242,7 @@ export default function ViewExplore() {
   }, [eventFilter]);
 
   // Get default events list to filter
-  let transformedEvents = eventsList.sort();
-
-  const rankedEvents: string[] = [
-    "Ladder",
-    "Alchemy_Ladder",
-    "Historic_Ladder",
-    "Traditional_Ladder",
-    "Traditional_Alchemy_Ladder",
-    "Traditional_Historic_Ladder",
-  ];
-
-  const drafts: string[] = [];
-
-  eventsList.forEach((ev) => {
-    if (rankedEvents.includes(ev)) {
-      transformedEvents.splice(transformedEvents.indexOf(ev), 1);
-    }
-    if (ev.indexOf("Draft") !== -1) {
-      transformedEvents.splice(transformedEvents.indexOf(ev), 1);
-      drafts.push(ev);
-    }
-  });
-
-  transformedEvents = [
-    "%%Ranked",
-    "Ladder",
-    "Alchemy_Ladder",
-    "Historic_Ladder",
-    "Traditional_Ladder",
-    "Traditional_Alchemy_Ladder",
-    "Traditional_Historic_Ladder",
-    "%%Drafts",
-    ...drafts,
-    "%%Other Events",
-    ...new Set(transformedEvents),
-  ];
+  const transformedEvents = transformEventsList(eventsList);
 
   return (
     <>
@@ -424,7 +402,11 @@ export default function ViewExplore() {
       )}
       {mode === MODE_AGGREGATOR && (
         <Section style={{ marginTop: "16px" }}>
-          <ExploreAggregator day={10} onExit={() => setMode(MODE_EXPLORE)} />
+          <ExploreAggregator
+            eventsList={eventsList}
+            day={10}
+            onExit={() => setMode(MODE_EXPLORE)}
+          />
         </Section>
       )}
       {mode === MODE_DECKVIEW && currentDeck && (

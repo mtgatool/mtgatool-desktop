@@ -11,9 +11,11 @@ import doExploreAggregation, {
 } from "./doExploreAggregation";
 import Select from "../../ui/Select";
 import Flex from "../../Flex";
+import transformEventsList from "./transformEventsList";
 
 interface ExploreAggregatorProps {
   day: number;
+  eventsList: string[];
   onExit: () => void;
 }
 
@@ -25,25 +27,8 @@ export default function ExploreAggregator(props: ExploreAggregatorProps) {
   const [isOk, setIsOk] = useState(false);
 
   const [eventId, setEventId] = useState<string>("Ladder");
-  const [eventsList, setEventsList] = useState<string[]>([]);
-  const { day, onExit } = props;
 
-  useEffect(() => {
-    window.toolDb.getData<string[]>("activeEvents").then((res) => {
-      if (res) {
-        const fixedList = res
-          .filter(
-            (k) =>
-              !k.includes("NPE_") &&
-              !k.includes("ColorChallenge_") &&
-              !k.includes("DirectGame")
-          )
-          .sort();
-
-        setEventsList(Array.from(new Set(fixedList)));
-      }
-    });
-  }, []);
+  const { day, onExit, eventsList } = props;
 
   const crdt = useRef<Automerge.FreezeObject<Record<string, number>>>(
     Automerge.init({})
@@ -120,6 +105,9 @@ export default function ExploreAggregator(props: ExploreAggregatorProps) {
         )
       : 0;
 
+  // Get default events list to filter
+  const transformedEvents = transformEventsList(eventsList);
+
   return (
     <div className="explore-aggregator">
       <h2 style={{ marginBottom: "8px", color: "var(--color-g)" }}>
@@ -137,7 +125,7 @@ export default function ExploreAggregator(props: ExploreAggregatorProps) {
       <div className="selector">
         <Select
           style={{ width: "280px" }}
-          options={eventsList}
+          options={transformedEvents}
           optionFormatter={getEventPrettyName}
           current={eventId}
           callback={setEventId}
