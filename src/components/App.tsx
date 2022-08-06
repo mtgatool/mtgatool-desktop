@@ -77,7 +77,6 @@ function App(props: AppProps) {
       console.log("Merged Peers: ", mergedPeers);
       window.toolDb = new ToolDb({
         peers: mergedPeers,
-        debug: true,
         topic: "mtgatool-db-swarm-v3",
         useWebrtc: true,
       });
