@@ -449,6 +449,7 @@ export default function MatchView(): JSX.Element {
                 lineHeight: "32px",
                 marginBottom: "16px",
                 justifyContent: "space-around",
+                width: "100%",
               }}
             >
               <SvgButton

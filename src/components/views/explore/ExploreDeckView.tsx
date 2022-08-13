@@ -161,7 +161,9 @@ export default function ExploreDeckView(
       <div
         className="decks-top"
         style={{
-          backgroundImage: `url(${getCardArtCrop(data.tile || DEFAULT_TILE)})`,
+          backgroundImage: data
+            ? `url(${getCardArtCrop(data.tile || DEFAULT_TILE)})`
+            : "",
         }}
       >
         <DeckColorsBar deck={deck} />

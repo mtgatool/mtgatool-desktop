@@ -240,7 +240,10 @@ export default function VisualDeckView(
           gridArea: "main",
         }}
       >
-        <div className="visual-mainboard">
+        <div
+          className="visual-mainboard"
+          style={{ maxWidth: `${(sz + 16) * 5}px` }}
+        >
           {finalSplits.map((idsList: SplitIds, index: number) => {
             const cards = idsList.map((grpId: number, cindex: number) => {
               const cardObj = database.card(grpId);

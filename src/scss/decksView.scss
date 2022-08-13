@@ -4,17 +4,26 @@
   gap: 16px;
   grid-template-rows: auto auto auto auto auto;
   grid-template-areas: "controls controls" "deck types" "deck curves" "deck pies" "deck rarities" "deck hand" "deck .";
+
+  @media screen and (max-width: 750px) {
+    grid-template-columns: 100%;
+    gap: 16px;
+    grid-template-rows: auto auto auto auto auto auto auto;
+    grid-template-areas: "controls" "deck" "types" "curves" "pies" "rarities" "hand";
+  }
 }
 
 .decks-top {
   height: 96px;
   background-size: cover;
   background-position: center;
+  background-image: url("../assets/images/blankgb.png");
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   margin: 16px 0;
+  -webkit-transition: all 0.2s ease-in-out;
 
   .top-inner {
     height: 32px;
@@ -63,6 +72,7 @@
 
 .visual-mainboard {
   display: flex;
+  margin: 0 auto;
   flex-wrap: wrap;
   align-content: start;
   justify-content: center;

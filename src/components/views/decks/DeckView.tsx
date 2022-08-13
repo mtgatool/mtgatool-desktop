@@ -143,9 +143,9 @@ export default function DeckView(): JSX.Element {
       <div
         className="decks-top"
         style={{
-          backgroundImage: `url(${getCardArtCrop(
-            dbDeck?.deckTileId || DEFAULT_TILE
-          )})`,
+          backgroundImage: dbDeck
+            ? `url(${getCardArtCrop(dbDeck.deckTileId || DEFAULT_TILE)})`
+            : "",
         }}
       >
         <DeckColorsBar deck={deck} />

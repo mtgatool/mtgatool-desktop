@@ -106,6 +106,12 @@
   grid-template-columns: calc(50% - 8px) calc(50% - 8px);
   grid-auto-rows: auto 80px 110px max-content;
   grid-template-areas: "controls controls" "name right" "buttons right" "deck right";
+
+  @media screen and (max-width: 750px) {
+    grid-template-columns: 100%;
+    grid-auto-rows: auto 80px 128px 280px max-content;
+    grid-template-areas: "controls" "name" "buttons" "right" "deck";
+  }
 }
 
 .match-top-result {
