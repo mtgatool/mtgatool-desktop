@@ -217,13 +217,13 @@ export default function TopNav(props: TopNavProps): JSX.Element {
   };
 
   const contructedNav = {
-    uri: "history",
+    uri: "/history",
     rank: uuidData[currentUUID]?.rank || defaultRankData,
     rankClass: "top-constructed-rank",
   };
 
   const limitedNav = {
-    uri: "history",
+    uri: "/history",
     rank: uuidData[currentUUID]?.rank || defaultRankData,
     rankClass: "top-limited-rank",
   };
