@@ -5,6 +5,7 @@ import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import { DbCardsData, DbInventoryData, DbRankData } from "../types/dbTypes";
 import globalData from "../utils/globalData";
+import setLocalSetting from "../utils/setLocalSetting";
 
 function handleMatchesIndex(matchesIndex: string[] | null) {
   globalData.matchesIndex = _.uniq([
@@ -82,6 +83,7 @@ export function afterLogin() {
   const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
 
   if (window.toolDb.user) {
+    setLocalSetting("pubkey", window.toolDb.user.pubKey);
     window.toolDb
       .queryKeys(`:${window.toolDb.user.pubKey}.matches-`)
       .then(handleMatchesIndex);

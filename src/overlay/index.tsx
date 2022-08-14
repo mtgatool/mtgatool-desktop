@@ -196,6 +196,7 @@ export default function Overlay() {
           )}
           {deck && settings && settings.mode !== OVERLAY_LOG && (
             <OverlayDeckList
+              matchId={matchState?.matchId || ""}
               deck={deck}
               settings={settings}
               subTitle={subTitle}

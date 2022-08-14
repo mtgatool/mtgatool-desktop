@@ -24,6 +24,7 @@ import { convertDbMatchToData } from "./views/history/getMatchesData";
 import getLocalDbValue from "../toolDb/getLocalDbValue";
 import PostSignupPopup from "./PostSignupPopup";
 import ViewDrafts from "./views/drafts/ViewDrafts";
+import ViewLiveMatch from "./views/livematch/ViewLiveMatch";
 import useDatePicker from "../hooks/useDatePicker";
 import ViewExplore from "./views/explore/ViewExplore";
 import { CardsData } from "../types/collectionTypes";
@@ -42,6 +43,7 @@ const views = {
   history: ViewHistory,
   timeline: ViewWip,
   drafts: ViewDrafts,
+  match: ViewLiveMatch,
   explore: ViewExplore,
   collection: ViewCollection,
 };

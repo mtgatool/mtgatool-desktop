@@ -57,6 +57,17 @@
   flex-grow: 2;
 }
 
+.overlay-qrcode {
+  width: 160px !important;
+  height: 160px !important;
+  border-radius: 6px;
+  position: absolute;
+  left: calc(50% - 80px);
+  top: 64x;
+  z-index: 100;
+  box-shadow: 0px 5px 20px 4px #000000a6;
+}
+
 .outer-wrapper {
   position: absolute !important;
   z-index: 1 !important;
@@ -247,7 +258,25 @@
   line-height: 24px;
   margin: 0 auto 1px auto;
   text-align: center;
+  display: flex;
   color: rgba(255, 255, 255, 0.85);
+
+  .title-qrcode {
+    width: 16px;
+    height: 16px;
+    margin: auto 8px auto auto;
+    fill: var(--color-text);
+    cursor: pointer;
+
+    &:hover {
+      fill: white;
+    }
+  }
+
+  .title-text {
+    width: 100%;
+    margin: auto;
+  }
 }
 
 .chance-title {

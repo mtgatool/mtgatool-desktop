@@ -1,6 +1,7 @@
 /* eslint-disable radix */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-nested-ternary */
+import { useCallback, useRef, useState } from "react";
 import {
   constants,
   Colors,
@@ -10,6 +11,9 @@ import {
   CardObject,
   database,
 } from "mtgatool-shared";
+
+import QRCode from "qrcode";
+
 import { OverlaySettings } from "../common/defaultConfig";
 
 import CardTile, { LandsTile, CardTileQuantity } from "./CardTile";
@@ -17,6 +21,9 @@ import CardTile, { LandsTile, CardTileQuantity } from "./CardTile";
 import DeckManaCurve from "./DeckManaCurve";
 import DeckTypesStats from "./DeckTypesStats";
 import SampleSizePanel from "./SampleSizePanel";
+
+import { ReactComponent as QrCodeIcon } from "../assets/images/svg/qrcode.svg";
+import copyToClipboard from "../utils/copyToClipboard";
 
 const { OVERLAY_FULL, OVERLAY_LEFT, OVERLAY_MIXED, OVERLAY_ODDS, LANDS_HACK } =
   constants;
@@ -28,6 +35,7 @@ function _compareQuantity(a: CardObject, b: CardObject): -1 | 0 | 1 {
 }
 
 interface DeckListProps {
+  matchId: string;
   deck: Deck;
   subTitle: string;
   highlightCardId?: number;
@@ -38,6 +46,7 @@ interface DeckListProps {
 
 export default function OverlayDeckList(props: DeckListProps): JSX.Element {
   const {
+    matchId,
     deck,
     subTitle,
     settings,
@@ -45,6 +54,21 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
     cardOdds,
     setOddsCallback,
   } = props;
+
+  const QRCanvas = useRef<HTMLCanvasElement | null>(null);
+
+  const [showQrCode, setShowQrCode] = useState(false);
+
+  const generateQrCode = useCallback(
+    (url: string) => {
+      copyToClipboard(url);
+      QRCode.toCanvas(QRCanvas.current, url, { margin: 2 }, () => {
+        setShowQrCode(true);
+      });
+    },
+    [QRCanvas]
+  );
+
   if (!deck) return <></>;
   const deckClone = deck.clone();
 
@@ -53,7 +77,6 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
   if (settings.mode === OVERLAY_ODDS || settings.mode == OVERLAY_MIXED) {
     sortFunc = compareCards; // compareQuantity;
   }
-
   const mainCardTiles: JSX.Element[] = [];
   const mainCards = deckClone.getMainboard();
   mainCards.removeDuplicates();
@@ -216,7 +239,23 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
 
   return (
     <div className="overlay-decklist click-on">
-      {!!settings.title && <div className="decklist-title">{subTitle}</div>}
+      {!!settings.title && (
+        <div className="decklist-title">
+          <div className="title-text">{subTitle}</div>
+          <QrCodeIcon
+            onClick={() => {
+              if (showQrCode) setShowQrCode(false);
+              else generateQrCode(`https://app.mtgatool.com/match/${matchId}`);
+            }}
+            className="title-qrcode"
+          />
+        </div>
+      )}
+      <canvas
+        ref={QRCanvas}
+        className="overlay-qrcode"
+        style={{ display: `${showQrCode ? "block" : "none"}` }}
+      />
       {!!settings.deck && mainCardTiles}
       {!!settings.sideboard && sideboardCardTiles.length > 0 && (
         <div className="decklist-title">Sideboard ({sideboardCards} cards)</div>

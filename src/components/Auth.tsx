@@ -133,9 +133,11 @@ export default function Auth(props: AuthProps) {
   useEffect(() => {
     if (loginState === LOGIN_OK) {
       if (rememberme) {
+        setLocalSetting("pubkey", window.toolDb.user?.pubKey || "");
         setLocalSetting("username", username);
         setLocalSetting("savedPass", pass);
       } else {
+        setLocalSetting("pubkey", "");
         setLocalSetting("username", "");
         setLocalSetting("savedPass", "");
       }
@@ -320,7 +322,7 @@ export default function Auth(props: AuthProps) {
         setErrorMessage("Passphrase needs to have 12 words");
       } else {
         checkPassphrase(usernameRecover, passphrase)
-          .then((hint) => {
+          .then((hint: any) => {
             if (hint) {
               setPass(hint);
               setPage(1);

@@ -4,7 +4,11 @@ import { cardType, Deck, DbCardData, database } from "mtgatool-shared";
 import CardTile from "./CardTile";
 import Separator from "./Separator";
 
-function getDeckComponents(deck: Deck, showWildcards = false): JSX.Element[] {
+function getDeckComponents(
+  deck: Deck,
+  showWildcards = false,
+  showOdds = false
+): JSX.Element[] {
   const components = [];
   const comp = deck.getCompanion();
   if (comp) {
@@ -116,10 +120,18 @@ function getDeckComponents(deck: Deck, showWildcards = false): JSX.Element[] {
               deck={deck}
               card={card.data as DbCardData}
               key={`mainboardcardtile${index}_${card.id}`}
-              quantity={{
-                type: "NUMBER",
-                quantity: card.quantity,
-              }}
+              quantity={
+                showOdds
+                  ? {
+                      type: "ODDS",
+                      quantity: card.quantity,
+                      odds: `${card.chance || 0}%`,
+                    }
+                  : {
+                      type: "NUMBER",
+                      quantity: card.quantity,
+                    }
+              }
             />
           );
         });
@@ -167,10 +179,11 @@ function getDeckComponents(deck: Deck, showWildcards = false): JSX.Element[] {
 interface DeckListProps {
   deck: Deck;
   showWildcards?: boolean;
+  showOdds?: boolean;
 }
 
 export default function DeckList(props: DeckListProps): JSX.Element {
-  const { deck, showWildcards } = props;
+  const { deck, showWildcards, showOdds } = props;
   if (!deck || database.version == 0) return <></>;
-  return <>{getDeckComponents(deck, showWildcards)}</>;
+  return <>{getDeckComponents(deck, showWildcards, showOdds)}</>;
 }

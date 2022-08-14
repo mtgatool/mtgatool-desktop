@@ -18,11 +18,14 @@ import globalData from "../utils/globalData";
 import getLocalSetting from "../utils/getLocalSetting";
 import electron from "../utils/electron/electronWrapper";
 import fetchCards from "../daemon/fetchCards";
+import upsertDbLiveMatch from "../toolDb/upsertDbLiveMatch";
 
 export default function mainChannelListeners() {
   const channel = bcConnect() as any;
 
   let last = Date.now();
+
+  let logReadFinished = false;
 
   if (electron) {
     electron.ipcRenderer.on(
@@ -55,6 +58,10 @@ export default function mainChannelListeners() {
       });
     }
 
+    if (logReadFinished && msg.data.type === "OVERLAY_UPDATE") {
+      upsertDbLiveMatch(msg.data.value);
+    }
+
     if (msg.data.type === "POPUP") {
       reduxAction(store.dispatch, {
         type: "SET_POPUP",
@@ -81,6 +88,7 @@ export default function mainChannelListeners() {
     }
 
     if (msg.data.type == "LOG_READ_FINISHED") {
+      logReadFinished = true;
       if (store.getState().renderer.loading === true) {
         reduxAction(store.dispatch, {
           type: "SET_LOGIN_STATE",

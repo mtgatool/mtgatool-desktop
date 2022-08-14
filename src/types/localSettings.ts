@@ -24,6 +24,7 @@ export const settingKeys = [
   "filterDate",
   "filterDateOption",
   "filterEventOptions",
+  "pubkey",
 ] as const;
 
 export type SettingKey = typeof settingKeys[number];
@@ -47,4 +48,5 @@ export const defaultSettings: Record<SettingKey, string> = {
   filterDate: "0",
   filterDateOption: "All Time",
   filterEventOptions: "",
+  pubkey: "",
 };
