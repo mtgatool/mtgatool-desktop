@@ -18,7 +18,7 @@ export default function AboutSettingsPanel(): JSX.Element {
         onClick={(): void => openExternal("https://mtgatool.com")}
       />
       <div className="message-sub15">
-        By Manuel Etchegaray &quot;Manwë&quot;, 2021
+        By Manuel Etchegaray &quot;Manwë&quot;, {new Date().getFullYear()}
       </div>
       <div
         className="message-sub15 release-notes-link"
