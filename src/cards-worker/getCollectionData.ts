@@ -38,6 +38,7 @@ const DRAFT_RANKS_LOLA = [
   "F",
 ];
 
+const FACE_SPECIALIZE_BACK = 11;
 const FACE_ADVENTURE = 7;
 const FACE_MODAL_BACK = 9;
 const FACE_DFC_BACK = 1;
@@ -62,7 +63,8 @@ export default function getCollectionData(
         card.dfc !== FACE_DFC_BACK &&
         card.dfc !== FACE_ADVENTURE &&
         card.dfc !== FACE_SPLIT &&
-        card.dfc !== FACE_MODAL_BACK
+        card.dfc !== FACE_MODAL_BACK &&
+        card.dfc !== FACE_SPECIALIZE_BACK
     )
     .map((card): any => {
       const RANK_SOURCE = card.source == 0 ? DRAFT_RANKS : DRAFT_RANKS_LOLA;
