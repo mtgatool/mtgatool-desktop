@@ -13,6 +13,7 @@ import { StatsDeck } from "../../types/dbTypes";
 import { AppState } from "../stores/rendererStore";
 import setFilter from "../../utils/tables/filters/setFilter";
 import setLocalSetting from "../../utils/setLocalSetting";
+import { Sort } from "../../components/SortControls";
 
 export type DateOption =
   | "All Time"
@@ -80,9 +81,7 @@ const calculateAllMatchDataFilters = (): Filters<MatchData> => {
 };
 
 const calculateAllDeckFilters = (): Filters<StatsDeck> => {
-  const filters: FilterTypeBase[] = [];
-
-  return <Filters<StatsDeck>>filters;
+  return <Filters<StatsDeck>>[];
 };
 
 const initialFilterState = {
@@ -91,6 +90,10 @@ const initialFilterState = {
   eventsFilter: getLocalSetting("filterEventOptions"),
   matchDataFilters: calculateAllMatchDataFilters(),
   deckFilters: calculateAllDeckFilters(),
+  deckSort: {
+    key: "lastUsed",
+    sort: -1,
+  } as Sort<StatsDeck>,
 };
 
 type FilterState = typeof initialFilterState;
@@ -171,6 +174,12 @@ const filterSlice = createSlice({
     resetDecksFilters: (state: FilterState): void => {
       state.deckFilters = calculateAllDeckFilters();
     },
+    setDeckSort: (
+      state: FilterState,
+      action: PayloadAction<Sort<StatsDeck>>
+    ): void => {
+      state.deckSort = action.payload;
+    },
   },
 });
 
@@ -180,6 +189,7 @@ export const {
   setEvents,
   setMatchDataFilters,
   setDecksFilters,
+  setDeckSort,
 } = filterSlice.actions;
 
 // Selectors

@@ -27,7 +27,10 @@ import setLocalSetting from "../../../utils/setLocalSetting";
 import setDbHiddenDecks from "../../../toolDb/setDbHiddenDecks";
 import Section from "../../ui/Section";
 import FilterSection from "../../ui/FilterSection";
-import { setDecksFilters } from "../../../redux/slices/FilterSlice";
+import {
+  setDecksFilters,
+  setDeckSort,
+} from "../../../redux/slices/FilterSlice";
 
 interface DeckListProps {
   openHistoryStatsPopup: () => void;
@@ -41,6 +44,7 @@ export default function DecksList(props: DeckListProps) {
   const [colorFilterState, setColorFilterState] = useState(31);
   const [deckNameFilterState, setDeckNameFilterState] = useState("");
   const fullStats = useSelector((state: AppState) => state.mainData.fullStats);
+  const sortValue = useSelector((state: AppState) => state.filter.deckSort);
   const hiddenDecks = useSelector(
     (state: AppState) => state.mainData.hiddenDecks
   );
@@ -92,11 +96,6 @@ export default function DecksList(props: DeckListProps) {
     },
     [fullStats]
   );
-
-  const [sortValue, setSortValue] = useState<Sort<StatsDeck>>({
-    key: "lastUsed",
-    sort: -1,
-  });
 
   const filteredData = useMemo(() => {
     if (!fullStats) return [];
@@ -228,7 +227,7 @@ export default function DecksList(props: DeckListProps) {
       </Section>
       <Section style={{ margin: "16px 0", flexDirection: "column" }}>
         <SortControls<StatsDeck>
-          setSortCallback={setSortValue}
+          setSortCallback={(s: Sort<StatsDeck>) => dispatch(setDeckSort(s))}
           defaultSort={sortValue}
           columnKeys={["lastUsed", "name", "winrate", "totalGames", "colors"]}
           columnNames={[

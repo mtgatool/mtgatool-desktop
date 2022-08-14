@@ -17,7 +17,7 @@ export default function doDecksFilter(
   let filteredData = data;
 
   filters.forEach((filter) => {
-    console.log(filter, filteredData);
+    // console.log(filter, filteredData);
     switch (filter.type) {
       case "string":
         if (filter.id === "name" || filter.id === "playerId") {
