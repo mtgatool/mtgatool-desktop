@@ -1,10 +1,14 @@
 /* eslint-disable radix */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-nested-ternary */
+import { useState } from "react";
 
 import { constants, compareCards, CardObject, Deck } from "mtgatool-shared";
 
-import { OVERLAY_SEEN } from "mtgatool-shared/dist/shared/constants";
+import {
+  OVERLAY_ODDS,
+  OVERLAY_SEEN,
+} from "mtgatool-shared/dist/shared/constants";
 import { OverlayUpdateMatchState } from "../../../background/store/types";
 
 import DeckManaCurve from "../../DeckManaCurve";
@@ -13,8 +17,11 @@ import DeckList from "../../DeckList";
 import Section from "../../ui/Section";
 import LiveDeckTypesStats from "./LiveDeckTypesStats";
 import LiveDeckLands from "./LiveDeckLands";
+import Select from "../../ui/Select";
 
 const { OVERLAY_FULL } = constants;
+
+const modeOptions = ["Opponent deck", "Player deck"];
 
 function _compareQuantity(a: CardObject, b: CardObject): -1 | 0 | 1 {
   if (b.quantity - a.quantity < 0) return -1;
@@ -24,20 +31,27 @@ function _compareQuantity(a: CardObject, b: CardObject): -1 | 0 | 1 {
 
 interface DeckListProps {
   matchState: OverlayUpdateMatchState;
-  mode: number;
 }
 
 export default function LiveMatchDeckList(props: DeckListProps): JSX.Element {
-  const { matchState, mode } = props;
+  const { matchState } = props;
+
+  const [modeOption, setMode] = useState("Player deck");
+
+  let mode = OVERLAY_ODDS;
+
+  if (modeOption === "Opponent deck") {
+    mode = OVERLAY_SEEN;
+  }
 
   let deck = new Deck();
+  const playerCardsLeft = new Deck(matchState.playerCardsLeft);
   if (mode === OVERLAY_SEEN) {
     const oppCards = new Deck(matchState.oppCards);
     oppCards.setName(`${matchState.opponent.name}'s deck`);
     deck = new Deck(matchState.oppCards);
   } else {
     // const oppCards = new Deck(matchState.oppCards);
-    const playerCardsLeft = new Deck(matchState.playerCardsLeft);
     const playerDeck = new Deck(matchState.playerDeck);
     // const player.originalDeck = new Deck(matchState.player.originalDeck);
 
@@ -68,14 +82,29 @@ export default function LiveMatchDeckList(props: DeckListProps): JSX.Element {
           flexDirection: "column",
         }}
       >
-        <DeckList deck={deck} showWildcards={false} showOdds />
+        <Select
+          style={{
+            margin: "0 auto 8px",
+          }}
+          options={modeOptions}
+          current={modeOption}
+          callback={setMode}
+        />
+        <DeckList
+          deck={deck}
+          showWildcards={false}
+          showOdds={modeOption === "Player deck"}
+        />
       </Section>
       <Section
         style={{
           gridArea: "types",
         }}
       >
-        <LiveDeckTypesStats deck={deck} cardOdds={matchState.cardsOdds} />
+        <LiveDeckTypesStats
+          deck={playerCardsLeft}
+          cardOdds={matchState.cardsOdds}
+        />
       </Section>
       <Section
         style={{

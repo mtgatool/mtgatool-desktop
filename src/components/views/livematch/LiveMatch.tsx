@@ -1,5 +1,5 @@
 import { getEventPrettyName } from "mtgatool-shared";
-import { OVERLAY_MIXED } from "mtgatool-shared/dist/shared/constants";
+
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
@@ -96,7 +96,7 @@ export default function LiveMatch() {
               <div>{getEventPrettyName(matchState.eventId)}</div>
             </Flex>
           </Section>
-          <LiveMatchDeckList matchState={matchState} mode={OVERLAY_MIXED} />
+          <LiveMatchDeckList matchState={matchState} />
         </>
       ) : (
         <></>
