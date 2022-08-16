@@ -1,5 +1,7 @@
 .stats-set-completion {
   width: -webkit-fill-available;
+  width: -moz-available;
+  width: fill-available;
   max-width: 600px;
   margin: 8px auto;
   display: flex;

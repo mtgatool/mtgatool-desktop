@@ -121,7 +121,10 @@
 
     .phrase {
       padding: 8px;
+      width: 100%;
       width: -webkit-fill-available;
+      width: -moz-available;
+      width: fill-available;
       font-size: 18px;
       color: var(--color-g);
       background-color: var(--color-section);
@@ -192,6 +195,8 @@
   max-width: 600px;
   height: 160px;
   width: -webkit-fill-available;
+  width: -moz-available;
+  width: fill-available;
   margin: auto;
   background-color: var(--color-base);
   padding: 32px;
@@ -205,6 +210,8 @@
   max-width: 600px;
   height: 160px;
   width: -webkit-fill-available;
+  width: -moz-available;
+  width: fill-available;
   margin: auto;
   background-color: var(--color-base);
   border-radius: 3px;

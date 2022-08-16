@@ -47,6 +47,8 @@
     overflow: hidden;
     max-width: 460px;
     width: -webkit-fill-available;
+    width: -moz-available;
+    width: fill-available;
     margin: 8px auto;
     display: flex;
     background-color: var(--color-section-hover);

@@ -24,7 +24,10 @@
   .mana-curve-column {
     color: var(--color-text);
     justify-content: space-around;
+    width: 100%;
+    width: -moz-available;
     width: -webkit-fill-available;
+    width: fill-available;
     flex-direction: column;
     margin: 0px 4px;
     display: flex;

@@ -38,7 +38,10 @@
   }
 
   .settings-page {
+    width: 100%;
     width: -webkit-fill-available;
+    width: -moz-available;
+    width: fill-available;
     max-width: 900px;
     height: max-content;
     margin: 0 16px 16px 16px;

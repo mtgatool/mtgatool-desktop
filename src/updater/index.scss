@@ -6,7 +6,9 @@
 
   background-color: #282829;
   width: 100%;
-  height: -webkit-fill-available;
+  width: -webkit-fill-available;
+  width: -moz-available;
+  width: fill-available;
   overflow: hidden;
   display: flex;
   align-items: center;

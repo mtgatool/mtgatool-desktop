@@ -1,5 +1,5 @@
 .live-match-header {
-  margin: 16px 0 !important;
+  margin: 0 0 16px 0 !important;
   line-height: 36px;
   padding: 16px;
   grid-area: controls;
@@ -16,13 +16,17 @@
   display: grid;
   gap: 16px;
   grid-template-columns: calc(50% - 8px) calc(50% - 8px);
-  grid-auto-rows: 120px auto 180px max-content;
+  grid-auto-rows: 160px auto 210px max-content;
   grid-template-areas: "deck types" "deck lands" "deck curve" "deck sample";
 
   @media screen and (max-width: 750px) {
     grid-template-columns: 100%;
-    grid-auto-rows: auto 120px auto 180px max-content;
+    grid-auto-rows: auto 160px auto 210px max-content;
     grid-template-areas: "deck" "types" "lands" "curve" "sample";
+  }
+
+  .card-tile-separator {
+    margin-bottom: 8px;
   }
 
   .overlay-deck-type-stats {
