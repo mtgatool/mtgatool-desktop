@@ -18,6 +18,7 @@ import Section from "../../ui/Section";
 import LiveDeckTypesStats from "./LiveDeckTypesStats";
 import LiveDeckLands from "./LiveDeckLands";
 import Select from "../../ui/Select";
+import Flex from "../../Flex";
 
 const { OVERLAY_FULL } = constants;
 
@@ -99,26 +100,38 @@ export default function LiveMatchDeckList(props: DeckListProps): JSX.Element {
       <Section
         style={{
           gridArea: "types",
+          flexDirection: "column",
         }}
       >
-        <LiveDeckTypesStats
-          deck={playerCardsLeft}
-          cardOdds={matchState.cardsOdds}
-        />
+        <div className="card-tile-separator">Types</div>
+        <Flex>
+          <LiveDeckTypesStats
+            deck={playerCardsLeft}
+            cardOdds={matchState.cardsOdds}
+          />
+        </Flex>
       </Section>
       <Section
         style={{
           gridArea: "lands",
+          flexDirection: "column",
         }}
       >
-        <LiveDeckLands cardOdds={matchState.cardsOdds} />
+        <div className="card-tile-separator">Land odds</div>
+        <Flex>
+          <LiveDeckLands cardOdds={matchState.cardsOdds} />
+        </Flex>
       </Section>
       <Section
         style={{
           gridArea: "curve",
+          flexDirection: "column",
         }}
       >
-        <DeckManaCurve className="overlay-deck-mana-curve" deck={deck} />
+        <div className="card-tile-separator">Mana curve</div>
+        <Flex>
+          <DeckManaCurve className="overlay-deck-mana-curve" deck={deck} />
+        </Flex>
       </Section>
     </div>
   );
