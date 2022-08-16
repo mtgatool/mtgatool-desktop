@@ -1,24 +1,29 @@
-import { getEventPrettyName } from "mtgatool-shared";
+import { Deck, getEventPrettyName } from "mtgatool-shared";
 
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
 import { ReactComponent as CopyButton } from "../../../assets/images/svg/copy.svg";
 // import { ReactComponent as IconCrown } from "../../../assets/images/svg/crown.svg";
 import { ReactComponent as IconEvent } from "../../../assets/images/svg/event.svg";
+import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
 
 import { OverlayUpdateMatchState } from "../../../background/store/types";
 import reduxAction from "../../../redux/reduxAction";
 import copyToClipboard from "../../../utils/copyToClipboard";
+import { getCardArtCrop } from "../../../utils/getCardArtCrop";
 import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
+import DeckColorsBar from "../../DeckColorsBar";
 import Flex from "../../Flex";
 import SvgButton from "../../SvgButton";
 import Section from "../../ui/Section";
 import LiveMatchDeckList from "./LiveMatchDeckList";
+import ManaCost from "../../ManaCost";
 
 export default function LiveMatch() {
+  const history = useHistory();
   const dispatch = useDispatch();
   const params = useParams<{ id: string }>();
 
@@ -49,6 +54,14 @@ export default function LiveMatch() {
     };
   }, []);
 
+  const goBack = (): void => {
+    history.push("/home");
+    reduxAction(dispatch, {
+      type: "SET_BACK_GRPID",
+      arg: null,
+    });
+  };
+
   const copyOppName = useCallback((): void => {
     if (matchState) {
       copyToClipboard(matchState.opponent.name);
@@ -63,10 +76,47 @@ export default function LiveMatch() {
     }
   }, [matchState]);
 
+  const playerDeck = new Deck(matchState?.playerDeck);
+
   return (
     <>
       {matchState ? (
         <>
+          <div
+            className="matches-top"
+            style={{
+              backgroundImage: `url(${getCardArtCrop(playerDeck.tile)})`,
+            }}
+          >
+            <DeckColorsBar deck={playerDeck} />
+            <div className="top-inner">
+              <div className="flex-item">
+                <SvgButton
+                  style={{
+                    marginRight: "8px",
+                    backgroundColor: "var(--color-section)",
+                  }}
+                  svg={BackIcon}
+                  onClick={goBack}
+                />
+                <div
+                  style={{
+                    lineHeight: "32px",
+                    color: "var(--color-text-hover)",
+                    textShadow: "3px 3px 6px #000000",
+                  }}
+                >
+                  {playerDeck.getName()}
+                </div>
+              </div>
+              <div className="flex-item">
+                <ManaCost
+                  className="manaS20"
+                  colors={playerDeck.getColors().get()}
+                />
+              </div>
+            </div>
+          </div>
           <Section className="live-match-header">
             <Flex>
               <div className="match-player-name">
