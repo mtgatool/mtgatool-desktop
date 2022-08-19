@@ -29,6 +29,28 @@ function handleMatchesIndex(matchesIndex: string[] | null) {
   });
 }
 
+function handleDraftsIndex(draftsIndex: string[] | null) {
+  globalData.draftsIndex = _.uniq([
+    ...globalData.draftsIndex,
+    ...(draftsIndex || []),
+  ]);
+  console.log("handleDraftsIndex", globalData.draftsIndex);
+
+  // Fetch any match we dont have locally
+  globalData.draftsIndex.forEach((id: string) => {
+    window.toolDb.store.get(id, (err, data) => {
+      if (!data) {
+        window.toolDb.getData(id, false, 2000);
+      }
+    });
+  });
+
+  reduxAction(store.dispatch, {
+    type: "SET_DRAFTS_INDEX",
+    arg: globalData.draftsIndex,
+  });
+}
+
 function handleLiveFeed(msg: CrdtMessage | PutMessage<any>) {
   // console.log("Key Listener live feed ", msg);
   if (msg && msg.type === "crdt") {
@@ -87,6 +109,10 @@ export function afterLogin() {
     window.toolDb
       .queryKeys(`:${window.toolDb.user.pubKey}.matches-`)
       .then(handleMatchesIndex);
+
+    window.toolDb
+      .queryKeys(`:${window.toolDb.user.pubKey}.draft-`)
+      .then(handleDraftsIndex);
   }
 
   window.toolDb.addKeyListener(

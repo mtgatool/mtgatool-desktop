@@ -15,6 +15,7 @@ const globalData = {
   mouseY: 0,
   fetchedAvatars: [] as string[],
   matchesIndex: [] as string[],
+  draftsIndex: [] as string[],
   hiddenDecks: [] as string[],
   liveFeed: Automerge.init<Record<string, number>>(),
   lastLogCheck: 0,
