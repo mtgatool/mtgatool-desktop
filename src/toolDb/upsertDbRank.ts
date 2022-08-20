@@ -26,6 +26,11 @@ export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
         });
 
         window.toolDb.putData<DbRankData>(`${uuid}-rank`, newData, true);
+        window.toolDb.putData(`rank-${window.toolDb.getPubKey()}`, {
+          ...newData,
+          uuid,
+          pubKey: window.toolDb.getPubKey(),
+        });
       } else {
         window.toolDb.putData<DbRankData>(
           `${uuid}-rank`,
@@ -35,6 +40,12 @@ export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
           },
           true
         );
+        window.toolDb.putData(`rank-${window.toolDb.getPubKey()}`, {
+          ...defaultRankData,
+          updated: new Date().getTime(),
+          uuid,
+          pubKey: window.toolDb.getPubKey(),
+        });
       }
     }
   );
