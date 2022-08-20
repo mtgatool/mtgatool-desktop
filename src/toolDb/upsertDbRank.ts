@@ -11,6 +11,8 @@ export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
   const uuid = getLocalSetting("playerId") || "default";
   const { dispatch } = store;
 
+  const pubKey = getLocalSetting("pubkey");
+
   getLocalDbValue(window.toolDb.getUserNamespacedKey(`${uuid}-rank`)).then(
     (uuidData) => {
       if (uuidData) {
@@ -26,10 +28,10 @@ export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
         });
 
         window.toolDb.putData<DbRankData>(`${uuid}-rank`, newData, true);
-        window.toolDb.putData(`rank-${window.toolDb.getPubKey()}`, {
+        window.toolDb.putData(`rank-${pubKey}`, {
           ...newData,
           uuid,
-          pubKey: window.toolDb.getPubKey(),
+          pubKey: pubKey,
         });
       } else {
         window.toolDb.putData<DbRankData>(
@@ -40,11 +42,11 @@ export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
           },
           true
         );
-        window.toolDb.putData(`rank-${window.toolDb.getPubKey()}`, {
+        window.toolDb.putData(`rank-${pubKey}`, {
           ...defaultRankData,
           updated: new Date().getTime(),
           uuid,
-          pubKey: window.toolDb.getPubKey(),
+          pubKey: pubKey,
         });
       }
     }
