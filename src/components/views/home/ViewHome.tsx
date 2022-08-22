@@ -7,6 +7,7 @@ import { convertDbMatchToData } from "../history/getMatchesData";
 
 import LiveFeedMatch from "./LiveFeedMatch";
 import Section from "../../ui/Section";
+import BestRanksFeed from "./BestRanksFeed";
 
 export default function ViewHome() {
   const liveFeed = useSelector((state: AppState) => state.mainData.liveFeed);
@@ -16,6 +17,12 @@ export default function ViewHome() {
 
   return (
     <>
+      <Section style={{ marginTop: "16px", flexDirection: "column" }}>
+        <h2 style={{ textAlign: "center", marginBottom: "16px" }}>
+          Best Players
+        </h2>
+        <BestRanksFeed />
+      </Section>
       <Section style={{ marginTop: "16px", flexDirection: "column" }}>
         {/* <div style={{ display: "flex" }}>
           <Button

@@ -3,3 +3,37 @@
   margin-top: 16px;
   overflow: hidden;
 }
+
+.ranks-feed-container {
+  display: flex;
+  max-width: 600px;
+  min-width: 70%;
+  margin: auto;
+  justify-content: space-between;
+
+  .ranks-feed-column {
+    flex-direction: column;
+    width: calc(50% - 32px);
+    text-align: center;
+
+    .feed-rank-listitem {
+      display: flex;
+      line-height: 56px;
+      margin-bottom: 8px;
+
+      .rank-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 32px;
+        background-size: contain;
+        margin: auto 0;
+      }
+
+      .rank-name {
+        width: calc(100% - 80px);
+        text-align: left;
+        text-indent: 16px;
+      }
+    }
+  }
+}

@@ -36,17 +36,19 @@ export default function RankIcon(props: RankIconProps): JSX.Element {
         className={rankClass}
         style={{ ...rankStyle, ...newStyle }}
       />
-      {step !== undefined ? (
+      {step !== undefined && rank !== "Mythic" ? (
         <div className="rank-bullets">
-          {[0, 0, 0, 0, 0, 0].fill(1, 0, step).map((v, i) => {
-            return (
-              <div
-                // eslint-disable-next-line react/no-array-index-key
-                key={`rank-bullet-${rank}-${i}`}
-                className={v ? "rank-bullet-light" : "rank-bullet-dark"}
-              />
-            );
-          })}
+          {[0, 0, 0, 0, 0, 0]
+            .fill(1, 0, rank === "Mythic" ? 6 : step)
+            .map((v, i) => {
+              return (
+                <div
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={`rank-bullet-${rank}-${i}`}
+                  className={v ? "rank-bullet-light" : "rank-bullet-dark"}
+                />
+              );
+            })}
         </div>
       ) : (
         <></>
