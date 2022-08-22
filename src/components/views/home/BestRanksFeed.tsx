@@ -75,6 +75,13 @@ function DrawLimitedRank(props: DbRankInfo) {
 export default function BestRanksFeed() {
   const [allRanks, setAllRanks] = useState<DbRankInfo[]>([]);
 
+  /**
+   * This does not scale well.
+   * We should probably use a cache entry on the database to store these,
+   * It could be an array of the top 10 ranks or something compact, once every month for
+   * consistency with the MTGA ladder.
+   * Also we should check for dates timestamps.
+   */
   useEffect(() => {
     window.toolDb
       .queryKeys("rank-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE")
