@@ -4,6 +4,15 @@
   overflow: hidden;
 }
 
+@keyframes loadingAnimation {
+  0% {
+    background-position: 150% 0
+  }
+  100% {
+    background-position: -150% 0
+  }
+}
+
 .ranks-feed-container {
   display: flex;
   width: 800px;
@@ -42,6 +51,16 @@
       line-height: 48px;
       margin-bottom: 8px;
       padding: 8px 16px;
+
+      &.loading {
+        animation-duration: 2s;
+        animation-fill-mode: forwards;
+        animation-iteration-count: infinite;
+        animation-name: loadingAnimation;
+        animation-timing-function: linear;
+        background: linear-gradient(to right, var(--color-dark) 0%, var(--color-shade-25) 20%, var(--color-dark) 40%);
+        background-size: 300% 100%;
+      }
 
       .rank-avatar {
         width: 32px;

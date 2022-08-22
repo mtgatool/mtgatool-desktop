@@ -1,7 +1,9 @@
 import getRankFilterVal, { RANK_MYTHIC } from "../history/getRankFilterVal";
 import DbRankInfo from "./DbRankInfo";
 
-export function sortConstructedRanks(a: DbRankInfo, b: DbRankInfo) {
+export function sortConstructedRanks(a?: DbRankInfo, b?: DbRankInfo) {
+  if (!a || !b) return 0;
+
   const ac = getRankFilterVal(a.constructedClass);
   const bc = getRankFilterVal(b.constructedClass);
   if (ac < bc) return 1;
@@ -23,7 +25,9 @@ export function sortConstructedRanks(a: DbRankInfo, b: DbRankInfo) {
   return 0;
 }
 
-export function sortLimitedRanks(a: DbRankInfo, b: DbRankInfo) {
+export function sortLimitedRanks(a?: DbRankInfo, b?: DbRankInfo) {
+  if (!a || !b) return 0;
+
   const ac = getRankFilterVal(a.limitedClass);
   const bc = getRankFilterVal(b.limitedClass);
   if (ac < bc) return 1;

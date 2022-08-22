@@ -72,6 +72,14 @@ function DrawLimitedRank(props: DbRankInfo) {
   );
 }
 
+function DrawLoadingRank() {
+  return (
+    <div className="list-item-container-nohover feed-rank-listitem loading" />
+  );
+}
+
+const emptyList = new Array(5).fill(0);
+
 export default function BestRanksFeed() {
   const [allRanks, setAllRanks] = useState<DbRankInfo[]>([]);
 
@@ -125,11 +133,15 @@ export default function BestRanksFeed() {
     <div className="ranks-feed-container">
       <div className="ranks-feed-column">
         <h3>Constructed</h3>
-        {bestConstructed.map(DrawConstructedRank)}
+        {allRanks.length === 0
+          ? emptyList.map(DrawLoadingRank)
+          : bestConstructed.map(DrawConstructedRank)}
       </div>
       <div className="ranks-feed-column">
         <h3>Limited</h3>
-        {bestLimited.map(DrawLimitedRank)}
+        {allRanks.length === 0
+          ? emptyList.map(DrawLoadingRank)
+          : bestLimited.map(DrawLimitedRank)}
       </div>
     </div>
   );
