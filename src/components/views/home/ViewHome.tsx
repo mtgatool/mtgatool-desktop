@@ -24,28 +24,6 @@ export default function ViewHome() {
         <BestRanksFeed />
       </Section>
       <Section style={{ marginTop: "16px", flexDirection: "column" }}>
-        {/* <div style={{ display: "flex" }}>
-          <Button
-            style={{
-              margin: "auto",
-            }}
-            onClick={() => {
-              postChannelMessage({
-                type: "START_LOG_READING",
-              });
-            }}
-            text="Re-read log"
-          />
-          <Button
-            style={{
-              margin: "auto",
-            }}
-            onClick={() =>
-              createOverlay(0).then(() => console.log("closeddd!"))
-            }
-            text="Test overaly"
-          />
-        </div> */}
         <h2 style={{ textAlign: "center" }}>Live Feed</h2>
         <div className="home-view">
           {liveFeed.map((matchId) => {
