@@ -18,7 +18,7 @@ function DrawConstructedRank(props: DbRankInfo) {
   } = props;
 
   return (
-    <div className="feed-rank-listitem">
+    <div className="list-item-container-nohover feed-rank-listitem">
       <div
         className="rank-avatar"
         style={{
@@ -51,7 +51,7 @@ function DrawLimitedRank(props: DbRankInfo) {
   } = props;
 
   return (
-    <div className="feed-rank-listitem">
+    <div className="list-item-container-nohover feed-rank-listitem">
       <div
         className="rank-avatar"
         style={{
@@ -101,8 +101,14 @@ export default function BestRanksFeed() {
             )
           );
           Promise.all(promises)
-            .then((data: any[]) => {
-              setAllRanks(data);
+            .then((data: DbRankInfo[]) => {
+              setAllRanks(
+                // filter out data from last week only
+                data.filter(
+                  (r) =>
+                    r.updated > new Date().getTime() - 1000 * 60 * 60 * 24 * 7
+                )
+              );
             })
             .catch((err) => {
               console.log(err);
