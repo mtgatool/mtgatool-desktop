@@ -78,7 +78,7 @@ function DrawLoadingRank() {
   );
 }
 
-const emptyList = new Array(5).fill(0);
+const emptyList = new Array(8).fill(0);
 
 export default function BestRanksFeed() {
   const [allRanks, setAllRanks] = useState<DbRankInfo[]>([]);
@@ -125,9 +125,9 @@ export default function BestRanksFeed() {
       });
   }, []);
 
-  const bestConstructed = allRanks.sort(sortConstructedRanks).slice(0, 5);
+  const bestConstructed = allRanks.sort(sortConstructedRanks).slice(0, 8);
 
-  const bestLimited = allRanks.sort(sortLimitedRanks).slice(0, 5);
+  const bestLimited = allRanks.sort(sortLimitedRanks).slice(0, 8);
 
   return (
     <div className="ranks-feed-container">

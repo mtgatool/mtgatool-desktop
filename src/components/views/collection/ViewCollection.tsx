@@ -213,7 +213,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
         />
       )}
       {viewMode === "cards" && (
-        <Section style={{ flexDirection: "column", marginTop: "16px" }}>
+        <Section className="collection-sort-controls">
           <SortControls<CardsData>
             defaultSort={sortValue}
             setSortCallback={setSortValue}

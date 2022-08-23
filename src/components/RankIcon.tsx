@@ -26,7 +26,9 @@ export default function RankIcon(props: RankIconProps): JSX.Element {
 
   const mythicRankTitle =
     rank +
-    (leaderboardPlace == 0 ? ` ${percentile}%` : ` #${leaderboardPlace}`);
+    (leaderboardPlace == 0
+      ? ` ${(percentile || 0).toFixed(2)}%`
+      : ` #${leaderboardPlace}`);
   const rankTitle = rank == "Mythic" ? mythicRankTitle : `${rank} ${tier}`;
 
   return (

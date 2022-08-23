@@ -49,8 +49,8 @@
       display: flex;
       height: 48px;
       line-height: 48px;
-      margin-bottom: 8px;
-      padding: 8px 16px;
+      margin-bottom: 4px;
+      padding: 4px 12px;
 
       &.loading {
         animation-duration: 2s;
@@ -74,6 +74,7 @@
         width: calc(100% - 80px);
         text-align: left;
         text-indent: 16px;
+        font-size: 16px !important;
       }
 
       @media screen and (max-width: 750px) {

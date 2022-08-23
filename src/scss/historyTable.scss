@@ -2,4 +2,27 @@
   display: flex;
   width: 100%;
   flex-direction: column;
+
+  @media screen and (max-width: 600px) {
+    .control-rank,
+    .control-oppDeckColors,
+    .control-playerDeckColors,
+    .control-playerWins,
+    .control-playerLosses {
+      display: none;
+      grid-area: none !important;
+    }
+
+    .control-timestamp {
+      grid-area: 1 / 1 / 1 / 3 !important;
+    }
+
+    .control-duration {
+      grid-area: 1 / 3 / 1 / 5 !important;
+    }
+
+    .control-eventId {
+      grid-area: 1 / 5 / 1 / 7 !important;
+    }
+  }
 }

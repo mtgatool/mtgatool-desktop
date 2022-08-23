@@ -2,3 +2,31 @@
   display: grid;
   width: 100%;
 }
+
+.collection-sort-controls {
+  margin-top: 16px;
+  flex-direction: column;
+
+  @media screen and (max-width: 600px) {
+    .control-set {
+      display: none;
+      grid-area: none !important;
+    }
+
+    .control-name {
+      grid-area: 1 / 1 / 1 / 2 !important;
+    }
+    
+    .control-rarityVal {
+      grid-area: 1 / 2 / 1 / 3 !important;
+    }
+
+    .control-cmc {
+      grid-area: 1 / 3 / 1 / 4 !important;
+    }
+
+    .control-cid {
+      grid-area: 1 / 4 / 1 / 5 !important;
+    }
+  }
+}

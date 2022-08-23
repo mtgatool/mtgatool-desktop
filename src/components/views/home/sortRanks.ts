@@ -16,6 +16,18 @@ export function sortConstructedRanks(a?: DbRankInfo, b?: DbRankInfo) {
     if (a.constructedStep < b.constructedStep) return 1;
     if (a.constructedStep > b.constructedStep) return -1;
   }
+
+  if (
+    a.constructedLeaderboardPlace !== 0 &&
+    b.constructedLeaderboardPlace === 0
+  )
+    return -1;
+  if (
+    b.constructedLeaderboardPlace !== 0 &&
+    a.constructedLeaderboardPlace === 0
+  )
+    return 1;
+
   if (a.constructedLeaderboardPlace < b.constructedLeaderboardPlace) return -1;
   if (a.constructedLeaderboardPlace > b.constructedLeaderboardPlace) return 1;
 
@@ -40,6 +52,12 @@ export function sortLimitedRanks(a?: DbRankInfo, b?: DbRankInfo) {
     if (a.limitedStep < b.limitedStep) return 1;
     if (a.limitedStep > b.limitedStep) return -1;
   }
+
+  if (a.limitedLeaderboardPlace !== 0 && b.limitedLeaderboardPlace === 0)
+    return -1;
+  if (b.limitedLeaderboardPlace !== 0 && a.limitedLeaderboardPlace === 0)
+    return 1;
+
   if (a.limitedLeaderboardPlace < b.limitedLeaderboardPlace) return -1;
   if (a.limitedLeaderboardPlace > b.limitedLeaderboardPlace) return 1;
 

@@ -1,3 +1,27 @@
+.explore-sort-controls {
+  margin-bottom: 16px;
+  flex-direction: column;
+
+  @media screen and (max-width: 600px) {
+    .control-ranks {
+      display: none;
+      grid-area: none !important;
+    }
+
+    .control-wr {
+      grid-area: 1 / 1 / 1 / 2 !important;
+    }
+    
+    .control-colors {
+      grid-area: 1 / 2 / 1 / 3 !important;
+    }
+
+    .control-avgDuration {
+      grid-area: 1 / 3 / 1 / 4 !important;
+    }
+  }
+}
+
 .explore-deck-view-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
