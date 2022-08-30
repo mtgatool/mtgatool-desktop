@@ -135,13 +135,27 @@ export default function BestRanksFeed() {
         <h3>Constructed</h3>
         {allRanks.length === 0
           ? emptyList.map(DrawLoadingRank)
-          : bestConstructed.map(DrawConstructedRank)}
+          : bestConstructed
+              .map((r) => {
+                return {
+                  ...r,
+                  key: `constructed-best-${r.uuid}`,
+                };
+              })
+              .map(DrawConstructedRank)}
       </div>
       <div className="ranks-feed-column">
         <h3>Limited</h3>
         {allRanks.length === 0
           ? emptyList.map(DrawLoadingRank)
-          : bestLimited.map(DrawLimitedRank)}
+          : bestLimited
+              .map((r) => {
+                return {
+                  ...r,
+                  key: `limited-best-${r.uuid}`,
+                };
+              })
+              .map(DrawLimitedRank)}
       </div>
     </div>
   );
