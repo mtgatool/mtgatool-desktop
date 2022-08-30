@@ -91,6 +91,9 @@ export default function BestRanksFeed() {
    * Also we should check for dates timestamps.
    */
   useEffect(() => {
+    const date = new Date();
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+
     window.toolDb
       .queryKeys("rank-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE")
       .then((keys) => {
@@ -112,10 +115,7 @@ export default function BestRanksFeed() {
             .then((data: DbRankInfo[]) => {
               setAllRanks(
                 // filter out data from last week only
-                data.filter(
-                  (r) =>
-                    r.updated > new Date().getTime() - 1000 * 60 * 60 * 24 * 7
-                )
+                data.filter((r) => r.updated > firstDay.getTime())
               );
             })
             .catch((err) => {
