@@ -7,10 +7,11 @@ import {
   MatchGameRoomStateChange,
 } from "mtgatool-shared";
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
+import MtgaTrackerDaemon from "../../daemon/mtgaTrackerDaemon";
 
 import LogEntry from "../../types/logDecoder";
 import getLocalSetting from "../../utils/getLocalSetting";
-import globalData from "../../utils/globalData";
+
 import actionLog from "../actionLog";
 import saveMatch from "../saveMatch";
 import selectDeck from "../selectDeck";
@@ -156,26 +157,28 @@ export default function onLabelMatchGameRoomStateChangedEvent(
       setPlayer(player);
     }
 
-    if (globalData.daemon) {
-      globalData.daemon.getMatchState().then((state) => {
-        if (state && state.matchId === gameRoom.gameRoomConfig.matchId) {
-          const opponent = {
-            tier: state.opponentRank.tier,
-            rank: rankClass[state.opponentRank.class],
-            percentile: state.opponentRank.mythicPercentile,
-            leaderboardPlace: state.opponentRank.mythicPlacement,
-          };
-          setOpponent(opponent);
+    if ((window as any).daemon) {
+      ((window as any).daemon as MtgaTrackerDaemon)
+        .getMatchState()
+        .then((state) => {
+          if (state && state.matchId === gameRoom.gameRoomConfig.matchId) {
+            const opponent = {
+              tier: state.opponentRank.tier,
+              rank: rankClass[state.opponentRank.class],
+              percentile: state.opponentRank.mythicPercentile,
+              leaderboardPlace: state.opponentRank.mythicPlacement,
+            };
+            setOpponent(opponent);
 
-          const player = {
-            tier: state.playerRank.tier,
-            rank: rankClass[state.playerRank.class],
-            percentile: state.playerRank.mythicPercentile,
-            leaderboardPlace: state.playerRank.mythicPlacement,
-          };
-          setPlayer(player);
-        }
-      });
+            const player = {
+              tier: state.playerRank.tier,
+              rank: rankClass[state.playerRank.class],
+              percentile: state.playerRank.mythicPercentile,
+              leaderboardPlace: state.playerRank.mythicPlacement,
+            };
+            setPlayer(player);
+          }
+        });
     }
 
     setEventId(eventId);
