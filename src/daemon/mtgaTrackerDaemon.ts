@@ -36,7 +36,7 @@ interface DaemonStatus {
   processId: number | -1;
 }
 
-interface DaemonMatchState {
+export interface DaemonMatchState {
   matchId: string;
   playerRank: {
     mythicPercentile: number;
@@ -71,10 +71,10 @@ export default class MtgaTrackerDaemon {
 
   private _daemonExecutablePath: string | null = null;
 
-  constructor() {
+  constructor(boot = true) {
     this._url = `http://localhost:${this._port}`;
 
-    if (isElectron() && os === "win32") {
+    if (boot && isElectron() && os === "win32") {
       this.setupDaemon();
     }
   }
