@@ -63,6 +63,8 @@
       }
 
       .rank-avatar {
+        min-width: 32px;
+        min-height: 32px;
         width: 32px;
         height: 32px;
         border-radius: 32px;
@@ -70,11 +72,30 @@
         margin: auto 0;
       }
 
-      .rank-name {
-        width: calc(100% - 80px);
+      .rank-name-container {
+        display: flex;
+        flex-direction: column;
+        line-height: 18px;
+        margin: auto 0;
+        width: 100%;
         text-align: left;
         text-indent: 16px;
         font-size: 16px !important;
+        overflow: hidden;
+
+        .rank-name {
+          text-overflow: ellipsis;
+          white-space: pre;
+          overflow: hidden;
+        }
+
+        .rank-time {
+          text-overflow: ellipsis;
+          white-space: pre;
+          overflow: hidden;
+          color: var(--color-text-disabled);
+          font-family: var(--main-font-name-it);
+        }
       }
 
       @media screen and (max-width: 750px) {
@@ -83,6 +104,20 @@
         }
         .limited-rank {
           scale: 0.75;
+        }
+      }
+
+      .rank-icon {
+        display: flex;
+
+        .rank-position {
+                  
+          @media screen and (max-width: 600px) {
+            font-size: 12px !important;
+          }
+          
+          margin: 0 8px;
+          color: var(--color-text-dark);
         }
       }
 

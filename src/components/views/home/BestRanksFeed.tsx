@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { DEFAULT_AVATAR } from "../../../constants";
+import timeAgo from "../../../utils/timeAgo";
 
 import RankIcon from "../../RankIcon";
 
@@ -8,6 +9,7 @@ import { sortConstructedRanks, sortLimitedRanks } from "./sortRanks";
 
 function DrawConstructedRank(props: DbRankInfo) {
   const {
+    updated,
     name,
     avatar,
     constructedClass,
@@ -17,6 +19,11 @@ function DrawConstructedRank(props: DbRankInfo) {
     constructedLeaderboardPlace,
   } = props;
 
+  const mythicRankTitle =
+    constructedLeaderboardPlace == 0
+      ? ` ${(constructedPercentile || 0).toFixed(2)}%`
+      : ` #${constructedLeaderboardPlace}`;
+
   return (
     <div className="list-item-container-nohover feed-rank-listitem">
       <div
@@ -25,22 +32,31 @@ function DrawConstructedRank(props: DbRankInfo) {
           backgroundImage: `url(${avatar || DEFAULT_AVATAR})`,
         }}
       />
-      <div className="rank-name">{name}</div>
-      <RankIcon
-        rank={constructedClass}
-        tier={constructedLevel}
-        step={constructedStep}
-        percentile={constructedPercentile}
-        leaderboardPlace={constructedLeaderboardPlace}
-        format="constructed"
-        style={{ margin: "auto 0" }}
-      />
+      <div className="rank-name-container">
+        <div className="rank-name">{name || "-"}</div>
+        <div className="rank-time">{timeAgo(updated)}</div>
+      </div>
+      <div className="rank-icon">
+        <div className="rank-position">
+          {constructedClass === "Mythic" ? mythicRankTitle : ""}
+        </div>
+        <RankIcon
+          rank={constructedClass}
+          tier={constructedLevel}
+          step={constructedStep}
+          percentile={constructedPercentile}
+          leaderboardPlace={constructedLeaderboardPlace}
+          format="constructed"
+          style={{ margin: "auto 0" }}
+        />
+      </div>
     </div>
   );
 }
 
 function DrawLimitedRank(props: DbRankInfo) {
   const {
+    updated,
     name,
     avatar,
     limitedClass,
@@ -50,6 +66,11 @@ function DrawLimitedRank(props: DbRankInfo) {
     limitedLeaderboardPlace,
   } = props;
 
+  const mythicRankTitle =
+    limitedLeaderboardPlace == 0
+      ? ` ${(limitedPercentile || 0).toFixed(2)}%`
+      : ` #${limitedLeaderboardPlace}`;
+
   return (
     <div className="list-item-container-nohover feed-rank-listitem">
       <div
@@ -58,16 +79,24 @@ function DrawLimitedRank(props: DbRankInfo) {
           backgroundImage: `url(${avatar || DEFAULT_AVATAR})`,
         }}
       />
-      <div className="rank-name">{name}</div>
-      <RankIcon
-        rank={limitedClass}
-        tier={limitedLevel}
-        step={limitedStep}
-        percentile={limitedPercentile}
-        leaderboardPlace={limitedLeaderboardPlace}
-        format="limited"
-        style={{ margin: "auto 0" }}
-      />
+      <div className="rank-name-container">
+        <div className="rank-name">{name || "-"}</div>
+        <div className="rank-time">{timeAgo(updated)}</div>
+      </div>
+      <div className="rank-icon">
+        <div className="rank-position">
+          {limitedClass === "Mythic" ? mythicRankTitle : ""}
+        </div>
+        <RankIcon
+          rank={limitedClass}
+          tier={limitedLevel}
+          step={limitedStep}
+          percentile={limitedPercentile}
+          leaderboardPlace={limitedLeaderboardPlace}
+          format="limited"
+          style={{ margin: "auto 0" }}
+        />
+      </div>
     </div>
   );
 }
