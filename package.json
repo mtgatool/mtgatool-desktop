@@ -25,7 +25,7 @@
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.0",
     "mathjs": "^9.3.0",
-    "mtgatool-db": "^1.6.2",
+    "mtgatool-db": "^1.7.0",
     "mtgatool-shared": "^1.1.7",
     "qrcode": "^1.5.1",
     "queue": "^6.0.2",
