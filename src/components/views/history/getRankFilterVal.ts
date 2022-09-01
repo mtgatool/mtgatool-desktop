@@ -8,6 +8,9 @@ export const RANK_MYTHIC = 32;
 export default function getRankFilterVal(rank: string): number {
   let ret = 0;
   switch (rank) {
+    case "Unranked":
+      ret = 0;
+      break;
     case "Bronze":
       ret = RANK_BRONZE;
       break;

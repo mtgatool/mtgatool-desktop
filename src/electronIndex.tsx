@@ -43,6 +43,8 @@ if (title == WINDOW_UPDATER) {
     document.getElementById("root")
   );
 } else if (title == WINDOW_BACKGROUND) {
+  (window as any).daemon = new MtgaTrackerDaemon(false);
+
   initDirectories();
   if (module.hot && process.env.NODE_ENV === "development") {
     module.hot.accept();

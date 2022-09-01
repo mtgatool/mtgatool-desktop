@@ -23,6 +23,11 @@
     background-size: auto 210px;
   }
 
+  @media screen and (max-width: 600px) {
+    width: 140px;
+    height: 110px;
+  }
+
   .archive-icon-container {
     @include animated;
     position: absolute;
@@ -51,6 +56,10 @@
     height: 46%;
     justify-content: space-between;
 
+    @media screen and (max-width: 600px) {
+      height: 70%;
+    }
+
     .decks-table-deck-item {
       margin: 2px 0;
       display: flex;
@@ -58,6 +67,10 @@
       text-align: center;
       text-overflow: ellipsis;
       white-space: pre;
+
+      @media screen and (max-width: 600px) {
+        margin: 2px 0 0 0;
+      }
     }
 
     .time {
@@ -72,12 +85,42 @@
   }
 }
 
+.decks-table-controls {
+  margin: 16px 0;
+  flex-direction: column;
+
+  @media screen and (max-width: 600px) {
+    .control-colors,
+    .control-name {
+      display: none;
+      grid-area: none !important;
+    }
+
+    .control-lastUsed {
+      grid-area: 1 / 1 / 1 / 2 !important;
+    }
+    
+    .control-winrate {
+      grid-area: 1 / 2 / 1 / 3 !important;
+    }
+
+    .control-totalGames {
+      grid-area: 1 / 3 / 1 / 4 !important;
+    }
+  }
+}
+
 .decks-table-wrapper {
   display: grid;
   width: 100%;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   grid-auto-rows: 190px;
   margin: 4px 0;
+
+  @media screen and (max-width: 600px) {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-auto-rows: 120px;
+  }
 }
 
 .decks-table-deck-archive {

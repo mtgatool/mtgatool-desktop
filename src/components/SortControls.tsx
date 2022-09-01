@@ -27,7 +27,7 @@ export default function SortControls<T>(props: SortControlsProps<T>) {
       {columnKeys.map((key: keyof T, index) => {
         return (
           <div
-            className="table-head-container"
+            className={`table-head-container control-${key}`}
             key={`table-head-${key}`}
             style={{
               gridArea: `1 / ${index + 1} / 1 / ${index + 2}`,

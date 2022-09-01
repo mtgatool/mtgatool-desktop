@@ -70,7 +70,7 @@ export default function ResultDetails(props: ResultDetailsProps): JSX.Element {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "row", margin: "auto 4px" }}>
+    <div className="result-details">
       <div title={g1Title} style={colStyle}>
         <div className={g1OnThePlay ? "ontheplaytext" : "onthedrawtext"}>
           {g1OnThePlay ? "P" : "D"}

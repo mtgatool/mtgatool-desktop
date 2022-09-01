@@ -35,4 +35,9 @@
 
 .sort-desc {
   transform: rotate(180deg);
+
+  
+  @media screen and (max-width: 600px) {
+    right: 0px !important;
+  }
 }

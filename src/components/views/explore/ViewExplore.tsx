@@ -358,7 +358,7 @@ export default function ViewExplore() {
               </i>
             </Flex>
           </Section>
-          <Section style={{ flexDirection: "column", marginBottom: "16px" }}>
+          <Section className="explore-sort-controls">
             {data ? (
               <>
                 <SortControls<ExploreDeckData>

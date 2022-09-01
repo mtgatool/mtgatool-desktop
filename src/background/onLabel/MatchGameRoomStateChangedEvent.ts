@@ -7,9 +7,11 @@ import {
   MatchGameRoomStateChange,
 } from "mtgatool-shared";
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
+import MtgaTrackerDaemon from "../../daemon/mtgaTrackerDaemon";
 
 import LogEntry from "../../types/logDecoder";
 import getLocalSetting from "../../utils/getLocalSetting";
+
 import actionLog from "../actionLog";
 import saveMatch from "../saveMatch";
 import selectDeck from "../selectDeck";
@@ -26,6 +28,17 @@ import { CombinedRankInfo } from "./InEventGetCombinedRankInfo";
 interface Entry extends LogEntry {
   json: MatchGameRoomStateChange;
 }
+
+const rankClass: Record<number, string> = {
+  "-1": "Unranked",
+  "0": "Beginner",
+  "1": "Bronze",
+  "2": "Silver",
+  "3": "Gold",
+  "4": "Platinum",
+  "5": "Diamond",
+  "6": "Mythic",
+};
 
 export default function onLabelMatchGameRoomStateChangedEvent(
   entry: Entry
@@ -142,6 +155,30 @@ export default function onLabelMatchGameRoomStateChangedEvent(
         ),
       };
       setPlayer(player);
+    }
+
+    if ((window as any).daemon) {
+      ((window as any).daemon as MtgaTrackerDaemon)
+        .getMatchState()
+        .then((state) => {
+          if (state && state.matchId === gameRoom.gameRoomConfig.matchId) {
+            const opponent = {
+              tier: state.opponentRank.tier,
+              rank: rankClass[state.opponentRank.class],
+              percentile: state.opponentRank.mythicPercentile,
+              leaderboardPlace: state.opponentRank.mythicPlacement,
+            };
+            setOpponent(opponent);
+
+            const player = {
+              tier: state.playerRank.tier,
+              rank: rankClass[state.playerRank.class],
+              percentile: state.playerRank.mythicPercentile,
+              leaderboardPlace: state.playerRank.mythicPlacement,
+            };
+            setPlayer(player);
+          }
+        });
     }
 
     setEventId(eventId);

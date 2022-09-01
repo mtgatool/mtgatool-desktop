@@ -225,7 +225,7 @@ export default function DecksList(props: DeckListProps) {
           />
         </Flex>
       </Section>
-      <Section style={{ margin: "16px 0", flexDirection: "column" }}>
+      <Section className="decks-table-controls">
         <SortControls<StatsDeck>
           setSortCallback={(s: Sort<StatsDeck>) => dispatch(setDeckSort(s))}
           defaultSort={sortValue}

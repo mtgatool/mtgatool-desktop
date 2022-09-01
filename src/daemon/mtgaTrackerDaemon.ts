@@ -36,6 +36,28 @@ interface DaemonStatus {
   processId: number | -1;
 }
 
+export interface DaemonMatchState {
+  matchId: string;
+  playerRank: {
+    mythicPercentile: number;
+    mythicPlacement: number;
+    class: number;
+    tier: number;
+  };
+  opponentRank: {
+    mythicPercentile: number;
+    mythicPlacement: number;
+    class: number;
+    tier: number;
+  };
+  elapsedTime: number;
+}
+
+interface DaemonEvents {
+  events: string[];
+  elapsedTime: number;
+}
+
 const os: string = isElectron() ? process.platform : "";
 
 export default class MtgaTrackerDaemon {
@@ -49,10 +71,10 @@ export default class MtgaTrackerDaemon {
 
   private _daemonExecutablePath: string | null = null;
 
-  constructor() {
+  constructor(boot = true) {
     this._url = `http://localhost:${this._port}`;
 
-    if (isElectron() && os === "win32") {
+    if (boot && isElectron() && os === "win32") {
       this.setupDaemon();
     }
   }
@@ -224,6 +246,22 @@ export default class MtgaTrackerDaemon {
       .get<{ updatesAvailable: boolean }>(`${this._url}/checkForUpdates`)
       .then((d) => d.data.updatesAvailable)
       .catch(() => false);
+  }
+
+  public getEvents(): Promise<string[]> {
+    console.log("mtgaTrackerDaemon getEvents()");
+    return axios
+      .get<DaemonEvents>(`${this._url}/events`)
+      .then((d) => d.data.events)
+      .catch(() => []);
+  }
+
+  public getMatchState(): Promise<DaemonMatchState | null> {
+    console.log("mtgaTrackerDaemon getMatchState()");
+    return axios
+      .get<DaemonMatchState>(`${this._url}/matchState`)
+      .then((d) => d.data)
+      .catch(() => null);
   }
 
   public getCards(): Promise<Card[]> {

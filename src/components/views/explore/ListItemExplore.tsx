@@ -130,7 +130,7 @@ export default function ListItemExplore({
         <WildcardsCostPreset showComplete wildcards={wildcards} />
       </Column>
 
-      <Column className="list-item-right">
+      <Column className="list-item-right explore-time">
         <FlexTop style={{ margin: "auto 8px auto auto" }}>
           {getRankBitsAsArray(data.ranks).map((r) => {
             return (
@@ -170,10 +170,7 @@ export default function ListItemExplore({
         </FlexBottom>
       </Column>
 
-      <Column
-        className="list-match-result-score"
-        style={{ width: "120px", textAlign: "right", fontSize: "18px" }}
-      >
+      <Column className="list-match-result-score explore-result">
         <div>
           {data.wins}:{data.losses}
           <span

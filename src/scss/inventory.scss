@@ -40,6 +40,14 @@
   margin: auto 4px;
   background-position: center 4px;
   background-repeat: no-repeat;
+
+  @media screen and (max-width: 600px) {
+    background-position: center 6px;
+    width: 16px;
+    height: 48px;
+    line-height: 72px;
+    background-size: contain;
+  }
 }
 
 .wc-deckstab-cost {
@@ -70,14 +78,20 @@
   font-family: var(--sub-font-name);
   color: var(--color-light);
   width: 40px;
-  line-height: 32px;
-  height: 32px;
   height: 64px;
   line-height: 96px;
   text-align: center;
   background-position: center 2px;
   background-repeat: no-repeat;
   background-image: url(../assets/images/booster.png);
+
+  @media screen and (max-width: 600px) {
+    width: 16px;
+    height: 48px;
+    line-height: 72px;
+    background-position: center 8px;
+    background-size: contain;
+  }
 }
 
 .bo-deckstab-cost {
@@ -98,6 +112,13 @@
   background-position: center;
   background-repeat: no-repeat;
   background-image: url(../assets/images/complete.png);
+
+  @media screen and (max-width: 600px) {
+    width: 16px;
+    height: 48px;
+    line-height: 24px;
+    background-size: contain;
+  }
 }
 
 .wc-common {

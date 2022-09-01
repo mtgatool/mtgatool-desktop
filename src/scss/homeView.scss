@@ -3,3 +3,127 @@
   margin-top: 16px;
   overflow: hidden;
 }
+
+@keyframes loadingAnimation {
+  0% {
+    background-position: 150% 0
+  }
+  100% {
+    background-position: -150% 0
+  }
+}
+
+.ranks-feed-container {
+  display: flex;
+  width: 800px;
+  margin: auto;
+  justify-content: space-between;
+
+  @media screen and (max-width: 950px) {
+    max-width: 100%;
+    min-width: 100%;
+  }
+
+  @media screen and (max-width: 600px) {
+    flex-direction: column;
+  }
+
+  .ranks-feed-column {
+    flex-direction: column;
+    width: calc(50% - 32px);
+    text-align: center;
+
+    @media screen and (max-width: 800px) {
+      width: calc(50% - 8px);
+    }
+
+    @media screen and (max-width: 600px) {
+      width: 100%;
+    }
+
+    h3 {
+      margin: 8px 0 16px 0;
+    }
+
+    .feed-rank-listitem {
+      display: flex;
+      height: 48px;
+      line-height: 48px;
+      margin-bottom: 4px;
+      padding: 4px 12px;
+
+      &.loading {
+        animation-duration: 2s;
+        animation-fill-mode: forwards;
+        animation-iteration-count: infinite;
+        animation-name: loadingAnimation;
+        animation-timing-function: linear;
+        background: linear-gradient(to right, var(--color-dark) 0%, var(--color-shade-25) 20%, var(--color-dark) 40%);
+        background-size: 300% 100%;
+      }
+
+      .rank-avatar {
+        min-width: 32px;
+        min-height: 32px;
+        width: 32px;
+        height: 32px;
+        border-radius: 32px;
+        background-size: contain;
+        margin: auto 0;
+      }
+
+      .rank-name-container {
+        display: flex;
+        flex-direction: column;
+        line-height: 18px;
+        margin: auto 0;
+        width: 100%;
+        text-align: left;
+        text-indent: 16px;
+        font-size: 16px !important;
+        overflow: hidden;
+
+        .rank-name {
+          text-overflow: ellipsis;
+          white-space: pre;
+          overflow: hidden;
+        }
+
+        .rank-time {
+          text-overflow: ellipsis;
+          white-space: pre;
+          overflow: hidden;
+          color: var(--color-text-disabled);
+          font-family: var(--main-font-name-it);
+        }
+      }
+
+      @media screen and (max-width: 750px) {
+        .constructed-rank {
+          scale: 0.75;
+        }
+        .limited-rank {
+          scale: 0.75;
+        }
+      }
+
+      .rank-icon {
+        display: flex;
+
+        .rank-position {
+                  
+          @media screen and (max-width: 600px) {
+            font-size: 12px !important;
+          }
+          
+          margin: 0 8px;
+          color: var(--color-text-dark);
+        }
+      }
+
+      .rank-bullets {
+        display: none;
+      }
+    }
+  }
+}
