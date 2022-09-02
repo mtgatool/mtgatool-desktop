@@ -44,14 +44,13 @@ export interface ExploreTempCardData {
 export interface ExploreCardData {
   id: number;
   name: string;
-  winrate: Winrate;
-  initHandWinrate: Winrate;
-  sideInWinrate: Winrate;
-  sideOutWinrate: Winrate;
+  winrate: number;
+  initHandWinrate: number;
+  sideInWinrate: number;
+  sideOutWinrate: number;
   ranks: number;
   mulligans: number;
   avgQuantity: number;
-  avgTurn: number;
   avgTurnUsed: number;
   avgFirstTurn: number;
 }
@@ -203,6 +202,11 @@ export default function doExploreAggregation(allData: DbMatch[]) {
         data.name = playerDeck.name;
         data.tile = playerDeck.deckTileId;
         data.deck = playerDeck.mainDeck.map((c) => {
+          // add to cards quantities
+          const name = database.card(c.id)?.name || "";
+          if (!tempCards[name]) tempCards[name] = newCardWinrate(c.id);
+          tempCards[name].quantities.push(c.quantity);
+
           // eslint-disable-next-line no-param-reassign
           if (c.measurable) delete c.measurable;
           return c;
@@ -210,6 +214,11 @@ export default function doExploreAggregation(allData: DbMatch[]) {
       }
       if (playerDeck?.sideboard) {
         data.side = playerDeck.sideboard.map((c) => {
+          // add to cards quantities
+          const name = database.card(c.id)?.name || "";
+          if (!tempCards[name]) tempCards[name] = newCardWinrate(c.id);
+          tempCards[name].quantities.push(c.quantity);
+
           // eslint-disable-next-line no-param-reassign
           if (c.measurable) delete c.measurable;
           return c;
@@ -275,11 +284,14 @@ export default function doExploreAggregation(allData: DbMatch[]) {
           game.cardsCast?.forEach((cardCast) => {
             const { grpId, player, turn } = cardCast;
 
-            // Only if we casted it
+            const cardName = database.card(grpId)?.name || "";
+
+            // Only if we cast it
             if (player == playerSeat) {
               // define
-              if (!tempCards[grpId]) tempCards[grpId] = newCardWinrate(grpId);
-              const cardData = tempCards[grpId];
+              if (!tempCards[cardName])
+                tempCards[cardName] = newCardWinrate(grpId);
+              const cardData = tempCards[cardName];
               // Only once per card cast!
               if (!gameCards.includes(grpId)) {
                 cardData.turnsFirstUsed.push(Math.ceil(turn / 2));
@@ -305,18 +317,18 @@ export default function doExploreAggregation(allData: DbMatch[]) {
             // Initial hand
             if (hand) {
               if (index == game.handsDrawn.length - 1) {
-                hand.forEach((grpId) => {
+                hand.forEach((gid) => {
+                  const name = database.card(gid)?.name || "";
                   // define
-                  if (!tempCards[grpId])
-                    tempCards[grpId] = newCardWinrate(grpId);
-                  tempCards[grpId].initHandWinrate.wins += wins;
-                  tempCards[grpId].initHandWinrate.losses += losses;
+                  if (!tempCards[name]) tempCards[name] = newCardWinrate(gid);
+                  tempCards[name].initHandWinrate.wins += wins;
+                  tempCards[name].initHandWinrate.losses += losses;
                 });
               } else {
-                hand.forEach((grpId) => {
-                  if (!tempCards[grpId])
-                    tempCards[grpId] = newCardWinrate(grpId);
-                  tempCards[grpId].mulligans += 1;
+                hand.forEach((gid) => {
+                  const name = database.card(gid)?.name || "";
+                  if (!tempCards[name]) tempCards[name] = newCardWinrate(gid);
+                  tempCards[name].mulligans += 1;
                 });
               }
             }
@@ -326,24 +338,26 @@ export default function doExploreAggregation(allData: DbMatch[]) {
           addDelta = [...addDelta, ...(game.sideboardChanges?.added || [])];
           remDelta = [...remDelta, ...(game.sideboardChanges?.removed || [])];
 
-          addDelta.forEach((grpId) => {
+          addDelta.forEach((gid) => {
+            const name = database.card(gid)?.name || "";
             // define
-            if (!tempCards[grpId]) tempCards[grpId] = newCardWinrate(grpId);
-            // tempCards[grpId].sidedIn += 1;
+            if (!tempCards[name]) tempCards[name] = newCardWinrate(gid);
+            // tempCards[name].sidedIn += 1;
             // Only add if the card was used
-            if (gameCards.includes(grpId)) {
-              tempCards[grpId].sideInWinrate.wins += wins;
-              tempCards[grpId].sideInWinrate.losses += losses;
+            if (gameCards.includes(gid)) {
+              tempCards[name].sideInWinrate.wins += wins;
+              tempCards[name].sideInWinrate.losses += losses;
             }
           });
-          remDelta.forEach((grpId) => {
+          remDelta.forEach((gid) => {
+            const name = database.card(gid)?.name || "";
             // define
-            if (!tempCards[grpId]) tempCards[grpId] = newCardWinrate(grpId);
-            // winrates[grpId].sidedOut += 1;
+            if (!tempCards[name]) tempCards[name] = newCardWinrate(gid);
+            // winrates[name].sidedOut += 1;
             // Only add if the card was not used
-            if (!gameCards.includes(grpId)) {
-              tempCards[grpId].sideOutWinrate.wins += wins;
-              tempCards[grpId].sideOutWinrate.losses += losses;
+            if (!gameCards.includes(gid)) {
+              tempCards[name].sideOutWinrate.wins += wins;
+              tempCards[name].sideOutWinrate.losses += losses;
             }
           });
         }
@@ -371,22 +385,56 @@ export default function doExploreAggregation(allData: DbMatch[]) {
     // }
   });
 
-  aggregated.cards = Object.values(tempCards).map(temp => {
-    return {
-      id: temp.cardObj?.id || 0,
-      name: temp.cardObj?.name || "";
-      winrate: getWinrateValue(temp.winrate.wins, temp.winrate.losses),
-      initHandWinrate: getWinrateValue(temp.initHandWinrate.wins, temp.initHandWinrate.losses),
-      sideInWinrate: getWinrateValue(temp.sideInWinrate.wins, temp.sideInWinrate.losses),
-      sideOutWinrate: getWinrateValue(temp.sideOutWinrate.wins, temp.sideOutWinrate.losses),
-      ranks: temp.ranks,
-      mulligans: temp.mulligans,
-      avgQuantity: temp.quantities,
-      avgTurn: 0,
-      avgTurnUsed: 0,
-      avgFirstTurn: 0,
-    }
-  })
+  aggregated.cards = Object.values(tempCards)
+    .filter((t) => {
+      return (
+        t.cardObj &&
+        t.cardObj?.name !== "Plains" &&
+        t.cardObj?.name !== "Island" &&
+        t.cardObj?.name !== "Swamp" &&
+        t.cardObj?.name !== "Mountain" &&
+        t.cardObj?.name !== "Forest" &&
+        t.winrate.wins + t.winrate.losses > 5
+      );
+    })
+    .map((temp) => {
+      return {
+        id: temp.cardObj?.id || 0,
+        name: temp.cardObj?.name || "",
+        winrate: getWinrateValue(temp.winrate.wins, temp.winrate.losses),
+        initHandWinrate: getWinrateValue(
+          temp.initHandWinrate.wins,
+          temp.initHandWinrate.losses
+        ),
+        sideInWinrate: getWinrateValue(
+          temp.sideInWinrate.wins,
+          temp.sideInWinrate.losses
+        ),
+        sideOutWinrate: getWinrateValue(
+          temp.sideOutWinrate.wins,
+          temp.sideOutWinrate.losses
+        ),
+        ranks: temp.ranks,
+        mulligans: temp.mulligans,
+        avgQuantity:
+          temp.quantities.length > 0
+            ? temp.quantities.reduce((acc, c) => acc + c, 0) /
+              temp.quantities.length
+            : 1,
+        avgTurnUsed:
+          temp.turnsUsed.length > 0
+            ? temp.turnsUsed.reduce((acc, c) => acc + c, 0) /
+              temp.turnsUsed.length
+            : 0,
+        avgFirstTurn:
+          temp.turnsFirstUsed.length > 0
+            ? temp.turnsFirstUsed.reduce((acc, c) => acc + c, 0) /
+              temp.turnsFirstUsed.length
+            : 0,
+      };
+    });
 
+  console.log("tempCards", tempCards);
+  console.log("aggregated", aggregated.cards);
   return aggregated;
 }
