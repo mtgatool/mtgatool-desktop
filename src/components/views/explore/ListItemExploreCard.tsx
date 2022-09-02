@@ -22,7 +22,10 @@ export default function ListItemExploreCard(props: ListItemExploreCardProps) {
           showWildcards={false}
           card={cardObj}
           key={`explore-card-list-${data.id}`}
-          quantity={{ type: "NUMBER", quantity: data.avgQuantity }}
+          quantity={{
+            type: "NUMBER",
+            quantity: Math.round(Math.max(1, data.avgQuantity)),
+          }}
         />
       </div>
       <div

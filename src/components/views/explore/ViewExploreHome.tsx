@@ -23,7 +23,6 @@ export default function ViewExploreHome() {
 
   useEffect(() => {
     const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
-
     const finalEventList: string[] = [];
 
     async function queryDayKeys(day: number): Promise<string[]> {

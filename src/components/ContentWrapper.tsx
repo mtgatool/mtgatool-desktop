@@ -36,6 +36,7 @@ import {
 import doHistoryFilter from "../utils/tables/doHistoryFilter";
 import isElectron from "../utils/electron/isElectron";
 import getPopupClass from "../utils/getPopupClass";
+import ViewExploreAggregator from "./views/explore/ViewExploreAggregator";
 
 const views = {
   home: ViewHome,
@@ -46,6 +47,7 @@ const views = {
   match: ViewLiveMatch,
   explore: ViewExplore,
   collection: ViewCollection,
+  aggregator: ViewExploreAggregator,
 };
 
 function delay(transition: any, timeout: number): any {
