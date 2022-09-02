@@ -161,6 +161,7 @@ export default function ExploreDeckView(
       <div
         className="decks-top"
         style={{
+          marginTop: "0px",
           backgroundImage: data
             ? `url(${getCardArtCrop(data.tile || DEFAULT_TILE)})`
             : "",

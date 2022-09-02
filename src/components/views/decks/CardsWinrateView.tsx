@@ -20,10 +20,7 @@ import CardTile from "../../CardTile";
 import { CardWinrateData, StatsDeck } from "../../../types/dbTypes";
 import { AggregatedStats } from "../../../utils/aggregateStats";
 import Select from "../../ui/Select";
-
-function getWinrateValue(wins: number, losses: number): number {
-  return wins + losses == 0 ? -1 : Math.round((100 / (wins + losses)) * wins);
-}
+import getWinrateValue from "../../../utils/getWinrateValue";
 
 function sortByLastUsed(a: StatsDeck, b: StatsDeck) {
   if (a.lastUsed > b.lastUsed) return -1;

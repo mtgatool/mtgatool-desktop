@@ -1,9 +1,10 @@
 /* eslint-disable no-bitwise */
 /* eslint-disable radix */
-import { Colors, database, v2cardsList } from "mtgatool-shared";
+import { Colors, database, DbCardData, v2cardsList } from "mtgatool-shared";
 import { DEFAULT_TILE } from "mtgatool-shared/dist/shared/constants";
 import { DbMatch } from "../../../types/dbTypes";
 import { Winrate } from "../../../utils/aggregateStats";
+import getWinrateValue from "../../../utils/getWinrateValue";
 import getRankFilterVal from "../history/getRankFilterVal";
 
 export interface ExploreDeckData {
@@ -25,6 +26,48 @@ export interface ExploreDeckData {
   side: v2cardsList;
   name: string;
   tile: number;
+}
+
+export interface ExploreTempCardData {
+  cardObj?: DbCardData;
+  winrate: Winrate;
+  initHandWinrate: Winrate;
+  sideInWinrate: Winrate;
+  sideOutWinrate: Winrate;
+  ranks: number;
+  quantities: number[];
+  mulligans: number;
+  turnsUsed: number[];
+  turnsFirstUsed: number[];
+}
+
+export interface ExploreCardData {
+  id: number;
+  name: string;
+  winrate: number;
+  initHandWinrate: number;
+  sideInWinrate: number;
+  sideOutWinrate: number;
+  ranks: number;
+  mulligans: number;
+  avgQuantity: number;
+  avgTurnUsed: number;
+  avgFirstTurn: number;
+}
+
+function newCardWinrate(grpId: number): ExploreTempCardData {
+  return {
+    cardObj: database.card(grpId),
+    winrate: { wins: 0, losses: 0 },
+    initHandWinrate: { wins: 0, losses: 0 },
+    sideInWinrate: { wins: 0, losses: 0 },
+    sideOutWinrate: { wins: 0, losses: 0 },
+    ranks: 0,
+    quantities: [],
+    mulligans: 0,
+    turnsUsed: [],
+    turnsFirstUsed: [],
+  };
 }
 
 function newDefaultExploreData(): ExploreDeckData {
@@ -53,9 +96,11 @@ function newDefaultExploreData(): ExploreDeckData {
 export interface DbExploreAggregated {
   aggregator: string;
   eventId: string;
+  custom: boolean;
   from: number;
   to: number;
   entries: number;
+  cards: ExploreCardData[];
   data: Record<string, ExploreDeckData>;
 }
 
@@ -88,12 +133,16 @@ export function limitRecord(
 export default function doExploreAggregation(allData: DbMatch[]) {
   // console.log(allData);
 
+  const tempCards: Record<string, ExploreTempCardData> = {};
+
   const aggregated: DbExploreAggregated = {
     aggregator: window.toolDb.user?.pubKey || "",
     eventId: allData[0]?.eventId || "",
+    custom: false,
     from: new Date().getTime(),
     to: new Date().getTime(),
     entries: 0,
+    cards: [],
     data: {} as Record<string, ExploreDeckData>,
   };
 
@@ -155,6 +204,11 @@ export default function doExploreAggregation(allData: DbMatch[]) {
         data.name = playerDeck.name;
         data.tile = playerDeck.deckTileId;
         data.deck = playerDeck.mainDeck.map((c) => {
+          // add to cards quantities
+          const name = database.card(c.id)?.name || "";
+          if (!tempCards[name]) tempCards[name] = newCardWinrate(c.id);
+          tempCards[name].quantities.push(c.quantity);
+
           // eslint-disable-next-line no-param-reassign
           if (c.measurable) delete c.measurable;
           return c;
@@ -162,6 +216,11 @@ export default function doExploreAggregation(allData: DbMatch[]) {
       }
       if (playerDeck?.sideboard) {
         data.side = playerDeck.sideboard.map((c) => {
+          // add to cards quantities
+          const name = database.card(c.id)?.name || "";
+          if (!tempCards[name]) tempCards[name] = newCardWinrate(c.id);
+          tempCards[name].quantities.push(c.quantity);
+
           // eslint-disable-next-line no-param-reassign
           if (c.measurable) delete c.measurable;
           return c;
@@ -207,6 +266,9 @@ export default function doExploreAggregation(allData: DbMatch[]) {
         });
       }
 
+      let addDelta: number[] = [];
+      let remDelta: number[] = [];
+
       Object.keys(match.internalMatch.gameStats).forEach((gameNum) => {
         const game = match.internalMatch.gameStats[parseInt(gameNum)];
 
@@ -216,6 +278,90 @@ export default function doExploreAggregation(allData: DbMatch[]) {
           } else {
             data.gLosses += 1;
           }
+
+          const gameCards: number[] = [];
+          const wins = game.winner === playerSeat ? 1 : 0;
+          const losses = game.winner === playerSeat ? 0 : 1;
+          // For each card cast
+          game.cardsCast?.forEach((cardCast) => {
+            const { grpId, player, turn } = cardCast;
+
+            const cardName = database.card(grpId)?.name || "";
+
+            // Only if we cast it
+            if (player == playerSeat) {
+              // define
+              if (!tempCards[cardName])
+                tempCards[cardName] = newCardWinrate(grpId);
+              const cardData = tempCards[cardName];
+              // Only once per card cast!
+              if (!gameCards.includes(grpId)) {
+                cardData.turnsFirstUsed.push(Math.ceil(turn / 2));
+                cardData.winrate.wins += wins;
+                cardData.winrate.losses += losses;
+
+                // if (!cardData.colors[oColorBits]) {
+                //   cardData.colors[oColorBits] = {
+                //     wins: 0,
+                //     losses: 0,
+                //   };
+                // }
+                // cardData.colors[oColorBits].wins += wins;
+                // cardData.colors[oColorBits].losses += losses;
+                gameCards.push(grpId);
+              }
+              // Do this for every card cast in the game
+              cardData.turnsUsed.push(Math.ceil(turn / 2));
+            }
+          });
+
+          game.handsDrawn?.forEach((hand, index) => {
+            // Initial hand
+            if (hand) {
+              if (index == game.handsDrawn.length - 1) {
+                hand.forEach((gid) => {
+                  const name = database.card(gid)?.name || "";
+                  // define
+                  if (!tempCards[name]) tempCards[name] = newCardWinrate(gid);
+                  tempCards[name].initHandWinrate.wins += wins;
+                  tempCards[name].initHandWinrate.losses += losses;
+                });
+              } else {
+                hand.forEach((gid) => {
+                  const name = database.card(gid)?.name || "";
+                  if (!tempCards[name]) tempCards[name] = newCardWinrate(gid);
+                  tempCards[name].mulligans += 1;
+                });
+              }
+            }
+          });
+
+          // Add the previos changes to the current ones
+          addDelta = [...addDelta, ...(game.sideboardChanges?.added || [])];
+          remDelta = [...remDelta, ...(game.sideboardChanges?.removed || [])];
+
+          addDelta.forEach((gid) => {
+            const name = database.card(gid)?.name || "";
+            // define
+            if (!tempCards[name]) tempCards[name] = newCardWinrate(gid);
+            // tempCards[name].sidedIn += 1;
+            // Only add if the card was used
+            if (gameCards.includes(gid)) {
+              tempCards[name].sideInWinrate.wins += wins;
+              tempCards[name].sideInWinrate.losses += losses;
+            }
+          });
+          remDelta.forEach((gid) => {
+            const name = database.card(gid)?.name || "";
+            // define
+            if (!tempCards[name]) tempCards[name] = newCardWinrate(gid);
+            // winrates[name].sidedOut += 1;
+            // Only add if the card was not used
+            if (!gameCards.includes(gid)) {
+              tempCards[name].sideOutWinrate.wins += wins;
+              tempCards[name].sideOutWinrate.losses += losses;
+            }
+          });
         }
       });
     }
@@ -241,5 +387,56 @@ export default function doExploreAggregation(allData: DbMatch[]) {
     // }
   });
 
+  aggregated.cards = Object.values(tempCards)
+    .filter((t) => {
+      return (
+        t.cardObj &&
+        t.cardObj?.name !== "Plains" &&
+        t.cardObj?.name !== "Island" &&
+        t.cardObj?.name !== "Swamp" &&
+        t.cardObj?.name !== "Mountain" &&
+        t.cardObj?.name !== "Forest" &&
+        t.winrate.wins + t.winrate.losses > 5
+      );
+    })
+    .map((temp) => {
+      return {
+        id: temp.cardObj?.id || 0,
+        name: temp.cardObj?.name || "",
+        winrate: getWinrateValue(temp.winrate.wins, temp.winrate.losses),
+        initHandWinrate: getWinrateValue(
+          temp.initHandWinrate.wins,
+          temp.initHandWinrate.losses
+        ),
+        sideInWinrate: getWinrateValue(
+          temp.sideInWinrate.wins,
+          temp.sideInWinrate.losses
+        ),
+        sideOutWinrate: getWinrateValue(
+          temp.sideOutWinrate.wins,
+          temp.sideOutWinrate.losses
+        ),
+        ranks: temp.ranks,
+        mulligans: temp.mulligans,
+        avgQuantity:
+          temp.quantities.length > 0
+            ? temp.quantities.reduce((acc, c) => acc + c, 0) /
+              temp.quantities.length
+            : 1,
+        avgTurnUsed:
+          temp.turnsUsed.length > 0
+            ? temp.turnsUsed.reduce((acc, c) => acc + c, 0) /
+              temp.turnsUsed.length
+            : 0,
+        avgFirstTurn:
+          temp.turnsFirstUsed.length > 0
+            ? temp.turnsFirstUsed.reduce((acc, c) => acc + c, 0) /
+              temp.turnsFirstUsed.length
+            : 0,
+      };
+    });
+
+  console.log("tempCards", tempCards);
+  console.log("aggregated", aggregated.cards);
   return aggregated;
 }

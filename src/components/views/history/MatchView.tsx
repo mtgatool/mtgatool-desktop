@@ -9,7 +9,6 @@ import { useHistory, useParams } from "react-router-dom";
 import {
   CardsList,
   Deck,
-  getEventPrettyName,
   MatchGameStats,
   compareCards,
   database,
@@ -38,6 +37,7 @@ import ActionLog from "../../ActionLog";
 import { DbMatch } from "../../../types/dbTypes";
 import isLimitedEventId from "../../../utils/isLimitedEventId";
 import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
+import getEventPrettyName from "../../../utils/getEventPrettyName";
 
 interface GameStatsProps {
   game: MatchGameStats;

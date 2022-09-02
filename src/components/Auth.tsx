@@ -347,7 +347,7 @@ export default function Auth(props: AuthProps) {
 
   return (
     <>
-      <div
+      {/* <div
         style={{
           width: "100%",
           color: "var(--color-w)",
@@ -371,7 +371,7 @@ export default function Auth(props: AuthProps) {
           Due to an api protocol and storage upgrade in v6.1.0 all users will
           have to sign up again, sorry for the inconvenience! -Manwë
         </div>
-      </div>
+      </div> */}
       <PopupComponent
         open={false}
         width="calc(100% - 32px)"
