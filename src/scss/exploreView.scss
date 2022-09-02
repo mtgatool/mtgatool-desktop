@@ -158,12 +158,20 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+
+  @media screen and (max-width: 750px) {
+    flex-direction: column;
+  }
 }
 
 .mosaic-column {
   display: flex;
   flex-direction: column;
   width: calc(50% - 8px);
+
+  @media screen and (max-width: 750px) {
+    width: auto;
+  }
 }
 
 .explore-event-list {
@@ -171,37 +179,37 @@
   display: flex;
   min-height: 64px;
   height: 64px;
-  width: calc(100% - 12px);
+  width: calc(100% - 8px);
   color: var(--color-text);
   background-color: var(--color-base);
   border-radius: 4px;
   text-indent: 12px;
   margin-bottom: 8px;
 
-  border-left: 12px solid var(--color-c);
+  border-left: 8px solid var(--color-c);
 
   &.Custom {
-    border-left: 12px solid var(--color-m);
+    border-left: 8px solid var(--color-m);
   }
 
   &.Ranked {
-    border-left: 12px solid var(--color-r);
+    border-left: 8px solid var(--color-r);
   }
 
   &.Constructed {
-    border-left: 12px solid var(--color-u);
+    border-left: 8px solid var(--color-u);
   }
 
   &.Limited {
-    border-left: 12px solid var(--color-g);
+    border-left: 8px solid var(--color-g);
   }
 
   &.Play {
-    border-left: 12px solid var(--color-w);
+    border-left: 8px solid var(--color-w);
   }
 
   &.Other {
-    border-left: 12px solid var(--color-b);
+    border-left: 8px solid var(--color-b);
   }
 
   &:hover:not(.loading) {

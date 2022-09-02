@@ -48,7 +48,7 @@ export default function ViewExploreHome() {
   });
 
   return (
-    <Section style={{ margin: "16px 0", flexDirection: "column" }}>
+    <Section style={{ margin: "16px 0 32px 0", flexDirection: "column" }}>
       <h2 style={{ textAlign: "center" }}>Explore Events</h2>
       <Flex
         style={{
