@@ -96,6 +96,7 @@ function newDefaultExploreData(): ExploreDeckData {
 export interface DbExploreAggregated {
   aggregator: string;
   eventId: string;
+  custom: boolean;
   from: number;
   to: number;
   entries: number;
@@ -137,6 +138,7 @@ export default function doExploreAggregation(allData: DbMatch[]) {
   const aggregated: DbExploreAggregated = {
     aggregator: window.toolDb.user?.pubKey || "",
     eventId: allData[0]?.eventId || "",
+    custom: false,
     from: new Date().getTime(),
     to: new Date().getTime(),
     entries: 0,

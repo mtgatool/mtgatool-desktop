@@ -2,7 +2,7 @@
 
 import { MutableRefObject, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getEventPrettyName } from "mtgatool-shared";
+
 import SvgButton from "../SvgButton";
 import { AppState } from "../../redux/stores/rendererStore";
 import { ReactComponent as StatsIcon } from "../../assets/images/svg/stats.svg";
@@ -15,6 +15,7 @@ import {
 import InputContainer from "../InputContainer";
 import Section from "./Section";
 import Select from "./Select";
+import getEventPrettyName from "../../utils/getEventPrettyName";
 
 interface FilterSectionProps {
   openHistoryStatsPopup: () => void;

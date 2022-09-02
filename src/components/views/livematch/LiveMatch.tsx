@@ -1,4 +1,4 @@
-import { Deck, getEventPrettyName } from "mtgatool-shared";
+import { Deck } from "mtgatool-shared";
 
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -21,6 +21,7 @@ import SvgButton from "../../SvgButton";
 import Section from "../../ui/Section";
 import LiveMatchDeckList from "./LiveMatchDeckList";
 import ManaCost from "../../ManaCost";
+import getEventPrettyName from "../../../utils/getEventPrettyName";
 
 export default function LiveMatch() {
   const history = useHistory();

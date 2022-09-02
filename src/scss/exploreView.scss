@@ -141,10 +141,150 @@
   display: grid;
   grid-template-columns: minmax(auto, 320px) 1fr 1fr 1fr 1fr 1fr 1fr;
 
-  .card-winrate, .card-firsthand, .card-sidedin, .card-sidedout, .card-avgturn, .card-avgfirst {
+  .card-winrate,
+  .card-firsthand,
+  .card-sidedin,
+  .card-sidedout,
+  .card-avgturn,
+  .card-avgfirst {
     text-align: center;
     font-size: 14px;
     line-height: 32px;
     border-right: 1px solid var(--color-section-hover);
+  }
+}
+
+.explore-events-mosaic {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.mosaic-column {
+  display: flex;
+  flex-direction: column;
+  width: calc(50% - 8px);
+}
+
+.explore-event-list {
+  flex: 1;
+  display: flex;
+  min-height: 64px;
+  height: 64px;
+  width: calc(100% - 12px);
+  color: var(--color-text);
+  background-color: var(--color-base);
+  border-radius: 4px;
+  text-indent: 12px;
+  margin-bottom: 8px;
+
+  border-left: 12px solid var(--color-c);
+
+  &.Custom {
+    border-left: 12px solid var(--color-m);
+  }
+
+  &.Ranked {
+    border-left: 12px solid var(--color-r);
+  }
+
+  &.Constructed {
+    border-left: 12px solid var(--color-u);
+  }
+
+  &.Limited {
+    border-left: 12px solid var(--color-g);
+  }
+
+  &.Play {
+    border-left: 12px solid var(--color-w);
+  }
+
+  &.Other {
+    border-left: 12px solid var(--color-b);
+  }
+
+  &:hover:not(.loading) {
+    cursor: pointer;
+    color: var(--color-text-hover);
+    background-color: var(--color-line-sep);
+  }
+
+  .event-name {
+    display: flex;
+    flex-direction: column;
+    height: 52px;
+    margin: auto 0;
+
+    .evid {
+      line-height: 26px;
+      text-overflow: ellipsis;
+      white-space: pre;
+      overflow: hidden;
+      font-family: var(--main-font-name);
+
+      &.loading {
+        width: 200px;
+        height: 20px;
+        border-radius: 3px;
+        background-color: var(--color-section);
+        color: var(--color-section);
+        margin-left: 8px;
+        margin-top: auto;
+        margin-bottom: 4px;
+      }
+    }
+
+    .time {
+      line-height: 26px;
+      text-overflow: ellipsis;
+      white-space: pre;
+      overflow: hidden;
+      color: var(--color-text-disabled);
+      font-family: var(--main-font-name-it);
+
+      &.loading {
+        width: 160px;
+        height: 20px;
+        border-radius: 3px;
+        background-color: var(--color-section);
+        color: var(--color-section);
+        margin-left: 8px;
+        margin-top: 4px;
+        margin-bottom: auto;
+      }
+    }
+  }
+
+  .name-container {
+    line-height: 64px;
+    display: flex;
+    margin-left: auto;
+
+    .name {
+      font-size: 14px;
+      line-height: 64px;
+      text-align: right;
+      font-family: var(--main-font-name-it);
+
+      &.loading {
+        width: 100px;
+        border-radius: 3px;
+        height: 16px;
+        margin: auto 0;
+        background-color: var(--color-section);
+        color: var(--color-section);
+        margin-left: 8px;
+      }
+    }
+
+    .avatar {
+      background-color: var(--color-section);
+      margin: auto 8px;
+      border-radius: 24px;
+      background-size: cover;
+      width: 24px;
+      height: 24px;
+    }
   }
 }

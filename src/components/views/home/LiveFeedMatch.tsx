@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { Colors, constants, getEventPrettyName } from "mtgatool-shared";
+import { Colors, constants } from "mtgatool-shared";
 
 import {
   Column,
@@ -17,6 +17,7 @@ import timeAgo from "../../../utils/timeAgo";
 import RankIcon from "../../RankIcon";
 import isLimitedEventId from "../../../utils/isLimitedEventId";
 import { MatchData } from "../history/getMatchesData";
+import getEventPrettyName from "../../../utils/getEventPrettyName";
 
 const { DEFAULT_TILE } = constants;
 

@@ -4,7 +4,6 @@ import { useHistory } from "react-router-dom";
 import Automerge from "automerge";
 import { base64ToBinaryDocument } from "mtgatool-db";
 
-import { getEventPrettyName } from "mtgatool-shared";
 import Button from "../../ui/Button";
 import { DbMatch } from "../../../types/dbTypes";
 import doExploreAggregation, {
@@ -14,6 +13,7 @@ import Select from "../../ui/Select";
 import Flex from "../../Flex";
 import transformEventsList from "./transformEventsList";
 import Section from "../../ui/Section";
+import getEventPrettyName from "../../../utils/getEventPrettyName";
 
 /**
  * Aggregates data into explore
@@ -91,11 +91,52 @@ export default function ViewExploreAggregator() {
       data.current = {};
       setIsOk(false);
       setQueriedIds(null);
-      for (let i = 0; i < _day; i += 1) {
-        const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
-        const queryKey = `explore-${currentDay - i}-${_eventId}`;
-        window.toolDb.addKeyListener(queryKey, handleExploreData);
-        window.toolDb.subscribeData(queryKey);
+
+      function queryForEvent(ev: string) {
+        for (let i = 0; i < _day; i += 1) {
+          const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
+          const queryKey = `explore-${currentDay - i}-${ev}`;
+          window.toolDb.addKeyListener(queryKey, handleExploreData);
+          window.toolDb.subscribeData(queryKey);
+        }
+      }
+
+      if (_eventId === "aggregated-standard") {
+        queryForEvent("Ladder");
+        queryForEvent("Play");
+        queryForEvent("Constructed_BestOf3");
+        queryForEvent("Constructed_Event_2020");
+        queryForEvent("Constructed_Event_2021");
+        queryForEvent("Constructed_Event_v2");
+        queryForEvent("Traditional_Cons_Event_2020");
+        queryForEvent("Traditional_Cons_Event_2021");
+        queryForEvent("Traditional_Cons_Event_2022");
+        queryForEvent("Traditional_Ladder");
+      } else if (_eventId === "aggregated-historic") {
+        queryForEvent("Historic_Ladder");
+        queryForEvent("Historic_Play");
+        queryForEvent("Historic_Event_v2");
+        queryForEvent("Historic_Event");
+        queryForEvent("Traditional_Historic_Event");
+        queryForEvent("Traditional_Historic_Play");
+        queryForEvent("Traditional_Historic_Ladder");
+      } else if (_eventId === "aggregated-alchemy") {
+        queryForEvent("Alchemy_Ladder");
+        queryForEvent("Alchemy_Play");
+        queryForEvent("Alchemy_Event");
+        queryForEvent("Traditional_Alchemy_Event");
+        queryForEvent("Traditional_Alchemy_Event_2022");
+        queryForEvent("Traditional_Alchemy_Play");
+        queryForEvent("Traditional_Alchemy_Ladder");
+      } else if (_eventId === "aggregated-explorer") {
+        queryForEvent("Explorer_Ladder");
+        queryForEvent("Explorer_Play");
+        queryForEvent("Explorer_Event");
+        queryForEvent("Explorer_Event_v2");
+        queryForEvent("Traditional_Explorer_Event");
+        queryForEvent("Traditional_Explorer_Ladder");
+      } else {
+        queryForEvent(_eventId);
       }
     },
     [handleExploreData]

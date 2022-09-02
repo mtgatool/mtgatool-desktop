@@ -2,7 +2,6 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/jsx-props-no-spreading */
 
-import { getEventPrettyName } from "mtgatool-shared";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
@@ -10,6 +9,7 @@ import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
 
 import { AppState } from "../../../redux/stores/rendererStore";
+import getEventPrettyName from "../../../utils/getEventPrettyName";
 
 import Flex from "../../Flex";
 import Button from "../../ui/Button";

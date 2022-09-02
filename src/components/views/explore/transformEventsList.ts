@@ -25,6 +25,11 @@ export default function transformEventsList(eventsList: string[]) {
   });
 
   transformedEvents = [
+    "%%Aggregated",
+    "aggregated-standard",
+    "aggregated-historic",
+    "aggregated-alchemy",
+    "aggregated-explorer",
     "%%Ranked",
     "Ladder",
     "Alchemy_Ladder",
