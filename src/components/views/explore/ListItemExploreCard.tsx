@@ -1,5 +1,6 @@
 import { database } from "mtgatool-shared";
 import getWinrateClass from "../../../utils/getWinrateClass";
+
 import CardTile from "../../CardTile";
 import { ExploreCardData } from "./doExploreAggregation";
 
@@ -30,6 +31,7 @@ export default function ListItemExploreCard(props: ListItemExploreCardProps) {
       </div>
       <div
         className={`card-winrate ${getWinrateClass(data.winrate / 100, true)}`}
+        title={`${data.total} matches`}
       >
         {data.winrate === -1 ? "-" : `${data.winrate}%`}
       </div>
@@ -38,6 +40,7 @@ export default function ListItemExploreCard(props: ListItemExploreCardProps) {
           data.initHandWinrate / 100,
           true
         )}`}
+        title={`${data.initHandTotal} matches`}
       >
         {data.initHandWinrate === -1 ? "-" : `${data.initHandWinrate}%`}
       </div>
@@ -46,6 +49,7 @@ export default function ListItemExploreCard(props: ListItemExploreCardProps) {
           data.sideInWinrate / 100,
           true
         )}`}
+        title={`${data.sideInTotal} matches`}
       >
         {data.sideInWinrate === -1 ? "-" : `${data.sideInWinrate}%`}
       </div>
@@ -54,6 +58,7 @@ export default function ListItemExploreCard(props: ListItemExploreCardProps) {
           data.sideOutWinrate / 100,
           true
         )}`}
+        title={`${data.sideOutTotal} matches`}
       >
         {data.sideOutWinrate === -1 ? "-" : `${data.sideOutWinrate}%`}
       </div>

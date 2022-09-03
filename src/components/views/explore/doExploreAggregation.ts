@@ -5,6 +5,7 @@ import { DEFAULT_TILE } from "mtgatool-shared/dist/shared/constants";
 import { DbMatch } from "../../../types/dbTypes";
 import { Winrate } from "../../../utils/aggregateStats";
 import getWinrateValue from "../../../utils/getWinrateValue";
+
 import getRankFilterVal from "../history/getRankFilterVal";
 
 export interface ExploreDeckData {
@@ -48,6 +49,10 @@ export interface ExploreCardData {
   initHandWinrate: number;
   sideInWinrate: number;
   sideOutWinrate: number;
+  total: number;
+  initHandTotal: number;
+  sideInTotal: number;
+  sideOutTotal: number;
   ranks: number;
   mulligans: number;
   avgQuantity: number;
@@ -416,6 +421,10 @@ export default function doExploreAggregation(allData: DbMatch[]) {
           temp.sideOutWinrate.wins,
           temp.sideOutWinrate.losses
         ),
+        total: temp.winrate.wins + temp.winrate.losses,
+        initHandTotal: temp.initHandWinrate.wins + temp.initHandWinrate.losses,
+        sideInTotal: temp.sideInWinrate.wins + temp.sideInWinrate.losses,
+        sideOutTotal: temp.sideOutWinrate.wins + temp.sideOutWinrate.losses,
         ranks: temp.ranks,
         mulligans: temp.mulligans,
         avgQuantity:
