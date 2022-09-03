@@ -285,6 +285,7 @@ export default function doExploreAggregation(allData: DbMatch[]) {
           }
 
           const gameCards: number[] = [];
+          const oppGameCards: number[] = [];
           const wins = game.winner === playerSeat ? 1 : 0;
           const losses = game.winner === playerSeat ? 0 : 1;
           // For each card cast
@@ -294,7 +295,7 @@ export default function doExploreAggregation(allData: DbMatch[]) {
             const cardName = database.card(grpId)?.name || "";
 
             // Only if we cast it
-            if (player == playerSeat) {
+            if (player === playerSeat) {
               // define
               if (!tempCards[cardName])
                 tempCards[cardName] = newCardWinrate(grpId);
@@ -314,6 +315,20 @@ export default function doExploreAggregation(allData: DbMatch[]) {
                 // cardData.colors[oColorBits].wins += wins;
                 // cardData.colors[oColorBits].losses += losses;
                 gameCards.push(grpId);
+              }
+              // Do this for every card cast in the game
+              cardData.turnsUsed.push(Math.ceil(turn / 2));
+            } else {
+              // define
+              if (!tempCards[cardName])
+                tempCards[cardName] = newCardWinrate(grpId);
+              const cardData = tempCards[cardName];
+              // Only once per card cast!
+              if (!gameCards.includes(grpId) && !oppGameCards.includes(grpId)) {
+                cardData.turnsFirstUsed.push(Math.ceil(turn / 2));
+                cardData.winrate.wins += losses;
+                cardData.winrate.losses += wins;
+                oppGameCards.push(grpId);
               }
               // Do this for every card cast in the game
               cardData.turnsUsed.push(Math.ceil(turn / 2));
@@ -445,7 +460,5 @@ export default function doExploreAggregation(allData: DbMatch[]) {
       };
     });
 
-  console.log("tempCards", tempCards);
-  console.log("aggregated", aggregated.cards);
   return aggregated;
 }
