@@ -47,7 +47,7 @@ export default function ViewExploreDecks(props: ViewExploreDecksProps) {
   const filteredData: ExploreDeckData[] = useMemo(() => {
     if (!data) return [];
 
-    const decksForFiltering = Object.keys(data.data)
+    const decksForFiltering = Object.keys(data.data || [])
       .map((hash) => data.data[hash])
       .map((d) => {
         return {
