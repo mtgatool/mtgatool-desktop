@@ -12,6 +12,18 @@ import Flex from "../../Flex";
 import Section from "../../ui/Section";
 import ExploreEvent from "./ExploreEvent";
 
+const eventsBlacklist = (ev: string) =>
+  !ev.includes("NPE_") &&
+  !ev.includes("ColorChallenge_") &&
+  !ev.includes("DirectGame") &&
+  !ev.includes("Decathlon10_TurboDraft_20211230") &&
+  !ev.includes("Decathlon1_Alchemy_20211218") &&
+  !ev.includes("Decathlon4_NewPrecons_20211221") &&
+  !ev.includes("MWM_Cascade_20220208") &&
+  !ev.includes("MWM_HistoricPauper_20211221") &&
+  !ev.includes("MWM_SlowStart_20220125") &&
+  !ev.includes("UnbrokenBlade_20220318");
+
 export default function ViewExploreHome() {
   const history = useHistory();
   const [eventsList, setEventsList] = useState<string[]>([]);
@@ -28,12 +40,7 @@ export default function ViewExploreHome() {
       const dayKeys = await queryKeys();
       finalEventList.push(...dayKeys);
 
-      const fixedList = finalEventList.filter(
-        (k) =>
-          !k.includes("NPE_") &&
-          !k.includes("ColorChallenge_") &&
-          !k.includes("DirectGame")
-      );
+      const fixedList = finalEventList.filter(eventsBlacklist);
 
       setEventsList(Array.from(new Set(fixedList)));
     }
