@@ -416,7 +416,7 @@ export default function doExploreAggregation(allData: DbMatch[]) {
         t.cardObj?.name !== "Swamp" &&
         t.cardObj?.name !== "Mountain" &&
         t.cardObj?.name !== "Forest" &&
-        t.winrate.wins + t.winrate.losses > 5
+        t.winrate.wins + t.winrate.losses > 9
       );
     })
     .map((temp) => {
