@@ -329,9 +329,9 @@ function startUpdater() {
 }
 
 function installUpdate() {
-  app.on("before-quit", () => {
-    quit();
-  });
+  // app.on("before-quit", () => {
+  //   quit();
+  // });
 
   autoUpdater.quitAndInstall(true, true);
 }
