@@ -11,6 +11,7 @@ import MtgaTrackerDaemon from "../../daemon/mtgaTrackerDaemon";
 
 import LogEntry from "../../types/logDecoder";
 import getLocalSetting from "../../utils/getLocalSetting";
+import isLimitedEventId from "../../utils/isLimitedEventId";
 
 import actionLog from "../actionLog";
 import saveMatch from "../saveMatch";
@@ -158,6 +159,8 @@ export default function onLabelMatchGameRoomStateChangedEvent(
     }
 
     if ((window as any).daemon) {
+      const isLimited = isLimitedEventId(gameRoom.gameRoomConfig.eventId);
+
       ((window as any).daemon as MtgaTrackerDaemon)
         .getMatchState()
         .then((state) => {
@@ -177,6 +180,24 @@ export default function onLabelMatchGameRoomStateChangedEvent(
               leaderboardPlace: state.playerRank.mythicPlacement,
             };
             setPlayer(player);
+
+            if (isLimited) {
+              postChannelMessage({
+                type: "UPSERT_DB_RANK",
+                value: {
+                  limitedClass: rankClass[state.playerRank.class],
+                  limitedLevel: state.playerRank.tier,
+                },
+              });
+            } else {
+              postChannelMessage({
+                type: "UPSERT_DB_RANK",
+                value: {
+                  constructedClass: rankClass[state.playerRank.class],
+                  constructedLevel: state.playerRank.tier,
+                },
+              });
+            }
           }
         });
     }
