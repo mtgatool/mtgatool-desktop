@@ -6,6 +6,7 @@ const tradMatch = new RegExp(/(TradDraft)_(.+)_([0-9.]+)/);
 const sealedMatch = new RegExp(/(Sealed)_(.+)_([0-9.]+)/);
 const miscDraftMatch = new RegExp(/(.+)_(Draft)_([0-9.]+)/);
 // use only as last match if others fail
+const tripleDateMatch = new RegExp(/(.+)_(.+)_(.+)_([0-9.]+)/);
 const doubleDateMatch = new RegExp(/(.+)_(.+)_([0-9.]+)/);
 const simpleDateMatch = new RegExp(/(.+)_([0-9.]+)/);
 const simpleMatch = new RegExp(/(.+)_(.+)/);
@@ -135,6 +136,16 @@ export default function getEventPrettyName(event: string): string {
 
   const misc = miscDraftMatch.exec(event);
   if (misc) return `${misc[1]} Draft`;
+
+  const triple = tripleDateMatch.exec(event);
+  if (triple) {
+    const yy = triple[4].slice(0, 4);
+    const mm = parseInt(triple[4].slice(4, 6));
+    if (months[mm]) {
+      return `${triple[1]} ${triple[2]} ${triple[3]} (${months[mm]} ${yy})`;
+    }
+    return `${triple[1]} ${triple[2]} ${triple[3]} ${triple[4]}`;
+  }
 
   const double = doubleDateMatch.exec(event);
   if (double) {
