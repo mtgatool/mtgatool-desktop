@@ -158,14 +158,16 @@ export default function ViewExploreAggregator() {
 
   const doAggregation = useCallback(() => {
     const aggregatedData = doExploreAggregation(Object.values(data.current));
-    window.toolDb
-      .putData<DbExploreAggregated>(`exploredata-${eventId}`, aggregatedData)
-      .then((res) => {
-        if (res) {
-          setIsOk(true);
-        }
-      })
-      .catch(console.warn);
+    if (aggregatedData.data && Object.values(aggregatedData.data).length > 0) {
+      window.toolDb
+        .putData<DbExploreAggregated>(`exploredata-${eventId}`, aggregatedData)
+        .then((res) => {
+          if (res) {
+            setIsOk(true);
+          }
+        })
+        .catch(console.warn);
+    }
   }, [eventId, data]);
 
   const loadingPercent =
