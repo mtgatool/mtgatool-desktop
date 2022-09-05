@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable radix */
@@ -13,6 +14,7 @@ import applySort from "../../../utils/tables/applySort";
 
 import Flex from "../../Flex";
 import PagingControls from "../../PagingControls";
+import SetsFilter from "../../SetsFilter";
 
 import SortControls, { Sort } from "../../SortControls";
 import Section from "../../ui/Section";
@@ -33,6 +35,7 @@ export default function ViewExploreCards(props: ViewExploreCardsProps) {
   const { data } = props;
 
   const [allBestCards, setAllBestCards] = useState<BestCards[]>([]);
+  const [filteredSets, setFilteredSets] = useState<string[]>([]);
 
   const [sortValue, setSortValue] = useState<Sort<ExploreCardData>>({
     key: "winrate",
@@ -93,8 +96,17 @@ export default function ViewExploreCards(props: ViewExploreCardsProps) {
     });
     setAllBestCards(finalBestCards);
 
-    return applySort(data.cards || [], sortValue);
-  }, [data, sortValue]);
+    const filteredCards = (data.cards || []).filter((c) => {
+      const cardObj = database.card(c.id);
+      return cardObj
+        ? filteredSets.length === 0
+          ? true
+          : filteredSets.includes(cardObj.set.toLocaleLowerCase())
+        : false;
+    });
+
+    return applySort(filteredCards, sortValue);
+  }, [data, filteredSets, sortValue]);
 
   const pagingControlProps = usePagingControls(filteredData.length, 25);
 
@@ -154,6 +166,7 @@ export default function ViewExploreCards(props: ViewExploreCardsProps) {
               return <></>;
             })}
         </div>
+        <SetsFilter callback={setFilteredSets} filtered={filteredSets} />
       </Section>
       <Section className="explore-cards-sort-controls">
         {data && filteredData.length > 0 ? (
