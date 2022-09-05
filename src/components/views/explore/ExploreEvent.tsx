@@ -37,6 +37,7 @@ export default function ExploreEvent(props: ExploreEventProps) {
       .getData<Partial<DbExploreAggregated>>(`exploredata-${eventId}`)
       .then((d) => {
         if (d) {
+          (d as any).size = Object.values(d.data || {}).length;
           delete d.cards;
           delete d.data;
           setEventData(d);
@@ -57,7 +58,9 @@ export default function ExploreEvent(props: ExploreEventProps) {
         <>
           <div className="event-name">
             <div className="evid">{getEventPrettyName(eventId)}</div>
-            <div className="time">{timeAgo(eventData?.to || 0)}</div>
+            <div className="time">
+              {(eventData as any).size} entries - {timeAgo(eventData?.to || 0)}
+            </div>
           </div>
           <div className="name-container">
             <div className="name">{`${
