@@ -101,7 +101,8 @@ export default function ViewExploreCards(props: ViewExploreCardsProps) {
       return cardObj
         ? filteredSets.length === 0
           ? true
-          : filteredSets.includes(cardObj.set.toLocaleLowerCase())
+          : filteredSets.includes(cardObj.set.toLocaleLowerCase()) ||
+            filteredSets.includes(cardObj.set_digital.toLocaleLowerCase())
         : false;
     });
 
