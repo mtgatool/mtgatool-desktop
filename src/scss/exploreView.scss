@@ -296,3 +296,43 @@
     }
   }
 }
+
+.event-descriptions {
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  justify-content: center;
+
+  .desc-a, .desc-r, .desc-e, .desc-o, .desc-l, .desc-p {
+    margin: 8px;
+    padding: 0 8px;
+    font-size: 16px;
+    height: 20px;
+    line-height: 18px;
+    font-family: var(--main-font-name-it);
+    border-radius: 4px;
+  }
+
+  .desc-a {
+    border-left: 4px solid var(--color-m);
+  }
+
+  .desc-r {
+    border-left: 4px solid var(--color-r);
+  }
+
+  .desc-e {
+    border-left: 4px solid var(--color-u);
+  }
+
+  .desc-p {
+    border-left: 4px solid var(--color-w);
+  }
+
+  .desc-l {
+    border-left: 4px solid var(--color-g);
+  }
+
+  .desc-o {
+    border-left: 4px solid var(--color-b);
+  }
+}

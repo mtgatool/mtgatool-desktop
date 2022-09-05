@@ -77,6 +77,14 @@ export default function ViewExploreHome() {
           </a>
         </i>
       </Flex>
+      <Flex className="event-descriptions">
+        <div className="desc-a">Aggregated</div>
+        <div className="desc-r">Ranked</div>
+        <div className="desc-l">Limited</div>
+        <div className="desc-e">Events</div>
+        <div className="desc-p">Play</div>
+        <div className="desc-o">Other</div>
+      </Flex>
       <div className="explore-events-mosaic">
         <div className="mosaic-column">
           {sortedEventsList.length === 0 && (
