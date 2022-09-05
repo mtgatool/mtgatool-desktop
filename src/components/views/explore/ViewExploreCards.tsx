@@ -56,7 +56,7 @@ export default function ViewExploreCards(props: ViewExploreCardsProps) {
     const allCardsCopies: Record<string, number[]> = {};
     let allBest: Record<string, number> = {};
 
-    Object.values(data.data).forEach((d) => {
+    Object.values(data.data || {}).forEach((d) => {
       d.deck.forEach((c) => {
         const cardObj = database.card(c.id);
         if (cardObj && !cardObj.type.toLowerCase().includes("land")) {
