@@ -38,8 +38,6 @@ export default function ExploreEvent(props: ExploreEventProps) {
       .then((d) => {
         if (d) {
           (d as any).size = Object.values(d.data || {}).length;
-          delete d.cards;
-          delete d.data;
           setEventData(d);
           fetchUsername(d.aggregator || "");
           fetchAvatar(d.aggregator || "");
