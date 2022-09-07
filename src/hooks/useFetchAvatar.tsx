@@ -13,10 +13,13 @@ export default function useFetchAvatar() {
   const fetchAvatar = useCallback(
     (pubKey: string) => {
       globalData.fetchedAvatars.push(pubKey);
-      reduxAction(dispatch, {
-        type: "SET_AVATAR",
-        arg: { pubKey, avatar: "" },
-      });
+
+      if (!avatars[pubKey]) {
+        reduxAction(dispatch, {
+          type: "SET_AVATAR",
+          arg: { pubKey, avatar: "" },
+        });
+      }
       window.toolDb.getData<string>(`:${pubKey}.avatar`).then((avatar) => {
         reduxAction(dispatch, {
           type: "SET_AVATAR",

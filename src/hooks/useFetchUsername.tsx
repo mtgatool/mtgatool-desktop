@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import reduxAction from "../redux/reduxAction";
 
 import { AppState } from "../redux/stores/rendererStore";
+import cleanUsername from "../utils/cleanUsername";
 
 export default function useFetchUsername() {
   const dispatch = useDispatch();
@@ -11,14 +12,16 @@ export default function useFetchUsername() {
 
   const fetchAvatar = useCallback(
     (pubKey: string) => {
-      reduxAction(dispatch, {
-        type: "SET_USERNAME",
-        arg: { pubKey, username: "" },
-      });
+      if (!usernames[pubKey]) {
+        reduxAction(dispatch, {
+          type: "SET_USERNAME",
+          arg: { pubKey, username: "" },
+        });
+      }
       window.toolDb.getData<string>(`:${pubKey}.username`).then((username) => {
         reduxAction(dispatch, {
           type: "SET_USERNAME",
-          arg: { pubKey, username: username || "" },
+          arg: { pubKey, username: cleanUsername(username || "") },
         });
       });
     },

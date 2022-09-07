@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { DEFAULT_AVATAR } from "../../../constants";
+import cleanUsername from "../../../utils/cleanUsername";
 import timeAgo from "../../../utils/timeAgo";
 
 import RankIcon from "../../RankIcon";
@@ -33,7 +34,7 @@ function DrawConstructedRank(props: DbRankInfo) {
         }}
       />
       <div className="rank-name-container">
-        <div className="rank-name">{name || "-"}</div>
+        <div className="rank-name">{cleanUsername(name || "-")}</div>
         <div className="rank-time">{timeAgo(updated)}</div>
       </div>
       <div className="rank-icon">
