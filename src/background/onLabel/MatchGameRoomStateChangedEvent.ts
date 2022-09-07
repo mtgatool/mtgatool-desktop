@@ -164,7 +164,11 @@ export default function onLabelMatchGameRoomStateChangedEvent(
       ((window as any).daemon as MtgaTrackerDaemon)
         .getMatchState()
         .then((state) => {
-          if (state && state.matchId === gameRoom.gameRoomConfig.matchId) {
+          if (
+            state &&
+            state.matchId === gameRoom.gameRoomConfig.matchId &&
+            state.playerRank.class > 0
+          ) {
             const opponent = {
               tier: state.opponentRank.tier,
               rank: rankClass[state.opponentRank.class],
