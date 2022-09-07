@@ -263,6 +263,8 @@ export default function Auth(props: AuthProps) {
         setErrorMessage("Passwords must contain at least 8 characters.");
       } else if (signupPass !== signupPassConfirm) {
         setErrorMessage("Passwords must match");
+      } else if (signupUsername.includes("@")) {
+        setErrorMessage("Username must not be an email!");
       } else {
         setErrorMessage("");
         setUsername(signupUsername);
