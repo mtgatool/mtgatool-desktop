@@ -35,6 +35,8 @@ import MtgaTrackerDaemon from "./daemon/mtgaTrackerDaemon";
 
 const title = getWindowTitle();
 
+document.title = `MTG Arena Tool - ${title}`;
+
 if (title == WINDOW_UPDATER) {
   ReactDOM.render(
     <React.StrictMode>

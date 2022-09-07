@@ -17,6 +17,8 @@ import { loadDbFromCache } from "./utils/database-wrapper";
 import getLocalSetting from "./utils/getLocalSetting";
 import reduxAction from "./redux/reduxAction";
 
+document.title = "MTG Arena Tool";
+
 defaultLocalSettings();
 mainChannelListeners();
 ReactDOM.render(
