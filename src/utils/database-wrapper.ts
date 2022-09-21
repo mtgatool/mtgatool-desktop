@@ -78,11 +78,11 @@ export function loadDbFromCache(
   }
 
   return axios
-    .get(`https://mtgatool.com/database/latest/${lang}`)
+    .get(`https://mtgatool.com/api/database/latest/${lang}`)
     .then((latestRes) => {
       if (forceReload || parseInt(latestRes.data.latest) > database.version) {
         return axios
-          .get<any>(`https://mtgatool.com/database/${lang}`)
+          .get<any>(`https://mtgatool.com/api/database/${lang}`)
           .then((res) => {
             console.log("Updated cards database OK");
             console.log("New DB version: ", latestRes.data.latest);
@@ -92,7 +92,7 @@ export function loadDbFromCache(
           })
           .catch((e) => {
             console.info(
-              "There was a problem updating cards database from https://mtgatool.com/database/"
+              "There was a problem updating cards database from https://mtgatool.com/api/database/"
             );
             console.info(e);
             return Promise.resolve();
@@ -103,7 +103,7 @@ export function loadDbFromCache(
     })
     .catch((e) => {
       console.info(
-        "There was a problem updating cards database from https://mtgatool.com/database/latest"
+        "There was a problem updating cards database from https://mtgatool.com/api/database/latest"
       );
       console.info(e);
       return Promise.resolve();
