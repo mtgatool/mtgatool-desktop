@@ -61,6 +61,7 @@ export default function Hover() {
   const [backLoaded, setBackLoaded] = useState(0);
   const [frontUrl, setFrontUrl] = useState("");
   const [backUrl, setBackUrl] = useState("");
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const calculatePosition = useCallback(() => {
     const remote = electron?.remote;
@@ -184,9 +185,14 @@ export default function Hover() {
       if (msg.data.type == "HOVER_IN") {
         setGrpId(msg.data.value);
         setHovering(true);
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+          setHovering(false);
+        }, 5000);
       }
 
       if (msg.data.type == "HOVER_OUT") {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
         setHovering(false);
       }
 
@@ -194,7 +200,7 @@ export default function Hover() {
         setCardOdds(msg.data.value.playerCardsOdds);
       }
     },
-    []
+    [timeoutRef]
   );
 
   useEffect(() => {
