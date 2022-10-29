@@ -5,7 +5,7 @@ import {
   Deck,
   CardObject,
   database,
-  DbCardData,
+  DbCardDataV2,
   cardType,
 } from "mtgatool-shared";
 import { Fragment } from "react";
@@ -29,7 +29,7 @@ function cmcSort(a: CardObject, b: CardObject): number {
   const cb = database.card(b.id);
 
   if (ca && cb) {
-    return ca.cmc - cb.cmc;
+    return ca.Cmc - cb.Cmc;
   }
   return 0;
 }
@@ -147,7 +147,7 @@ export default function VisualDeckView(
     .map((card) => ({ data: database.card(card.id), ...card }))
     .filter((card) => card.data !== undefined)
     .groupBy((card) => {
-      const type = cardType(card.data as DbCardData);
+      const type = cardType(card.data as DbCardDataV2);
       switch (type) {
         case "Creature":
           return "Creatures";

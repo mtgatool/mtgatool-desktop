@@ -40,7 +40,7 @@ export const initialRendererState = {
   rewards_weekly_ends: "",
   topArtist: "Thoughtseize by Aleksi Briclot",
   updateState: "",
-  collectionQuery: "",
+  collectionQuery: "f:standard r>token",
   forceQuery: 0,
   matchInProgress: false,
   draftInProgress: false,

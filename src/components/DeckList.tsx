@@ -1,6 +1,6 @@
 /* eslint-disable react/no-array-index-key */
 import _ from "lodash";
-import { cardType, Deck, DbCardData, database } from "mtgatool-shared";
+import { cardType, Deck, DbCardDataV2, database } from "mtgatool-shared";
 import CardTile from "./CardTile";
 import Separator from "./Separator";
 
@@ -66,7 +66,7 @@ function getDeckComponents(
     .map((card) => ({ data: database.card(card.id), ...card }))
     .filter((card) => card.data !== undefined)
     .groupBy((card) => {
-      const type = cardType(card.data as DbCardData);
+      const type = cardType(card.data as DbCardDataV2);
       switch (type) {
         case "Creature":
           return "Creatures";
@@ -118,7 +118,7 @@ function getDeckComponents(
               isSideboard={false}
               showWildcards={showWildcards}
               deck={deck}
-              card={card.data as DbCardData}
+              card={card.data as DbCardDataV2}
               key={`mainboardcardtile${index}_${card.id}`}
               quantity={
                 showOdds
@@ -162,7 +162,7 @@ function getDeckComponents(
             isSideboard
             showWildcards={showWildcards}
             deck={deck}
-            card={card.data as DbCardData}
+            card={card.data as DbCardDataV2}
             key={`sideboardcardtile${index}_${card.id}`}
             quantity={{
               type: "NUMBER",

@@ -15,9 +15,10 @@ export default function getDeckMissing(deck: Deck): MissingWildcards {
     if (alreadySeenIds.has(grpid)) {
       return;
     }
-    const rarity = database.card(grpid)?.rarity;
-    if (rarity && rarity !== "land" && rarity !== "token") {
-      missing[rarity] += getCardsMissingCount(deck, grpid);
+    const cardObj = database.card(grpid);
+
+    if (cardObj?.Rarity && cardObj.Rarity !== "land" && !cardObj.IsToken) {
+      missing[cardObj.Rarity] += getCardsMissingCount(deck, grpid);
       alreadySeenIds.add(grpid); // remember this card
     }
   });

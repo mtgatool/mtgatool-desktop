@@ -1,4 +1,3 @@
-import { DbCardData } from "mtgatool-shared";
 import {
   ColorBitsFilter,
   ArrayFilter,
@@ -9,7 +8,10 @@ import {
   QuerySeparators,
 } from "./filterTypes";
 
-export interface CardsData extends DbCardData {
+export interface CardsData {
+  fullName: string;
+  fullType: string;
+  artist: string;
   colors: number;
   colorSortVal: string;
   rankSortVal: string;
@@ -23,6 +25,9 @@ export interface CardsData extends DbCardData {
   suspended: string[];
   craftable: boolean;
   booster: boolean;
+  cmc: number;
+  id: number;
+  cid: number;
 }
 
 export type QueryKeys =

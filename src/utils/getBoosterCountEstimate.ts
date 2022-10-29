@@ -26,7 +26,7 @@ export default function getBoosterCountEstimate(
   };
 
   CARD_RARITIES.forEach((rarity) => {
-    if (rarity !== "land" && rarity !== "token") {
+    if (rarity !== "land") {
       const needed = neededWildcards[rarity] || 0;
       const owned = ownedWildcards[rarity] || 0;
       const missing = Math.max(0, needed - owned);

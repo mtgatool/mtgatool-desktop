@@ -1,20 +1,27 @@
 import findSetByCode from "./findSetByCode";
+import CardType from "./typesWrap";
 
 export default function getCardInBoosters(
-  card: any,
+  card: CardType,
   setNames: any,
   sets: any
 ): boolean {
   const set = findSetByCode(
-    card.set_digital == "" ? card.set : card.set_digital,
+    card.DigitalSet === null || card.DigitalSet === ""
+      ? card.Set
+      : card.DigitalSet,
     setNames,
     sets
   );
 
-  if (card.rarity === "land" || card.rarity === "token") return false;
+  if (card.IsToken) return false;
   if (set?.collation === -1) return false;
 
-  if (card.dfc === 11) {
+  if (card.LinkedFaceType === 11) {
+    return false;
+  }
+
+  if (!card.IsPrimaryCard) {
     return false;
   }
 

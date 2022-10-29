@@ -14,11 +14,11 @@ import { Settings } from "../common/defaultConfig";
 import bcConnect from "../utils/bcConnect";
 import electron from "../utils/electron/electronWrapper";
 import getBackUrl from "../utils/getBackUrl";
-import getFrontUrl from "../utils/getFrontUrl";
+
 import getLocalSetting from "../utils/getLocalSetting";
 import vodiFn from "../utils/voidfn";
 import isCardDfc from "../utils/isCardDfc";
-import database from "../utils/database-wrapper";
+
 import {
   ALL_OVERLAYS,
   WINDOW_MAIN,
@@ -33,6 +33,7 @@ import GroupedLandsDetails from "../overlay/GroupedLandsDetails";
 import { CARD_SIZE_RATIO } from "../common/static";
 import useTransparentFix from "../hooks/useTransparentFix";
 import setTopMost from "../utils/electron/setTopMost";
+import { getCardImage } from "../utils/getCardArtCrop";
 
 const { LANDS_HACK } = constants;
 
@@ -220,9 +221,8 @@ export default function Hover() {
 
   const styleDfc = useMemo((): CSSProperties => {
     const size = 100 + hoverSize * 15;
-    const cardObj = database.card(grpId || 0);
     let op = "block";
-    if (!(cardObj?.dfcId && isCardDfc(grpId || 0))) {
+    if (!isCardDfc(grpId || 0)) {
       op = "none";
     }
 
@@ -250,7 +250,7 @@ export default function Hover() {
     }
     if (grpId) {
       // Reset the image, begin new loading and clear state
-      const front = getFrontUrl(grpId, quality);
+      const front = getCardImage(grpId, quality);
       const back = getBackUrl(grpId, quality);
       const img = new Image();
       img.src = front;

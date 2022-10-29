@@ -2,7 +2,7 @@ import { useCallback, useState, CSSProperties, useEffect } from "react";
 import {
   constants,
   Deck,
-  DbCardData,
+  DbCardDataV2,
   Rarity,
   cardHasType,
 } from "mtgatool-shared";
@@ -112,9 +112,9 @@ export type CardTileQuantity =
   | QuantityText;
 
 export interface CardTileProps {
-  card: DbCardData | undefined;
+  card: DbCardDataV2 | undefined;
   deck?: Deck;
-  dfcCard?: DbCardData;
+  dfcCard?: DbCardDataV2;
   indent: string;
   isHighlighted: boolean;
   isSideboard: boolean;
@@ -123,33 +123,33 @@ export interface CardTileProps {
 }
 
 function CostSymbols(props: {
-  card: DbCardData;
-  dfcCard?: DbCardData;
+  card: DbCardDataV2;
+  dfcCard?: DbCardDataV2;
 }): JSX.Element {
   const { card, dfcCard } = props;
   const costSymbols: JSX.Element[] = [];
   let prevc = true;
-  const hasSplitCost = card.dfc === FACE_SPLIT_FULL;
+  const hasSplitCost = card.LinkedFaceType === FACE_SPLIT_FULL;
 
   const dfcSeparator = "//";
-  if (card.cost) {
-    if (!cardHasType(card, "Land") && card.cost.length === 0) {
+  if (card.ManaCost) {
+    if (!cardHasType(card, "Land") && card.ManaCost.length === 0) {
       costSymbols.push(
         <div
           style={{
             justifyContent: "flex-end",
           }}
           // eslint-disable-next-line react/no-array-index-key
-          key={`${card.id}_0`}
+          key={`${card.GrpId}_0`}
           className={`mana-s16 ${mana["0"]}`}
         />
       );
     }
-    card.cost.forEach((cost: string, index: number) => {
+    card.ManaCost.forEach((cost: string, index: number) => {
       if (hasSplitCost) {
         if (/^(x|\d)+$/.test(cost) && prevc === false) {
           costSymbols.push(
-            <span key={`${card.id}_cost_separator`}>{dfcSeparator}</span>
+            <span key={`${card.GrpId}_cost_separator`}>{dfcSeparator}</span>
           );
         }
         prevc = /^\d+$/.test(cost);
@@ -160,23 +160,29 @@ function CostSymbols(props: {
             justifyContent: "flex-end",
           }}
           // eslint-disable-next-line react/no-array-index-key
-          key={`${card.id}_${index}`}
+          key={`${card.GrpId}_${index}`}
           className={`mana-s16 ${mana[cost]}`}
         />
       );
     });
   }
-  if (card.dfc === FACE_ADVENTURE_MAIN && dfcCard && dfcCard.cost) {
-    // eslint-disable-next-line react/jsx-curly-brace-presence
-    costSymbols.push(<span key={`${dfcCard.id}_cost_separator`}>{`//`}</span>);
-    dfcCard.cost.forEach((cost: string, index: number) => {
+  if (
+    card.LinkedFaceType === FACE_ADVENTURE_MAIN &&
+    dfcCard &&
+    dfcCard.ManaCost
+  ) {
+    costSymbols.push(
+      // eslint-disable-next-line react/jsx-curly-brace-presence
+      <span key={`${dfcCard.GrpId}_cost_separator`}>{`//`}</span>
+    );
+    dfcCard.ManaCost.forEach((cost: string, index: number) => {
       costSymbols.push(
         <div
           style={{
             justifyContent: "flex-end",
           }}
           // eslint-disable-next-line react/no-array-index-key
-          key={`${dfcCard.id}_${index}`}
+          key={`${dfcCard.GrpId}_${index}`}
           className={`mana-s16 ${mana[cost]}`}
         />
       );
@@ -216,7 +222,7 @@ function CardQuantityDisplay(props: {
 }
 
 interface WildcardsNeededProps {
-  card: DbCardData;
+  card: DbCardDataV2;
   deck: Deck;
   isSideboard: boolean;
   listStyle: "flat" | "arena";
@@ -234,9 +240,7 @@ function MissingCardSprite(props: MissingCardsProps): JSX.Element {
   const { missing, cardRarity, listStyle, ww } = props;
 
   const xoff =
-    CARD_RARITIES.filter((r) => r !== "token" && r !== "land").indexOf(
-      cardRarity
-    ) * -24;
+    CARD_RARITIES.filter((r) => r !== "land").indexOf(cardRarity) * -24;
   const yoff = missing * -24;
 
   let className = "not-owned-sprite";
@@ -259,11 +263,11 @@ function MissingCardSprite(props: MissingCardsProps): JSX.Element {
 function WildcardsNeeded(props: WildcardsNeededProps): JSX.Element {
   const { card, deck, isSideboard, listStyle, ww } = props;
   if (
-    card.type.indexOf("Basic Land") === -1 &&
-    card.type.indexOf("Basic Snow Land") === -1
+    card.Types.indexOf("Basic Land") === -1 &&
+    card.Types.indexOf("Basic Snow Land") === -1
   ) {
-    const missing = getWildcardsMissing(deck, card.id, isSideboard);
-    const cardRarity = card.rarity;
+    const missing = getWildcardsMissing(deck, card.GrpId, isSideboard);
+    const cardRarity = card.Rarity as Rarity;
 
     if (missing > 0) {
       return MissingCardSprite({ missing, cardRarity, listStyle, ww });
@@ -284,7 +288,7 @@ export default function CardTile(props: CardTileProps): JSX.Element {
     showWildcards,
   } = props;
   const [isMouseHovering, setMouseHovering] = useState(false);
-  const [hoverIn, hoverOut] = useHoverCard(card?.id || 0);
+  const [hoverIn, hoverOut] = useHoverCard(card?.GrpId || 0);
   const [cardUrl, setCardUrl] = useState<string | undefined>();
 
   const handleMouseEnter = useCallback((): void => {
@@ -298,25 +302,27 @@ export default function CardTile(props: CardTileProps): JSX.Element {
 
   const handleMouseClick = useCallback((): void => {
     let _card = card;
-    if (card?.dfc === FACE_SPLIT_FULL) {
+    if (card?.LinkedFaceType === FACE_SPLIT_FULL) {
       _card = dfcCard || card;
     }
     openScryfallCard(_card);
   }, [card, dfcCard]);
 
   const cardTileStyle = { backgroundImage: "", borderImage: "" };
-  cardTileStyle.backgroundImage = `url(${cardUrl || DEFAULT_TILE})`;
+  cardTileStyle.backgroundImage = `url("${
+    cardUrl || getCardArtCrop(DEFAULT_TILE)
+  }")`;
 
   let colorA = "c";
   let colorB = "c";
-  if (card?.frame) {
-    if (card.frame.length == 1) {
-      colorA = COLORS_ALL[card.frame[0] - 1];
-      colorB = COLORS_ALL[card.frame[0] - 1];
-    } else if (card.frame.length == 2) {
-      colorA = COLORS_ALL[card.frame[0] - 1];
-      colorB = COLORS_ALL[card.frame[1] - 1];
-    } else if (card.frame.length > 2) {
+  if (card?.FrameColors) {
+    if (card.FrameColors.length == 1) {
+      colorA = COLORS_ALL[card.FrameColors[0] - 1];
+      colorB = COLORS_ALL[card.FrameColors[0] - 1];
+    } else if (card.FrameColors.length == 2) {
+      colorA = COLORS_ALL[card.FrameColors[0] - 1];
+      colorB = COLORS_ALL[card.FrameColors[1] - 1];
+    } else if (card.FrameColors.length > 2) {
       colorA = "m";
       colorB = "m";
     }
@@ -333,23 +339,20 @@ export default function CardTile(props: CardTileProps): JSX.Element {
   }
 
   const phyrexianName = `|Ceghm.`; // Swamp
-  const isPhyrexian = card?.id == 72578;
+  const isPhyrexian = card?.GrpId == 72578;
 
   useEffect(() => {
     const img = new Image();
-    let imageUrl = getCardArtCrop(card || 0);
-    if (card?.type == "Special") {
-      imageUrl = card.images.art_crop;
-    }
+    const imageUrl = getCardArtCrop(card || 0);
     img.src = imageUrl;
     img.onload = (): void => {
       setCardUrl(imageUrl);
     };
   }, [deck]);
 
-  const isRebalanced = !isPhyrexian && card && card.name.startsWith("A-");
+  const isRebalanced = !isPhyrexian && card && card.IsRebalanced;
 
-  let finalName = isPhyrexian ? phyrexianName : card?.name || "Unknown Card";
+  let finalName = isPhyrexian ? phyrexianName : card?.Name || "Unknown Card";
 
   if (isRebalanced) {
     finalName = finalName.slice(2);
@@ -359,7 +362,7 @@ export default function CardTile(props: CardTileProps): JSX.Element {
     <div className="card-tile-container-outer">
       <div
         className="card-tile-container-flat click-on"
-        data-grp-id={card?.id || 0}
+        data-grp-id={card?.GrpId || 0}
         data-id={indent}
         data-quantity={quantity}
         style={tileStyle}

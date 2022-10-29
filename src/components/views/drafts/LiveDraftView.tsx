@@ -197,8 +197,8 @@ export default function LiveDraftView() {
                 const fullCard = database.card(id);
 
                 const dfcCard =
-                  fullCard?.dfcId && fullCard.dfcId !== true
-                    ? database.card(fullCard.dfcId)
+                  fullCard && fullCard.LinkedFaceGrpIds.length > 0
+                    ? database.card(fullCard.LinkedFaceGrpIds[0])
                     : undefined;
 
                 return (

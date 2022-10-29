@@ -1,14 +1,15 @@
 import getCardFormats from "./getCardFormats";
+import CardType from "./typesWrap";
 
 export default function getCardIsCraftable(
-  card: any,
-  cards: any,
+  card: CardType,
+  cards: Record<string, CardType>,
   setNames: any,
   sets: any
 ): boolean {
-  if (card.rarity === "land" || card.rarity === "token") return false;
+  if (card.Rarity === "land" || !card.IsToken) return false;
 
-  if (card.dfc === 11) {
+  if (card.LinkedFaceType === 11) {
     return false;
   }
 

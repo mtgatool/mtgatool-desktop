@@ -5,10 +5,11 @@ import { database } from "mtgatool-shared";
 import NoCard from "../assets/images/nocard.png";
 import { AppState } from "../redux/stores/rendererStore";
 import OwnershipStars from "./OwnershipStars";
-import getFrontUrl from "../utils/getFrontUrl";
+
 import getBackUrl from "../utils/getBackUrl";
 import isCardDfc from "../utils/isCardDfc";
 import { CARD_SIZE_RATIO } from "../common/static";
+import { getCardImage } from "../utils/getCardArtCrop";
 
 export default function CardHover(): JSX.Element {
   const opacity = useSelector((state: AppState) => state.hover.opacity);
@@ -37,9 +38,8 @@ export default function CardHover(): JSX.Element {
   }, [frontUrl, opacity, grpId, frontLoaded, size]);
 
   const styleDfc = useMemo((): CSSProperties => {
-    const cardObj = database.card(grpId);
     let op = opacity;
-    if (!(cardObj?.dfcId && isCardDfc(grpId))) {
+    if (!isCardDfc(grpId)) {
       op = 0;
     }
 
@@ -55,7 +55,7 @@ export default function CardHover(): JSX.Element {
 
   useEffect(() => {
     // Reset the image, begin new loading and clear state
-    const front = getFrontUrl(grpId, quality);
+    const front = getCardImage(grpId, quality);
     const back = getBackUrl(grpId, quality);
     const img = new Image();
     img.src = front;

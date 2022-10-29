@@ -22,7 +22,7 @@ interface LogCardProps {
 function LogCard(props: LogCardProps): JSX.Element {
   const { children, grpId } = props;
   const cardObj = database.card(grpId);
-  const cardName = cardObj?.name;
+  const cardName = cardObj?.Name;
 
   const [hoverIn, hoverOut] = useHoverCard(grpId);
 

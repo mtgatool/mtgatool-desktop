@@ -32,7 +32,7 @@ export function HoverTile(
   return (
     <div
       className="list-item-image"
-      style={{ backgroundImage: `url(${getCardArtCrop(grpId)})` }}
+      style={{ backgroundImage: `url("${getCardArtCrop(grpId)}")` }}
     >
       {children}
     </div>

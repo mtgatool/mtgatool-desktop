@@ -22,8 +22,8 @@ export default function doCollectionFilter(
     switch (element.type) {
       case "string":
         if (
-          element.id === "name" ||
-          element.id === "type" ||
+          element.id === "fullName" ||
+          element.id === "fullType" ||
           element.id === "artist"
         ) {
           filteredData = stringFilterFn(

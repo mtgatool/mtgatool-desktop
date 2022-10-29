@@ -17,7 +17,7 @@ export default function setFilterFn(
       res =
         res ||
         (_key === "setCode" && row.setCode.includes(set)) ||
-        (_key === "set" && row.set.indexOf(set) !== -1);
+        (_key === "set" && row.setCode.indexOf(set) !== -1);
     });
 
     return filterValue.not ? !res : res;

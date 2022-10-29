@@ -56,7 +56,6 @@ export const defaultConfig = {
   cardsSize: 2,
   cardsSizeHoverCard: 10,
   exportFormat: "$Name,$Count,$Rarity,$SetName,$Collector",
-  collectionQuery: "f:standard r>token",
   collectionMode: COLLECTION_CARD_MODE,
   matchesTableState: undefined,
   matchesTableMode: MATCHES_LIST_MODE,

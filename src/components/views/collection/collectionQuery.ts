@@ -94,7 +94,7 @@ function getTokenVal(
       if (separator === "=" || separator === ":") {
         const newFilter: StringFilterType<CardsData> = {
           type: "string",
-          id: "name",
+          id: "fullName",
           value: { string: val, not: isNegative, exact: false },
         };
         return newFilter;
@@ -104,7 +104,7 @@ function getTokenVal(
       if (separator === "=" || separator === ":") {
         const newFilter: StringFilterType<CardsData> = {
           type: "string",
-          id: "type",
+          id: "fullType",
           value: { string: val, not: isNegative, exact: false },
         };
         return newFilter;
@@ -233,7 +233,6 @@ function getTokenVal(
       return newFilter;
       break;
     case "cmc":
-    case "owned":
       const intVal = parseInt(val);
       let value: number | undefined;
       if (separator === "=" || separator === ":") {
@@ -248,8 +247,29 @@ function getTokenVal(
       if (value) {
         const minmaxFilter: MinMaxFilterType<CardsData> = {
           type: "minmax",
-          id: key,
+          id: "cmc",
           value: { value, not: isNegative, mode: separator },
+        };
+        return minmaxFilter;
+      }
+      break;
+    case "owned":
+      const parsedIntValue = parseInt(val);
+      let intValue: number | undefined;
+      if (separator === "=" || separator === ":") {
+        intValue = parsedIntValue;
+        intValue = parsedIntValue;
+      }
+      if (separator === ">") intValue = parsedIntValue + 1;
+      if (separator === "<") intValue = parsedIntValue - 1;
+      if (separator === ">=") intValue = parsedIntValue;
+      if (separator === "<=") intValue = parsedIntValue;
+
+      if (intValue) {
+        const minmaxFilter: MinMaxFilterType<CardsData> = {
+          type: "minmax",
+          id: "owned",
+          value: { value: intValue, not: isNegative, mode: separator },
         };
         return minmaxFilter;
       }
@@ -443,10 +463,12 @@ export default function getFiltersFromQuery(query: string): Filters<CardsData> {
   if (keysAdded == 0) {
     filters.push({
       type: "string",
-      id: "name",
+      id: "fullName",
       value: { string: query, not: false, exact: false },
     });
   }
+
+  console.log("getFiltersFromQuery", query, filters);
 
   return filters;
 }

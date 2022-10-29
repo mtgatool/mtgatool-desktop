@@ -50,7 +50,7 @@ export default function CardLiveDraft(props: CardLiveDraftProps) {
   return (
     <div
       ref={containerEl}
-      title={`${card?.name || ""}`}
+      title={`${card?.Name || ""}`}
       onClick={onClick}
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >

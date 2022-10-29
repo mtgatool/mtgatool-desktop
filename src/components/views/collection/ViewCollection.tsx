@@ -43,7 +43,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
   const [filters, setFilters] = useState<Filters<CardsData>>();
   const [sortValue, setSortValue] = useState<Sort<CardsData>>({
-    key: "set",
+    key: "setCode",
     sort: -1,
   });
 
@@ -217,7 +217,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
           <SortControls<CardsData>
             defaultSort={sortValue}
             setSortCallback={setSortValue}
-            columnKeys={["name", "rarityVal", "cmc", "cid", "set"]}
+            columnKeys={["fullName", "rarityVal", "cmc", "cid", "setCode"]}
             columnNames={["Name", "Rarity", "CMC", "Collector ID", "Set"]}
           />
           <div

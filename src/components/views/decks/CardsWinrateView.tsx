@@ -4,7 +4,7 @@
 import { useMemo, useState } from "react";
 import {
   compareCards,
-  DbCardData,
+  DbCardDataV2,
   CardObject,
   database,
   Deck,
@@ -30,7 +30,7 @@ function sortByLastUsed(a: StatsDeck, b: StatsDeck) {
 
 interface LineData {
   wr: CardWinrateData;
-  cardObj: DbCardData;
+  cardObj: DbCardDataV2;
   quantity: number;
   name: string;
   winrate: number;
@@ -46,11 +46,11 @@ interface LineData {
 
 function cardWinrateLineData(
   winrates: Record<number, CardWinrateData>,
-  cardObj: DbCardData,
+  cardObj: DbCardDataV2,
   quantity: number,
   name: string
 ): LineData {
-  const wr = winrates[cardObj.id];
+  const wr = winrates[cardObj.GrpId];
   const winrate = getWinrateValue(wr.wins, wr.losses);
   const sideInWinrate = getWinrateValue(wr.sideInWins, wr.sideInLosses);
   const initHandWinrate = getWinrateValue(wr.initHandWins, wr.initHandsLosses);
@@ -97,7 +97,7 @@ function cardWinrateLine(line: LineData): JSX.Element {
   } = line;
 
   return (
-    <div className="card-wr-line" key={`${cardObj.id}-${name}`}>
+    <div className="card-wr-line" key={`${cardObj.GrpId}-${name}`}>
       <div className="card-wr-line-card">
         <CardTile
           indent="c"
@@ -105,7 +105,7 @@ function cardWinrateLine(line: LineData): JSX.Element {
           isSideboard={false}
           showWildcards={false}
           card={cardObj}
-          key={`main-${name}-${cardObj.id}`}
+          key={`main-${name}-${cardObj.GrpId}`}
           quantity={{ type: "NUMBER", quantity }}
         />
       </div>
@@ -291,7 +291,7 @@ export default function CardsWinratesView(
     return Object.keys(winrates).map((grpid) => {
       const cardObj = database.card(parseInt(grpid));
       return cardObj
-        ? cardWinrateLineData(winrates, cardObj, 1, cardObj.name)
+        ? cardWinrateLineData(winrates, cardObj, 1, cardObj.Name)
         : {
             cardObj: null,
           };

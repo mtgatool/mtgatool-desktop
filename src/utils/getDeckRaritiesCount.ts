@@ -17,9 +17,9 @@ export default function getDeckRaritiesCount(deck: Deck): RaritiesCount {
     })
     .forEach((c: CardObject) => {
       const card = database.card(c.id);
-      if (card && card.rarity !== "land" && card.rarity !== "token") {
+      if (card && card.Rarity !== "land" && !card.IsToken) {
         for (let i = 0; i < c.quantity; i += 1) {
-          rarities.push(card.rarity);
+          rarities.push(card.Rarity);
         }
       }
     });

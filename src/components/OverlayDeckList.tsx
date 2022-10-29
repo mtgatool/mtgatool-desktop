@@ -91,10 +91,10 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
   const landsColors = new Colors();
   mainCards.get().forEach((card: CardObject) => {
     const cardObj = database.card(card.id);
-    if (cardObj && cardObj.type.includes("Land", 0)) {
+    if (cardObj && cardObj.Types.includes("Land", 0)) {
       landsNumber += card.quantity;
-      if (cardObj.frame) {
-        landsColors.addFromArray(cardObj.frame);
+      if (cardObj.FrameColors) {
+        landsColors.addFromArray(cardObj.FrameColors);
       }
     }
   });
@@ -170,8 +170,8 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
 
         if (
           shouldDoGroupLandsHack &&
-          fullCard.type &&
-          fullCard.type.includes("Land", 0)
+          fullCard.Types &&
+          fullCard.Types.includes("Land", 0)
         ) {
           // skip land cards while doing group lands hack
           return;

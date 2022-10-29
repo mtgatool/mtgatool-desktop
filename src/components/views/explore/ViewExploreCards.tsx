@@ -62,20 +62,20 @@ export default function ViewExploreCards(props: ViewExploreCardsProps) {
     Object.values(data.data || {}).forEach((d) => {
       d.deck.forEach((c) => {
         const cardObj = database.card(c.id);
-        if (cardObj && !cardObj.type.toLowerCase().includes("land")) {
-          if (!allCardsCopies[cardObj.name]) {
-            allCardsCopies[cardObj.name] = [];
+        if (cardObj && !cardObj.Types.toLowerCase().includes("land")) {
+          if (!allCardsCopies[cardObj.Name]) {
+            allCardsCopies[cardObj.Name] = [];
           }
-          allCardsCopies[cardObj.name].push(c.quantity);
+          allCardsCopies[cardObj.Name].push(c.quantity);
         }
       });
       Object.keys(d.bestCards).forEach((c) => {
         const cardObj = database.card(parseInt(c));
         if (cardObj) {
-          if (!allBest[cardObj.name]) {
-            allBest[cardObj.name] = 0;
+          if (!allBest[cardObj.Name]) {
+            allBest[cardObj.Name] = 0;
           }
-          allBest[cardObj.name] += 1;
+          allBest[cardObj.Name] += 1;
         }
       });
     });
@@ -90,7 +90,7 @@ export default function ViewExploreCards(props: ViewExploreCardsProps) {
     const finalBestCards = Object.keys(allBest).map((name) => {
       return {
         copies: allCardsAverageCopies[name],
-        id: database.cardByName(name)?.id || 0,
+        id: database.cardByName(name)?.GrpId || 0,
         rating: allBest[name],
       };
     });
@@ -101,8 +101,9 @@ export default function ViewExploreCards(props: ViewExploreCardsProps) {
       return cardObj
         ? filteredSets.length === 0
           ? true
-          : filteredSets.includes(cardObj.set.toLocaleLowerCase()) ||
-            filteredSets.includes(cardObj.set_digital.toLocaleLowerCase())
+          : filteredSets.includes(cardObj.Set.toLocaleLowerCase()) ||
+            (cardObj.DigitalSet &&
+              filteredSets.includes(cardObj.DigitalSet?.toLocaleLowerCase()))
         : false;
     });
 

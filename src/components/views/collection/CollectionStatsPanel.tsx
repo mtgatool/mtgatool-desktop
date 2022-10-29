@@ -71,7 +71,7 @@ export default function CollectionStatsPanel({
   const userData = uuidData[currentUUID];
 
   const query = useSelector(
-    (state: AppState) => state.settings.collectionQuery
+    (state: AppState) => state.renderer.collectionQuery
   );
 
   let boostersMode = inBoostersMode[0];

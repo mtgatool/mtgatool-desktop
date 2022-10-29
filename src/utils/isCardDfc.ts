@@ -8,9 +8,9 @@ export default function isCardDfc(grpId: number) {
   const cardObj = database.card(grpId);
   return (
     cardObj &&
-    (cardObj.dfc == FACE_DFC_BACK ||
-      cardObj.dfc == FACE_DFC_FRONT ||
-      cardObj.dfc == FACE_MODAL_BACK ||
-      cardObj.dfc == FACE_MODAL_FRONT)
+    (cardObj.LinkedFaceType == FACE_DFC_BACK ||
+      cardObj.LinkedFaceType == FACE_DFC_FRONT ||
+      cardObj.LinkedFaceType == FACE_MODAL_BACK ||
+      cardObj.LinkedFaceType == FACE_MODAL_FRONT)
   );
 }

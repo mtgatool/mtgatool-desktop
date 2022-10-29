@@ -85,10 +85,10 @@ export default function ListItemExplore({
       if (missing > 0) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         totalWildcardsMissing += missing;
-        if (card.rarity === "common") wildcards.c += missing;
-        if (card.rarity === "uncommon") wildcards.u += missing;
-        if (card.rarity === "rare") wildcards.r += missing;
-        if (card.rarity === "mythic") wildcards.m += missing;
+        if (card.Rarity === "common") wildcards.c += missing;
+        if (card.Rarity === "uncommon") wildcards.u += missing;
+        if (card.Rarity === "rare") wildcards.r += missing;
+        if (card.Rarity === "mythic") wildcards.m += missing;
       }
     }
   });

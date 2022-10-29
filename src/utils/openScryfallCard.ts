@@ -1,18 +1,18 @@
-import { database, DbCardData } from "mtgatool-shared";
+import { database, DbCardDataV2 } from "mtgatool-shared";
 import findSetByCode from "./findSetByCode";
 import openExternal from "./openExternal";
 
-export default function openScryfallCard(card?: DbCardData | number): void {
+export default function openScryfallCard(card?: DbCardDataV2 | number): void {
   const cardObj = typeof card == "number" ? database.card(card) : card;
   if (cardObj) {
-    const { cid, set } = cardObj;
-    const token = cardObj.rarity == "token" ? "t" : "";
+    const { CollectorNumber, Set } = cardObj;
+    const token = cardObj.IsToken ? "t" : "";
 
-    const setObj = findSetByCode(set);
+    const setObj = findSetByCode(Set);
 
     if (setObj) {
       openExternal(
-        `https://scryfall.com/card/${token}${setObj.scryfall}/${cid}`
+        `https://scryfall.com/card/${token}${setObj.scryfall}/${CollectorNumber}`
       );
     }
   } else {

@@ -41,7 +41,7 @@ export function getCollectionStats(cardIds: number[]): CollectionStats {
   const noUndefUuidData = uuidData || makeDefaultUUIDData();
   // uuidData[currentUUID]?.cards || defaultCardsData
 
-  const stats: any = {
+  const stats: Record<string, SetStats> = {
     complete: new SetStats("complete"),
   };
 
@@ -65,60 +65,59 @@ export function getCollectionStats(cardIds: number[]): CollectionStats {
   cardIds.forEach((cardId) => {
     const card = database.card(cardId);
     if (!card) return;
-    if (card.rarity === "land" || card.rarity === "token") return;
+    if (card.Rarity === "land" || card.IsToken) return;
 
     const cardSet =
-      card.set_digital === ""
-        ? card.set.toLowerCase()
-        : card.set_digital.toLowerCase();
+      card.DigitalSet === null || card.DigitalSet === ""
+        ? card.Set.toLowerCase()
+        : card.DigitalSet.toLowerCase();
 
     const obj: CardStats = {
-      id: card.id,
+      id: card.GrpId,
       owned: 0,
       wanted: 0,
     };
 
     // add to totals
-    if (!stats[cardSet] || stats[cardSet][card.rarity] === undefined) {
-      console.log(card, cardSet, card.rarity);
+    if (!stats[cardSet] || stats[cardSet][card.Rarity] === undefined) {
       return;
     }
 
-    stats[cardSet][card.rarity].total += 4;
-    stats[cardSet][card.rarity].unique += 1;
-    stats.complete[card.rarity].total += 4;
-    stats.complete[card.rarity].unique += 1;
+    stats[cardSet][card.Rarity].total += 4;
+    stats[cardSet][card.Rarity].unique += 1;
+    stats.complete[card.Rarity].total += 4;
+    stats.complete[card.Rarity].unique += 1;
 
     // add cards we own
-    if (cards.cards[card.id] !== undefined) {
-      const owned = cards.cards[card.id];
+    if (cards.cards[card.GrpId] !== undefined) {
+      const owned = cards.cards[card.GrpId];
       obj.owned = owned;
-      stats[cardSet][card.rarity].owned += owned;
-      stats[cardSet][card.rarity].uniqueOwned += 1;
-      stats.complete[card.rarity].owned += owned;
-      stats.complete[card.rarity].uniqueOwned += 1;
+      stats[cardSet][card.Rarity].owned += owned;
+      stats[cardSet][card.Rarity].uniqueOwned += 1;
+      stats.complete[card.Rarity].owned += owned;
+      stats.complete[card.Rarity].uniqueOwned += 1;
 
       // count complete sets we own
       if (owned == 4) {
-        stats[cardSet][card.rarity].complete += 1;
-        stats.complete[card.rarity].complete += 1;
+        stats[cardSet][card.Rarity].complete += 1;
+        stats.complete[card.Rarity].complete += 1;
       }
     }
 
     const col = new Colors();
-    (window as any).Colors = Colors;
-    col.addFromCost(card.cost);
+
+    col.addFromCost(card.ManaCost);
     const colorIndex = col.getBaseColor();
 
     if (!stats[cardSet].cards[colorIndex]) {
       stats[cardSet].cards[colorIndex] = {};
     }
 
-    if (!stats[cardSet].cards[colorIndex][card.rarity]) {
-      stats[cardSet].cards[colorIndex][card.rarity] = [];
+    if (!stats[cardSet].cards[colorIndex][card.Rarity]) {
+      stats[cardSet].cards[colorIndex][card.Rarity] = [];
     }
 
-    stats[cardSet].cards[colorIndex][card.rarity].push(obj);
+    stats[cardSet].cards[colorIndex][card.Rarity].push(obj);
   });
 
   return stats;

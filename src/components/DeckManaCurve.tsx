@@ -48,9 +48,9 @@ function getDeckCurve(deck: Deck): number[][] {
       const cardObj = database.card(card.id);
       if (!cardObj) return;
 
-      const cmc = Math.min(MAX_CMC, cardObj.cmc);
-      if (!cardObj.type.includes("Land")) {
-        cardObj.cost.forEach((c: string): void => {
+      const cmc = Math.min(MAX_CMC, cardObj.Cmc);
+      if (!cardObj.Types.includes("Land")) {
+        cardObj.ManaCost.forEach((c: string): void => {
           if (c.includes("w")) curve[cmc][1] += card.quantity;
           if (c.includes("u")) curve[cmc][2] += card.quantity;
           if (c.includes("b")) curve[cmc][3] += card.quantity;

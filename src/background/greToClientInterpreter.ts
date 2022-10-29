@@ -138,7 +138,7 @@ function isAnnotationProcessed(id: number): boolean {
 
 const actionLogGenerateLink = (grpId: number): string => {
   const card = db.card(grpId);
-  return card ? `<log-card id="${grpId}">${card.name}</log-card>` : "";
+  return card ? `<log-card id="${grpId}">${card.Name}</log-card>` : "";
 };
 
 const actionLogGenerateAbilityLink = (abId: number): string => {
@@ -903,7 +903,7 @@ function getPlayerUsedCards(): number[] {
                     // abilities will apear as many times as this card exists
                     const count = countValues(
                       obj.abilities,
-                      cardObj.abilities[0] || -1
+                      cardObj.AbilityIds[0] || -1
                     );
                     // Add these to the list of cards used
                     for (let ii = 0; ii < count; ii += 1) {

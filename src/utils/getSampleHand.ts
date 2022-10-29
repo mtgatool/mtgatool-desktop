@@ -1,7 +1,7 @@
-import { CardObject, database, DbCardData, Deck } from "mtgatool-shared";
+import { CardObject, database, DbCardDataV2, Deck } from "mtgatool-shared";
 
-export default function getSampleHand(deck: Deck): DbCardData[] {
-  const cards: DbCardData[] = [];
+export default function getSampleHand(deck: Deck): DbCardDataV2[] {
+  const cards: DbCardDataV2[] = [];
   deck
     .getMainboard()
     .get()
@@ -17,7 +17,7 @@ export default function getSampleHand(deck: Deck): DbCardData[] {
       }
     });
 
-  const hand: DbCardData[] = [];
+  const hand: DbCardDataV2[] = [];
   if (cards.length < 7) {
     return hand;
   }

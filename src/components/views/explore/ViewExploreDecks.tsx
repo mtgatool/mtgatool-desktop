@@ -64,20 +64,20 @@ export default function ViewExploreDecks(props: ViewExploreDecksProps) {
     decksForFiltering.forEach((d) => {
       d.deck.forEach((c) => {
         const cardObj = database.card(c.id);
-        if (cardObj && !cardObj.type.toLowerCase().includes("land")) {
-          if (!allCardsCopies[cardObj.name]) {
-            allCardsCopies[cardObj.name] = [];
+        if (cardObj && !cardObj.Types.toLowerCase().includes("land")) {
+          if (!allCardsCopies[cardObj.Name]) {
+            allCardsCopies[cardObj.Name] = [];
           }
-          allCardsCopies[cardObj.name].push(c.quantity);
+          allCardsCopies[cardObj.Name].push(c.quantity);
         }
       });
       Object.keys(d.bestCards).forEach((c) => {
         const cardObj = database.card(parseInt(c));
         if (cardObj) {
-          if (!allBest[cardObj.name]) {
-            allBest[cardObj.name] = 0;
+          if (!allBest[cardObj.Name]) {
+            allBest[cardObj.Name] = 0;
           }
-          allBest[cardObj.name] += 1;
+          allBest[cardObj.Name] += 1;
         }
       });
     });

@@ -317,7 +317,7 @@ export default function MatchView(): JSX.Element {
       <div
         className="matches-top"
         style={{
-          backgroundImage: `url(${getCardArtCrop(playerDeck.tile)})`,
+          backgroundImage: `url("${getCardArtCrop(playerDeck.tile)}")`,
         }}
       >
         <DeckColorsBar deck={playerDeck} />

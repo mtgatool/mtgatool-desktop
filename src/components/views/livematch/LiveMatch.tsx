@@ -86,7 +86,7 @@ export default function LiveMatch() {
           <div
             className="matches-top"
             style={{
-              backgroundImage: `url(${getCardArtCrop(playerDeck.tile)})`,
+              backgroundImage: `url("${getCardArtCrop(playerDeck.tile)}")`,
             }}
           >
             <DeckColorsBar deck={playerDeck} />

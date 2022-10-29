@@ -25,13 +25,13 @@ function getDeckTypesAmount(deck: Deck): { [key: string]: number } {
       }
       const c = database.card(card.id);
       if (c) {
-        if (c.type.includes("Land", 0)) types.lan += card.quantity;
-        if (c.type.includes("Creature", 0)) types.cre += card.quantity;
-        if (c.type.includes("Artifact", 0)) types.art += card.quantity;
-        if (c.type.includes("Enchantment", 0)) types.enc += card.quantity;
-        if (c.type.includes("Instant", 0)) types.ins += card.quantity;
-        if (c.type.includes("Sorcery", 0)) types.sor += card.quantity;
-        if (c.type.includes("Planeswalker", 0)) types.pla += card.quantity;
+        if (c.Types.includes("Land", 0)) types.lan += card.quantity;
+        if (c.Types.includes("Creature", 0)) types.cre += card.quantity;
+        if (c.Types.includes("Artifact", 0)) types.art += card.quantity;
+        if (c.Types.includes("Enchantment", 0)) types.enc += card.quantity;
+        if (c.Types.includes("Instant", 0)) types.ins += card.quantity;
+        if (c.Types.includes("Sorcery", 0)) types.sor += card.quantity;
+        if (c.Types.includes("Planeswalker", 0)) types.pla += card.quantity;
       }
     });
 

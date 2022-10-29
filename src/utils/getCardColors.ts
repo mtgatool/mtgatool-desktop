@@ -1,10 +1,10 @@
 import { uniq } from "lodash";
-import { DbCardData, constants } from "mtgatool-shared";
+import { DbCardDataV2, constants } from "mtgatool-shared";
 
 const { WHITE, BLUE, BLACK, RED, GREEN, COLORLESS } = constants;
 
-export default function getCardColors(card: DbCardData): number[] {
-  const colors = card.cost.reduce<number[]>((colorIndices, current) => {
+export default function getCardColors(card: DbCardDataV2): number[] {
+  const colors = card.ManaCost.reduce<number[]>((colorIndices, current) => {
     switch (current) {
       case "w":
         return colorIndices.concat(WHITE);

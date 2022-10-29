@@ -12,6 +12,7 @@ import { CARD_SIZE_RATIO } from "../../../common/static";
 import useHoverCard from "../../../hooks/useHoverCard";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { CardsData } from "../../../types/collectionTypes";
+import database from "../../../utils/database-wrapper";
 import { getCardImage } from "../../../utils/getCardArtCrop";
 import getCssQuality from "../../../utils/getCssQuality";
 import openScryfallCard from "../../../utils/openScryfallCard";
@@ -24,7 +25,7 @@ interface CardCollectionProps {
 export default function CardCollection(props: CardCollectionProps) {
   const { card } = props;
   const onClick = useCallback(() => {
-    openScryfallCard(card);
+    openScryfallCard(card.id);
   }, [card]);
   const containerEl = useRef<HTMLDivElement>(null);
 
@@ -45,22 +46,25 @@ export default function CardCollection(props: CardCollectionProps) {
 
   useEffect(() => {
     const img = new Image();
-    const imageUrl = getCardImage(card, cardsQuality);
+
+    const imageUrl = getCardImage(card.id, cardsQuality);
     img.src = imageUrl;
     img.onload = (): void => {
       setCardUrl(imageUrl);
     };
   }, []);
 
+  const cardObj = database.card(card.id);
+
   return (
     <div
       ref={containerEl}
-      title={`open ${card.name} in Scryfall (browser)`}
+      title={`open ${cardObj?.Name} in Scryfall (browser)`}
       onClick={onClick}
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
       <div style={{ width: "100%", maxWidth: `${cardSize}px` }}>
-        <OwnershipStars card={card} />
+        {cardObj && <OwnershipStars card={cardObj} />}
       </div>
       <div
         className="inventory-card"

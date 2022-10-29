@@ -18,13 +18,13 @@ export default function getDeckColors(deck: InternalDeck): number[] {
         return;
       }
 
-      const isLand = cardData.type.indexOf("Land") !== -1;
-      const { frame } = cardData;
-      if (isLand && frame.length < 3) {
-        colorIndices = colorIndices.concat(frame);
+      const isLand = cardData.Types.indexOf("Land") !== -1;
+      const { FrameColors } = cardData;
+      if (isLand && FrameColors.length < 3) {
+        colorIndices = colorIndices.concat(FrameColors);
       }
 
-      cardData.cost.forEach((cost) => {
+      cardData.ManaCost.forEach((cost) => {
         if (cost === "w") {
           colorIndices.push(WHITE);
         } else if (cost === "u") {

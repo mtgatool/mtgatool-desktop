@@ -52,31 +52,31 @@ export default function WildcardsCost(props: WildcardsCostProps): JSX.Element {
           : { display: "flex", flexDirection: "row", marginRight: "16px" }
       }
     >
-      {CARD_RARITIES.filter(
-        (rarity) => rarity !== "land" && rarity !== "token"
-      ).map((cardRarity: string, index) => {
-        const key = getRarityKey(cardRarity);
-        if (key) {
-          // const owned = ownedWildcards[key];
-          const missing = missingWildcards[key];
-          if (missing) {
-            return (
-              <div
-                // eslint-disable-next-line react/no-array-index-key
-                key={`${deck.id}-${index}-${cardRarity}`}
-                className={`${
-                  shrink ? "wc-deckstab-cost" : "wc-explore-cost"
-                } ${wcIcon[cardRarity]}`}
-                title={`${_.capitalize(cardRarity)} wildcards needed.`}
-              >
-                {missing}
-              </div>
-            );
+      {CARD_RARITIES.filter((rarity) => rarity !== "land").map(
+        (cardRarity: string, index) => {
+          const key = getRarityKey(cardRarity);
+          if (key) {
+            // const owned = ownedWildcards[key];
+            const missing = missingWildcards[key];
+            if (missing) {
+              return (
+                <div
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={`${deck.id}-${index}-${cardRarity}`}
+                  className={`${
+                    shrink ? "wc-deckstab-cost" : "wc-explore-cost"
+                  } ${wcIcon[cardRarity]}`}
+                  title={`${_.capitalize(cardRarity)} wildcards needed.`}
+                >
+                  {missing}
+                </div>
+              );
+            }
           }
+          // eslint-disable-next-line react/no-array-index-key
+          return <Fragment key={`${deck.id}-${index}-${cardRarity}`} />;
         }
-        // eslint-disable-next-line react/no-array-index-key
-        return <Fragment key={`${deck.id}-${index}-${cardRarity}`} />;
-      })}
+      )}
       {drawCost && (
         <div
           title="Boosters needed (estimated)"

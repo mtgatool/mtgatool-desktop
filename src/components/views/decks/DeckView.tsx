@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import {
   Colors,
   compareCards,
-  DbCardData,
+  DbCardDataV2,
   Deck,
   getDeckColorsAmmount,
   getDeckLandsAmmount,
@@ -289,12 +289,12 @@ export default function DeckView(): JSX.Element {
 
               {shuffle[0] &&
                 getSampleHand(deck)
-                  .sort((a: DbCardData, b: DbCardData) => {
+                  .sort((a: DbCardDataV2, b: DbCardDataV2) => {
                     const sort = (_a: any, _b: any): number =>
                       _a > _b ? 1 : _a < _b ? -1 : 0;
-                    return sort(a.cmc, b.cmc) || sort(a.name, b.name);
+                    return sort(a.Cmc, b.Cmc) || sort(a.Name, b.Name);
                   })
-                  .map((c: DbCardData, index: number) => {
+                  .map((c: DbCardDataV2, index: number) => {
                     return (
                       <CardTile
                         indent="a"

@@ -12,7 +12,7 @@ export interface Winrate {
 
 function newCardWinrate(grpId: number): CardWinrateData {
   return {
-    name: database.card(grpId)?.name || "",
+    name: database.card(grpId)?.Name || "",
     wins: 0,
     losses: 0,
     turnsUsed: [],

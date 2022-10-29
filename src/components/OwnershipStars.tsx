@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { cardHasType, DbCardData } from "mtgatool-shared";
+import { cardHasType, DbCardDataV2 } from "mtgatool-shared";
 import { AppState } from "../redux/stores/rendererStore";
 import { defaultCardsData } from "../types/dbTypes";
 
@@ -82,7 +82,7 @@ function MultiCardOwnership(props: OwnershipProps): JSX.Element {
 }
 
 export default function OwnershipStars(props: {
-  card: DbCardData;
+  card: DbCardDataV2;
   wanted?: number;
 }): JSX.Element {
   const { card, wanted } = props;
@@ -99,21 +99,20 @@ export default function OwnershipStars(props: {
   if (!card) {
     return <></>;
   }
-  let owned = cards.cards[card.id] ?? 0;
+  let owned = cards.cards[card.GrpId] ?? 0;
   const acquired =
-    (cards.cards[card.id] || 0) - (cards.prevCards[card.id] || 0);
+    (cards.cards[card.GrpId] || 0) - (cards.prevCards[card.GrpId] || 0);
   const isWanted = wanted ?? 0;
 
   const infinitePlaysetCards = [69172, 67306, 76490];
 
-  const isbasic =
-    cardHasType(card, "Basic Land") || cardHasType(card, "Basic Snow Land");
+  const isbasic = cardHasType(card, "Basic") || cardHasType(card, "Basic Snow");
   let Renderer = isbasic ? OwnershipInfinity : MultiCardOwnership;
 
-  if (infinitePlaysetCards.includes(card.id) && owned == 4) {
+  if (infinitePlaysetCards.includes(card.GrpId) && owned == 4) {
     Renderer = OwnershipInfinity;
   }
-  if (card.rarity == "token") {
+  if (card.IsToken) {
     owned = 4;
     Renderer = OwnershipInfinity;
   }

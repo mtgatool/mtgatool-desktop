@@ -1,4 +1,9 @@
-import { Colors, database, DbCardData, InternalDraftv2 } from "mtgatool-shared";
+import {
+  Colors,
+  database,
+  DbCardDataV2,
+  InternalDraftv2,
+} from "mtgatool-shared";
 import {
   DRAFT_RANKS,
   DRAFT_RANKS_LOLA,
@@ -13,14 +18,18 @@ interface DraftOverlayProps {
   votes: Record<string, DbDraftVote>;
 }
 
-function getRank(cardId: number): number {
+function getRank(cardId: number): number | undefined {
   const cardObj = database.card(cardId);
-  return cardObj?.rank || 0;
+  if (cardObj?.RankData && cardObj?.RankData.rankSource !== -1) {
+    return cardObj.RankData.rank;
+  }
+
+  return undefined;
 }
 
 function compareDraftPicks(
-  aCard: DbCardData | undefined,
-  bCard: DbCardData | undefined
+  aCard: DbCardDataV2 | undefined,
+  bCard: DbCardDataV2 | undefined
 ): -1 | 0 | 1 {
   if (bCard === undefined) {
     return -1;
@@ -29,22 +38,32 @@ function compareDraftPicks(
     return 1;
   }
   const aColors = new Colors();
-  if (aCard.cost) {
-    aColors.addFromCost(aCard.cost);
+  if (aCard.ManaCost) {
+    aColors.addFromCost(aCard.ManaCost);
   }
   const bColors = new Colors();
-  if (bCard.cost) {
-    bColors.addFromCost(bCard.cost);
+  if (bCard.ManaCost) {
+    bColors.addFromCost(bCard.ManaCost);
   }
-  const aType = getCardTypeSort(aCard.type);
-  const bType = getCardTypeSort(bCard.type);
+  const aType = getCardTypeSort(aCard.Types);
+  const bType = getCardTypeSort(bCard.Types);
 
-  const rankDiff =
-    aCard.source == 0 ? bCard.rank - aCard.rank : aCard.rank - bCard.rank;
+  let aRankVal = 0;
+  if (aCard.RankData.rankSource == 0) aRankVal = aCard.RankData.rank;
+  if (aCard.RankData.rankSource == 1) aRankVal = aCard.RankData.rank;
+  if (aCard.RankData.rankSource == 2) aRankVal = aCard.RankData.rank;
+
+  let bRankVal = 0;
+  if (bCard.RankData.rankSource == 0) bRankVal = bCard.RankData.rank;
+  if (bCard.RankData.rankSource == 1) bRankVal = bCard.RankData.rank;
+  if (bCard.RankData.rankSource == 2) bRankVal = bCard.RankData.rank;
+
+  const rankDiff = aRankVal - bRankVal;
+
   const colorsLengthDiff = aColors.length - bColors.length;
-  const cmcDiff = aCard.cmc - bCard.cmc;
+  const cmcDiff = aCard.Cmc - bCard.Cmc;
   const typeDiff = aType - bType;
-  const localeCompare = aCard.name.localeCompare(bCard.name);
+  const localeCompare = aCard.Name.localeCompare(bCard.Name);
   const compare =
     rankDiff || colorsLengthDiff || cmcDiff || typeDiff || localeCompare;
 
@@ -85,35 +104,37 @@ export default function DraftOverlay(props: DraftOverlayProps) {
         .sort(compareDraftPicks)
         .map((fullCard) => {
           if (!fullCard) return <></>;
-          const rank = getRank(fullCard.id);
+          const rank = getRank(fullCard.GrpId);
           const quantity: QuantityRank = {
             type: "RANK",
             quantity:
-              fullCard.source == 0 ? DRAFT_RANKS[rank] : DRAFT_RANKS_LOLA[rank],
+              fullCard.RankData.rankSource == 0
+                ? DRAFT_RANKS[rank || 0]
+                : DRAFT_RANKS_LOLA[rank || 0],
           };
 
           const dfcCard =
-            fullCard?.dfcId && fullCard.dfcId !== true
-              ? database.card(fullCard.dfcId)
+            fullCard?.LinkedFaceGrpIds.length > 0
+              ? database.card(fullCard.LinkedFaceGrpIds[0])
               : undefined;
 
           return (
             <div
               className="draft-card-tile-container"
-              key={`draft-card-tile-${fullCard.id}`}
+              key={`draft-card-tile-${fullCard.GrpId}`}
             >
               {Object.keys(votes).length > 0 && (
                 <div
                   style={{
-                    color: fullCard.id === mostVoted ? "var(--color-g)" : "",
+                    color: fullCard.GrpId === mostVoted ? "var(--color-g)" : "",
                     fontFamily:
-                      fullCard.id === mostVoted
+                      fullCard.GrpId === mostVoted
                         ? "var(--main-font-name-bold-it)"
                         : "",
                   }}
                   className="draft-vote"
                 >
-                  {currentVotes[fullCard.id] || 0}
+                  {currentVotes[fullCard.GrpId] || 0}
                 </div>
               )}
               <CardTile

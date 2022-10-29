@@ -92,7 +92,7 @@ export default function DecksArtViewRow(
       className="decks-table-deck-tile"
       onClick={() => clickDeck(deck)}
       style={{
-        backgroundImage: `url(${cardUrl || squirrels})`,
+        backgroundImage: `url("${cardUrl || squirrels}")`,
       }}
     >
       <DeckColorsBar deck={deckObj} />

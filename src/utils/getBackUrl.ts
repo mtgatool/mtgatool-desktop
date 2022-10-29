@@ -1,20 +1,17 @@
+import { DEFAULT_TILE } from "mtgatool-shared/dist/shared/constants";
 import notFound from "../assets/images/notfound.png";
 import database from "./database-wrapper";
-import isCardDfc from "./isCardDfc";
+import { getCardImage } from "./getCardArtCrop";
 
 export default function getBackUrl(
   hoverGrpId: number,
   quality: string
 ): string {
-  let cardObj = database.card(hoverGrpId);
-  let newImg;
-  if (cardObj?.dfcId && cardObj.dfcId !== true && isCardDfc(hoverGrpId)) {
-    cardObj = database.card(cardObj.dfcId);
-    try {
-      newImg = cardObj?.images[quality];
-    } catch (e) {
-      newImg = notFound;
-    }
-  }
+  const cardObj = database.card(hoverGrpId);
+  const newImg = getCardImage(
+    cardObj?.LinkedFaceGrpIds[0] || DEFAULT_TILE,
+    quality
+  );
+
   return newImg || notFound;
 }

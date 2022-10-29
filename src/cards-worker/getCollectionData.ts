@@ -1,3 +1,4 @@
+import { CardsData } from "../types/collectionTypes";
 import Colors from "./colors";
 import getCardBanned from "./getCardBanned";
 import getCardFormats from "./getCardFormats";
@@ -5,6 +6,7 @@ import getCardInBoosters from "./getCardInBoosters";
 import getCardIsCraftable from "./getCardIsCraftable";
 import getCardSuspended from "./getCardSuspended";
 import getRarityFilterVal from "./getRarityFilterVal";
+import CardType from "./typesWrap";
 
 const DRAFT_RANKS = [
   "F",
@@ -51,62 +53,74 @@ const FACE_SPLIT = 5;
  * @returns Cards Data
  */
 export default function getCollectionData(
-  cards: any,
-  cardsList: any[],
-  allCards: Record<string, any>,
+  cards: {
+    prevCards: Record<string, number>;
+    cards: Record<string, number>;
+  },
+  cardsList: CardType[],
+  allCards: Record<string, CardType>,
   setNames: any,
   sets: any
 ): any[] {
   return cardsList
     .filter(
       (card) =>
-        card.dfc !== FACE_DFC_BACK &&
-        card.dfc !== FACE_ADVENTURE &&
-        card.dfc !== FACE_SPLIT &&
-        card.dfc !== FACE_MODAL_BACK &&
-        card.dfc !== FACE_SPECIALIZE_BACK
+        card.LinkedFaceType !== FACE_DFC_BACK &&
+        card.LinkedFaceType !== FACE_ADVENTURE &&
+        card.LinkedFaceType !== FACE_SPLIT &&
+        card.LinkedFaceType !== FACE_MODAL_BACK &&
+        card.LinkedFaceType !== FACE_SPECIALIZE_BACK
     )
-    .map((card): any => {
-      const RANK_SOURCE = card.source == 0 ? DRAFT_RANKS : DRAFT_RANKS_LOLA;
+    .map((card) => {
+      const RANK_SOURCE =
+        card.RankData.rankSource == 0 ? DRAFT_RANKS : DRAFT_RANKS_LOLA;
 
-      const dfc = allCards[card.dfcId !== true ? card.dfcId || 0 : 0];
-      const dfcName = dfc?.name.toLowerCase() || "";
-      const name = `${card.name.toLowerCase()} ${dfcName}`;
-      const type = card.type.toLowerCase();
-      const artist = card.artist?.toLowerCase() || "";
+      const dfc =
+        allCards[
+          card.LinkedFaceGrpIds.length > 0 ? card.LinkedFaceGrpIds[0] : 0
+        ];
+      const dfcName = dfc?.Name.toLowerCase() || "";
+      const fullName = `${card.Name.toLowerCase()} ${dfcName}`;
+      const fullType = [
+        card.Supertypes.toLowerCase(),
+        card.Types.toLowerCase(),
+        card.Subtypes.toLowerCase(),
+      ].join(" ");
+      const artist = card.ArtistCredit?.toLowerCase() || "";
 
-      const owned = cards.cards[card.id] ?? 0;
+      const owned = cards.cards[card.GrpId] ?? 0;
       const acquired =
-        (cards.cards[card.id] || 0) - (cards.prevCards[card.id] || 0);
+        (cards.cards[card.GrpId] || 0) - (cards.prevCards[card.GrpId] || 0);
 
       const colorsObj = new Colors();
-      colorsObj.addFromCost(card.cost);
+      colorsObj.addFromCost(card.ManaCost);
       const colorSortVal = colorsObj.get().join("");
       let colors = colorsObj.getBits();
       if (colors > 31 && colors !== 32) {
         colors -= 32;
       }
-      const rarityVal = getRarityFilterVal(card.rarity);
-      const rankSortVal = RANK_SOURCE[card.rank] ?? "?";
+      const rarityVal = getRarityFilterVal(card.Rarity);
+      const rankSortVal =
+        RANK_SOURCE[card.RankData.rankSource !== -1 ? card.RankData.rank : 0] ??
+        "?";
 
-      const setCode =
-        card.set_digital === ""
-          ? [card.set.toLowerCase()]
-          : [card.set_digital.toLowerCase()];
-
-      const { set } = card;
+      const setCode = [
+        card.DigitalSet?.toLowerCase() || card.Set.toLowerCase(),
+      ];
 
       const format = getCardFormats(card, allCards, setNames, sets);
       const banned = getCardBanned(card);
       const suspended = getCardSuspended(card);
       const craftable = getCardIsCraftable(card, allCards, setNames, sets);
       const booster = getCardInBoosters(card, setNames, sets);
-      return {
-        ...card,
-        name,
-        type,
+      const finalCard: CardsData = {
+        // : CardsData
+        id: card.GrpId,
+        cmc: card.Cmc,
+        cid: parseFloat(card.CollectorNumber),
+        fullName,
+        fullType,
         artist,
-        set,
         owned,
         acquired,
         colors,
@@ -121,5 +135,7 @@ export default function getCollectionData(
         craftable,
         booster,
       };
+
+      return finalCard;
     });
 }

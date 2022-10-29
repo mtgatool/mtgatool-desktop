@@ -38,7 +38,7 @@ export default function getWildcardsMissing(
 
   const card = database.card(grpid);
   let arr = [];
-  if (!card?.reprints) arr = [grpid];
+  if (!card?.Reprints) arr = [grpid];
   else arr.push(grpid);
 
   let have = 0;
