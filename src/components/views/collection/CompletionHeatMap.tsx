@@ -74,9 +74,9 @@ function RarityColumn({
   color: number;
   rarityCode: string;
 }): JSX.Element {
-  const rarityIndex = CARD_RARITIES.filter((r) => r !== "land").indexOf(
-    rarityCode as any
-  );
+  const rarityIndex = CARD_RARITIES.filter(
+    (r) => r !== "land" && r !== "token"
+  ).indexOf(rarityCode as any);
   const rarity = rarityCode.toLowerCase();
   const cardsArray = colorData && colorData[rarity] ? colorData[rarity] : [];
   return (
