@@ -135,6 +135,18 @@ export default function CollectionStatsPanel({
         <div className="economy-wc wc-mythic" />
         <div>{formatNumber(userData.inventory.WildCardMythics)}</div>
       </div>
+      <i
+        style={{
+          color: "var(--color-text-dark)",
+          textAlign: "center",
+          fontSize: "14px",
+          marginBottom: "16px",
+          padding: "0px 16px",
+        }}
+      >
+        MTG Arena now displays set stats as &quot;In boosters&quot; and
+        &quot;Singleton (at least one)&quot;.
+      </i>
       <div style={{ textAlign: "center" }}>
         <Flex
           style={{
