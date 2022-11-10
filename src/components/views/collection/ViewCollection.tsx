@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useRouteMatch } from "react-router-dom";
+import { database } from "mtgatool-shared";
 import reduxAction from "../../../redux/reduxAction";
 import store, { AppState } from "../../../redux/stores/rendererStore";
 
@@ -175,8 +176,62 @@ export default function ViewCollection(props: ViewCollectionProps) {
     [history]
   );
 
+  function generateCollectionCSV() {
+    let csv = `Count,Name,Edition,Collector Number\n`;
+
+    collectionData.forEach((c) => {
+      const cardObj = database.card(c.id);
+
+      if (c.owned > 0 && cardObj && c.rarityVal > 2) {
+        let set = cardObj.DigitalSet ? cardObj.DigitalSet : cardObj.Set;
+
+        const setName =
+          database.setNames[set.toUpperCase()] ||
+          database.setNames[set.toLowerCase()];
+        if (setName) {
+          set = database.sets[setName].scryfall;
+        }
+
+        csv += `${c.owned},${cardObj.Name},${set},${c.cid}\n`;
+      }
+    });
+
+    return csv;
+  }
+
+  const downloadTxtFile = useCallback(() => {
+    const exportTxt = generateCollectionCSV();
+    const element = document.createElement("a");
+    const file = new Blob([exportTxt], { type: "text/plain" });
+    element.href = URL.createObjectURL(file);
+    element.download = "collection.csv";
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
+  }, []);
+
   return (
     <>
+      <Section style={{ marginTop: "16px" }}>
+        <i
+          style={{
+            lineHeight: "30px",
+            height: "30px",
+            margin: "auto auto auto 8px",
+            color: "var(--color-text-dark)",
+          }}
+        >
+          Collection is saved in the{" "}
+          <a href="https://www.moxfield.com/help/importing-collection">
+            MoxField CSV format
+          </a>
+        </i>
+        <Button
+          style={{ margin: "16px" }}
+          className="button-simple"
+          text="Download Collection"
+          onClick={downloadTxtFile}
+        />
+      </Section>
       <Section style={{ flexDirection: "column", marginTop: "16px" }}>
         <div style={{ display: "flex", width: "100%" }}>
           <Button
