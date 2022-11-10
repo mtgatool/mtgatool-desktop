@@ -157,6 +157,7 @@
   },
   "devDependencies": {
     "@craco/craco": "^6.4.3",
+    "@electron/rebuild": "^3.2.10",
     "@storybook/addon-actions": "^6.5.0-beta.1",
     "@storybook/addon-essentials": "^6.5.0-beta.1",
     "@storybook/addon-links": "^6.5.0-beta.1",
@@ -184,7 +185,6 @@
     "chromatic": "^5.9.2",
     "electron": "^13.0.0",
     "electron-builder": "^22.11.7",
-    "electron-rebuild": "^2.3.5",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-cypress": "^2.11.3",
