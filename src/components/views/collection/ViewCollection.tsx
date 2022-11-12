@@ -25,6 +25,7 @@ import { Filters } from "../../../types/genericFilterTypes";
 import SetsView from "./SetsView";
 import { getCollectionStats } from "./collectionStats";
 import Section from "../../ui/Section";
+import Toggle from "../../ui/Toggle";
 
 interface ViewCollectionProps {
   collectionData: CardsData[];
@@ -35,6 +36,8 @@ export default function ViewCollection(props: ViewCollectionProps) {
   const match = useRouteMatch<{ query: string }>("/collection/:query");
   const history = useHistory();
 
+  const [exportUnowned, setExportUnowned] = useState<boolean>(false);
+  const [exportDigital, setExportDigital] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<"cards" | "set">("cards");
 
   const { collectionData, openAdvancedCollectionSearch } = props;
@@ -56,6 +59,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
   const forceQuery = useSelector(
     (state: AppState) => state.renderer.forceQuery
   );
+
   const collectionQuery = useSelector(
     (state: AppState) => state.renderer.collectionQuery
   );
@@ -176,30 +180,40 @@ export default function ViewCollection(props: ViewCollectionProps) {
     [history]
   );
 
-  function generateCollectionCSV() {
-    let csv = `Count,Name,Edition,Collector Number\n`;
-
-    collectionData.forEach((c) => {
-      const cardObj = database.card(c.id);
-
-      if (c.owned > 0 && cardObj && c.rarityVal > 2) {
-        let set = cardObj.DigitalSet ? cardObj.DigitalSet : cardObj.Set;
-
-        const setName =
-          database.setNames[set.toUpperCase()] ||
-          database.setNames[set.toLowerCase()];
-        if (setName) {
-          set = database.sets[setName].scryfall;
-        }
-
-        csv += `${c.owned},${cardObj.Name},${set},${c.cid}\n`;
-      }
-    });
-
-    return csv;
-  }
-
   const downloadTxtFile = useCallback(() => {
+    function generateCollectionCSV() {
+      let csv = `Count,Name,Edition,Collector Number,Rarity\n`;
+
+      collectionData.forEach((c) => {
+        const cardObj = database.card(c.id);
+
+        const isDigital =
+          cardObj &&
+          (cardObj.DigitalSet !== "" || cardObj.IsDigitalOnly === true);
+
+        if (
+          cardObj &&
+          (!isDigital || exportDigital) &&
+          cardObj.Set !== "WC" &&
+          c.rarityVal > 2 &&
+          (c.owned > 0 || exportUnowned)
+        ) {
+          let set = cardObj.DigitalSet ? cardObj.DigitalSet : cardObj.Set;
+
+          const setName =
+            database.setNames[set.toUpperCase()] ||
+            database.setNames[set.toLowerCase()];
+          if (setName) {
+            set = database.sets[setName].scryfall;
+          }
+
+          csv += `${c.owned},${cardObj.Name},${set},${c.cid},${cardObj.Rarity}\n`;
+        }
+      });
+
+      return csv;
+    }
+
     const exportTxt = generateCollectionCSV();
     const element = document.createElement("a");
     const file = new Blob([exportTxt], { type: "text/plain" });
@@ -207,11 +221,23 @@ export default function ViewCollection(props: ViewCollectionProps) {
     element.download = "collection.csv";
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
-  }, []);
+  }, [exportUnowned, exportDigital, collectionData]);
 
   return (
     <>
       <Section style={{ marginTop: "16px" }}>
+        <Toggle
+          style={{ maxWidth: "240px", marginRight: "48px" }}
+          text="Include unowned cards?"
+          value={exportUnowned}
+          callback={setExportUnowned}
+        />
+        <Toggle
+          style={{ maxWidth: "240px", marginRight: "48px" }}
+          text="Include digital sets?"
+          value={exportDigital}
+          callback={setExportDigital}
+        />
         <i
           style={{
             lineHeight: "30px",
