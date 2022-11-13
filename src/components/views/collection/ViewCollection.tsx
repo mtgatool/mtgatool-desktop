@@ -246,10 +246,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
             color: "var(--color-text-dark)",
           }}
         >
-          Collection is saved in the{" "}
-          <a href="https://www.moxfield.com/help/importing-collection">
-            MoxField CSV format
-          </a>
+          Collection is saved in CSV format
         </i>
         <Button
           style={{ margin: "16px" }}
