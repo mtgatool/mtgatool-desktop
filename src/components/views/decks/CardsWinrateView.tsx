@@ -365,6 +365,8 @@ export default function CardsWinratesView(
     useSortBy
   );
 
+  console.log(rows);
+
   return (
     <div className="cards-wr-view-grid">
       <Section
@@ -432,7 +434,7 @@ export default function CardsWinratesView(
               .getMainboard()
               .countFilter(
                 "quantity",
-                (card: CardObject) => row.original.cardObj?.id == card.id
+                (card: CardObject) => row.original.cardObj?.GrpId == card.id
               );
             if (q > 0 && row.original.cardObj !== null) {
               return cardWinrateLine({ ...row.original, quantity: q });
@@ -459,7 +461,7 @@ export default function CardsWinratesView(
               .getSideboard()
               .countFilter(
                 "quantity",
-                (card: CardObject) => row.original.cardObj?.id == card.id
+                (card: CardObject) => row.original.cardObj?.GrpId == card.id
               );
             if (q > 0 && row.original.cardObj !== null) {
               return cardWinrateLine({ ...row.original, quantity: q });
