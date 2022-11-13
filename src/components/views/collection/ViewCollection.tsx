@@ -182,7 +182,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
   const downloadTxtFile = useCallback(() => {
     function generateCollectionCSV() {
-      let csv = `Count,Name,Edition,Collector Number,Rarity\n`;
+      let csv = `Count;Name;Edition;Collector Number;Rarity\n`;
 
       collectionData.forEach((c) => {
         const cardObj = database.card(c.id);
@@ -207,7 +207,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
             set = database.sets[setName].scryfall;
           }
 
-          csv += `${c.owned},${cardObj.Name},${set},${c.cid},${cardObj.Rarity}\n`;
+          csv += `${c.owned};${cardObj.Name};${set};${c.cid};${cardObj.Rarity}\n`;
         }
       });
 
