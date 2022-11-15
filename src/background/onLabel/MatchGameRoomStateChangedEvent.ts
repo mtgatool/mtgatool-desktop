@@ -49,7 +49,15 @@ export default function onLabelMatchGameRoomStateChangedEvent(
   const gameRoom = json.matchGameRoomStateChangedEvent.gameRoomInfo;
   let eventId = "";
 
-  if (gameRoom.gameRoomConfig) {
+  if (gameRoom.gameRoomConfig.eventId) {
+    eventId = gameRoom.gameRoomConfig.eventId;
+    setCurrentMatchMany({
+      eventId: eventId,
+    });
+    // globals.duringMatch = true;
+  }
+
+  if ((gameRoom.gameRoomConfig as any).reservedPlayers) {
     eventId = (gameRoom.gameRoomConfig as any).reservedPlayers[0].eventId;
     setCurrentMatchMany({
       eventId: eventId,
