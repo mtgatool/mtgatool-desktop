@@ -50,7 +50,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
   let eventId = "";
 
   if (gameRoom.gameRoomConfig) {
-    eventId = gameRoom.gameRoomConfig.eventId;
+    eventId = (gameRoom.gameRoomConfig as any).reservedPlayers[0].eventId;
     setCurrentMatchMany({
       eventId: eventId,
     });
