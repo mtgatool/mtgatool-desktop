@@ -1,7 +1,7 @@
 // import "./wdyr";
-// eslint-disable-next-line no-use-before-define
 import "./index.scss";
 
+// eslint-disable-next-line no-use-before-define
 import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
