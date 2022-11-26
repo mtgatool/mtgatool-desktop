@@ -1,27 +1,24 @@
 import { Deck } from "mtgatool-shared";
-
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-
 import { useHistory, useParams } from "react-router-dom";
 
+import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
 import { ReactComponent as CopyButton } from "../../../assets/images/svg/copy.svg";
 // import { ReactComponent as IconCrown } from "../../../assets/images/svg/crown.svg";
 import { ReactComponent as IconEvent } from "../../../assets/images/svg/event.svg";
-import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
-
 import { OverlayUpdateMatchState } from "../../../background/store/types";
 import reduxAction from "../../../redux/reduxAction";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { getCardArtCrop } from "../../../utils/getCardArtCrop";
+import getEventPrettyName from "../../../utils/getEventPrettyName";
 import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
 import DeckColorsBar from "../../DeckColorsBar";
 import Flex from "../../Flex";
+import ManaCost from "../../ManaCost";
 import SvgButton from "../../SvgButton";
 import Section from "../../ui/Section";
 import LiveMatchDeckList from "./LiveMatchDeckList";
-import ManaCost from "../../ManaCost";
-import getEventPrettyName from "../../../utils/getEventPrettyName";
 
 export default function LiveMatch() {
   const history = useHistory();

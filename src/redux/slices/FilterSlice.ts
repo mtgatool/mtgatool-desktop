@@ -1,19 +1,20 @@
 /* eslint-disable no-param-reassign */
 
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+import { Sort } from "../../components/SortControls";
+import { MatchData } from "../../components/views/history/getMatchesData";
+import { StatsDeck } from "../../types/dbTypes";
 import {
   Filters,
   FilterTypeBase,
   MinMaxFilterType,
   StringFilterType,
 } from "../../types/genericFilterTypes";
-import { MatchData } from "../../components/views/history/getMatchesData";
 import getLocalSetting from "../../utils/getLocalSetting";
-import { StatsDeck } from "../../types/dbTypes";
-import { AppState } from "../stores/rendererStore";
-import setFilter from "../../utils/tables/filters/setFilter";
 import setLocalSetting from "../../utils/setLocalSetting";
-import { Sort } from "../../components/SortControls";
+import setFilter from "../../utils/tables/filters/setFilter";
+import { AppState } from "../stores/rendererStore";
 
 export type DateOption =
   | "All Time"

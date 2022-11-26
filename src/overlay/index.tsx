@@ -1,30 +1,28 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import { Chances, compareCards, Deck, InternalDraftv2 } from "mtgatool-shared";
-
 import {
   OVERLAY_DRAFT,
   OVERLAY_FULL,
   OVERLAY_LOG,
   OVERLAY_SEEN,
 } from "mtgatool-shared/dist/shared/constants";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { OverlayUpdateMatchState } from "../background/store/types";
+import { ChannelMessage } from "../broadcastChannel/channelMessages";
+import postChannelMessage from "../broadcastChannel/postChannelMessage";
+import { OverlaySettings, Settings } from "../common/defaultConfig";
+import { overlayTitleToId } from "../common/maps";
+import ActionLog from "../components/ActionLog";
 import OverlayDeckList from "../components/OverlayDeckList";
 import TopBar from "../components/TopBar";
-
-import { ChannelMessage } from "../broadcastChannel/channelMessages";
-import bcConnect from "../utils/bcConnect";
-import getLocalSetting from "../utils/getLocalSetting";
 import useDebounce from "../hooks/useDebounce";
-import electron from "../utils/electron/electronWrapper";
-import { OverlayUpdateMatchState } from "../background/store/types";
-import { OverlaySettings, Settings } from "../common/defaultConfig";
-
-import postChannelMessage from "../broadcastChannel/postChannelMessage";
-import Clock from "./Clock";
-import { overlayTitleToId } from "../common/maps";
-import DraftOverlay from "./DraftOverlay";
-import getPlayerNameWithoutSuffix from "../utils/getPlayerNameWithoutSuffix";
 import { DbDraftVote } from "../types/dbTypes";
-import ActionLog from "../components/ActionLog";
+import bcConnect from "../utils/bcConnect";
+import electron from "../utils/electron/electronWrapper";
+import getLocalSetting from "../utils/getLocalSetting";
+import getPlayerNameWithoutSuffix from "../utils/getPlayerNameWithoutSuffix";
+import Clock from "./Clock";
+import DraftOverlay from "./DraftOverlay";
 
 function getCurrentOverlayId(): number {
   const title = electron?.remote.getCurrentWindow().getTitle() || "";

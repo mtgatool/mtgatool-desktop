@@ -1,31 +1,27 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import { database } from "mtgatool-shared";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { database } from "mtgatool-shared";
+
+import usePagingControls from "../../../hooks/usePagingControls";
 import reduxAction from "../../../redux/reduxAction";
 import store, { AppState } from "../../../redux/stores/rendererStore";
-
-import InputContainer from "../../InputContainer";
-import Button from "../../ui/Button";
-
-import getFiltersFromQuery from "./collectionQuery";
-
 import { CardsData } from "../../../types/collectionTypes";
-import doCollectionFilter from "../../../utils/tables/doCollectionFilter";
-
-import CardCollection from "./CardCollection";
-import PagingControls from "../../PagingControls";
-import usePagingControls from "../../../hooks/usePagingControls";
-import SortControls, { Sort } from "../../SortControls";
-import SetsFilter from "../../SetsFilter";
-import setFilter from "../../../utils/tables/filters/setFilter";
 import { Filters } from "../../../types/genericFilterTypes";
-
-import SetsView from "./SetsView";
-import { getCollectionStats } from "./collectionStats";
+import doCollectionFilter from "../../../utils/tables/doCollectionFilter";
+import setFilter from "../../../utils/tables/filters/setFilter";
+import InputContainer from "../../InputContainer";
+import PagingControls from "../../PagingControls";
+import SetsFilter from "../../SetsFilter";
+import SortControls, { Sort } from "../../SortControls";
+import Button from "../../ui/Button";
 import Section from "../../ui/Section";
 import Toggle from "../../ui/Toggle";
+import CardCollection from "./CardCollection";
+import getFiltersFromQuery from "./collectionQuery";
+import { getCollectionStats } from "./collectionStats";
+import SetsView from "./SetsView";
 
 interface ViewCollectionProps {
   collectionData: CardsData[];

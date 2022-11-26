@@ -1,6 +1,6 @@
-import { Switch, Route, useRouteMatch } from "react-router-dom";
-import useDbUser from "../../../hooks/useDbUser";
+import { Route, Switch, useRouteMatch } from "react-router-dom";
 
+import useDbUser from "../../../hooks/useDbUser";
 import LiveMatch from "./LiveMatch";
 
 export default function ViewLiveMatch() {

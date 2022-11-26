@@ -1,24 +1,21 @@
 /* eslint-disable radix */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-nested-ternary */
-import { useState } from "react";
-
-import { constants, compareCards, CardObject, Deck } from "mtgatool-shared";
-
+import { CardObject, compareCards, constants, Deck } from "mtgatool-shared";
 import {
   OVERLAY_ODDS,
   OVERLAY_SEEN,
 } from "mtgatool-shared/dist/shared/constants";
+import { useState } from "react";
+
 import { OverlayUpdateMatchState } from "../../../background/store/types";
-
-import DeckManaCurve from "../../DeckManaCurve";
-
 import DeckList from "../../DeckList";
-import Section from "../../ui/Section";
-import LiveDeckTypesStats from "./LiveDeckTypesStats";
-import LiveDeckLands from "./LiveDeckLands";
-import Select from "../../ui/Select";
+import DeckManaCurve from "../../DeckManaCurve";
 import Flex from "../../Flex";
+import Section from "../../ui/Section";
+import Select from "../../ui/Select";
+import LiveDeckLands from "./LiveDeckLands";
+import LiveDeckTypesStats from "./LiveDeckTypesStats";
 
 const { OVERLAY_FULL } = constants;
 

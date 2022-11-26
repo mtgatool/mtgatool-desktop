@@ -2,11 +2,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Format, InternalDraftv2 } from "mtgatool-shared";
 import {
-  LOGIN_WAITING,
   LOGIN_AUTH,
   LOGIN_FAILED,
   LOGIN_OK,
+  LOGIN_WAITING,
 } from "mtgatool-shared/dist/shared/constants";
+
 import { DEFAULT_PEERS } from "../../constants";
 
 export interface Peer {

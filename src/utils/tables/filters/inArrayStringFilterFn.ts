@@ -1,5 +1,6 @@
 /* eslint-disable no-bitwise */
 import _ from "lodash";
+
 import { InArrayStringFilter } from "../../../types/filterTypes";
 import { FilterKeys } from "../../../types/utility";
 

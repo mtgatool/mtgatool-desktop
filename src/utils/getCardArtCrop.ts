@@ -2,9 +2,9 @@
 /* eslint-disable radix */
 import { database, DbCardDataV2 } from "mtgatool-shared";
 import { DEFAULT_TILE } from "mtgatool-shared/dist/shared/constants";
+
 import notFound from "../assets/images/notfound.png";
 import notFoundArt from "../assets/images/notFoundArt.png";
-
 import isCardDfcBack from "./isCardDfcBack";
 
 export function getCardImage(

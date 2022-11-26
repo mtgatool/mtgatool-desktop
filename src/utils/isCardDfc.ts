@@ -1,4 +1,5 @@
 import { constants } from "mtgatool-shared";
+
 import database from "./database-wrapper";
 
 const { FACE_DFC_FRONT, FACE_DFC_BACK, FACE_MODAL_BACK, FACE_MODAL_FRONT } =

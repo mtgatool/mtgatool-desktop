@@ -10,6 +10,11 @@ import {
   formatPercent,
 } from "mtgatool-shared";
 
+import { toMMSS } from "../../../utils/dateTo";
+import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
+// import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
+import getWildcardsMissing from "../../../utils/getWildcardsMissing";
+import getWinrateClass from "../../../utils/getWinrateClass";
 import {
   Column,
   FlexBottom,
@@ -17,14 +22,9 @@ import {
   HoverTile,
   ListItem,
 } from "../../ListItem";
-
 import ManaCost from "../../ManaCost";
-import { toMMSS } from "../../../utils/dateTo";
 import RankSmall from "../../RankSmall";
-
-import { ExploreDeckData } from "./doExploreAggregation";
-import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
-import getWinrateClass from "../../../utils/getWinrateClass";
+import WildcardsCostPreset from "../../WildcardsCostPreset";
 import {
   RANK_BRONZE,
   RANK_DIAMOND,
@@ -33,10 +33,7 @@ import {
   RANK_PLATINUM,
   RANK_SILVER,
 } from "../history/getRankFilterVal";
-import WildcardsCostPreset from "../../WildcardsCostPreset";
-
-// import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
-import getWildcardsMissing from "../../../utils/getWildcardsMissing";
+import { ExploreDeckData } from "./doExploreAggregation";
 
 const { DEFAULT_TILE } = constants;
 

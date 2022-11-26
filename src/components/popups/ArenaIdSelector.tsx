@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+
 import { ReactComponent as Close } from "../../assets/images/svg/close.svg";
 import { AppState } from "../../redux/stores/rendererStore";
 import switchPlayerUUID from "../../utils/switchPlayerUUID";

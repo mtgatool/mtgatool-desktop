@@ -4,9 +4,10 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable complexity */
 import _ from "lodash";
-import { constants, Colors } from "mtgatool-shared";
+import { Colors, constants } from "mtgatool-shared";
 
 import {
+  CardsData,
   ParsedToken,
   QueryKeys,
   RARITY_COMMON,
@@ -15,7 +16,6 @@ import {
   RARITY_RARE,
   RARITY_TOKEN,
   RARITY_UNCOMMON,
-  CardsData,
 } from "../../../types/collectionTypes";
 import { FilterModes, QuerySeparators } from "../../../types/filterTypes";
 import {

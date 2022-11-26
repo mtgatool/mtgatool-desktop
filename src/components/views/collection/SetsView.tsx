@@ -1,19 +1,16 @@
-import { useSelector } from "react-redux";
-
 import { database } from "mtgatool-shared";
-import { CollectionStats } from "./collectionStats";
-import CompletionHeatMap from "./CompletionHeatMap";
+import { useSelector } from "react-redux";
 
 import notFound from "../../../assets/images/notfound.png";
 import { AppState } from "../../../redux/stores/rendererStore";
-
-import Section from "../../ui/Section";
-
-import Flex from "../../Flex";
-import SetCompletionStats from "./SetCompletionStats";
-import CollectionStatsPanel from "./CollectionStatsPanel";
 import { CardsData } from "../../../types/collectionTypes";
 import { Filters } from "../../../types/genericFilterTypes";
+import Flex from "../../Flex";
+import Section from "../../ui/Section";
+import { CollectionStats } from "./collectionStats";
+import CollectionStatsPanel from "./CollectionStatsPanel";
+import CompletionHeatMap from "./CompletionHeatMap";
+import SetCompletionStats from "./SetCompletionStats";
 
 interface SetsViewProps {
   stats: CollectionStats;

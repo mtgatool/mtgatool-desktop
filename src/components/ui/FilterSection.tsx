@@ -3,8 +3,6 @@
 import { MutableRefObject, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import SvgButton from "../SvgButton";
-import { AppState } from "../../redux/stores/rendererStore";
 import { ReactComponent as StatsIcon } from "../../assets/images/svg/stats.svg";
 import {
   DateOption,
@@ -12,10 +10,12 @@ import {
   setDateOption,
   setEvents,
 } from "../../redux/slices/FilterSlice";
+import { AppState } from "../../redux/stores/rendererStore";
+import getEventPrettyName from "../../utils/getEventPrettyName";
 import InputContainer from "../InputContainer";
+import SvgButton from "../SvgButton";
 import Section from "./Section";
 import Select from "./Select";
-import getEventPrettyName from "../../utils/getEventPrettyName";
 
 interface FilterSectionProps {
   openHistoryStatsPopup: () => void;

@@ -1,4 +1,5 @@
 import _ from "lodash";
+
 import { Sort } from "../../components/SortControls";
 
 export default function applySort<D>(data: D[], sort: Sort<D>): D[] {

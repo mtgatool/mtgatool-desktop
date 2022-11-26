@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
 import { ToolDb } from "mtgatool-db";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export default function useDbUser(): [ToolDb["user"], boolean] {
   const userRef = useMemo(() => window.toolDb.user, []);

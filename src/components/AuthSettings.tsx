@@ -1,25 +1,20 @@
 /* eslint-disable radix */
 /* eslint-disable no-alert */
 /* eslint-disable no-restricted-globals */
-import { useCallback, useState } from "react";
 import { format, fromUnixTime } from "date-fns";
 import { database } from "mtgatool-shared";
-
-import info from "../info.json";
+import { useCallback, useState } from "react";
 
 import { ReactComponent as Close } from "../assets/images/svg/close.svg";
-
-import Toggle from "./ui/Toggle";
-
-import showOpenLogDialog from "../utils/showOpenLogDialog";
-import setLocalSetting from "../utils/setLocalSetting";
+import info from "../info.json";
+import isElectron from "../utils/electron/isElectron";
 import getLocalSetting from "../utils/getLocalSetting";
 import openExternal from "../utils/openExternal";
-import isElectron from "../utils/electron/isElectron";
-
-import NetworkSettingsPanel from "./views/settings/NetworkSettingsPanel";
-
+import setLocalSetting from "../utils/setLocalSetting";
+import showOpenLogDialog from "../utils/showOpenLogDialog";
+import Toggle from "./ui/Toggle";
 import DaemonSettingsPanel from "./views/settings/DaemonSettingsPanel";
+import NetworkSettingsPanel from "./views/settings/NetworkSettingsPanel";
 
 function clickBetaChannel(value: boolean): void {
   setLocalSetting("betaChannel", value ? "true" : "false");

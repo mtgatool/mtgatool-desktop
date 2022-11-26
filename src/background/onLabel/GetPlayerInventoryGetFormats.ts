@@ -1,4 +1,5 @@
 import { Format } from "mtgatool-shared";
+
 import LogEntry from "../../types/logDecoder";
 
 interface Entry extends LogEntry {

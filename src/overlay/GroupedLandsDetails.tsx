@@ -1,4 +1,4 @@
-import { constants, Chances } from "mtgatool-shared";
+import { Chances, constants } from "mtgatool-shared";
 
 import manaClasses from "../common/manaClasses";
 

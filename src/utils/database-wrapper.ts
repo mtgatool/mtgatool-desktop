@@ -1,8 +1,9 @@
 /* eslint-disable radix */
 /* eslint-disable no-console */
+import axios from "axios";
 import _ from "lodash";
 import { database, loadDbFromCache as loadDbFromShared } from "mtgatool-shared";
-import axios from "axios";
+
 import electron from "./electron/electronWrapper";
 
 // import distributedDb from "../assets/resources/database.json";

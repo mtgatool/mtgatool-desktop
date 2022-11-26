@@ -1,14 +1,12 @@
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
 
-import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
 import useDbUser from "../../../hooks/useDbUser";
-
-import HistoryList from "./HistoryList";
-import MatchView from "./MatchView";
-
 import { AppState } from "../../../redux/stores/rendererStore";
 import getMatchesData, { MatchData } from "./getMatchesData";
+import HistoryList from "./HistoryList";
+import MatchView from "./MatchView";
 
 interface ViewHistoryProps {
   openHistoryStatsPopup: () => void;

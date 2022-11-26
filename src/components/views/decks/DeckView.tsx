@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-nested-ternary */
 import {
@@ -9,38 +8,38 @@ import {
   getDeckColorsAmmount,
   getDeckLandsAmmount,
 } from "mtgatool-shared";
-import { PieChart } from "react-minimal-pie-chart";
-import { useHistory, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import {
   DEFAULT_TILE,
   MANA_COLORS,
 } from "mtgatool-shared/dist/shared/constants";
+import { useEffect, useState } from "react";
+import { PieChart } from "react-minimal-pie-chart";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory, useParams } from "react-router-dom";
+
+import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
+import reduxAction from "../../../redux/reduxAction";
+import { AppState } from "../../../redux/stores/rendererStore";
+import { StatsDeck } from "../../../types/dbTypes";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { getCardArtCrop } from "../../../utils/getCardArtCrop";
 import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
-import DeckColorsBar from "../../DeckColorsBar";
-import SvgButton from "../../SvgButton";
-
-import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
-import ManaCost from "../../ManaCost";
-import VisualDeckView from "./VisualDeckView";
-import Section from "../../ui/Section";
-import Button from "../../ui/Button";
-import Separator from "../../Separator";
-import DeckTypesStats from "../../DeckTypesStats";
-import DeckManaCurve from "../../DeckManaCurve";
-import WildcardsCostPreset from "../../WildcardsCostPreset";
-import CraftingCost from "../../CraftingCost";
 import getSampleHand from "../../../utils/getSampleHand";
 import CardTile from "../../CardTile";
-
+import CraftingCost from "../../CraftingCost";
+import DeckColorsBar from "../../DeckColorsBar";
 import DeckList from "../../DeckList";
-import reduxAction from "../../../redux/reduxAction";
-import { StatsDeck } from "../../../types/dbTypes";
-import { AppState } from "../../../redux/stores/rendererStore";
-import ChangesDeckView from "./ChangesDeckView";
+import DeckManaCurve from "../../DeckManaCurve";
+import DeckTypesStats from "../../DeckTypesStats";
+import ManaCost from "../../ManaCost";
+import Separator from "../../Separator";
+import SvgButton from "../../SvgButton";
+import Button from "../../ui/Button";
+import Section from "../../ui/Section";
+import WildcardsCostPreset from "../../WildcardsCostPreset";
 import CardsWinratesView from "./CardsWinrateView";
+import ChangesDeckView from "./ChangesDeckView";
+import VisualDeckView from "./VisualDeckView";
 
 // const { MANA_COLORS } = constants;
 

@@ -1,4 +1,5 @@
 import { InternalMatch } from "mtgatool-shared/dist";
+
 import getLocalDbValue from "../../../toolDb/getLocalDbValue";
 import { DbMatch } from "../../../types/dbTypes";
 import getRankFilterVal from "./getRankFilterVal";

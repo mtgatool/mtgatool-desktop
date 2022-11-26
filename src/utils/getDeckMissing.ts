@@ -1,4 +1,5 @@
 import { database, Deck, MissingWildcards } from "mtgatool-shared";
+
 import getCardsMissingCount from "./getCardsMissinCount";
 
 export default function getDeckMissing(deck: Deck): MissingWildcards {

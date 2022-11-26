@@ -4,33 +4,30 @@ import { ChangeEvent, Fragment, useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
-import usePagingControls from "../../../hooks/usePagingControls";
-import { AppState } from "../../../redux/stores/rendererStore";
-import { StatsDeck } from "../../../types/dbTypes";
-
-import doDecksFilter from "../../../utils/tables/doDecksFilter";
-import setFilter from "../../../utils/tables/filters/setFilter";
-import DecksArtViewRow from "../../DecksArtViewRow";
-import ManaFilter from "../../ManaFilter";
-import PagingControls from "../../PagingControls";
-import SortControls, { Sort } from "../../SortControls";
-
 import useDebounce from "../../../hooks/useDebounce";
-import InputContainer from "../../InputContainer";
-
-import globalData from "../../../utils/globalData";
-import getLocalSetting from "../../../utils/getLocalSetting";
-import Flex from "../../Flex";
-import Toggle from "../../ui/Toggle";
-import unsetFilter from "../../../utils/tables/filters/unsetFilter";
-import setLocalSetting from "../../../utils/setLocalSetting";
-import setDbHiddenDecks from "../../../toolDb/setDbHiddenDecks";
-import Section from "../../ui/Section";
-import FilterSection from "../../ui/FilterSection";
+import usePagingControls from "../../../hooks/usePagingControls";
 import {
   setDecksFilters,
   setDeckSort,
 } from "../../../redux/slices/FilterSlice";
+import { AppState } from "../../../redux/stores/rendererStore";
+import setDbHiddenDecks from "../../../toolDb/setDbHiddenDecks";
+import { StatsDeck } from "../../../types/dbTypes";
+import getLocalSetting from "../../../utils/getLocalSetting";
+import globalData from "../../../utils/globalData";
+import setLocalSetting from "../../../utils/setLocalSetting";
+import doDecksFilter from "../../../utils/tables/doDecksFilter";
+import setFilter from "../../../utils/tables/filters/setFilter";
+import unsetFilter from "../../../utils/tables/filters/unsetFilter";
+import DecksArtViewRow from "../../DecksArtViewRow";
+import Flex from "../../Flex";
+import InputContainer from "../../InputContainer";
+import ManaFilter from "../../ManaFilter";
+import PagingControls from "../../PagingControls";
+import SortControls, { Sort } from "../../SortControls";
+import FilterSection from "../../ui/FilterSection";
+import Section from "../../ui/Section";
+import Toggle from "../../ui/Toggle";
 
 interface DeckListProps {
   openHistoryStatsPopup: () => void;

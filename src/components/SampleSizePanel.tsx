@@ -1,5 +1,5 @@
+import { Chances, constants } from "mtgatool-shared";
 import { useCallback } from "react";
-import { constants, Chances } from "mtgatool-shared";
 
 const { CARD_TYPES } = constants;
 

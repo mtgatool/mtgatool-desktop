@@ -1,20 +1,19 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-
-import { database, InternalDraftv2 } from "mtgatool-shared";
 import Automerge, { FreezeObject } from "automerge";
 import {
   arrayBufferToBase64,
   base64ToBinaryDocument,
   signData,
 } from "mtgatool-db";
-import { DbliveDraftV1 } from "../../../types/dbTypes";
-import { AppState } from "../../../redux/stores/rendererStore";
-import CardLiveDraft from "./CardLiveDraft";
+import { database, InternalDraftv2 } from "mtgatool-shared";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
+import { AppState } from "../../../redux/stores/rendererStore";
+import { DbliveDraftV1 } from "../../../types/dbTypes";
 import CardTile from "../../CardTile";
+import CardLiveDraft from "./CardLiveDraft";
 
 export default function LiveDraftView() {
   const avatars = useSelector((state: AppState) => state.avatars.avatars);

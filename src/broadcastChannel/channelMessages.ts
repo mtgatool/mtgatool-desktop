@@ -4,6 +4,7 @@ import {
   InternalMatch,
   InventoryUpdate,
 } from "mtgatool-shared";
+
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { OverlayUpdateMatchState } from "../background/store/types";
 import { OverlaySettings } from "../common/defaultConfig";

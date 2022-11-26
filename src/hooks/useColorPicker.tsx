@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ChromePicker } from "react-color";
 
 const decimalToHex = (alpha: number): string =>

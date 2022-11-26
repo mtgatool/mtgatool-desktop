@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { Deck } from "mtgatool-shared";
 import { ClientToGREMessage } from "mtgatool-shared/dist/types/greTypes";
-
 import LogEntry from "mtgatool-shared/dist/types/logDecoder";
-import { setOnThePlay } from "../store/currentMatchStore";
-import globalStore from "../store";
+
 import normaliseFields from "../../utils/normaliseFields";
+import globalStore from "../store";
+import { setOnThePlay } from "../store/currentMatchStore";
 
 const messages = require("../messages_pb");
 

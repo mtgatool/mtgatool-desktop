@@ -1,11 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Story, Meta } from "@storybook/react";
+import "../index.scss";
 
-import IconButton, { IconButtonProps } from "../components/ui/IconButton";
+import { Meta, Story } from "@storybook/react";
 
 import settingsIcon from "../assets/images/cog.png";
-
-import "../index.scss";
+import IconButton, { IconButtonProps } from "../components/ui/IconButton";
 import vodiFn from "../utils/voidfn";
 
 export default {

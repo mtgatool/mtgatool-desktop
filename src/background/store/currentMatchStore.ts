@@ -1,26 +1,25 @@
 /* eslint-disable radix */
 import {
-  Deck,
-  Chances,
-  InternalPlayer,
   CardCast,
-  PriorityTimers,
+  Chances,
+  Deck,
+  InternalPlayer,
   MatchGameStats,
+  PriorityTimers,
 } from "mtgatool-shared";
 import {
-  Phase,
-  TurnInfo,
-  PlayerInfo,
-  GameInfo,
-  ZoneInfo,
   AnnotationInfo,
+  GameInfo,
   GameObjectInfo,
   GREToClientMessage,
+  Phase,
+  PlayerInfo,
+  TurnInfo,
+  ZoneInfo,
 } from "mtgatool-shared/dist/types/greTypes";
 
-import globalStore from ".";
-
 import { DetailsIdChange, GameObject } from "../../types/greInterpreter";
+import globalStore from ".";
 import { MatchState } from "./types";
 
 interface Heat {

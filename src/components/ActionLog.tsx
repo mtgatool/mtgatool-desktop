@@ -3,6 +3,7 @@
 
 import { database } from "mtgatool-shared";
 import { Fragment } from "react";
+
 import useHoverCard from "../hooks/useHoverCard";
 
 interface LogTextProps {

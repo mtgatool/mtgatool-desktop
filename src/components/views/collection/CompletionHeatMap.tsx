@@ -1,9 +1,9 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/jsx-props-no-spreading */
 import { constants } from "mtgatool-shared";
-import { CardStats } from "./collectionStats";
 
 import useHoverCard from "../../../hooks/useHoverCard";
+import { CardStats } from "./collectionStats";
 
 const { CARD_RARITIES, COLORS_LONG } = constants;
 

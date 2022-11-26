@@ -1,22 +1,22 @@
-import { useCallback, useState, CSSProperties, useEffect } from "react";
 import {
-  constants,
-  Deck,
-  DbCardDataV2,
-  Rarity,
   cardHasType,
+  constants,
+  DbCardDataV2,
+  Deck,
+  Rarity,
 } from "mtgatool-shared";
 import {
   DEFAULT_TILE,
   LANDS_HACK,
 } from "mtgatool-shared/dist/shared/constants";
-import getRankColorClass from "../utils/getRankColorClass";
-import openScryfallCard from "../utils/openScryfallCard";
-import { getCardArtCrop } from "../utils/getCardArtCrop";
-import useHoverCard from "../hooks/useHoverCard";
+import { CSSProperties, useCallback, useEffect, useState } from "react";
 
 import typeLand from "../assets/images/type_land.png";
+import useHoverCard from "../hooks/useHoverCard";
+import { getCardArtCrop } from "../utils/getCardArtCrop";
+import getRankColorClass from "../utils/getRankColorClass";
 import getWildcardsMissing from "../utils/getWildcardsMissing";
+import openScryfallCard from "../utils/openScryfallCard";
 
 // import gray from "../assets/images/gray.png";
 

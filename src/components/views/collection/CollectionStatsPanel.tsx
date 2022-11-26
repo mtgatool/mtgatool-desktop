@@ -1,30 +1,29 @@
 /* eslint-disable prefer-destructuring */
-import { useCallback } from "react";
-import { useSelector, useDispatch } from "react-redux";
-
 import { constants } from "mtgatool-shared";
+import { useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import reduxAction from "../../../redux/reduxAction";
+import { AppState } from "../../../redux/stores/rendererStore";
+import { CardsData } from "../../../types/collectionTypes";
+import { InBoolFilter } from "../../../types/filterTypes";
+import { Filters } from "../../../types/genericFilterTypes";
+import formatNumber from "../../../utils/formatNumber";
+import openExternal from "../../../utils/openExternal";
+import Flex from "../../Flex";
+import InputContainer from "../../InputContainer";
+import RaritySymbol from "../../RaritySymbol";
+import Button from "../../ui/Button";
+import Select from "../../ui/Select";
+import { removeFilterFromQuery } from "./collectionQuery";
 import {
   ALL_CARDS,
   CollectionStats,
   FULL_SETS,
   SINGLETONS,
 } from "./collectionStats";
-
-import { Filters } from "../../../types/genericFilterTypes";
-import { CardsData } from "../../../types/collectionTypes";
-import { AppState } from "../../../redux/stores/rendererStore";
-import Select from "../../ui/Select";
-import { InBoolFilter } from "../../../types/filterTypes";
-import reduxAction from "../../../redux/reduxAction";
-import Flex from "../../Flex";
-import formatNumber from "../../../utils/formatNumber";
-import { removeFilterFromQuery } from "./collectionQuery";
-import InputContainer from "../../InputContainer";
-import SetCompletionBar from "./SetCompletionBar";
 import CompletionProgressBar from "./CompletionProgressBar";
-import Button from "../../ui/Button";
-import RaritySymbol from "../../RaritySymbol";
-import openExternal from "../../../utils/openExternal";
+import SetCompletionBar from "./SetCompletionBar";
 
 const { CARD_RARITIES } = constants;
 

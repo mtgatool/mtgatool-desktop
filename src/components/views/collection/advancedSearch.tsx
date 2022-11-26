@@ -1,31 +1,22 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable radix */
-import { useState, useCallback, useEffect } from "react";
-import { constants, Colors } from "mtgatool-shared";
-
+import { Colors, constants } from "mtgatool-shared";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { ReactComponent as Close } from "../../../assets/images/svg/close.svg";
 
+import { ReactComponent as Close } from "../../../assets/images/svg/close.svg";
+import reduxAction from "../../../redux/reduxAction";
+import { AppState } from "../../../redux/stores/rendererStore";
 import {
   RARITY_COMMON,
-  RARITY_TOKEN,
   RARITY_LAND,
-  RARITY_UNCOMMON,
-  RARITY_RARE,
   RARITY_MYTHIC,
+  RARITY_RARE,
+  RARITY_TOKEN,
+  RARITY_UNCOMMON,
 } from "../../../types/collectionTypes";
-
-import getFiltersFromQuery from "./collectionQuery";
-import Select from "../../ui/Select";
-import Flex from "../../Flex";
-import Button from "../../ui/Button";
-import ManaFilter from "../../ManaFilter";
-import SetsFilter from "../../SetsFilter";
-import InputContainer from "../../InputContainer";
-import { AppState } from "../../../redux/stores/rendererStore";
-import reduxAction from "../../../redux/reduxAction";
 import {
   ArrayFilter,
   ColorBitsFilter,
@@ -34,6 +25,13 @@ import {
   MinMaxFilter,
   RarityBitsFilter,
 } from "../../../types/filterTypes";
+import Flex from "../../Flex";
+import InputContainer from "../../InputContainer";
+import ManaFilter from "../../ManaFilter";
+import SetsFilter from "../../SetsFilter";
+import Button from "../../ui/Button";
+import Select from "../../ui/Select";
+import getFiltersFromQuery from "./collectionQuery";
 
 const { WHITE, BLUE, BLACK, RED, GREEN, COLORLESS } = constants;
 

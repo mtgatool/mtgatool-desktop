@@ -1,9 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Story, Meta } from "@storybook/react";
+import "../index.scss";
+
+import { Meta, Story } from "@storybook/react";
 
 import RankSmall, { RankSmallProps } from "../components/RankSmall";
-
-import "../index.scss";
 
 export default {
   title: "MTG Arena Tool/RankSmall",

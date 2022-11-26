@@ -4,6 +4,7 @@ import {
   InternalDeck,
   ModuleInstanceData,
 } from "mtgatool-shared";
+
 import LogEntry from "../../types/logDecoder";
 import selectDeck from "../selectDeck";
 import {

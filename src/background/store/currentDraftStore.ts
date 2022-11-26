@@ -1,4 +1,5 @@
 import { InternalDraftv2 } from "mtgatool-shared";
+
 import globalStore from ".";
 
 export const draftStateObject = {

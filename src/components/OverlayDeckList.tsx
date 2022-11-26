@@ -1,29 +1,25 @@
 /* eslint-disable radix */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-nested-ternary */
-import { useCallback, useRef, useState } from "react";
 import {
-  constants,
+  CardObject,
+  Chances,
   Colors,
   compareCards,
-  Deck,
-  Chances,
-  CardObject,
+  constants,
   database,
+  Deck,
 } from "mtgatool-shared";
-
 import QRCode from "qrcode";
+import { useCallback, useRef, useState } from "react";
 
+import { ReactComponent as QrCodeIcon } from "../assets/images/svg/qrcode.svg";
 import { OverlaySettings } from "../common/defaultConfig";
-
-import CardTile, { LandsTile, CardTileQuantity } from "./CardTile";
-
+import copyToClipboard from "../utils/copyToClipboard";
+import CardTile, { CardTileQuantity, LandsTile } from "./CardTile";
 import DeckManaCurve from "./DeckManaCurve";
 import DeckTypesStats from "./DeckTypesStats";
 import SampleSizePanel from "./SampleSizePanel";
-
-import { ReactComponent as QrCodeIcon } from "../assets/images/svg/qrcode.svg";
-import copyToClipboard from "../utils/copyToClipboard";
 
 const { OVERLAY_FULL, OVERLAY_LEFT, OVERLAY_MIXED, OVERLAY_ODDS, LANDS_HACK } =
   constants;

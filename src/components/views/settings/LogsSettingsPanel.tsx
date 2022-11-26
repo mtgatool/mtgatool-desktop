@@ -1,18 +1,15 @@
 import { useCallback, useState } from "react";
-
 import { useDispatch } from "react-redux";
-import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 
+import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
+import reduxAction from "../../../redux/reduxAction";
+import isElectron from "../../../utils/electron/isElectron";
 import getLocalSetting from "../../../utils/getLocalSetting";
+import globalData from "../../../utils/globalData";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import showOpenLogDialog from "../../../utils/showOpenLogDialog";
 import Button from "../../ui/Button";
-import globalData from "../../../utils/globalData";
-
-import reduxAction from "../../../redux/reduxAction";
-
 import DaemonSettingsPanel from "./DaemonSettingsPanel";
-import isElectron from "../../../utils/electron/isElectron";
 
 function getLogExists(path: string) {
   // eslint-disable-next-line global-require

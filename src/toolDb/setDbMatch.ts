@@ -2,15 +2,13 @@
 import _ from "lodash";
 import { Deck, InternalMatch } from "mtgatool-shared";
 
-import { DbMatch } from "../types/dbTypes";
-import getLocalSetting from "../utils/getLocalSetting";
-
-import pushToLiveFeed from "./pushToLivefeed";
-
-import globalData from "../utils/globalData";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
+import { DbMatch } from "../types/dbTypes";
+import getLocalSetting from "../utils/getLocalSetting";
+import globalData from "../utils/globalData";
 import pushToExplore from "./pushToExplore";
+import pushToLiveFeed from "./pushToLivefeed";
 
 export default async function setDbMatch(match: InternalMatch) {
   console.log("> Set match", match);

@@ -3,6 +3,7 @@ import { Colors, formatPercent } from "mtgatool-shared";
 import { COLORLESS } from "mtgatool-shared/dist/shared/constants";
 import { PieChart } from "react-minimal-pie-chart";
 import { useSelector } from "react-redux";
+
 import { AppState } from "../../../redux/stores/rendererStore";
 import { Winrate } from "../../../utils/aggregateStats";
 import { toDDHHMMSS } from "../../../utils/dateTo";

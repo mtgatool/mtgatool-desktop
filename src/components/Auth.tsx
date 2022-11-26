@@ -1,42 +1,35 @@
-import { useHistory } from "react-router-dom";
-
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { animated, useSpring } from "react-spring";
+import { sha1 } from "mtgatool-db";
 import {
   LOGIN_AUTH,
   LOGIN_OK,
   LOGIN_WAITING,
 } from "mtgatool-shared/dist/shared/constants";
-import { sha1 } from "mtgatool-db";
-
-import postChannelMessage from "../broadcastChannel/postChannelMessage";
-
-import AuthSettings from "./AuthSettings";
-import PopupComponent from "./PopupComponent";
-
-import IconButton from "./ui/IconButton";
-import Checkbox from "./ui/Checkbox";
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
+import { animated, useSpring } from "react-spring";
 
 import settingsIcon from "../assets/images/cog.png";
-
-import checkPassphrase from "../toolDb/checkPassphrase";
-import signup from "../toolDb/signup";
-import login from "../toolDb/login";
-
-import voidFn from "../utils/voidfn";
-import getLocalSetting from "../utils/getLocalSetting";
-import setLocalSetting from "../utils/setLocalSetting";
-import electron from "../utils/electron/electronWrapper";
-
+import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
+import { ReactComponent as PutKey } from "../assets/images/svg/put-key.svg";
+import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
+import postChannelMessage from "../broadcastChannel/postChannelMessage";
+import fetchCards from "../daemon/fetchCards";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
-import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
-import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
-import { ReactComponent as PutKey } from "../assets/images/svg/put-key.svg";
-import Button from "./ui/Button";
+import checkPassphrase from "../toolDb/checkPassphrase";
 import keysLogin from "../toolDb/keysLogin";
-import fetchCards from "../daemon/fetchCards";
+import login from "../toolDb/login";
+import signup from "../toolDb/signup";
+import electron from "../utils/electron/electronWrapper";
+import getLocalSetting from "../utils/getLocalSetting";
+import setLocalSetting from "../utils/setLocalSetting";
+import voidFn from "../utils/voidfn";
+import AuthSettings from "./AuthSettings";
+import PopupComponent from "./PopupComponent";
+import Button from "./ui/Button";
+import Checkbox from "./ui/Checkbox";
+import IconButton from "./ui/IconButton";
 
 type InputChange = ChangeEvent<HTMLInputElement>;
 

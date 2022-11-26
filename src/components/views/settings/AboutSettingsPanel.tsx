@@ -1,11 +1,10 @@
+import { format, fromUnixTime } from "date-fns";
 import { database } from "mtgatool-shared";
 import { useSelector } from "react-redux";
-import { format, fromUnixTime } from "date-fns";
-
-import { AppState } from "../../../redux/stores/rendererStore";
-import openExternal from "../../../utils/openExternal";
 
 import info from "../../../info.json";
+import { AppState } from "../../../redux/stores/rendererStore";
+import openExternal from "../../../utils/openExternal";
 
 export default function AboutSettingsPanel(): JSX.Element {
   const updateState = useSelector(

@@ -4,21 +4,17 @@ import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
-import { SettingsPanelProps } from "./ViewSettings";
-
+import { ReactComponent as KeysIcon } from "../../../assets/images/svg/keys.svg";
+import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
+import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import reduxAction from "../../../redux/reduxAction";
+import { AppState } from "../../../redux/stores/rendererStore";
+import saveKeysCallback from "../../../toolDb/saveKeysCallback";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
-
 import PassphraseGenerate from "../../PassphraseGenerate";
 import Button from "../../ui/Button";
-
-import { ReactComponent as KeysIcon } from "../../../assets/images/svg/keys.svg";
-
-import saveKeysCallback from "../../../toolDb/saveKeysCallback";
-import { AppState } from "../../../redux/stores/rendererStore";
-import useFetchAvatar from "../../../hooks/useFetchAvatar";
-import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
+import { SettingsPanelProps } from "./ViewSettings";
 
 function resizeBase64Img(
   base64: string,

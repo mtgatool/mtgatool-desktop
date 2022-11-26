@@ -1,8 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Story, Meta } from "@storybook/react";
-import ManaCost, { ManaCostProps } from "../components/ManaCost";
-
 import "../index.scss";
+
+import { Meta, Story } from "@storybook/react";
+
+import ManaCost, { ManaCostProps } from "../components/ManaCost";
 
 export default {
   title: "MTG Arena Tool/ManaCost",

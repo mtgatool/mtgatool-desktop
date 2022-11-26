@@ -1,9 +1,9 @@
 import { Reducer, useEffect, useReducer } from "react";
 import { useSelector } from "react-redux";
 import { animated, useTransition } from "react-spring";
-import { AppState } from "../redux/stores/rendererStore";
 
 import { ReactComponent as CloseIcon } from "../assets/images/svg/win-close.svg";
+import { AppState } from "../redux/stores/rendererStore";
 import textRandom from "../utils/textRandom";
 
 interface PopupData {

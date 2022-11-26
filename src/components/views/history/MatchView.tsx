@@ -2,42 +2,41 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable react/no-array-index-key */
-import { Fragment, useState, useCallback, useEffect } from "react";
-
-import { useDispatch } from "react-redux";
-import { useHistory, useParams } from "react-router-dom";
 import {
   CardsList,
-  Deck,
-  MatchGameStats,
   compareCards,
   database,
+  Deck,
+  MatchGameStats,
 } from "mtgatool-shared";
+import { Fragment, useCallback, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useHistory, useParams } from "react-router-dom";
 
 import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
 import { ReactComponent as CopyButton } from "../../../assets/images/svg/copy.svg";
 import { ReactComponent as IconCrown } from "../../../assets/images/svg/crown.svg";
-import { ReactComponent as IconTime } from "../../../assets/images/svg/time.svg";
 import { ReactComponent as IconEvent } from "../../../assets/images/svg/event.svg";
+import { ReactComponent as IconTime } from "../../../assets/images/svg/time.svg";
 import reduxAction from "../../../redux/reduxAction";
-import copyToClipboard from "../../../utils/copyToClipboard";
-import DeckColorsBar from "../../DeckColorsBar";
-import SvgButton from "../../SvgButton";
-import ManaCost from "../../ManaCost";
-import Section from "../../ui/Section";
-import Flex from "../../Flex";
-import ResultDetails from "../../ResultDetails";
-import Button from "../../ui/Button";
-import RankIcon from "../../RankIcon";
-import DeckList from "../../DeckList";
-import { getCardImage, getCardArtCrop } from "../../../utils/getCardArtCrop";
-import CardList from "../../CardList";
-import { toMMSS } from "../../../utils/dateTo";
-import ActionLog from "../../ActionLog";
 import { DbMatch } from "../../../types/dbTypes";
-import isLimitedEventId from "../../../utils/isLimitedEventId";
-import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
+import copyToClipboard from "../../../utils/copyToClipboard";
+import { toMMSS } from "../../../utils/dateTo";
+import { getCardArtCrop, getCardImage } from "../../../utils/getCardArtCrop";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
+import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
+import isLimitedEventId from "../../../utils/isLimitedEventId";
+import ActionLog from "../../ActionLog";
+import CardList from "../../CardList";
+import DeckColorsBar from "../../DeckColorsBar";
+import DeckList from "../../DeckList";
+import Flex from "../../Flex";
+import ManaCost from "../../ManaCost";
+import RankIcon from "../../RankIcon";
+import ResultDetails from "../../ResultDetails";
+import SvgButton from "../../SvgButton";
+import Button from "../../ui/Button";
+import Section from "../../ui/Section";
 
 interface GameStatsProps {
   game: MatchGameStats;

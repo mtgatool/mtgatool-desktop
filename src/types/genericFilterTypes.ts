@@ -1,13 +1,13 @@
 import {
   ArrayFilter,
-  ColorBitsFilter,
   BitsFilter,
+  ColorBitsFilter,
+  InArrayStringFilter,
+  InBoolFilter,
+  InStringArrayFilter,
   MinMaxFilter,
   RarityBitsFilter,
   StringFilter,
-  InBoolFilter,
-  InArrayStringFilter,
-  InStringArrayFilter,
 } from "./filterTypes";
 import { FilterKeys } from "./utility";
 

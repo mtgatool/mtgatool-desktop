@@ -1,4 +1,4 @@
-import { constants, Deck, CardObject, database } from "mtgatool-shared";
+import { CardObject, constants, database, Deck } from "mtgatool-shared";
 
 const { CARD_TYPES, CARD_TYPE_CODES } = constants;
 

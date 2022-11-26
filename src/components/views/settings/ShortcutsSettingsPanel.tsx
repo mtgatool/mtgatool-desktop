@@ -1,13 +1,13 @@
-import { useState, useCallback } from "react";
-
+import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
-import Toggle from "../../ui/Toggle";
-import Button from "../../ui/Button";
-import EditKey from "../../popups/EditKey";
 import electron from "../../../utils/electron/electronWrapper";
 import registerShortcuts from "../../../utils/registerShortcuts";
+import EditKey from "../../popups/EditKey";
+import Button from "../../ui/Button";
+import Toggle from "../../ui/Toggle";
 
 const SHORTCUT_NAMES = {
   shortcutOverlay1: "Toggle Overlay 1",

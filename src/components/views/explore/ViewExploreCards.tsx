@@ -8,14 +8,11 @@ import { useDispatch } from "react-redux";
 
 import usePagingControls from "../../../hooks/usePagingControls";
 import reduxAction from "../../../redux/reduxAction";
-
 import { getCardImage } from "../../../utils/getCardArtCrop";
 import applySort from "../../../utils/tables/applySort";
-
 import Flex from "../../Flex";
 import PagingControls from "../../PagingControls";
 import SetsFilter from "../../SetsFilter";
-
 import SortControls, { Sort } from "../../SortControls";
 import Section from "../../ui/Section";
 import {

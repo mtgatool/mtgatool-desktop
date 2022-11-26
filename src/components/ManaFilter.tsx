@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import { useState } from "react";
+import { Colors } from "mtgatool-shared";
 import {
   BLACK,
   BLUE,
@@ -8,7 +8,8 @@ import {
   RED,
   WHITE,
 } from "mtgatool-shared/dist/shared/constants";
-import { Colors } from "mtgatool-shared";
+import { useState } from "react";
+
 import manaClasses from "../common/manaClasses";
 
 interface ManaFilterProps {

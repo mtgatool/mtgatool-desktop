@@ -1,11 +1,10 @@
 import {
-  useCallback,
-  useState,
-  PropsWithChildren,
   CSSProperties,
   MutableRefObject,
+  PropsWithChildren,
+  useCallback,
+  useState,
 } from "react";
-
 import { animated, useSpring } from "react-spring";
 
 type PopupComponentProps = PropsWithChildren<{

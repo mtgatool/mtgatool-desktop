@@ -1,12 +1,10 @@
+import { useSelector } from "react-redux";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
 
-import { useSelector } from "react-redux";
 import useDbUser from "../../../hooks/useDbUser";
-
+import { AppState } from "../../../redux/stores/rendererStore";
 import DecksList from "./DecksList";
 import DeckView from "./DeckView";
-
-import { AppState } from "../../../redux/stores/rendererStore";
 
 interface ViewDecksProps {
   openHistoryStatsPopup: () => void;

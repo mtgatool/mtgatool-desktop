@@ -1,19 +1,18 @@
+import Automerge from "automerge";
+import { base64ToBinaryDocument } from "mtgatool-db";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 
-import Automerge from "automerge";
-import { base64ToBinaryDocument } from "mtgatool-db";
-
-import Button from "../../ui/Button";
 import { DbMatch } from "../../../types/dbTypes";
+import getEventPrettyName from "../../../utils/getEventPrettyName";
+import Flex from "../../Flex";
+import Button from "../../ui/Button";
+import Section from "../../ui/Section";
+import Select from "../../ui/Select";
 import doExploreAggregation, {
   DbExploreAggregated,
 } from "./doExploreAggregation";
-import Select from "../../ui/Select";
-import Flex from "../../Flex";
 import transformEventsList from "./transformEventsList";
-import Section from "../../ui/Section";
-import getEventPrettyName from "../../../utils/getEventPrettyName";
 
 /**
  * Aggregates data into explore

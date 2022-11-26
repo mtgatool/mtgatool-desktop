@@ -5,24 +5,21 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
+
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
-
 import { AppState } from "../../../redux/stores/rendererStore";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
-
 import Flex from "../../Flex";
 import Button from "../../ui/Button";
 import Section from "../../ui/Section";
-
 import { DbExploreAggregated, ExploreDeckData } from "./doExploreAggregation";
-
 import ExploreDeckView from "./ExploreDeckView";
 import {
-  Modes,
   MODE_DECKVIEW,
   MODE_EXPLORE_CARDS,
   MODE_EXPLORE_DECKS,
+  Modes,
 } from "./ExploreTypes";
 import ViewExploreCards from "./ViewExploreCards";
 import ViewExploreDecks from "./ViewExploreDecks";

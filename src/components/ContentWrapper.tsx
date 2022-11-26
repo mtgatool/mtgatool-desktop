@@ -1,42 +1,40 @@
+import { database } from "mtgatool-shared";
 import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { animated, useTransition } from "react-spring";
 
-import { useDispatch, useSelector } from "react-redux";
-import { database } from "mtgatool-shared";
-import PopupComponent from "./PopupComponent";
-import vodiFn from "../utils/voidfn";
-
-import ViewWip from "./views/wip/ViewWip";
-import ViewHome from "./views/home/ViewHome";
-import ViewDecks from "./views/decks/ViewDecks";
-import ViewHistory from "./views/history/ViewHistory";
-import ViewCollection from "./views/collection/ViewCollection";
-import AdvancedSearch from "./views/collection/advancedSearch";
-import { AppState } from "../redux/stores/rendererStore";
-
-import { DbMatch, defaultCardsData } from "../types/dbTypes";
-import reduxAction from "../redux/reduxAction";
-import aggregateStats from "../utils/aggregateStats";
-import getCssQuality from "../utils/getCssQuality";
-import HistoryStats from "./views/history/HistoryStats";
-import { convertDbMatchToData } from "./views/history/getMatchesData";
-import getLocalDbValue from "../toolDb/getLocalDbValue";
-import PostSignupPopup from "./PostSignupPopup";
-import ViewDrafts from "./views/drafts/ViewDrafts";
-import ViewLiveMatch from "./views/livematch/ViewLiveMatch";
 import useDatePicker from "../hooks/useDatePicker";
-import ViewExplore from "./views/explore/ViewExplore";
-import { CardsData } from "../types/collectionTypes";
+import reduxAction from "../redux/reduxAction";
 import {
   DateOption,
   setDate,
   setDateOption,
 } from "../redux/slices/FilterSlice";
-import doHistoryFilter from "../utils/tables/doHistoryFilter";
+import { AppState } from "../redux/stores/rendererStore";
+import getLocalDbValue from "../toolDb/getLocalDbValue";
+import { CardsData } from "../types/collectionTypes";
+import { DbMatch, defaultCardsData } from "../types/dbTypes";
+import aggregateStats from "../utils/aggregateStats";
 import isElectron from "../utils/electron/isElectron";
+import getCssQuality from "../utils/getCssQuality";
 import getPopupClass from "../utils/getPopupClass";
+import doHistoryFilter from "../utils/tables/doHistoryFilter";
+import vodiFn from "../utils/voidfn";
+import PopupComponent from "./PopupComponent";
+import PostSignupPopup from "./PostSignupPopup";
+import AdvancedSearch from "./views/collection/advancedSearch";
+import ViewCollection from "./views/collection/ViewCollection";
+import ViewDecks from "./views/decks/ViewDecks";
+import ViewDrafts from "./views/drafts/ViewDrafts";
+import ViewExplore from "./views/explore/ViewExplore";
 import ViewExploreAggregator from "./views/explore/ViewExploreAggregator";
+import { convertDbMatchToData } from "./views/history/getMatchesData";
+import HistoryStats from "./views/history/HistoryStats";
+import ViewHistory from "./views/history/ViewHistory";
+import ViewHome from "./views/home/ViewHome";
+import ViewLiveMatch from "./views/livematch/ViewLiveMatch";
+import ViewWip from "./views/wip/ViewWip";
 
 const views = {
   home: ViewHome,

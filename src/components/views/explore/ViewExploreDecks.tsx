@@ -5,10 +5,8 @@ import { database } from "mtgatool-shared";
 import { useCallback, useMemo, useState } from "react";
 
 import usePagingControls from "../../../hooks/usePagingControls";
-
 import { Filters } from "../../../types/genericFilterTypes";
 import doExploreFilter from "../../../utils/tables/doExploreFilter";
-
 import setFilter from "../../../utils/tables/filters/setFilter";
 import Flex from "../../Flex";
 import ManaFilter from "../../ManaFilter";
@@ -21,7 +19,7 @@ import {
   ExploreDeckData,
   limitRecord,
 } from "./doExploreAggregation";
-import { Modes, MODE_DECKVIEW } from "./ExploreTypes";
+import { MODE_DECKVIEW, Modes } from "./ExploreTypes";
 import ListItemExplore from "./ListItemExplore";
 
 interface ViewExploreDecksProps {

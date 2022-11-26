@@ -1,9 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Story, Meta } from "@storybook/react";
-import { Deck, loadDbFromCache } from "mtgatool-shared";
-import CardTile, { CardTileProps } from "../components/CardTile";
-
 import "../index.scss";
+
+import { Meta, Story } from "@storybook/react";
+import { Deck, loadDbFromCache } from "mtgatool-shared";
+
+import CardTile, { CardTileProps } from "../components/CardTile";
 import database from "../utils/database-wrapper";
 
 loadDbFromCache();

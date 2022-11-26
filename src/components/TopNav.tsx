@@ -1,23 +1,20 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import _ from "lodash";
-import { useState, useRef, useEffect } from "react";
-import { useLocation, useHistory, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { getRankIndex, InternalRankData } from "mtgatool-shared";
-
-import formatRank from "../utils/formatRank";
-
-import useWindowSize from "../hooks/useWindowSize";
+import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { useHistory, useLocation, useParams } from "react-router-dom";
 
 import settingsIcon from "../assets/images/cog.png";
-
-import IconButton from "./ui/IconButton";
-import getLocalSetting from "../utils/getLocalSetting";
-import { AppState } from "../redux/stores/rendererStore";
-import Alt from "./Alt";
-import vodiFn from "../utils/voidfn";
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
+import useWindowSize from "../hooks/useWindowSize";
+import { AppState } from "../redux/stores/rendererStore";
 import { defaultRankData } from "../types/dbTypes";
+import formatRank from "../utils/formatRank";
+import getLocalSetting from "../utils/getLocalSetting";
+import vodiFn from "../utils/voidfn";
+import Alt from "./Alt";
+import IconButton from "./ui/IconButton";
 
 interface TopNavItemProps {
   compact: boolean;

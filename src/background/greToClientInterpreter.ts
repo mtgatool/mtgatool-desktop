@@ -2,62 +2,59 @@
 /* eslint-disable radix */
 /* eslint-disable no-console */
 import { app } from "electron";
-import { objectClone, useSet, countValues } from "mtgatool-shared";
+import { countValues, objectClone, useSet } from "mtgatool-shared";
 import {
-  ZoneInfo,
-  PlayerInfo,
-  ZoneType,
   AnnotationInfo,
-  GameObjectInfo,
   AnnotationType,
-  KeyValuePairInfo,
+  GameObjectInfo,
   GameStateMessage,
-  TurnInfo,
-  GREToClientMessage,
   GREMessageType,
+  GREToClientMessage,
+  KeyValuePairInfo,
+  PlayerInfo,
+  TurnInfo,
+  ZoneInfo,
+  ZoneType,
 } from "mtgatool-shared/dist/types/greTypes";
 
-import actionLog from "./actionLog";
-import db from "../utils/database-wrapper";
-
-import forceDeckUpdate from "./forceDeckUpdate";
-import getNameBySeat from "./getNameBySeat";
-import updateDeck from "./updateDeck";
 import {
-  Annotations,
-  GameObject,
   AggregatedDetailsType,
-  DetailsSrcDestCategoryType,
+  Annotations,
   DetailsKeyType,
+  DetailsSrcDestCategoryType,
+  GameObject,
 } from "../types/greInterpreter";
-
+import db from "../utils/database-wrapper";
+import actionLog from "./actionLog";
+import forceDeckUpdate from "./forceDeckUpdate";
 import getMatchGameStats from "./getMatchGameStats";
-
+import getNameBySeat from "./getNameBySeat";
 import globalStore from "./store";
 import {
-  setMatchId,
-  setPlayerCardsUsed,
-  setOppCardsUsed,
-  setCurrentMatchMany,
-  setIdChange,
   addCardCast,
-  removeAnnotations,
-  setInitialLibraryInstanceIds,
-  setOnThePlay,
-  setGameInfo,
-  setTurnInfo,
-  setManyZones,
-  setPlayers,
-  setManyGameObjects,
-  setManyAnnotations,
-  resetCurrentGame,
-  setHandDrawn,
-  setGameBeginTime,
-  setGameWinner,
-  setCardsBottom,
   addCardFromSideboard,
+  removeAnnotations,
+  resetCurrentGame,
+  setCardsBottom,
+  setCurrentMatchMany,
+  setGameBeginTime,
+  setGameInfo,
+  setGameWinner,
+  setHandDrawn,
+  setIdChange,
+  setInitialLibraryInstanceIds,
+  setManyAnnotations,
+  setManyGameObjects,
+  setManyZones,
+  setMatchId,
   setMatchStarted,
+  setOnThePlay,
+  setOppCardsUsed,
+  setPlayerCardsUsed,
+  setPlayers,
+  setTurnInfo,
 } from "./store/currentMatchStore";
+import updateDeck from "./updateDeck";
 
 function changePriority(previous: number, current: number, time: number): void {
   const priorityTimers = objectClone(globalStore.currentMatch.priorityTimers);

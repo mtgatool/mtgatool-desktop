@@ -1,18 +1,18 @@
 /* eslint-disable react/no-array-index-key */
+import { CardsList, database, Deck, formatPercent } from "mtgatool-shared";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { CardsList, database, Deck, formatPercent } from "mtgatool-shared";
-import getWinrateClass from "../../../utils/getWinrateClass";
-import Section from "../../ui/Section";
-import Button from "../../ui/Button";
-import { StatsDeck } from "../../../types/dbTypes";
+
 import { AppState } from "../../../redux/stores/rendererStore";
+import { StatsDeck } from "../../../types/dbTypes";
+import getDeckDiff, { DeckDiff } from "../../../utils/getDeckDiff";
+import getWinrateClass from "../../../utils/getWinrateClass";
+import CardTile from "../../CardTile";
 import DeckList from "../../DeckList";
 import Flex from "../../Flex";
-
-import getDeckDiff, { DeckDiff } from "../../../utils/getDeckDiff";
-import CardTile from "../../CardTile";
+import Button from "../../ui/Button";
+import Section from "../../ui/Section";
 
 interface ChangesDeckViewProps {
   setRegularView: () => void;

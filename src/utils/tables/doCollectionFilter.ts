@@ -1,15 +1,16 @@
 import _ from "lodash";
-import { CardsData } from "../../types/collectionTypes";
+
 import { Sort } from "../../components/SortControls";
+import { CardsData } from "../../types/collectionTypes";
+import { Filters } from "../../types/genericFilterTypes";
 import applySort from "./applySort";
 import colorsBitsFilterFn from "./filters/colorsBitsFilterFn";
-import inStringArrayFilterFn from "./filters/inStringArrayFilterFn";
 import inBoolFilterFn from "./filters/inBoolFilterFn";
+import inStringArrayFilterFn from "./filters/inStringArrayFilterFn";
 import minMaxFilterFn from "./filters/minMaxFilterFn";
 import rarityFilterFn from "./filters/rarityFilterFn";
 import setFilterFn from "./filters/setFilterFn";
 import stringFilterFn from "./filters/stringFilterFn";
-import { Filters } from "../../types/genericFilterTypes";
 
 export default function doCollectionFilter(
   data: CardsData[],

@@ -3,18 +3,19 @@
 import { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
+
 import usePagingControls from "../../../hooks/usePagingControls";
+import reduxAction from "../../../redux/reduxAction";
+import { selectCurrentFilterDate } from "../../../redux/slices/FilterSlice";
 import { AppState } from "../../../redux/stores/rendererStore";
+import aggregateStats from "../../../utils/aggregateStats";
 import doHistoryFilter from "../../../utils/tables/doHistoryFilter";
 import PagingControls from "../../PagingControls";
 import SortControls, { Sort } from "../../SortControls";
+import FilterSection from "../../ui/FilterSection";
+import Section from "../../ui/Section";
 import { MatchData } from "./getMatchesData";
 import ListItemMatch from "./ListItemMatch";
-import aggregateStats from "../../../utils/aggregateStats";
-import reduxAction from "../../../redux/reduxAction";
-import Section from "../../ui/Section";
-import FilterSection from "../../ui/FilterSection";
-import { selectCurrentFilterDate } from "../../../redux/slices/FilterSlice";
 
 interface HistoryListProps {
   openHistoryStatsPopup: () => void;

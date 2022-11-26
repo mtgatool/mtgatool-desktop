@@ -8,7 +8,6 @@ import {
   estimateBoosterMythics,
   estimateBoosterRares,
 } from "./collectionStats";
-
 import SetStats from "./SetsStats";
 
 export default function SetCompletionStats({

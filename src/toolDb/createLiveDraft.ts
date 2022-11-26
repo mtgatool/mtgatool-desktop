@@ -1,7 +1,8 @@
 /* eslint-disable no-param-reassign */
 import Automerge from "automerge";
-import { InternalDraftv2 } from "mtgatool-shared";
 import { base64ToBinaryDocument } from "mtgatool-db";
+import { InternalDraftv2 } from "mtgatool-shared";
+
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { DbliveDraftV1 } from "../types/dbTypes";
 

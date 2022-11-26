@@ -1,5 +1,5 @@
 import { uniq } from "lodash";
-import { DbCardDataV2, constants } from "mtgatool-shared";
+import { constants, DbCardDataV2 } from "mtgatool-shared";
 
 const { WHITE, BLUE, BLACK, RED, GREEN, COLORLESS } = constants;
 

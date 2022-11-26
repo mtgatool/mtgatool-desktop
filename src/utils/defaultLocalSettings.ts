@@ -1,4 +1,4 @@
-import { settingKeys, defaultSettings } from "../types/localSettings";
+import { defaultSettings, settingKeys } from "../types/localSettings";
 
 export default function defaultLocalSettings() {
   settingKeys.forEach((key) => {

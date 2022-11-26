@@ -2,10 +2,10 @@
 /* eslint-disable radix */
 import { Colors, database, DbCardDataV2, v2cardsList } from "mtgatool-shared";
 import { DEFAULT_TILE } from "mtgatool-shared/dist/shared/constants";
+
 import { DbMatch } from "../../../types/dbTypes";
 import { Winrate } from "../../../utils/aggregateStats";
 import getWinrateValue from "../../../utils/getWinrateValue";
-
 import getRankFilterVal from "../history/getRankFilterVal";
 
 export interface ExploreDeckData {

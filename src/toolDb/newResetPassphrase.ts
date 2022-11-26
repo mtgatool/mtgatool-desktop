@@ -1,4 +1,3 @@
-import randomWords from "random-words";
 import {
   encryptWithPass,
   generateIv,
@@ -6,6 +5,8 @@ import {
   toBase64,
   uint8ToBase64,
 } from "mtgatool-db";
+import randomWords from "random-words";
+
 import { UserRecoveryData } from "../types/dbTypes";
 
 export default function newResetPassphrase(reminder: string) {

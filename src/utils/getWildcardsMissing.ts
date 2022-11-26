@@ -1,4 +1,5 @@
 import { database, Deck } from "mtgatool-shared";
+
 import store from "../redux/stores/rendererStore";
 import { defaultCardsData } from "../types/dbTypes";
 

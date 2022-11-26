@@ -1,6 +1,7 @@
 import { getSetInEventId, PlayerCourse } from "mtgatool-shared";
+
 import LogEntry from "../../types/logDecoder";
-import { setDraftId, setDraftData } from "../store/currentDraftStore";
+import { setDraftData, setDraftId } from "../store/currentDraftStore";
 
 interface Entry extends LogEntry {
   json: PlayerCourse;

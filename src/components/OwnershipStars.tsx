@@ -1,5 +1,6 @@
-import { useSelector } from "react-redux";
 import { cardHasType, DbCardDataV2 } from "mtgatool-shared";
+import { useSelector } from "react-redux";
+
 import { AppState } from "../redux/stores/rendererStore";
 import { defaultCardsData } from "../types/dbTypes";
 

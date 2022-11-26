@@ -1,13 +1,14 @@
 import _ from "lodash";
+
 import { Sort } from "../../components/SortControls";
+import { MatchData } from "../../components/views/history/getMatchesData";
+import { Filters } from "../../types/genericFilterTypes";
 import applySort from "./applySort";
+import bitsFilterFn from "./filters/bitsFilterFn";
+import colorsBitsFilterFn from "./filters/colorsBitsFilterFn";
+import inBoolFilterFn from "./filters/inBoolFilterFn";
 import minMaxFilterFn from "./filters/minMaxFilterFn";
 import stringFilterFn from "./filters/stringFilterFn";
-import { MatchData } from "../../components/views/history/getMatchesData";
-import inBoolFilterFn from "./filters/inBoolFilterFn";
-import colorsBitsFilterFn from "./filters/colorsBitsFilterFn";
-import { Filters } from "../../types/genericFilterTypes";
-import bitsFilterFn from "./filters/bitsFilterFn";
 
 export default function doHistoryFilter(
   data: MatchData[],

@@ -1,15 +1,16 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { Fragment, useState } from "react";
+
 import { ReactComponent as Close } from "../../../assets/images/svg/close.svg";
 import isElectron from "../../../utils/electron/isElectron";
 import AboutSettingsPanel from "./AboutSettingsPanel";
-import OverlaySettingsPanel from "./OverlaySettingsPanel";
-import VisualSettingsPanel from "./VisualSettingsPanel";
-import ShortcutsSettingsPanel from "./ShortcutsSettingsPanel";
 import AccountSettingsPanel from "./AccountSettingsPanel";
 import DataSettingsPanel from "./DataSettingsPanel";
 import LogsSettingsPanel from "./LogsSettingsPanel";
 import NetworkSettingsPanel from "./NetworkSettingsPanel";
+import OverlaySettingsPanel from "./OverlaySettingsPanel";
+import ShortcutsSettingsPanel from "./ShortcutsSettingsPanel";
+import VisualSettingsPanel from "./VisualSettingsPanel";
 
 const SETTINGS_LOGS = 10;
 const SETTINGS_DATA = 11;

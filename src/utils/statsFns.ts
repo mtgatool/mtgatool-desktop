@@ -1,5 +1,5 @@
 /* eslint-disable no-redeclare */
-import MathJs, { create, all, MathJsStatic } from "mathjs";
+import MathJs, { all, create, MathJsStatic } from "mathjs";
 
 const config = { precision: 2000 };
 const math: MathJsStatic = create(all, config) as MathJsStatic;

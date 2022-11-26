@@ -1,28 +1,26 @@
 /* eslint-disable no-nested-ternary */
-import { CSSProperties, useState } from "react";
-
-import { useSelector } from "react-redux";
 import { COLORS_ALL } from "mtgatool-shared/dist/shared/constants";
-import { ReactComponent as MacMinimize } from "../assets/images/svg/mac-minimize.svg";
-import { ReactComponent as MacMaximize } from "../assets/images/svg/mac-maximize.svg";
-import { ReactComponent as MacClose } from "../assets/images/svg/mac-close.svg";
-
-import { ReactComponent as WinMinimize } from "../assets/images/svg/win-minimize.svg";
-import { ReactComponent as WinMaximize } from "../assets/images/svg/win-maximize.svg";
-import { ReactComponent as WinRestore } from "../assets/images/svg/win-restore.svg";
-import { ReactComponent as WinClose } from "../assets/images/svg/win-close.svg";
+import { CSSProperties, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 import { ReactComponent as Logo } from "../assets/images/svg/logo.svg";
-
-import minimizeWindow from "../utils/electron/minimizeWindow";
-import setMaximize from "../utils/electron/setMaximize";
-import hideWindow from "../utils/electron/hideWindow";
-import isMaximized from "../utils/electron/isMaximized";
+import { ReactComponent as MacClose } from "../assets/images/svg/mac-close.svg";
+import { ReactComponent as MacMaximize } from "../assets/images/svg/mac-maximize.svg";
+import { ReactComponent as MacMinimize } from "../assets/images/svg/mac-minimize.svg";
+import { ReactComponent as WinClose } from "../assets/images/svg/win-close.svg";
+import { ReactComponent as WinMaximize } from "../assets/images/svg/win-maximize.svg";
+import { ReactComponent as WinMinimize } from "../assets/images/svg/win-minimize.svg";
+import { ReactComponent as WinRestore } from "../assets/images/svg/win-restore.svg";
+import { overlayTitleToId } from "../common/maps";
 import store, { AppState } from "../redux/stores/rendererStore";
-import getWindowTitle from "../utils/electron/getWindowTitle";
 import { ALL_OVERLAYS, WINDOW_MAIN } from "../types/app";
 import electron from "../utils/electron/electronWrapper";
-import { overlayTitleToId } from "../common/maps";
+import getWindowTitle from "../utils/electron/getWindowTitle";
+import hideWindow from "../utils/electron/hideWindow";
+import isFocused from "../utils/electron/isFocused";
+import isMaximized from "../utils/electron/isMaximized";
+import minimizeWindow from "../utils/electron/minimizeWindow";
+import setMaximize from "../utils/electron/setMaximize";
 
 function clickMinimize(): void {
   minimizeWindow();
@@ -78,7 +76,30 @@ export default function TopBar(props: TopBarProps): JSX.Element {
 
   const isOverlay = ALL_OVERLAYS.includes(getWindowTitle());
 
-  const topButtonClass = os == "darwin" ? "top-button-mac" : "top-button";
+  const [_redraw, setRedraw] = useState(0);
+
+  useEffect(() => {
+    if (os !== "darwin") {
+      return () => {
+        //
+      };
+    }
+
+    const interval = setInterval(() => {
+      setRedraw(new Date().getTime());
+    }, 50);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  const topButtonClass =
+    os == "darwin"
+      ? isFocused()
+        ? "top-button-mac"
+        : "top-button-mac-unfocus"
+      : "top-button";
 
   const topButtonsContainerClass =
     os == "darwin" ? "top-buttons-container-mac" : "top-buttons-container";
@@ -92,7 +113,7 @@ export default function TopBar(props: TopBarProps): JSX.Element {
 
   // Define components for simple ordering later
   const iconStyle: CSSProperties = {
-    fill: os == "darwin" ? (hoverControls ? "#000000bf" : "#00000000") : "",
+    fill: os == "darwin" ? (hoverControls ? "#0000008c" : "#00000000") : "",
     margin: "auto",
   };
 

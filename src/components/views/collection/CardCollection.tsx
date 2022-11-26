@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { useSelector } from "react-redux";
+
 import LoadingCard from "../../../assets/images/loadingcard.png";
 import { CARD_SIZE_RATIO } from "../../../common/static";
 import useHoverCard from "../../../hooks/useHoverCard";

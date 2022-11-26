@@ -1,6 +1,7 @@
 import { database } from "mtgatool-shared";
 import { useRef } from "react";
 import { useSelector } from "react-redux";
+
 import { ReactComponent as DataIcon } from "../assets/images/svg/data.svg";
 import { AppState } from "../redux/stores/rendererStore";
 import vodiFn from "../utils/voidfn";

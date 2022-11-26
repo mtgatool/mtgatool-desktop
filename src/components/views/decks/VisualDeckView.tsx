@@ -2,20 +2,21 @@
 /* eslint-disable react/no-array-index-key */
 import _ from "lodash";
 import {
-  Deck,
   CardObject,
+  cardType,
   database,
   DbCardDataV2,
-  cardType,
+  Deck,
 } from "mtgatool-shared";
 import { Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import reduxAction from "../../../redux/reduxAction";
+import { AppState } from "../../../redux/stores/rendererStore";
 import { getCardImage } from "../../../utils/getCardArtCrop";
 import DeckTypesStats from "../../DeckTypesStats";
-import Section from "../../ui/Section";
 import Button from "../../ui/Button";
-import { AppState } from "../../../redux/stores/rendererStore";
+import Section from "../../ui/Section";
 
 interface VisualDeckViewProps {
   deck: Deck;

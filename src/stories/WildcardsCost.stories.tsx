@@ -1,10 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Story, Meta } from "@storybook/react";
+import "../index.scss";
+
+import { Meta, Story } from "@storybook/react";
 import { Deck } from "mtgatool-shared";
 
 import WildcardsCost, { WildcardsCostProps } from "../components/WildcardsCost";
-
-import "../index.scss";
 
 export default {
   title: "MTG Arena Tool/WildcardsCost",

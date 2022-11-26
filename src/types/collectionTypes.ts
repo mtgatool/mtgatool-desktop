@@ -1,11 +1,11 @@
 import {
-  ColorBitsFilter,
   ArrayFilter,
+  ColorBitsFilter,
   InBoolFilter,
   MinMaxFilter,
+  QuerySeparators,
   RarityBitsFilter,
   StringFilter,
-  QuerySeparators,
 } from "./filterTypes";
 
 export interface CardsData {

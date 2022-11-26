@@ -1,10 +1,10 @@
-import * as HoverSlice from "./slices/hoverSlice";
+import * as avatarsSlice from "./slices/avatarsSlice";
 import * as CollectionSlice from "./slices/collectionSlice";
+import * as HoverSlice from "./slices/hoverSlice";
 import * as MainDataSlice from "./slices/mainDataSlice";
 import * as RendererSlice from "./slices/rendererSlice";
-import * as avatarsSlice from "./slices/avatarsSlice";
-import * as usernamesSlice from "./slices/usernamesSlice";
 import * as SettingsSlice from "./slices/settingsSlice";
+import * as usernamesSlice from "./slices/usernamesSlice";
 
 export const actions = {
   SET_HOVER_IN: HoverSlice.setHoverIn,

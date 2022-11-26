@@ -8,8 +8,8 @@ import {
   DRAFT_RANKS,
   DRAFT_RANKS_LOLA,
 } from "mtgatool-shared/dist/shared/constants";
-import CardTile, { QuantityRank } from "../components/CardTile";
 
+import CardTile, { QuantityRank } from "../components/CardTile";
 import { DbDraftVote } from "../types/dbTypes";
 import getCardTypeSort from "../utils/getCardTypeSort";
 

@@ -6,6 +6,7 @@ import {
   InternalDeck,
   v4cardsList,
 } from "mtgatool-shared";
+
 import LogEntry from "../../types/logDecoder";
 import selectDeck from "../selectDeck";
 

@@ -1,11 +1,12 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Story, Meta } from "@storybook/react";
+import "../index.scss";
+
+import { Meta, Story } from "@storybook/react";
 
 import DecksArtViewRow, {
   DecksArtViewRowProps,
 } from "../components/DecksArtViewRow";
 import vodiFn from "../utils/voidfn";
-import "../index.scss";
 
 export default {
   title: "MTG Arena Tool/DecksArtViewRow",

@@ -1,4 +1,5 @@
 import { CSSProperties } from "react";
+
 import openExternal from "../utils/openExternal";
 
 interface LinkProps {

@@ -1,17 +1,16 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable radix */
 import _ from "lodash";
-import { ChangeEvent, useCallback, useState } from "react";
 import { ToolDbNetwork } from "mtgatool-db";
+import { ChangeEvent, useCallback, useState } from "react";
 
+import { knownHosts } from "../../../constants";
 import { Peer } from "../../../redux/slices/rendererSlice";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import { getFinalHost } from "../../../utils/peerToUrl";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
-
 import Button from "../../ui/Button";
-import { knownHosts } from "../../../constants";
 
 function _getPeerFromUrl(url: string) {
   const urlParseRegex = new RegExp(

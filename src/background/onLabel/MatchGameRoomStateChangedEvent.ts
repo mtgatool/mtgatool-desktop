@@ -6,13 +6,12 @@ import {
   InternalDeck,
   MatchGameRoomStateChange,
 } from "mtgatool-shared";
+
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import MtgaTrackerDaemon from "../../daemon/mtgaTrackerDaemon";
-
 import LogEntry from "../../types/logDecoder";
 import getLocalSetting from "../../utils/getLocalSetting";
 import isLimitedEventId from "../../utils/isLimitedEventId";
-
 import actionLog from "../actionLog";
 import saveMatch from "../saveMatch";
 import selectDeck from "../selectDeck";

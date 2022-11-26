@@ -1,6 +1,7 @@
-import { CSSProperties } from "react";
 import { isEqual } from "lodash";
 import { CardSet, database } from "mtgatool-shared";
+import { CSSProperties } from "react";
+
 import allFormats from "../common/allFormats";
 
 interface SetsFilterProps {

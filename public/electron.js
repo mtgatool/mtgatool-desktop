@@ -11,7 +11,7 @@ const mainGlobals = require("./mainGlobals");
 const installDevTools = require("./devtools");
 
 const iconNormal = "icon.png";
-const iconTray = "icon-tray.png";
+const iconTrayOsx = "icon-tray-osx.png";
 const iconTray8x = "icon-tray@8x.png";
 const icon256 = "icon-256.png";
 
@@ -222,7 +222,7 @@ function createWindow() {
 
   createCardHoverWindow();
 
-  let iconPath = iconTray;
+  let iconPath = iconTrayOsx;
   if (process.platform == "linux") {
     iconPath = iconTray8x;
   }

@@ -1,6 +1,5 @@
-import { ALL_CARDS, FULL_SETS, SINGLETONS } from "./collectionStats";
-
 import Flex from "../../Flex";
+import { ALL_CARDS, FULL_SETS, SINGLETONS } from "./collectionStats";
 import CountStats from "./CountStats";
 
 interface CompletionProgressBarProps {

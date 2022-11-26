@@ -1,8 +1,7 @@
-import { Switch, Route, useRouteMatch } from "react-router-dom";
+import { Route, Switch, useRouteMatch } from "react-router-dom";
+
 import useDbUser from "../../../hooks/useDbUser";
-
 import Section from "../../ui/Section";
-
 import DraftsHome from "./DraftsHome";
 import LiveDraftView from "./LiveDraftView";
 

@@ -1,4 +1,5 @@
 import { getSetInEventId } from "mtgatool-shared";
+
 import LogEntry from "../../types/logDecoder";
 import { setDraftData } from "../store/currentDraftStore";
 

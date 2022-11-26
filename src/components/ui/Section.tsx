@@ -1,4 +1,5 @@
 import { CSSProperties } from "react";
+
 import getCssQuality from "../../utils/getCssQuality";
 
 export type SectionProps = React.PropsWithChildren<{

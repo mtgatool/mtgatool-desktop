@@ -1,46 +1,40 @@
 /* eslint-disable import/no-webpack-loader-syntax */
 /* eslint-disable no-nested-ternary */
+import _ from "lodash";
+import { sha1, ToolDb } from "mtgatool-db";
+import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
-import { Switch, Route, useHistory } from "react-router-dom";
+import { Route, Switch, useHistory } from "react-router-dom";
 
-import { sha1, ToolDb } from "mtgatool-db";
-
-import _ from "lodash";
+import overlayHandler from "../common/overlayHandler";
+// import liveDraftVerification from "../toolDb/liveDraftVerification";
+import { DEFAULT_PEERS } from "../constants";
+import info from "../info.json";
+import reduxAction from "../redux/reduxAction";
+import { AppState } from "../redux/stores/rendererStore";
+import login from "../toolDb/login";
+import electron from "../utils/electron/electronWrapper";
+import isElectron from "../utils/electron/isElectron";
+import { getCardArtCrop } from "../utils/getCardArtCrop";
+import getLocalSetting from "../utils/getLocalSetting";
+import getPopupClass from "../utils/getPopupClass";
+import { getFinalHost } from "../utils/peerToUrl";
+import vodiFn from "../utils/voidfn";
 import Auth from "./Auth";
 import CardHover from "./CardHover";
 import ContentWrapper from "./ContentWrapper";
 import DataStatus from "./DataStatus";
 import ErrorBoundary from "./ErrorBoundary";
 import LoadingBar from "./LoadingBar";
+import PopupComponent from "./PopupComponent";
+import Popups from "./Popups";
+import ArenaIdSelector from "./popups/ArenaIdSelector";
+import SettingsPersistor from "./SettingsPersistor";
 import TopBar from "./TopBar";
 import TopNav from "./TopNav";
-
-import { AppState } from "../redux/stores/rendererStore";
-import electron from "../utils/electron/electronWrapper";
-import getLocalSetting from "../utils/getLocalSetting";
-import { getCardArtCrop } from "../utils/getCardArtCrop";
-
-import reduxAction from "../redux/reduxAction";
-import PopupComponent from "./PopupComponent";
-import vodiFn from "../utils/voidfn";
 import ViewSettings from "./views/settings/ViewSettings";
-import SettingsPersistor from "./SettingsPersistor";
-import isElectron from "../utils/electron/isElectron";
-
-import info from "../info.json";
-import overlayHandler from "../common/overlayHandler";
-import login from "../toolDb/login";
 import Welcome from "./Welcome";
-// import liveDraftVerification from "../toolDb/liveDraftVerification";
-import { DEFAULT_PEERS } from "../constants";
-
-import Popups from "./Popups";
-
-import ArenaIdSelector from "./popups/ArenaIdSelector";
-import { getFinalHost } from "../utils/peerToUrl";
-import getPopupClass from "../utils/getPopupClass";
 
 export interface AppProps {
   forceOs?: string;

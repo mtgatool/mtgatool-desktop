@@ -5,6 +5,7 @@ import {
   proofOfWork,
   UserRootData,
 } from "mtgatool-db";
+
 import { UserRecoveryData } from "../types/dbTypes";
 
 /* eslint-disable prefer-promise-reject-errors */

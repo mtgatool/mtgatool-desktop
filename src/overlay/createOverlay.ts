@@ -1,5 +1,6 @@
 import path from "path";
 import url from "url";
+
 import { OverlaySettings, Settings } from "../common/defaultConfig";
 import {
   WINDOW_OVERLAY_0,

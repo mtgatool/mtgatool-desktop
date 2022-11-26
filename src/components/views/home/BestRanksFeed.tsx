@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
+
 import { DEFAULT_AVATAR } from "../../../constants";
 import cleanUsername from "../../../utils/cleanUsername";
 import timeAgo from "../../../utils/timeAgo";
-
 import RankIcon from "../../RankIcon";
-
 import DbRankInfo from "./DbRankInfo";
 import { sortConstructedRanks, sortLimitedRanks } from "./sortRanks";
 

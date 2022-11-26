@@ -1,4 +1,5 @@
 import path from "path";
+
 import electron from "./electronWrapper";
 
 export default function getPublicPath(): string {

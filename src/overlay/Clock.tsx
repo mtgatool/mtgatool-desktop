@@ -1,6 +1,6 @@
+import { PriorityTimers } from "mtgatool-shared";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { PriorityTimers } from "mtgatool-shared";
 import { toHHMMSS, toMMSS } from "../utils/dateTo";
 
 const CLOCK_MODE_BOTH = 0;

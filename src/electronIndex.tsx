@@ -1,37 +1,35 @@
 // import "./wdyr";
 // eslint-disable-next-line no-use-before-define
-import React from "react";
-import ReactDOM from "react-dom";
-import { BrowserRouter as Router } from "react-router-dom";
-
-import { Provider } from "react-redux";
-
-import App from "./components/App";
-import Overlay from "./overlay";
-import Hover from "./hover";
-import store from "./redux/stores/rendererStore";
 import "./index.scss";
 
-import * as serviceWorker from "./serviceWorker";
-import defaultLocalSettings from "./utils/defaultLocalSettings";
+import React from "react";
+import ReactDOM from "react-dom";
+import { Provider } from "react-redux";
+import { BrowserRouter as Router } from "react-router-dom";
+
 import backgroundChannelListeners from "./broadcastChannel/backgroundChannelListeners";
 import mainChannelListeners from "./broadcastChannel/mainChannelListeners";
-import { loadDbFromCache } from "./utils/database-wrapper";
-import initDirectories from "./utils/initDirectories";
-import getWindowTitle from "./utils/electron/getWindowTitle";
+import App from "./components/App";
+import MtgaTrackerDaemon from "./daemon/mtgaTrackerDaemon";
+import Hover from "./hover";
+import Overlay from "./overlay";
+import reduxAction from "./redux/reduxAction";
+import store from "./redux/stores/rendererStore";
+import * as serviceWorker from "./serviceWorker";
 import {
   ALL_OVERLAYS,
   WINDOW_BACKGROUND,
   WINDOW_HOVER,
   WINDOW_UPDATER,
 } from "./types/app";
-
 import Updater from "./updater";
+import { loadDbFromCache } from "./utils/database-wrapper";
+import defaultLocalSettings from "./utils/defaultLocalSettings";
+import getWindowTitle from "./utils/electron/getWindowTitle";
 import getLocalSetting from "./utils/getLocalSetting";
-import registerShortcuts from "./utils/registerShortcuts";
-import reduxAction from "./redux/reduxAction";
 import globalData from "./utils/globalData";
-import MtgaTrackerDaemon from "./daemon/mtgaTrackerDaemon";
+import initDirectories from "./utils/initDirectories";
+import registerShortcuts from "./utils/registerShortcuts";
 
 const title = getWindowTitle();
 

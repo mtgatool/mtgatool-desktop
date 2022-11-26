@@ -1,4 +1,5 @@
 import { MythicRatingUpdate } from "mtgatool-shared";
+
 import LogEntry from "../../types/logDecoder";
 import globalStore from "../store";
 

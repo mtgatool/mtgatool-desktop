@@ -2,7 +2,6 @@
 /* eslint-disable radix */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-nested-ternary */
-import { useState } from "react";
 import {
   compareCards,
   database,
@@ -11,39 +10,37 @@ import {
   getDeckColorsAmmount,
   getDeckLandsAmmount,
 } from "mtgatool-shared";
-import { PieChart } from "react-minimal-pie-chart";
-
 import {
   DEFAULT_TILE,
   MANA_COLORS,
 } from "mtgatool-shared/dist/shared/constants";
+import { useState } from "react";
+import { PieChart } from "react-minimal-pie-chart";
 import { useDispatch } from "react-redux";
-import copyToClipboard from "../../../utils/copyToClipboard";
-import { getCardArtCrop, getCardImage } from "../../../utils/getCardArtCrop";
-import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
-import DeckColorsBar from "../../DeckColorsBar";
-import SvgButton from "../../SvgButton";
 
 import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
-import ManaCost from "../../ManaCost";
-import Section from "../../ui/Section";
-import Button from "../../ui/Button";
-import Separator from "../../Separator";
-import DeckTypesStats from "../../DeckTypesStats";
-import DeckManaCurve from "../../DeckManaCurve";
-import WildcardsCostPreset from "../../WildcardsCostPreset";
-import CraftingCost from "../../CraftingCost";
-import getSampleHand from "../../../utils/getSampleHand";
-import CardTile from "../../CardTile";
-
-import DeckList from "../../DeckList";
-
-import { ExploreDeckData } from "./doExploreAggregation";
-import VisualDeckView from "../decks/VisualDeckView";
-import getWinrateClass from "../../../utils/getWinrateClass";
 import reduxAction from "../../../redux/reduxAction";
-import Flex from "../../Flex";
+import copyToClipboard from "../../../utils/copyToClipboard";
 import { toMMSS } from "../../../utils/dateTo";
+import { getCardArtCrop, getCardImage } from "../../../utils/getCardArtCrop";
+import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
+import getSampleHand from "../../../utils/getSampleHand";
+import getWinrateClass from "../../../utils/getWinrateClass";
+import CardTile from "../../CardTile";
+import CraftingCost from "../../CraftingCost";
+import DeckColorsBar from "../../DeckColorsBar";
+import DeckList from "../../DeckList";
+import DeckManaCurve from "../../DeckManaCurve";
+import DeckTypesStats from "../../DeckTypesStats";
+import Flex from "../../Flex";
+import ManaCost from "../../ManaCost";
+import Separator from "../../Separator";
+import SvgButton from "../../SvgButton";
+import Button from "../../ui/Button";
+import Section from "../../ui/Section";
+import WildcardsCostPreset from "../../WildcardsCostPreset";
+import VisualDeckView from "../decks/VisualDeckView";
+import { ExploreDeckData } from "./doExploreAggregation";
 
 // const { MANA_COLORS } = constants;
 

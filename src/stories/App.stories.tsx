@@ -1,10 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Story, Meta } from "@storybook/react";
-
-import Auth, { AuthProps } from "../components/Auth";
-import App, { AppProps } from "../components/App";
-
 import "../index.scss";
+
+import { Meta, Story } from "@storybook/react";
+
+import App, { AppProps } from "../components/App";
+import Auth, { AuthProps } from "../components/Auth";
 
 export default {
   title: "MTG Arena Tool/App",

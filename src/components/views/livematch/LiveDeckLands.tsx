@@ -8,6 +8,7 @@ import {
   WHITE,
 } from "mtgatool-shared/dist/shared/constants";
 import { PieChart } from "react-minimal-pie-chart";
+
 import manaClasses from "../../../common/manaClasses";
 
 export default function LiveDeckLands(props: { cardOdds: Chances }) {

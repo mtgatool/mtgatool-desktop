@@ -1,24 +1,24 @@
+import _ from "lodash";
+import { InternalDraftv2 } from "mtgatool-shared";
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 
-import { InternalDraftv2 } from "mtgatool-shared";
-import _ from "lodash";
 import { overlayTitleToId } from "../common/maps";
+import fetchCards from "../daemon/fetchCards";
+import reduxAction from "../redux/reduxAction";
+import store from "../redux/stores/rendererStore";
 import setDbMatch from "../toolDb/setDbMatch";
 import upsertDbCards from "../toolDb/upsertDbCards";
 import upsertDbInventory from "../toolDb/upsertDbInventory";
+import upsertDbLiveMatch from "../toolDb/upsertDbLiveMatch";
 import upsertDbRank from "../toolDb/upsertDbRank";
-import reduxAction from "../redux/reduxAction";
-import store from "../redux/stores/rendererStore";
 import LogEntry from "../types/logDecoder";
 import bcConnect from "../utils/bcConnect";
+import electron from "../utils/electron/electronWrapper";
+import getLocalSetting from "../utils/getLocalSetting";
+import globalData from "../utils/globalData";
+import setLocalSetting from "../utils/setLocalSetting";
 import switchPlayerUUID from "../utils/switchPlayerUUID";
 import { ChannelMessage } from "./channelMessages";
-import setLocalSetting from "../utils/setLocalSetting";
-import globalData from "../utils/globalData";
-import getLocalSetting from "../utils/getLocalSetting";
-import electron from "../utils/electron/electronWrapper";
-import fetchCards from "../daemon/fetchCards";
-import upsertDbLiveMatch from "../toolDb/upsertDbLiveMatch";
 
 export default function mainChannelListeners() {
   const channel = bcConnect() as any;

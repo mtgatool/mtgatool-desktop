@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { AppState } from "../redux/stores/rendererStore";
-
-import newResetPassphrase from "../toolDb/newResetPassphrase";
-import copyToClipboard from "../utils/copyToClipboard";
 
 import { ReactComponent as KeysIcon } from "../assets/images/svg/keys.svg";
-
-import Button from "./ui/Button";
-
+import { AppState } from "../redux/stores/rendererStore";
+import newResetPassphrase from "../toolDb/newResetPassphrase";
 import saveKeysCallback from "../toolDb/saveKeysCallback";
+import copyToClipboard from "../utils/copyToClipboard";
+import Button from "./ui/Button";
 
 export default function PostSignupPopup(): JSX.Element {
   const [phrase, setPhrase] = useState("-");

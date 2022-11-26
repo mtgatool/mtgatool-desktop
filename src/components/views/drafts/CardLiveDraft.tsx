@@ -1,11 +1,11 @@
 import { database } from "mtgatool-shared";
 import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+
 import LoadingCard from "../../../assets/images/loadingcard.png";
 import { CARD_SIZE_RATIO } from "../../../common/static";
 import useHoverCard from "../../../hooks/useHoverCard";
 import { AppState } from "../../../redux/stores/rendererStore";
-
 import { getCardImage } from "../../../utils/getCardArtCrop";
 import getCssQuality from "../../../utils/getCssQuality";
 

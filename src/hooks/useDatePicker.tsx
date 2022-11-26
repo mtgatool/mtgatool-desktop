@@ -1,7 +1,7 @@
-import { useState, useCallback, useMemo } from "react";
-import DayPicker from "react-day-picker";
-
 import "react-day-picker/lib/style.css";
+
+import { useCallback, useMemo, useState } from "react";
+import DayPicker from "react-day-picker";
 
 export default function useDatePicker(
   initialDate: Date,

@@ -1,11 +1,10 @@
+import { useSelector } from "react-redux";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
 
-import { useSelector } from "react-redux";
 import useDbUser from "../../../hooks/useDbUser";
-
 import { AppState } from "../../../redux/stores/rendererStore";
-import ViewExploreHome from "./ViewExploreHome";
 import ViewExploreEvent from "./ViewExploreEvent";
+import ViewExploreHome from "./ViewExploreHome";
 
 export default function ViewExplore() {
   const { url } = useRouteMatch();

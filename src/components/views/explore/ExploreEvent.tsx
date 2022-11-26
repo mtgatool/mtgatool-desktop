@@ -1,18 +1,15 @@
 /* eslint-disable no-param-reassign */
 
 import { useEffect, useState } from "react";
-
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
+import { AppState } from "../../../redux/stores/rendererStore";
 import getEventExplorerSection from "../../../utils/getEventExplorerSection";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import timeAgo from "../../../utils/timeAgo";
-
-import { AppState } from "../../../redux/stores/rendererStore";
-
 import { DbExploreAggregated } from "./doExploreAggregation";
 
 interface ExploreEventProps {

@@ -6,8 +6,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import _ from "lodash";
 import { sha1 } from "mtgatool-shared";
-import nthLastIndexOf from "./nthLastIndexOf";
+
 import * as jsonText from "./jsonText";
+import nthLastIndexOf from "./nthLastIndexOf";
 
 function occurrences(text: string, re: RegExp): number {
   const matches = text.match(re);

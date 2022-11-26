@@ -2,22 +2,19 @@
 import { Colors, Deck, formatPercent } from "mtgatool-shared";
 import { useEffect, useState } from "react";
 
-import ManaCost from "./ManaCost";
-
+import squirrels from "../assets/images/squirrels.png";
 import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
 import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
-
-import WildcardsCost from "./WildcardsCost";
-import DeckColorsBar from "./DeckColorsBar";
-import getDeckMissing from "../utils/getDeckMissing";
-import { getCardArtCrop } from "../utils/getCardArtCrop";
-import getWinrateClass from "../utils/getWinrateClass";
 import { StatsDeck } from "../types/dbTypes";
+import { getCardArtCrop } from "../utils/getCardArtCrop";
+import getDeckMissing from "../utils/getDeckMissing";
 // import timeAgo from "../utils/timeAgo";
 import getPreconDeckName from "../utils/getPreconDeckName";
-
-import squirrels from "../assets/images/squirrels.png";
+import getWinrateClass from "../utils/getWinrateClass";
 import { normalApproximationInterval } from "../utils/statsFns";
+import DeckColorsBar from "./DeckColorsBar";
+import ManaCost from "./ManaCost";
+import WildcardsCost from "./WildcardsCost";
 
 export interface DecksArtViewRowProps {
   clickDeck: (deck: StatsDeck) => void;

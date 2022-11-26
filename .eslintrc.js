@@ -28,6 +28,8 @@ module.exports = {
     "no-console": "off",
     "no-redeclare": "warn",
     "no-duplicate-imports": "warn",
+    "simple-import-sort/imports": "warn",
+    "simple-import-sort/exports": "warn",
     "no-undef": "error",
     "no-global-assign": "warn",
     "no-empty": "warn",
@@ -109,5 +111,6 @@ module.exports = {
     "prettier",
     "react",
     "react-hooks",
+    "simple-import-sort",
   ],
 };

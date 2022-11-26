@@ -1,6 +1,6 @@
 import { RankUpdate } from "mtgatool-shared";
-import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 
+import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import LogEntry from "../../types/logDecoder";
 import globalStore from "../store";
 

@@ -1,10 +1,10 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable radix */
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
+
 import getLocalSetting from "../../../utils/getLocalSetting";
 import globalData from "../../../utils/globalData";
 import openExternal from "../../../utils/openExternal";
-
 import Button from "../../ui/Button";
 
 export default function DaemonSettingsPanel(): JSX.Element {

@@ -1,6 +1,7 @@
-import { base64ToBinaryDocument, CrdtMessage, PutMessage } from "mtgatool-db";
 import Automerge from "automerge";
 import _ from "lodash";
+import { base64ToBinaryDocument, CrdtMessage, PutMessage } from "mtgatool-db";
+
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import { DbCardsData, DbInventoryData, DbRankData } from "../types/dbTypes";

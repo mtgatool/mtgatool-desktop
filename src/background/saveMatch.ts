@@ -1,13 +1,13 @@
 import electron from "electron";
 import {
+  constants,
   getJumpstartThemes,
   InternalMatch,
   JumpstartThemes,
   themeCards,
-  constants,
 } from "mtgatool-shared";
-
 import { ResultSpec } from "mtgatool-shared/dist/types/greTypes";
+
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import getToolVersion from "../utils/getToolVersion";
 import getOpponentDeck from "./getOpponentDeck";

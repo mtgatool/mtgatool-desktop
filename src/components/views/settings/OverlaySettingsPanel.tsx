@@ -20,15 +20,16 @@ import {
   useState,
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
+import { defaultConfig, OverlaySettings } from "../../../common/defaultConfig";
+import useColorPicker from "../../../hooks/useColorPicker";
+import reduxAction from "../../../redux/reduxAction";
 import store, { AppState } from "../../../redux/stores/rendererStore";
+import vodiFn from "../../../utils/voidfn";
+import Button from "../../ui/Button";
+import Select from "../../ui/Select";
 import Slider from "../../ui/Slider";
 import Toggle from "../../ui/Toggle";
-import Select from "../../ui/Select";
-import Button from "../../ui/Button";
-import { defaultConfig, OverlaySettings } from "../../../common/defaultConfig";
-import reduxAction from "../../../redux/reduxAction";
-import useColorPicker from "../../../hooks/useColorPicker";
-import vodiFn from "../../../utils/voidfn";
 
 function backgroundColorPicker(color: string): void {
   reduxAction(store.dispatch, {

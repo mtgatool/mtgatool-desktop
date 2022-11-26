@@ -1,13 +1,11 @@
 import _ from "lodash";
+
 import { Sort } from "../../components/SortControls";
-import applySort from "./applySort";
-
-import stringFilterFn from "./filters/stringFilterFn";
-
-import colorsBitsFilterFn from "./filters/colorsBitsFilterFn";
-import { Filters } from "../../types/genericFilterTypes";
-
 import { ExploreDeckData } from "../../components/views/explore/doExploreAggregation";
+import { Filters } from "../../types/genericFilterTypes";
+import applySort from "./applySort";
+import colorsBitsFilterFn from "./filters/colorsBitsFilterFn";
+import stringFilterFn from "./filters/stringFilterFn";
 
 export default function doExploreFilter(
   data: ExploreDeckData[],

@@ -1,13 +1,11 @@
-import { useSelector } from "react-redux";
 import { Fragment } from "react";
+import { useSelector } from "react-redux";
 
 import { AppState } from "../../../redux/stores/rendererStore";
-
-import { convertDbMatchToData } from "../history/getMatchesData";
-
-import LiveFeedMatch from "./LiveFeedMatch";
 import Section from "../../ui/Section";
+import { convertDbMatchToData } from "../history/getMatchesData";
 import BestRanksFeed from "./BestRanksFeed";
+import LiveFeedMatch from "./LiveFeedMatch";
 
 export default function ViewHome() {
   const liveFeed = useSelector((state: AppState) => state.mainData.liveFeed);

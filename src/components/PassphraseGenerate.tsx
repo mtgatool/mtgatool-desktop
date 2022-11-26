@@ -1,12 +1,11 @@
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { sha1, sha256 } from "mtgatool-db";
-
-import newResetPassphrase from "../toolDb/newResetPassphrase";
-import copyToClipboard from "../utils/copyToClipboard";
-import Button from "./ui/Button";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
 
 import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
 import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
+import newResetPassphrase from "../toolDb/newResetPassphrase";
+import copyToClipboard from "../utils/copyToClipboard";
+import Button from "./ui/Button";
 
 export default function PassphraseGenerate(): JSX.Element {
   const [phrase, setPhrase] = useState("-");

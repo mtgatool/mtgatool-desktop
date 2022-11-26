@@ -1,8 +1,8 @@
 import { database } from "mtgatool-shared";
-import SetStats from "./SetsStats";
 
 import notFound from "../../../assets/images/notfound.png";
 import CompletionProgressBar from "./CompletionProgressBar";
+import SetStats from "./SetsStats";
 
 export default function SetCompletionBar({
   countMode,

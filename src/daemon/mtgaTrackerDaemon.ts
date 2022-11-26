@@ -1,16 +1,16 @@
 /* eslint-disable radix */
 import axios from "axios";
-
-import path from "path";
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import extract from "extract-zip";
+import path from "path";
 import tar from "tar-fs";
 import zlib from "zlib";
-import electron from "../utils/electron/electronWrapper";
+
 import downloadFile from "../utils/downloadFile";
-import globalData from "../utils/globalData";
+import electron from "../utils/electron/electronWrapper";
 import isElectron from "../utils/electron/isElectron";
 import getLocalSetting from "../utils/getLocalSetting";
+import globalData from "../utils/globalData";
 import setLocalSetting from "../utils/setLocalSetting";
 
 interface DaemonInventory {

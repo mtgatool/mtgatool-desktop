@@ -1,26 +1,24 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable radix */
-import { useMemo, useState } from "react";
 import {
-  compareCards,
-  DbCardDataV2,
   CardObject,
+  compareCards,
   database,
+  DbCardDataV2,
   Deck,
 } from "mtgatool-shared";
-
+import { useMemo, useState } from "react";
 import { useSortBy, useTable } from "react-table";
 
-import Section from "../../ui/Section";
-
-import Button from "../../ui/Button";
-import getWinrateClass from "../../../utils/getWinrateClass";
-import CardTile from "../../CardTile";
 import { CardWinrateData, StatsDeck } from "../../../types/dbTypes";
 import { AggregatedStats } from "../../../utils/aggregateStats";
-import Select from "../../ui/Select";
+import getWinrateClass from "../../../utils/getWinrateClass";
 import getWinrateValue from "../../../utils/getWinrateValue";
+import CardTile from "../../CardTile";
+import Button from "../../ui/Button";
+import Section from "../../ui/Section";
+import Select from "../../ui/Select";
 
 function sortByLastUsed(a: StatsDeck, b: StatsDeck) {
   if (a.lastUsed > b.lastUsed) return -1;

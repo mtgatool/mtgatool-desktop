@@ -1,5 +1,5 @@
 /* eslint-disable radix */
-import { create, all, MathJsStatic } from "mathjs";
+import { all, create, MathJsStatic } from "mathjs";
 
 const config = { precision: 2000 };
 const math: MathJsStatic = create(all, config) as MathJsStatic;

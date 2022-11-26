@@ -1,4 +1,5 @@
-import { constants, CardQuality } from "mtgatool-shared";
+import { CardQuality, constants } from "mtgatool-shared";
+
 import electron from "../utils/electron/electronWrapper";
 
 const {

@@ -1,4 +1,4 @@
-import { toHHMMSS, toHHMM, toMMSS } from "../dateTo";
+import { toHHMM, toHHMMSS, toMMSS } from "../dateTo";
 
 it("Converts to MM:SS", () => {
   expect(toMMSS(9600)).toBe("2:40:00");

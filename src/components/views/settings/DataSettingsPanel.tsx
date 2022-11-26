@@ -1,17 +1,14 @@
 import _ from "lodash";
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import reduxAction from "../../../redux/reduxAction";
-
 import { DbMatch } from "../../../types/dbTypes";
 import { loadDbFromCache } from "../../../utils/database-wrapper";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import globalData from "../../../utils/globalData";
 import dataMigration from "../../../utils/migration/dataMigration";
 import setLocalSetting from "../../../utils/setLocalSetting";
-
 import vodiFn from "../../../utils/voidfn";
 import Button from "../../ui/Button";
 import Select from "../../ui/Select";

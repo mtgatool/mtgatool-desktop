@@ -1,10 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Story, Meta } from "@storybook/react";
+import "../index.scss";
+
+import { Meta, Story } from "@storybook/react";
 
 import Checkbox, { CheckboxProps } from "../components/ui/Checkbox";
 import CheckboxContainer from "../components/ui/CheckboxContainer";
-
-import "../index.scss";
 import vodiFn from "../utils/voidfn";
 
 export default {

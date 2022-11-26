@@ -1,7 +1,7 @@
-import ArenaLogWatcher from "./arena-log-watcher";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
-import logEntrySwitch from "./logEntrySwitch";
 import getLocalSetting from "../utils/getLocalSetting";
+import ArenaLogWatcher from "./arena-log-watcher";
+import logEntrySwitch from "./logEntrySwitch";
 
 export default function start(): undefined | (() => void) {
   // eslint-disable-next-line global-require

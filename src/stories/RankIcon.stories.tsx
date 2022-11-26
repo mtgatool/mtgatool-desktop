@@ -1,10 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Story, Meta } from "@storybook/react";
-import Flex from "../components/Flex";
-
-import RankIcon, { RankIconProps } from "../components/RankIcon";
-
 import "../index.scss";
+
+import { Meta, Story } from "@storybook/react";
+
+import Flex from "../components/Flex";
+import RankIcon, { RankIconProps } from "../components/RankIcon";
 
 export default {
   title: "MTG Arena Tool/RankIcon",

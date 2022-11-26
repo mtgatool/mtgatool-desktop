@@ -1,3 +1,4 @@
+import { Chances, constants } from "mtgatool-shared";
 import {
   CSSProperties,
   useCallback,
@@ -7,18 +8,12 @@ import {
   useState,
 } from "react";
 
-import { constants, Chances } from "mtgatool-shared";
-import { ChannelMessage } from "../broadcastChannel/channelMessages";
 import NoCard from "../assets/images/nocard.png";
+import { ChannelMessage } from "../broadcastChannel/channelMessages";
 import { Settings } from "../common/defaultConfig";
-import bcConnect from "../utils/bcConnect";
-import electron from "../utils/electron/electronWrapper";
-import getBackUrl from "../utils/getBackUrl";
-
-import getLocalSetting from "../utils/getLocalSetting";
-import vodiFn from "../utils/voidfn";
-import isCardDfc from "../utils/isCardDfc";
-
+import { CARD_SIZE_RATIO } from "../common/static";
+import useTransparentFix from "../hooks/useTransparentFix";
+import GroupedLandsDetails from "../overlay/GroupedLandsDetails";
 import {
   ALL_OVERLAYS,
   WINDOW_MAIN,
@@ -28,12 +23,14 @@ import {
   WINDOW_OVERLAY_3,
   WINDOW_OVERLAY_4,
 } from "../types/app";
-
-import GroupedLandsDetails from "../overlay/GroupedLandsDetails";
-import { CARD_SIZE_RATIO } from "../common/static";
-import useTransparentFix from "../hooks/useTransparentFix";
+import bcConnect from "../utils/bcConnect";
+import electron from "../utils/electron/electronWrapper";
 import setTopMost from "../utils/electron/setTopMost";
+import getBackUrl from "../utils/getBackUrl";
 import { getCardImage } from "../utils/getCardArtCrop";
+import getLocalSetting from "../utils/getLocalSetting";
+import isCardDfc from "../utils/isCardDfc";
+import vodiFn from "../utils/voidfn";
 
 const { LANDS_HACK } = constants;
 

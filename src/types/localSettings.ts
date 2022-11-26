@@ -1,4 +1,5 @@
 import { sha1 } from "mtgatool-shared";
+
 import { defaultConfig } from "../common/defaultConfig";
 import { DEFAULT_PEERS } from "../constants";
 import defaultLogUri from "../utils/defaultLogUri";

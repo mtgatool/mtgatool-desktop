@@ -1,6 +1,12 @@
 import _ from "lodash";
 import { Colors, constants } from "mtgatool-shared";
 
+import copyToClipboard from "../../../utils/copyToClipboard";
+import { toMMSS } from "../../../utils/dateTo";
+import getEventPrettyName from "../../../utils/getEventPrettyName";
+import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
+import isLimitedEventId from "../../../utils/isLimitedEventId";
+import timeAgo from "../../../utils/timeAgo";
 import {
   Column,
   FlexBottom,
@@ -8,17 +14,11 @@ import {
   HoverTile,
   ListItem,
 } from "../../ListItem";
-import copyToClipboard from "../../../utils/copyToClipboard";
 import ManaCost from "../../ManaCost";
-import { toMMSS } from "../../../utils/dateTo";
+import RankIcon from "../../RankIcon";
 import RankSmall from "../../RankSmall";
 import ResultDetails from "../../ResultDetails";
-import timeAgo from "../../../utils/timeAgo";
-import RankIcon from "../../RankIcon";
-import isLimitedEventId from "../../../utils/isLimitedEventId";
 import { MatchData } from "./getMatchesData";
-import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
-import getEventPrettyName from "../../../utils/getEventPrettyName";
 
 const { DEFAULT_TILE } = constants;
 

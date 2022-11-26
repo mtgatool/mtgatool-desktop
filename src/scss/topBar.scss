@@ -71,7 +71,14 @@
 }
 
 .top-button-mac-unfocus {
-  background-color: #E0E0E0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: flex;
+  border: 1px solid;
+  margin: 0 4px;
+  background-color: #282829;
+  border-color: #282829;
 }
 
 .top-button-mac.maximize {

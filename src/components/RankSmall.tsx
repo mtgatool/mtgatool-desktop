@@ -1,4 +1,5 @@
 import { getRankIndex16, InternalRankData } from "mtgatool-shared";
+
 import formatRank from "../utils/formatRank";
 
 export interface RankSmallProps {

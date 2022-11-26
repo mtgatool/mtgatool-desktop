@@ -1,21 +1,20 @@
 // import "./wdyr";
 // eslint-disable-next-line no-use-before-define
-import React from "react";
-import ReactDOM from "react-dom";
-
-import { BrowserRouter as Router } from "react-router-dom";
-
-import { Provider } from "react-redux";
-import App from "./components/App";
-import store from "./redux/stores/rendererStore";
 import "./index.scss";
 
-import * as serviceWorker from "./serviceWorker";
-import defaultLocalSettings from "./utils/defaultLocalSettings";
+import React from "react";
+import ReactDOM from "react-dom";
+import { Provider } from "react-redux";
+import { BrowserRouter as Router } from "react-router-dom";
+
 import mainChannelListeners from "./broadcastChannel/mainChannelListeners";
-import { loadDbFromCache } from "./utils/database-wrapper";
-import getLocalSetting from "./utils/getLocalSetting";
+import App from "./components/App";
 import reduxAction from "./redux/reduxAction";
+import store from "./redux/stores/rendererStore";
+import * as serviceWorker from "./serviceWorker";
+import { loadDbFromCache } from "./utils/database-wrapper";
+import defaultLocalSettings from "./utils/defaultLocalSettings";
+import getLocalSetting from "./utils/getLocalSetting";
 
 document.title = "MTG Arena Tool";
 

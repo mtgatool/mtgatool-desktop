@@ -1,8 +1,8 @@
 import { Cards } from "mtgatool-shared";
+
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import { DbCardsData, defaultCardsData } from "../types/dbTypes";
-
 import getLocalSetting from "../utils/getLocalSetting";
 import getLocalDbValue from "./getLocalDbValue";
 

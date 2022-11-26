@@ -1,13 +1,14 @@
-import { combineReducers } from "redux";
 import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers } from "redux";
+
+import avatarsSlice from "../slices/avatarsSlice";
 import collectionSlice from "../slices/collectionSlice";
+import filterSlice from "../slices/FilterSlice";
+import hoverSlice from "../slices/hoverSlice";
 import mainDataSlice from "../slices/mainDataSlice";
 import rendererSlice from "../slices/rendererSlice";
-import avatarsSlice from "../slices/avatarsSlice";
-import usernamesSlice from "../slices/usernamesSlice";
 import settingsSlice from "../slices/settingsSlice";
-import hoverSlice from "../slices/hoverSlice";
-import filterSlice from "../slices/FilterSlice";
+import usernamesSlice from "../slices/usernamesSlice";
 
 const rootReducer = combineReducers({
   collection: collectionSlice.reducer,

@@ -1,11 +1,11 @@
 // eslint-disable-next-line import/no-unresolved
+import { ToolDb } from "mtgatool-db";
 import {
   Cards,
   DatabaseClass,
   InternalMatch,
   v2cardsList,
 } from "mtgatool-shared";
-import { ToolDb } from "mtgatool-db";
 
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { InventoryInfo } from "../background/onLabel/InStartHook";

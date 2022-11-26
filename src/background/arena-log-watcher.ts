@@ -2,11 +2,12 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable no-console */
 import fs, { Stats } from "fs";
-import { promisify } from "util";
-import { StringDecoder } from "string_decoder";
 import queue from "queue";
-import ArenaLogDecoder from "./arena-log-decoder/arena-log-decoder";
+import { StringDecoder } from "string_decoder";
+import { promisify } from "util";
+
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
+import ArenaLogDecoder from "./arena-log-decoder/arena-log-decoder";
 
 const skipFirstpass = false;
 

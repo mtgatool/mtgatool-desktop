@@ -1,5 +1,6 @@
-import { Dispatch, AnyAction } from "@reduxjs/toolkit";
-import { actions, ActionKeys } from "./actions";
+import { AnyAction, Dispatch } from "@reduxjs/toolkit";
+
+import { ActionKeys, actions } from "./actions";
 
 type DispatchParameter<K extends ActionKeys> = {
   type: K;

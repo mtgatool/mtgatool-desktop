@@ -5,10 +5,9 @@
 
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+
 import getEventExplorerSection from "../../../utils/getEventExplorerSection";
-
 import Flex from "../../Flex";
-
 import Section from "../../ui/Section";
 import ExploreEvent from "./ExploreEvent";
 

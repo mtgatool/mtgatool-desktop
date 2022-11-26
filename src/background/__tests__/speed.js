@@ -1,4 +1,5 @@
 import path from "path";
+
 import arenaLogWatcher from "../arena-log-watcher";
 import logEntrySwitch from "../logEntrySwitch";
 

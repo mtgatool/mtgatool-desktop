@@ -1,19 +1,17 @@
-import { useMemo, useState, useCallback } from "react";
 import _ from "lodash";
-
-import { useDispatch, useSelector } from "react-redux";
 import { CardQuality } from "mtgatool-shared";
+import { useCallback, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-import { AppState } from "../../../redux/stores/rendererStore";
-import { getCardImage } from "../../../utils/getCardArtCrop";
-import Slider from "../../ui/Slider";
-import Select from "../../ui/Select";
-import CardTile from "../../CardTile";
-
-import database from "../../../utils/database-wrapper";
 import reduxAction from "../../../redux/reduxAction";
-import setLocalSetting from "../../../utils/setLocalSetting";
+import { AppState } from "../../../redux/stores/rendererStore";
+import database from "../../../utils/database-wrapper";
+import { getCardImage } from "../../../utils/getCardArtCrop";
 import getLocalSetting from "../../../utils/getLocalSetting";
+import setLocalSetting from "../../../utils/setLocalSetting";
+import CardTile from "../../CardTile";
+import Select from "../../ui/Select";
+import Slider from "../../ui/Slider";
 
 export default function VisualSettingsPanel(): JSX.Element {
   const dispatch = useDispatch();

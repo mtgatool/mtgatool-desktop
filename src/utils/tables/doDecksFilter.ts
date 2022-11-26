@@ -1,13 +1,12 @@
 import _ from "lodash";
+
 import { Sort } from "../../components/SortControls";
-import applySort from "./applySort";
-
-import stringFilterFn from "./filters/stringFilterFn";
-
-import colorsBitsFilterFn from "./filters/colorsBitsFilterFn";
-import { Filters } from "../../types/genericFilterTypes";
 import { StatsDeck } from "../../types/dbTypes";
+import { Filters } from "../../types/genericFilterTypes";
+import applySort from "./applySort";
+import colorsBitsFilterFn from "./filters/colorsBitsFilterFn";
 import inArrayStringFilterFn from "./filters/inArrayStringFilterFn";
+import stringFilterFn from "./filters/stringFilterFn";
 
 export default function doDecksFilter(
   data: StatsDeck[],

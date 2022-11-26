@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+
 import openExternal from "../../utils/openExternal";
 
 interface DialogProps {
