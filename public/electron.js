@@ -11,7 +11,7 @@ const mainGlobals = require("./mainGlobals");
 const installDevTools = require("./devtools");
 
 const iconNormal = "icon.png";
-const iconTrayOsx = "icon-tray-osx-large.png";
+const iconTrayOsx = "icon-tray-osx.png";
 const iconTray8x = "icon-tray@8x.png";
 const icon256 = "icon-256.png";
 
