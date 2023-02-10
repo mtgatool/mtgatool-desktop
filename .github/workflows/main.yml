@@ -17,10 +17,10 @@ jobs:
           ref: ${{ github.ref }}
       - name: "cat package.json"
         run: cat ./package.json
-      - name: Use node ${{ matrix.node_version }}
+      - name: "Setup node"
         uses: actions/setup-node@v1
         with:
-          version: ${{ matrix.node_version }}
+          node-version: '16'
       - name: "Version Bump"
         uses: "Manuel-777/gh-action-bump-version@master"
         with:
