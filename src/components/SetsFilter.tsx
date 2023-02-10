@@ -61,6 +61,7 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
 
   const standard = allFormats.Standard.sets;
   const alchemy = allFormats.Explorer.sets;
+
   allSets.forEach((s) => {
     if (standard.includes(s.arenacode) || standard.includes(s.code)) {
       standardSets.push(s);
@@ -70,6 +71,8 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
       otherSets.push(s);
     }
   });
+
+  console.log(otherSets);
 
   return (
     <div
