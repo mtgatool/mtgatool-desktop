@@ -25,7 +25,5 @@ jobs:
         uses: "Manuel-777/gh-action-bump-version@master"
         with:
           tag-prefix: ''
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       - name: "cat package.json"
         run: cat ./package.json
