@@ -22,12 +22,14 @@ jobs:
       - name: "Setup node"
         uses: actions/setup-node@v1
         with:
-          node-version: '16'
+          version: 16.10.0
 
       - name: "Version Bump"
         uses: "Manuel-777/gh-action-bump-version@master"
         with:
           tag-prefix: ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: "cat package.json"
         run: cat ./package.json
