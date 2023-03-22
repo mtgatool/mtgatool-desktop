@@ -9,6 +9,7 @@ export default function isCardDfcBack(grpId: number) {
   return (
     cardObj &&
     (cardObj.LinkedFaceType == FACE_DFC_BACK ||
-      cardObj.LinkedFaceType == FACE_MODAL_BACK)
+      cardObj.LinkedFaceType == FACE_MODAL_BACK ||
+      cardObj.LinkedFaceType == 3)
   );
 }

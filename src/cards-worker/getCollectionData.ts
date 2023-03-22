@@ -66,6 +66,7 @@ export default function getCollectionData(
     .filter(
       (card) =>
         card.LinkedFaceType !== FACE_DFC_BACK &&
+        card.LinkedFaceType !== 3 && // meld
         card.LinkedFaceType !== FACE_ADVENTURE &&
         card.LinkedFaceType !== FACE_SPLIT &&
         card.LinkedFaceType !== FACE_MODAL_BACK &&
