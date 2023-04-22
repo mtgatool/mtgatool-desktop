@@ -1,6 +1,5 @@
 module.exports = {
   env: {
-    "cypress/globals": true,
     browser: true,
     commonjs: true,
     es6: true,
@@ -96,7 +95,6 @@ module.exports = {
   },
   parser: "@typescript-eslint/parser",
   extends: [
-    "plugin:cypress/recommended",
     "airbnb-base",
     "airbnb/rules/react",
     "plugin:react/recommended",
@@ -104,7 +102,6 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
   ],
   plugins: [
-    "cypress",
     "jest",
     "jsx-a11y",
     "import",

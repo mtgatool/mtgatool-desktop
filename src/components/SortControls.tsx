@@ -27,8 +27,8 @@ export default function SortControls<T>(props: SortControlsProps<T>) {
       {columnKeys.map((key: keyof T, index) => {
         return (
           <div
-            className={`table-head-container control-${key}`}
-            key={`table-head-${key}`}
+            className={`table-head-container control-${String(key)}`}
+            key={`table-head-${String(key)}`}
             style={{
               gridArea: `1 / ${index + 1} / 1 / ${index + 2}`,
               cursor: "pointer",
