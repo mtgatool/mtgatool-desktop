@@ -6,7 +6,8 @@ export default function getCardTypeSort(a?: string): number {
   if (a.includes("Sorcery", 0)) return 4;
   if (a.includes("Artifact", 0)) return 5;
   if (a.includes("Enchantment", 0)) return 6;
-  if (a.includes("Land", 0)) return 7;
-  if (a.includes("Special", 0)) return 8;
+  if (a.includes("Battle", 0)) return 7;
+  if (a.includes("Land", 0)) return 8;
+  if (a.includes("Special", 0)) return 9;
   return 0;
 }

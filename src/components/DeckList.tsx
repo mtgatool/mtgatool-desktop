@@ -67,6 +67,7 @@ function getDeckComponents(
     .map((card) => ({ data: database.card(card.id), ...card }))
     .filter((card) => card.data !== undefined)
     .groupBy((card) => {
+      console.log(card.data);
       const type = cardType(card.data as DbCardDataV2);
       switch (type) {
         case "Creature":
@@ -85,7 +86,7 @@ function getDeckComponents(
         case "Basic Snow Land":
           return "Lands";
         default:
-          throw new Error(`Unexpected card type: ${type}`);
+          throw new Error(`Unexpected card type: ${card.grpId} ${type}`);
       }
     })
     .value();
