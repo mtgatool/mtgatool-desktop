@@ -16,9 +16,19 @@ typeIcons.ins = "type-ins";
 typeIcons.lan = "type-lan";
 typeIcons.pla = "type-pla";
 typeIcons.sor = "type-sor";
+typeIcons.bat = "type-bat";
 
 function getDeckTypesAmount(deck: Deck): { [key: string]: number } {
-  const types = { art: 0, cre: 0, enc: 0, ins: 0, lan: 0, pla: 0, sor: 0 };
+  const types = {
+    art: 0,
+    cre: 0,
+    enc: 0,
+    ins: 0,
+    lan: 0,
+    pla: 0,
+    sor: 0,
+    bat: 0,
+  };
   if (!deck.getMainboard().get()) return types;
 
   deck
@@ -38,6 +48,7 @@ function getDeckTypesAmount(deck: Deck): { [key: string]: number } {
         if (c.Types.includes("Instant", 0)) types.ins += card.quantity;
         if (c.Types.includes("Sorcery", 0)) types.sor += card.quantity;
         if (c.Types.includes("Planeswalker", 0)) types.pla += card.quantity;
+        if (c.Types.includes("Battle", 0)) types.bat += card.quantity;
       }
     });
 
@@ -66,6 +77,7 @@ export default function LiveDeckTypesStats(props: {
               {cardTypeKey === "art" ? cardOdds.chanceArt : ""}
               {cardTypeKey === "cre" ? cardOdds.chanceCre : ""}
               {cardTypeKey === "enc" ? cardOdds.chanceEnc : ""}
+              {cardTypeKey === "bat" ? cardOdds.chanceBat : ""}
               {cardTypeKey === "ins" ? cardOdds.chanceIns : ""}
               {cardTypeKey === "lan" ? cardOdds.chanceLan : ""}
               {cardTypeKey === "pla" ? cardOdds.chancePla : ""}

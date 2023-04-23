@@ -75,6 +75,10 @@ export default function SampleSizePanel(
             value = cardOdds.chancePla / 100;
             field = "chancePla";
             break;
+          case "Battles":
+            value = cardOdds.chancePla / 100;
+            field = "chanceBat";
+            break;
           default:
             break;
         }
