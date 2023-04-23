@@ -79,6 +79,8 @@ function getDeckComponents(
           return "Spells";
         case "Enchantment":
           return "Enchantments";
+        case "Battle":
+          return "Battles";
         case "Artifact":
           return "Artifacts";
         case "Land":
