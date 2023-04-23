@@ -98,6 +98,7 @@ function getDeckComponents(
     "Planeswalkers",
     "Spells",
     "Enchantments",
+    "Battles",
     "Artifacts",
     "Lands",
   ])
