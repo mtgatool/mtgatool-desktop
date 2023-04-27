@@ -1,6 +1,11 @@
 import _ from "lodash";
 import { Colors, constants } from "mtgatool-shared";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
+import useFetchAvatar from "../../../hooks/useFetchAvatar";
+import useFetchUsername from "../../../hooks/useFetchUsername";
+import { AppState } from "../../../redux/stores/rendererStore";
 import { toMMSS } from "../../../utils/dateTo";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import isLimitedEventId from "../../../utils/isLimitedEventId";
@@ -21,12 +26,20 @@ const { DEFAULT_TILE } = constants;
 
 interface ListItemMatchProps {
   match: MatchData;
+  pubKey: string;
 }
 
 export default function LiveFeedMatch({
   match,
+  pubKey,
 }: ListItemMatchProps): JSX.Element {
   const { internalMatch } = match;
+
+  const avatars = useSelector((state: AppState) => state.avatars.avatars);
+  const usernames = useSelector((state: AppState) => state.usernames.usernames);
+
+  const fetchAvatar = useFetchAvatar();
+  const fetchUsername = useFetchUsername();
 
   let dateTime = new Date(match.timestamp);
   // Quick hack to check if NaN
@@ -35,7 +48,15 @@ export default function LiveFeedMatch({
     dateTime = new Date();
   }
 
+  useEffect(() => {
+    fetchAvatar(pubKey);
+    fetchUsername(pubKey);
+  }, [pubKey]);
+
   const isLimited = isLimitedEventId(match.eventId);
+
+  const username = usernames[pubKey || ""];
+  const avatar = avatars[pubKey || ""];
 
   return (
     <ListItem>
@@ -46,8 +67,19 @@ export default function LiveFeedMatch({
             match.playerWins > match.playerLosses
               ? `var(--color-g)`
               : `var(--color-r)`,
+          position: "relative",
         }}
-      />
+      >
+        {avatar ? (
+          <div
+            title={username}
+            className="livefeed-avatar"
+            style={{
+              backgroundImage: `url(${avatar})`,
+            }}
+          />
+        ) : null}
+      </div>
       <HoverTile grpId={internalMatch.playerDeck.deckTileId || DEFAULT_TILE}>
         {internalMatch.player.rank ? (
           <RankIcon

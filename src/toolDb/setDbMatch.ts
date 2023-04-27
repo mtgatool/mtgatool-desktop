@@ -27,6 +27,7 @@ export default async function setDbMatch(match: InternalMatch) {
     duration: match.duration,
     internalMatch: match,
     timestamp: new Date(match.date).getTime() || new Date().getTime(),
+    pubKey: window.toolDb.user?.pubKey || "",
     // actionLog: match.actionLog,
   };
 

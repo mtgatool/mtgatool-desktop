@@ -2,6 +2,19 @@
   height: 562px;
   margin-top: 16px;
   overflow: hidden;
+
+  .livefeed-avatar {
+    min-width: 32px;
+    min-height: 32px;
+    width: 32px;
+    height: 32px;
+    border-radius: 32px;
+    background-size: contain;
+    margin: auto 0;
+    position: absolute;
+    top: 16px;
+    left: 12px;
+  }
 }
 
 @keyframes loadingAnimation {

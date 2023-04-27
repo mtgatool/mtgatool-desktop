@@ -37,6 +37,7 @@ function convertOldInternalToDbMatch(
     duration: match.duration,
     internalMatch: match,
     timestamp: date.getTime(),
+    pubKey: "",
   };
 
   let corrupted = false;

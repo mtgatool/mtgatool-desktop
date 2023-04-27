@@ -31,6 +31,7 @@ export default function ViewHome() {
               return (
                 <LiveFeedMatch
                   key={`livefeed-match-${match.matchId}`}
+                  pubKey={match.pubKey}
                   match={data}
                 />
               );

@@ -82,6 +82,7 @@ export interface DbMatch {
   duration: number;
   internalMatch: InternalMatch;
   timestamp: number;
+  pubKey: string;
 }
 
 export type DbInventoryInfo = Omit<
