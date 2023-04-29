@@ -16,6 +16,7 @@ import ListItemMatch from "../history/ListItemMatch";
 
 interface UserHistoryListProps {
   matchesData: MatchData[];
+  pubKey: string;
 }
 
 export default function UserHistoryList(props: UserHistoryListProps) {
@@ -25,7 +26,7 @@ export default function UserHistoryList(props: UserHistoryListProps) {
   const filterDate = useSelector(selectCurrentFilterDate);
   const history = useHistory();
   const dispatch = useDispatch();
-  const { matchesData } = props;
+  const { matchesData, pubKey } = props;
 
   const [sortValue, setSortValue] = useState<Sort<MatchData>>({
     key: "timestamp",
@@ -46,12 +47,10 @@ export default function UserHistoryList(props: UserHistoryListProps) {
   const openMatch = useCallback(
     (match: MatchData) => {
       history.push(
-        `/history/${encodeURIComponent(
-          window.toolDb.getUserNamespacedKey(`matches-${match.matchId}`)
-        )}`
+        `/history/${encodeURIComponent(`:${pubKey}.matches-${match.matchId}`)}`
       );
     },
-    [history]
+    [pubKey, history]
   );
 
   return (
