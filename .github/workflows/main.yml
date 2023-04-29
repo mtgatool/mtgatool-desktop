@@ -26,7 +26,7 @@ jobs:
           GITHUB_EMAIL: 'mtgatool@gmail.com'
           GITHUB_USER: 'mtgatool-bot'
         with:
-          tag-prefix:  ''
+          tag-prefix:  'v'
           minor-wording:  'add,added,feat,feature,minor'
           major-wording:  'breaking'
           patch-wording:  'patch,fix,fixes,fixed'
