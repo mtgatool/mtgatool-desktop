@@ -42,6 +42,8 @@ export default function ExploreEvent(props: ExploreEventProps) {
       });
   }, [eventId]);
 
+  const username = usernames[eventData?.aggregator || ""];
+
   return (
     <div
       className={`explore-event-list ${getEventExplorerSection(eventId)} ${
@@ -58,9 +60,15 @@ export default function ExploreEvent(props: ExploreEventProps) {
             </div>
           </div>
           <div className="name-container">
-            <div className="name">{`${
-              usernames[eventData.aggregator || ""]
-            }`}</div>
+            <div
+              className="name link"
+              style={{ margin: "0" }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                history.push(`/user/${username}`);
+              }}
+            >{`${username}`}</div>
             <div
               className="avatar"
               style={{

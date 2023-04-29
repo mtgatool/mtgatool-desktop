@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 
 import { DEFAULT_AVATAR } from "../../../constants";
 import cleanUsername from "../../../utils/cleanUsername";
@@ -19,6 +20,8 @@ function DrawConstructedRank(props: DbRankInfo) {
     constructedLeaderboardPlace,
   } = props;
 
+  const history = useHistory();
+
   const mythicRankTitle =
     constructedLeaderboardPlace == 0
       ? ` ${(constructedPercentile || 0).toFixed(2)}%`
@@ -33,7 +36,12 @@ function DrawConstructedRank(props: DbRankInfo) {
         }}
       />
       <div className="rank-name-container">
-        <div className="rank-name">{cleanUsername(name || "-")}</div>
+        <div
+          className="rank-name"
+          onClick={() => history.push(`/user/${encodeURIComponent(name)}`)}
+        >
+          {cleanUsername(name || "-")}
+        </div>
         <div className="rank-time">{timeAgo(updated)}</div>
       </div>
       <div className="rank-icon">
@@ -66,6 +74,8 @@ function DrawLimitedRank(props: DbRankInfo) {
     limitedLeaderboardPlace,
   } = props;
 
+  const history = useHistory();
+
   const mythicRankTitle =
     limitedLeaderboardPlace == 0
       ? ` ${(limitedPercentile || 0).toFixed(2)}%`
@@ -80,7 +90,12 @@ function DrawLimitedRank(props: DbRankInfo) {
         }}
       />
       <div className="rank-name-container">
-        <div className="rank-name">{name || "-"}</div>
+        <div
+          className="rank-name"
+          onClick={() => history.push(`/user/${encodeURIComponent(name)}`)}
+        >
+          {name || "-"}
+        </div>
         <div className="rank-time">{timeAgo(updated)}</div>
       </div>
       <div className="rank-icon">
@@ -133,6 +148,7 @@ export default function BestRanksFeed() {
                 window.toolDb.getData(`:${d.pubKey}.username`).then((name) => {
                   return {
                     ...d,
+                    pubKey: d.pubKey,
                     avatar,
                     name,
                   };

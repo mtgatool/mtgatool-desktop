@@ -1,0 +1,25 @@
+.user-view {
+  width: 100%;
+  
+  margin-top: 16px;
+  overflow: hidden;
+
+  .top-container {
+    display: flex;
+  
+    .avatar {
+      min-width: 128px;
+      min-height: 128px;
+      width: 128px;
+      height: 128px;
+      border-radius: 128px;
+      background-size: contain;
+      margin: 0;
+    }
+  
+    .username {
+      margin: auto 24px;
+    }
+  }
+}
+

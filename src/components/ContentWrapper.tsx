@@ -34,6 +34,7 @@ import HistoryStats from "./views/history/HistoryStats";
 import ViewHistory from "./views/history/ViewHistory";
 import ViewHome from "./views/home/ViewHome";
 import ViewLiveMatch from "./views/livematch/ViewLiveMatch";
+import ViewUser from "./views/user/ViewUser";
 import ViewWip from "./views/wip/ViewWip";
 
 const views = {
@@ -46,6 +47,7 @@ const views = {
   explore: ViewExplore,
   collection: ViewCollection,
   aggregator: ViewExploreAggregator,
+  user: ViewUser,
 };
 
 function delay(transition: any, timeout: number): any {
