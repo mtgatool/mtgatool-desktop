@@ -29,7 +29,7 @@ jobs:
           tag-prefix:  ''
           minor-wording:  'add,added,feat,feature,minor'
           major-wording:  'breaking'
-          patch-wording:  'patch,fix,fixes,fixed'.
+          patch-wording:  'patch,fix,fixes,fixed'
           rc-wording:     'RELEASE'
 
       - name: "cat package.json"
