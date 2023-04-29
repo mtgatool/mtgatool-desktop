@@ -19,17 +19,18 @@ jobs:
       - name: "cat package.json"
         run: cat ./package.json
 
-      - name: "Setup node"
-        uses: actions/setup-node@v1
-        with:
-          version: 16.10.0
-
-      - name: "Version Bump"
-        uses: "Manuel-777/gh-action-bump-version@master"
-        with:
-          tag-prefix: ''
+      - name:  'Automated Version Bump'
+        uses:  'phips28/gh-action-bump-version@master'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_EMAIL: 'mtgatool@gmail.com'
+          GITHUB_USER: 'mtgatool-bot'
+        with:
+          tag-prefix:  'v'
+          minor-wording:  'add,added,feat,feature,minor'
+          major-wording:  'breaking'
+          patch-wording:  'patch,fix,fixes,fixed'
+          rc-wording:     'RELEASE'
 
       - name: "cat package.json"
         run: cat ./package.json
