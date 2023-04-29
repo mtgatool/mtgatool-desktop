@@ -5,7 +5,6 @@ The project runs under a (create-react-app)[https://create-react-app.dev/] + typ
 We use eslint and prettier for style enforcement, please install those plugins for your code editor if you plan to contribute!
 
 
-
 The structure is quite straightforward, but some considerations to better understand what is going on under the hood:
 
 The app runs 3 main "processes", in the form of electron windows, that are always-on:
