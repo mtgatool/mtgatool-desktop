@@ -9,7 +9,7 @@ export default function ViewUser() {
   return (
     <Section style={{ marginTop: "16px" }}>
       <Switch>
-        <Route exact path={`${url}/:username`} component={UserView} />
+        <Route exact path={`${url}/:key`} component={UserView} />
       </Switch>
     </Section>
   );

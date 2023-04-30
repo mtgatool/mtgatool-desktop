@@ -76,7 +76,9 @@ export default function ViewExploreEvent() {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    history.push(`/user/${usernames[data.aggregator]}`);
+                    history.push(
+                      `/user/${encodeURIComponent(data.aggregator || "")}`
+                    );
                   }}
                 >
                   {usernames[data.aggregator]}

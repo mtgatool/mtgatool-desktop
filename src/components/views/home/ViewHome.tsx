@@ -25,13 +25,14 @@ export default function ViewHome() {
         <h2 style={{ textAlign: "center" }}>Live Feed</h2>
         <div className="home-view">
           {liveFeed.map((matchId) => {
+            const pubKey = matchId.slice(1, matchId.indexOf(".matches-"));
             const match = liveFeedMatches[matchId] || undefined;
             if (match) {
               const data = convertDbMatchToData(match);
               return (
                 <LiveFeedMatch
                   key={`livefeed-match-${match.matchId}`}
-                  pubKey={match.pubKey}
+                  pubKey={pubKey}
                   match={data}
                 />
               );

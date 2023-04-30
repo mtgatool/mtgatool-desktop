@@ -66,7 +66,9 @@ export default function ExploreEvent(props: ExploreEventProps) {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                history.push(`/user/${username}`);
+                history.push(
+                  `/user/${encodeURIComponent(eventData?.aggregator || "")}`
+                );
               }}
             >{`${username}`}</div>
             <div

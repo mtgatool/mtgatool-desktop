@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { DEFAULT_AVATAR } from "../../../constants";
 import useDebounce from "../../../hooks/useDebounce";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
-import useFetchPubKey from "../../../hooks/useFetchPubKey";
+import useFetchUsername from "../../../hooks/useFetchUsername";
 import { AppState } from "../../../redux/stores/rendererStore";
 import getLocalDbValue from "../../../toolDb/getLocalDbValue";
 import { DbMatch } from "../../../types/dbTypes";
@@ -13,10 +13,11 @@ import { convertDbMatchToData, MatchData } from "../history/getMatchesData";
 import UserHistoryList from "./UserHistoryList";
 
 export default function UserView() {
-  const { username } = useParams<{ username: string }>();
-  const pubKey = useFetchPubKey(decodeURIComponent(username));
+  const { key } = useParams<{ key: string }>();
+  const pubKey = decodeURIComponent(key);
 
   const avatars = useSelector((state: AppState) => state.avatars.avatars);
+  const usernames = useSelector((state: AppState) => state.usernames.usernames);
 
   const [matchesList, setMatchesList] = useState<MatchData[]>([]);
   const matches = useRef<Record<string, MatchData>>({});
@@ -24,10 +25,12 @@ export default function UserView() {
   const deboucer = useDebounce(200);
 
   const fetchAvatar = useFetchAvatar();
+  const fetchUsername = useFetchUsername();
 
   useEffect(() => {
     if (pubKey) {
       fetchAvatar(pubKey);
+      fetchUsername(pubKey);
 
       window.toolDb.queryKeys(`:${pubKey}.matches-`).then((matchesIndex) => {
         if (matchesIndex && matches.current) {
@@ -55,6 +58,7 @@ export default function UserView() {
   }, [pubKey, matches, deboucer]);
 
   const avatar = avatars[pubKey || DEFAULT_AVATAR];
+  const username = usernames[pubKey || ""];
 
   return (
     <div className="user-view">

@@ -13,6 +13,7 @@ function DrawConstructedRank(props: DbRankInfo) {
     updated,
     name,
     avatar,
+    pubKey,
     constructedClass,
     constructedLevel,
     constructedStep,
@@ -38,7 +39,7 @@ function DrawConstructedRank(props: DbRankInfo) {
       <div className="rank-name-container">
         <div
           className="rank-name"
-          onClick={() => history.push(`/user/${encodeURIComponent(name)}`)}
+          onClick={() => history.push(`/user/${encodeURIComponent(pubKey)}`)}
         >
           {cleanUsername(name || "-")}
         </div>
@@ -67,6 +68,7 @@ function DrawLimitedRank(props: DbRankInfo) {
     updated,
     name,
     avatar,
+    pubKey,
     limitedClass,
     limitedLevel,
     limitedStep,
@@ -92,7 +94,7 @@ function DrawLimitedRank(props: DbRankInfo) {
       <div className="rank-name-container">
         <div
           className="rank-name"
-          onClick={() => history.push(`/user/${encodeURIComponent(name)}`)}
+          onClick={() => history.push(`/user/${encodeURIComponent(pubKey)}`)}
         >
           {name || "-"}
         </div>
