@@ -74,7 +74,18 @@ export default function DeckView(): JSX.Element {
     }
   }, [fullStats, params]);
 
-  const deck = new Deck({}, dbDeck?.mainDeck || [], dbDeck?.sideboard || []);
+  const deck = new Deck(
+    {
+      commandZoneGRPIds: dbDeck?.commanders
+        ? dbDeck.commanders.map((c) => c.id)
+        : undefined,
+      companionGRPId: dbDeck?.companions
+        ? dbDeck.companions.map((c) => c.id)[0]
+        : undefined,
+    },
+    dbDeck?.mainDeck || [],
+    dbDeck?.sideboard || []
+  );
 
   const [deckView, setDeckView] = useState(VIEW_REGULAR);
   const [shuffle, setShuffle] = useState([true]);
