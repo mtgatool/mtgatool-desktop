@@ -1,9 +1,28 @@
 /* eslint-disable react/no-array-index-key */
 import _ from "lodash";
-import { cardType, database, DbCardDataV2, Deck } from "mtgatool-shared";
+import {
+  CardObject,
+  cardType,
+  database,
+  DbCardDataV2,
+  Deck,
+} from "mtgatool-shared";
 
 import CardTile from "./CardTile";
 import Separator from "./Separator";
+
+interface GroupedCard extends CardObject {
+  data?: DbCardDataV2;
+}
+
+function cardsSort(a: GroupedCard, b: GroupedCard) {
+  if (!a.data || !b.data) return 0;
+  if (a.data.Cmc > b.data.Cmc) return 1;
+  if (a.data.Cmc < b.data.Cmc) return -1;
+  if (a.data.Name > b.data.Name) return 1;
+  if (a.data.Name < b.data.Name) return -1;
+  return 0;
+}
 
 function getDeckComponents(
   deck: Deck,
@@ -67,7 +86,6 @@ function getDeckComponents(
     .map((card) => ({ data: database.card(card.id), ...card }))
     .filter((card) => card.data !== undefined)
     .groupBy((card) => {
-      console.log(card.data);
       const type = cardType(card.data as DbCardDataV2);
       switch (type) {
         case "Creature":
@@ -114,7 +132,7 @@ function getDeckComponents(
       // draw the cards
       _(cards)
         .filter((card) => card.quantity > 0)
-        .orderBy(["data.cmc", "data.name"])
+        .sort(cardsSort)
         .forEach((card, index) => {
           components.push(
             <CardTile
@@ -158,7 +176,7 @@ function getDeckComponents(
     _(deck.getSideboard().get())
       .map((card) => ({ data: database.card(card.id), ...card }))
       .filter((card) => card.quantity > 0)
-      .orderBy(["data.cmc", "data.name"])
+      .sort(cardsSort)
       .forEach((card, index) => {
         components.push(
           <CardTile
