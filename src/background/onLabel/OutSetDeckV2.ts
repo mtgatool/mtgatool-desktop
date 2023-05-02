@@ -53,6 +53,8 @@ export default function OutSetDeckV2(entry: Entry): any {
     format: "",
     mainDeck: main,
     sideboard: side,
+    commandZoneGRPIds: json.Deck.CommandZone.map((c) => c.cardId),
+    companionGRPId: json.Deck.Companions.map((c) => c.cardId)[0],
     colors: new CardsList(main).getColors().getBits(),
     type: "InternalDeck",
   };

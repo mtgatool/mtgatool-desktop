@@ -166,12 +166,32 @@ export default function aggregateStats(
       //   dc -= 32;
       // }
 
+      const commanders = playerDeck.commandZoneGRPIds
+        ? playerDeck.commandZoneGRPIds.map((id) => {
+            return {
+              quantity: 1,
+              id,
+            };
+          })
+        : [];
+
+      const companions = playerDeck.companionGRPId
+        ? [
+            {
+              quantity: 1,
+              id: playerDeck.companionGRPId,
+            },
+          ]
+        : undefined;
+
       stats.deckIndex[match.internalMatch.playerDeckHash] = {
         id: playerDeck.id,
         deckTileId: playerDeck.deckTileId,
         name: playerDeck.name,
         mainDeck: playerDeck.mainDeck,
         sideboard: playerDeck.sideboard,
+        commanders,
+        companions,
         colors: dc,
         playerId: match.uuid,
         deckHash: match.internalMatch.playerDeckHash,

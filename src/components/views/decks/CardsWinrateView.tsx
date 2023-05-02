@@ -181,6 +181,8 @@ export default function CardsWinratesView(
     name: "",
     mainDeck: [],
     sideboard: [],
+    commanders: [],
+    companions: [],
     playerId: "",
     deckHash: "",
     matches: {},

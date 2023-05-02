@@ -52,6 +52,8 @@ export interface StatsDeck {
   name: string;
   mainDeck: v2cardsList;
   sideboard: v2cardsList;
+  commanders?: v2cardsList;
+  companions?: v2cardsList;
   playerId: string;
   deckHash: string;
   matches: Record<string, boolean>;
