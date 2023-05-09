@@ -6,20 +6,52 @@
 
   .top-container {
     display: flex;
+    margin-bottom: 24px;
+    justify-content: space-between;
   
-    .avatar {
-      min-width: 128px;
-      min-height: 128px;
-      width: 128px;
-      height: 128px;
-      border-radius: 128px;
-      background-size: contain;
-      margin: 0;
+    .top-userdata {
+      display: flex;
+
+      .avatar {
+        min-width: 128px;
+        min-height: 128px;
+        width: 128px;
+        height: 128px;
+        border-radius: 128px;
+        background-size: contain;
+        margin: 0;
+      }
+    
+      .username {
+        margin: auto 24px;
+      }
     }
-  
-    .username {
-      margin: auto 24px;
+
+    .top-ranks {
+      display: flex;
+      flex-direction: column;
     }
+  }
+
+  .top-constructed-rank,
+  .top-limited-rank {
+    /* Align leaderboard indicator to center and add text border*/
+    display: flex;
+    margin: auto;
+    align-items: center;
+    justify-content: center;
+    -webkit-app-region: no-drag;
+    align-self: center;
+    width: 48px;
+    height: 48px;
+    background-position: 0px 0px;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
   }
 }
 
+.user-rank {
+  width: 240px;
+  height: 48px;
+  display: flex;
+  justify-content: space-between;
+}

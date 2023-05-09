@@ -10,7 +10,6 @@ import { AppState } from "../../../redux/stores/rendererStore";
 import doHistoryFilter from "../../../utils/tables/doHistoryFilter";
 import PagingControls from "../../PagingControls";
 import SortControls, { Sort } from "../../SortControls";
-import Section from "../../ui/Section";
 import { MatchData } from "../history/getMatchesData";
 import ListItemMatch from "../history/ListItemMatch";
 
@@ -54,55 +53,51 @@ export default function UserHistoryList(props: UserHistoryListProps) {
   );
 
   return (
-    <>
-      <Section style={{ marginBottom: "16px" }}>
-        <div className="history-table-wrapper">
-          <SortControls<MatchData>
-            setSortCallback={setSortValue}
-            defaultSort={sortValue}
-            columnKeys={[
-              "timestamp",
-              "rank",
-              "duration",
-              "playerWins",
-              "playerLosses",
-              "eventId",
-              "oppDeckColors",
-              "playerDeckColors",
-            ]}
-            columnNames={[
-              "Date",
-              "Rank",
-              "Duration",
-              "Wins",
-              "Losses",
-              "Event",
-              "Opponent Colors",
-              "Player Colors",
-            ]}
-          />
-          {filteredData
-            .slice(
-              pagingControlProps.pageIndex * pagingControlProps.pageSize,
-              (pagingControlProps.pageIndex + 1) * pagingControlProps.pageSize
-            )
-            .map((match) => {
-              return (
-                <ListItemMatch
-                  key={match.matchId}
-                  match={match}
-                  openMatchCallback={openMatch}
-                />
-              );
-            })}
-          <div style={{ marginTop: "10px" }}>
-            <PagingControls
-              {...pagingControlProps}
-              pageSizeOptions={[10, 25, 50, 100]}
+    <div className="history-table-wrapper">
+      <SortControls<MatchData>
+        setSortCallback={setSortValue}
+        defaultSort={sortValue}
+        columnKeys={[
+          "timestamp",
+          "rank",
+          "duration",
+          "playerWins",
+          "playerLosses",
+          "eventId",
+          "oppDeckColors",
+          "playerDeckColors",
+        ]}
+        columnNames={[
+          "Date",
+          "Rank",
+          "Duration",
+          "Wins",
+          "Losses",
+          "Event",
+          "Opponent Colors",
+          "Player Colors",
+        ]}
+      />
+      {filteredData
+        .slice(
+          pagingControlProps.pageIndex * pagingControlProps.pageSize,
+          (pagingControlProps.pageIndex + 1) * pagingControlProps.pageSize
+        )
+        .map((match) => {
+          return (
+            <ListItemMatch
+              key={match.matchId}
+              match={match}
+              openMatchCallback={openMatch}
             />
-          </div>
-        </div>
-      </Section>
-    </>
+          );
+        })}
+      <div style={{ marginTop: "10px" }}>
+        <PagingControls
+          {...pagingControlProps}
+          pageSizeOptions={[10, 25, 50, 100]}
+        />
+      </div>
+    </div>
   );
 }
