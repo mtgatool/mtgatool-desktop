@@ -8,6 +8,8 @@
 
 MTG Arena Tool is a collection browser, a deck tracker and a statistics manager. Explore which decks you played against and what other players are brewing. MTG Arena Tool is all about improving your Magic Arena experience.
 
+The MTGA tracker daemon can be found at https://github.com/frcaton/mtga-tracker-daemon.
+
 ***THIS IS PRELIMINARY version 6***
 
 Things are still unfinished, bugs will probably happen. Use at your own risk.
