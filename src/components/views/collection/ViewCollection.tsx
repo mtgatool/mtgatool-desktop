@@ -191,7 +191,13 @@ export default function ViewCollection(props: ViewCollectionProps) {
           cardObj &&
           (!isDigital || exportDigital) &&
           cardObj.Set !== "WC" &&
-          c.rarityVal > 2 &&
+          !(
+            c.fullName.includes("plains") ||
+            c.fullName.includes("island") ||
+            c.fullName.includes("swamp") ||
+            c.fullName.includes("mountain") ||
+            c.fullName.includes("forest")
+          ) &&
           (c.owned > 0 || exportUnowned)
         ) {
           let set = cardObj.DigitalSet ? cardObj.DigitalSet : cardObj.Set;
