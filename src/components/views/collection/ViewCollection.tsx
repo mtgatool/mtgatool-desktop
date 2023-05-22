@@ -191,12 +191,14 @@ export default function ViewCollection(props: ViewCollectionProps) {
           cardObj &&
           (!isDigital || exportDigital) &&
           cardObj.Set !== "WC" &&
+          cardObj.Rarity !== "token" &&
           !(
-            c.fullName.includes("plains") ||
-            c.fullName.includes("island") ||
-            c.fullName.includes("swamp") ||
-            c.fullName.includes("mountain") ||
-            c.fullName.includes("forest")
+            c.fullType.toLocaleLowerCase().includes("basic land") &&
+            (c.fullName.toLocaleLowerCase().includes("plains") ||
+              c.fullName.toLocaleLowerCase().includes("island") ||
+              c.fullName.toLocaleLowerCase().includes("swamp") ||
+              c.fullName.toLocaleLowerCase().includes("mountain") ||
+              c.fullName.toLocaleLowerCase().includes("forest"))
           ) &&
           (c.owned > 0 || exportUnowned)
         ) {
