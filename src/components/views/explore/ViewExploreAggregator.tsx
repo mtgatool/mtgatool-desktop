@@ -110,7 +110,9 @@ export default function ViewExploreAggregator() {
         queryForEvent("Traditional_Cons_Event_2020");
         queryForEvent("Traditional_Cons_Event_2021");
         queryForEvent("Traditional_Cons_Event_2022");
+        queryForEvent("Traditional_Cons_Event_2023");
         queryForEvent("Traditional_Ladder");
+        queryForEvent("Standard_Challenge_20230421");
       } else if (_eventId === "aggregated-historic") {
         queryForEvent("Historic_Ladder");
         queryForEvent("Historic_Play");
@@ -123,8 +125,9 @@ export default function ViewExploreAggregator() {
         queryForEvent("Alchemy_Ladder");
         queryForEvent("Alchemy_Play");
         queryForEvent("Alchemy_Event");
-        queryForEvent("Traditional_Alchemy_Event");
         queryForEvent("Traditional_Alchemy_Event_2022");
+        queryForEvent("Traditional_Alchemy_Event_2023");
+        queryForEvent("Traditional_Alchemy_Event");
         queryForEvent("Traditional_Alchemy_Play");
         queryForEvent("Traditional_Alchemy_Ladder");
       } else if (_eventId === "aggregated-explorer") {
@@ -133,6 +136,7 @@ export default function ViewExploreAggregator() {
         queryForEvent("Explorer_Event");
         queryForEvent("Explorer_Event_v2");
         queryForEvent("Traditional_Explorer_Event");
+        queryForEvent("Traditional_Explorer_Play");
         queryForEvent("Traditional_Explorer_Ladder");
       } else {
         queryForEvent(_eventId);
