@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { DEFAULT_AVATAR } from "../../../constants";
+import useFetchAvatar from "../../../hooks/useFetchAvatar";
+import useFetchUsername from "../../../hooks/useFetchUsername";
+import { DbRankDataWithKey } from "../../../types/dbTypes";
 import cleanUsername from "../../../utils/cleanUsername";
 import timeAgo from "../../../utils/timeAgo";
 import RankIcon from "../../RankIcon";
@@ -107,52 +110,57 @@ function DrawLoadingRank() {
   );
 }
 
+// Promise utility that will resolve to undefined if the promise fails
+// Used to avoid Promise.all() to fail if one of the promises fails
+function finallyThen<T>(param: Promise<T>) {
+  return param
+    .then((res) => {
+      return res;
+    })
+    .catch(() => {
+      return undefined;
+    });
+}
+
 const emptyList = new Array(8).fill(0);
 
 export default function BestRanksFeed() {
   const [allRanks, setAllRanks] = useState<DbRankInfo[]>([]);
 
-  /**
-   * This does not scale well.
-   * We should probably use a cache entry on the database to store these,
-   * It could be an array of the top 10 ranks or something compact, once every month for
-   * consistency with the MTGA ladder.
-   * Also we should check for dates timestamps.
-   */
+  const isLoadingRef = useRef(false);
+
+  const fetchAvatar = useFetchAvatar();
+  const fetchUsername = useFetchUsername();
+
   useEffect(() => {
-    const date = new Date();
-    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    if (isLoadingRef.current) return;
+    isLoadingRef.current = true;
 
     window.toolDb
-      .queryKeys("rank-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE")
-      .then((keys) => {
-        if (keys) {
-          const promises = keys.map((k) =>
-            window.toolDb.getData(k).then((d) =>
-              window.toolDb.getData(`:${d.pubKey}.avatar`).then((avatar) =>
-                window.toolDb.getData(`:${d.pubKey}.username`).then((name) => {
-                  return {
-                    ...d,
-                    avatar,
-                    name,
-                  };
-                })
-              )
-            )
-          );
-          Promise.all(promises)
-            .then((data: DbRankInfo[]) => {
-              setAllRanks(
-                // filter out data from last week only
-                data.filter((r) => r.updated > firstDay.getTime())
-              );
+      .doFunction<DbRankDataWithKey[]>("getLatestRanks", {})
+      .then((fnRet) => {
+        const data: DbRankDataWithKey[] =
+          fnRet.code === "OK" && fnRet.return ? fnRet.return : [];
+
+        const promises = data.map((rankInfo) =>
+          finallyThen(fetchAvatar(rankInfo.pubKey)).then((avatar) =>
+            finallyThen(fetchUsername(rankInfo.pubKey)).then((name) => {
+              console.log("rankInfo", name, avatar?.slice(0, 10));
+              return {
+                ...rankInfo,
+                avatar: avatar || DEFAULT_AVATAR,
+                name: name || "",
+              };
             })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
+          )
+        );
+
+        Promise.all(promises).then((ranks) => {
+          console.log("ranks", ranks);
+          setAllRanks(ranks);
+        });
       });
-  }, []);
+  }, [isLoadingRef, fetchAvatar, fetchUsername]);
 
   const bestConstructed = allRanks.sort(sortConstructedRanks).slice(0, 8);
 

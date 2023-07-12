@@ -1,7 +1,11 @@
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
-import { DbRankData, defaultRankData } from "../types/dbTypes";
+import {
+  DbRankData,
+  DbRankDataWithKey,
+  defaultRankData,
+} from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
 import getLocalDbValue from "./getLocalDbValue";
 
@@ -28,7 +32,7 @@ export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
         });
 
         window.toolDb.putData<DbRankData>(`${uuid}-rank`, newData, true);
-        window.toolDb.putData(`rank-${pubKey}`, {
+        window.toolDb.putData<DbRankDataWithKey>(`rank-${pubKey}`, {
           ...newData,
           uuid,
           pubKey: pubKey,
@@ -42,7 +46,7 @@ export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
           },
           true
         );
-        window.toolDb.putData(`rank-${pubKey}`, {
+        window.toolDb.putData<DbRankDataWithKey>(`rank-${pubKey}`, {
           ...defaultRankData,
           updated: new Date().getTime(),
           uuid,

@@ -106,6 +106,12 @@ export interface DbRankData extends CombinedRankInfo {
   updated: number;
 }
 
+export interface DbRankDataWithKey extends CombinedRankInfo {
+  updated: number;
+  pubKey: string;
+  uuid: string;
+}
+
 export interface DbState {
   [record: string]: any;
 }

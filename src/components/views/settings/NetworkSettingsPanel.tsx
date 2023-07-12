@@ -4,39 +4,16 @@ import _ from "lodash";
 import { ToolDbNetwork } from "mtgatool-db";
 import { ChangeEvent, useCallback, useState } from "react";
 
-import { knownHosts } from "../../../constants";
-import { Peer } from "../../../redux/slices/rendererSlice";
 import getLocalSetting from "../../../utils/getLocalSetting";
-import { getFinalHost } from "../../../utils/peerToUrl";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
 import Button from "../../ui/Button";
 
-function _getPeerFromUrl(url: string) {
-  const urlParseRegex = new RegExp(
-    /^((ftp|http[s]?|ws[s]?):\/\/)?([^/?:#]+)([:/])?([0-9]*)?(\/.*)?$/,
-    "g"
-  );
-  const result = urlParseRegex.exec(url);
-  if (!result) {
-    return {
-      host: "",
-      port: 0,
-    };
-  }
-  return {
-    host: result[3],
-    port:
-      result[2] === "https" || result[2] === "wss" ? 443 : parseInt(result[5]),
-  };
-}
-
 export default function NetworkSettingsPanel(): JSX.Element {
-  const peers: Peer[] = JSON.parse(getLocalSetting("peers"));
+  const peers: string[] = JSON.parse(getLocalSetting("peer-keys"));
   const [_rerender, setRerender] = useState(0);
 
-  const [newHost, setNewHost] = useState("localhost");
-  const [newPort, setNewPort] = useState(3000);
+  const [newHost, setNewHost] = useState("");
 
   setTimeout(() => setRerender(new Date().getTime()), 500);
 
@@ -44,14 +21,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
 
   const handleSetHost = useCallback(
     (event: ChangeEvent<HTMLInputElement>): void => {
-      setNewHost(event.target.value.replace(/(^\w+:|^)\/\/|\//g, ""));
-    },
-    []
-  );
-
-  const handleSetPort = useCallback(
-    (event: ChangeEvent<HTMLInputElement>): void => {
-      setNewPort(parseInt(event.target.value));
+      setNewHost(event.target.value);
     },
     []
   );
@@ -59,31 +29,18 @@ export default function NetworkSettingsPanel(): JSX.Element {
   const connections = Object.keys(networkModule.clientToSend);
 
   const addPeer = () => {
-    const p: Peer = {
-      host: newHost,
-      port: newPort,
-    };
-    const newPeers = [...peers, p];
+    const newPeers = [...peers, newHost];
 
-    networkModule.connectTo(getFinalHost(p.host), p.port);
-    setNewHost("localhost");
-    setNewPort(3000);
-    setLocalSetting("peers", JSON.stringify(newPeers));
-  };
-
-  const _connectPeer = (host: string, port: number) => {
-    networkModule.connectTo(getFinalHost(host), port);
-  };
-
-  const _disconnectPeer = (clientId: string) => {
-    console.log("Client ID disconnect", clientId);
-    // networkModule.close(clientId);
+    networkModule.findServer(newHost);
+    setNewHost("");
+    setLocalSetting("peer-keys", JSON.stringify(newPeers));
   };
 
   return (
     <>
       <p>Peers:</p>
       {connections.map((peerId: string) => {
+        const peerData = networkModule.serverPeerData[peerId];
         const host = window.toolDb.peers[peerId.slice(-20)]?.host;
         const peerHost =
           !host || host === "127.0.0.1" ? peerId.slice(-20) : host;
@@ -109,7 +66,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
             />
 
             <div style={{ width: "500px" }}>
-              {knownHosts[peerHost] || peerHost}
+              {peerData.name || peerHost}
               {networkModule.isServer(peerId) ? <i> (server)</i> : ""}
             </div>
 
@@ -137,11 +94,10 @@ export default function NetworkSettingsPanel(): JSX.Element {
 
       <div style={{ marginTop: "24px" }}>
         <p>
-          You can add a custom server peer host here. Usually servers will be
-          acquired automaticaly via DHT, but you might want to deploy your own
-          servers or conenct to a different swarm.
+          You can add a server peer host here. If you are running a server, you
+          can add your own host here. Server connection data will be acquired
+          automatically with it Public Key.
         </p>
-        <p>Use port 443 to upgrade connections to HTTPS.</p>
       </div>
       <div>
         <div
@@ -151,11 +107,11 @@ export default function NetworkSettingsPanel(): JSX.Element {
             margin: "8px 0",
           }}
         >
-          <label className="label">Host:</label>
+          <label className="label">Public Key:</label>
           <div
             style={{
               display: "flex",
-              width: "300px",
+              width: "400px",
               margin: "0 16px",
             }}
           >
@@ -171,30 +127,10 @@ export default function NetworkSettingsPanel(): JSX.Element {
               />
             </div>
           </div>
-          <label className="label">Port:</label>
-          <div
-            style={{
-              display: "flex",
-              width: "120px",
-              margin: "0 0 0 16px",
-            }}
-          >
-            <div
-              className="form-input-container"
-              style={{ padding: "0", margin: "auto" }}
-            >
-              <input
-                onChange={handleSetPort}
-                autoComplete="off"
-                type="text"
-                value={newPort}
-              />
-            </div>
-          </div>
           <Button
             style={{ margin: "auto 16px" }}
             onClick={addPeer}
-            text="Add"
+            text="Add Server"
           />
         </div>
       </div>

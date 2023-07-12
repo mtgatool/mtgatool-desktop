@@ -123,10 +123,7 @@ export default function LiveDraftView() {
       });
 
       pubKeys.forEach((key) => {
-        if (!avatars[key]) {
-          // && !globalData.fetchedAvatars.includes(key)) {
-          fetchAvatar(key);
-        }
+        fetchAvatar(key);
       });
     }
   }, [fetchAvatar, avatars, liveDraftState]);

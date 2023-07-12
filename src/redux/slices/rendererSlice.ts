@@ -57,7 +57,7 @@ const rendererSlice = createSlice({
   name: "renderer",
   initialState: initialRendererState,
   reducers: {
-    setPeers: (state: RendererState, action: PayloadAction<Peer[]>): void => {
+    setPeers: (state: RendererState, action: PayloadAction<string[]>): void => {
       state.peers = action.payload;
     },
     setReadingLog: (

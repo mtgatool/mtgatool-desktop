@@ -47,10 +47,10 @@ export default function mainChannelListeners() {
     // console.log(msg.data.type);
 
     if (msg.data.type === "DATABASE_PEERS") {
-      const oldPeers = JSON.parse(getLocalSetting("peers"));
+      const oldPeers = JSON.parse(getLocalSetting("peer-keys"));
       const newPeers = _.uniqWith([...oldPeers, ...msg.data.peers], _.isEqual);
 
-      setLocalSetting("peers", JSON.stringify(newPeers));
+      setLocalSetting("peer-keys", JSON.stringify(newPeers));
       console.log("Peers: ", newPeers);
       reduxAction(store.dispatch, {
         type: "SET_PEERS",
