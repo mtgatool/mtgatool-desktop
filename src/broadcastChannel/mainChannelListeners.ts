@@ -14,9 +14,7 @@ import upsertDbRank from "../toolDb/upsertDbRank";
 import LogEntry from "../types/logDecoder";
 import bcConnect from "../utils/bcConnect";
 import electron from "../utils/electron/electronWrapper";
-import getLocalSetting from "../utils/getLocalSetting";
 import globalData from "../utils/globalData";
-import setLocalSetting from "../utils/setLocalSetting";
 import switchPlayerUUID from "../utils/switchPlayerUUID";
 import { ChannelMessage } from "./channelMessages";
 
@@ -45,19 +43,6 @@ export default function mainChannelListeners() {
 
   channel.onmessage = (msg: MessageEvent<ChannelMessage>) => {
     // console.log(msg.data.type);
-
-    if (msg.data.type === "DATABASE_PEERS") {
-      const oldPeers = JSON.parse(getLocalSetting("peer-keys"));
-      const newPeers = _.uniqWith([...oldPeers, ...msg.data.peers], _.isEqual);
-
-      setLocalSetting("peer-keys", JSON.stringify(newPeers));
-      console.log("Peers: ", newPeers);
-      reduxAction(store.dispatch, {
-        type: "SET_PEERS",
-        arg: newPeers,
-      });
-    }
-
     if (logReadFinished && msg.data.type === "OVERLAY_UPDATE") {
       upsertDbLiveMatch(msg.data.value);
     }

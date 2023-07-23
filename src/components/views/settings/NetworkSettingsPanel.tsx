@@ -10,7 +10,7 @@ import vodiFn from "../../../utils/voidfn";
 import Button from "../../ui/Button";
 
 export default function NetworkSettingsPanel(): JSX.Element {
-  const peers: string[] = JSON.parse(getLocalSetting("peer-keys"));
+  const peers: string[] = JSON.parse(getLocalSetting("saved-peer-keys"));
   const [_rerender, setRerender] = useState(0);
 
   const [newHost, setNewHost] = useState("");
@@ -33,7 +33,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
 
     networkModule.findServer(newHost);
     setNewHost("");
-    setLocalSetting("peer-keys", JSON.stringify(newPeers));
+    setLocalSetting("saved-peer-keys", JSON.stringify(newPeers));
   };
 
   return (
@@ -66,7 +66,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
             />
 
             <div style={{ width: "500px" }}>
-              {peerData.name || peerHost}
+              {peerData?.name || peerHost}
               {networkModule.isServer(peerId) ? <i> (server)</i> : ""}
             </div>
 

@@ -53,7 +53,10 @@ function App(props: AppProps) {
 
   useEffect(() => {
     if (!window.toolDbInitialized) {
-      const storedPeers = JSON.parse(getLocalSetting("peer-keys")) as string[];
+      const storedPeers = JSON.parse(
+        getLocalSetting("saved-peer-keys")
+      ) as string[];
+
       const mergedPeers = _.uniqWith(
         isElectron() ? storedPeers : DEFAULT_PEERS,
         _.isEqual

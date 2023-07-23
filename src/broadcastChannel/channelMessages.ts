@@ -8,12 +8,10 @@ import {
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { OverlayUpdateMatchState } from "../background/store/types";
 import { OverlaySettings } from "../common/defaultConfig";
-import { Peer } from "../redux/slices/rendererSlice";
 import { DbDraftVote, DbInventoryInfo } from "../types/dbTypes";
 import { ClientSceneChange } from "../types/logDecoder";
 
 export type MessageType =
-  | "DATABASE_PEERS"
   | "POPUP"
   | "LOG_CHECK"
   | "START_LOG_READING"
@@ -43,11 +41,6 @@ export type MessageType =
 
 export interface ChannelMessageBase {
   type: MessageType;
-}
-
-export interface DatabasePeersMessage extends ChannelMessageBase {
-  type: "DATABASE_PEERS";
-  peers: Peer[];
 }
 
 export interface PopupMessage extends ChannelMessageBase {
@@ -176,7 +169,6 @@ export interface UpdateActiveEventsMessage extends ChannelMessageBase {
 }
 
 export type ChannelMessage =
-  | DatabasePeersMessage
   | PopupMessage
   | LogCheckMessage
   | StartLogReadingMessage
