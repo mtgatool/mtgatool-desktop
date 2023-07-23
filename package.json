@@ -1,6 +1,6 @@
 {
   "name": "mtgatool-desktop",
-  "version": "6.2.9",
+  "version": "6.2.13",
   "private": true,
   "main": "public/electron.js",
   "homepage": "./",
@@ -13,7 +13,6 @@
     "automerge": "^1.0.1-preview.5",
     "axios": "^0.21.1",
     "date-fns": "^2.19.0",
-    "discovery-channel": "^5.5.1",
     "electron-devtools-installer": "^3.1.1",
     "electron-log": "^4.3.2",
     "electron-updater": "^4.3.9",
@@ -23,7 +22,7 @@
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.0",
     "mathjs": "^9.3.0",
-    "mtgatool-db": "^1.7.0",
+    "mtgatool-db": "^2.1.4",
     "mtgatool-shared": "^2.2.0",
     "qrcode": "^1.5.1",
     "queue": "^6.0.2",
@@ -141,7 +140,7 @@
     ]
   },
   "devDependencies": {
-    "@craco/craco": "^6.4.3",
+    "@craco/craco": "^6.4.5",
     "@electron/rebuild": "^3.2.10",
     "@types/follow-redirects": "^1.13.1",
     "@types/jest": "^26.0.15",

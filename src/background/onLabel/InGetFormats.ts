@@ -6,7 +6,7 @@ export interface Format {
   bannedTitleIds: number[];
   suspendedTitleIds: number[];
   allowedTitleIds: number[];
-  cardCountRestriction: string;
+  cardCountRestriction?: string;
   // | "None"
   // | "Singleton"
   // | "Limited"

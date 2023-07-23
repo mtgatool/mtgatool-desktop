@@ -25,12 +25,15 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
     "Jumpstart",
     "Jumpstart: Historic Horizons",
     "Explorer Anthology 1",
+    "Explorer Anthology 2",
+    "Explorer Anthology 3",
     "Historic Anthology 1",
     "Historic Anthology 2",
     "Historic Anthology 3",
     "Historic Anthology 4",
     "Historic Anthology 5",
-    "Historic Anthology 6"
+    "Historic Anthology 6",
+    "Historic Anthology 7"
   );
 
   const filterSets: Set[] = filterable.map((set) => {

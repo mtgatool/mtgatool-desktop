@@ -1,7 +1,7 @@
 /* eslint-disable import/no-webpack-loader-syntax */
 /* eslint-disable no-nested-ternary */
 import _ from "lodash";
-import { sha1, ToolDb } from "mtgatool-db";
+import { sha1, ToolDb, ToolDbNetwork } from "mtgatool-db";
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,7 +19,6 @@ import isElectron from "../utils/electron/isElectron";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
 import getLocalSetting from "../utils/getLocalSetting";
 import getPopupClass from "../utils/getPopupClass";
-import { getFinalHost } from "../utils/peerToUrl";
 import vodiFn from "../utils/voidfn";
 import Auth from "./Auth";
 import CardHover from "./CardHover";
@@ -54,26 +53,30 @@ function App(props: AppProps) {
 
   useEffect(() => {
     if (!window.toolDbInitialized) {
-      const storedPeers = JSON.parse(getLocalSetting("peers")) as {
-        host: string;
-        port: number;
-      }[];
+      const storedPeers = JSON.parse(
+        getLocalSetting("saved-peer-keys")
+      ) as string[];
+
       const mergedPeers = _.uniqWith(
         isElectron() ? storedPeers : DEFAULT_PEERS,
         _.isEqual
-      ).map((p) => {
-        return {
-          ...p,
-          host: getFinalHost(p.host),
-        };
-      });
+      );
 
       console.log("Merged Peers: ", mergedPeers);
       window.toolDb = new ToolDb({
-        peers: mergedPeers,
-        topic: "mtgatool-db-swarm-v3",
-        useWebrtc: true,
+        topic: "mtgatool-db-swarm-v4",
+        server: false,
       });
+
+      window.toolDb.on("init", (key) =>
+        console.warn("ToolDb initialized!", key)
+      );
+
+      mergedPeers.forEach((peer) => {
+        const networkModule = window.toolDb.network as ToolDbNetwork;
+        networkModule.findServer(peer);
+      });
+
       window.toolDb.onConnect = () => {
         window.toolDb.onConnect = () => {
           //

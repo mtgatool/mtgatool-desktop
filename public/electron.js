@@ -5,7 +5,7 @@ const url = require("url");
 
 const { autoUpdater } = require("electron-updater");
 
-const DC = require("discovery-channel");
+// const DC = require("discovery-channel");
 const mainIpcInitialize = require("./ipcHandlers");
 const mainGlobals = require("./mainGlobals");
 const installDevTools = require("./devtools");
@@ -60,9 +60,12 @@ function sendInit() {
   request.on("error", console.log);
   request.end();
 
+  /*
+  // This was okay, but instead we use webrtc to find servers, and then
+  // connect to them on the client side
   const peers = [];
   const channel = DC();
-  channel.join("mtgatool-db-swarm-v3");
+  channel.join("mtgatool-db-swarm-v4");
   channel.on("peer", (id, peer) => {
     console.log("Server peer found: ", peer);
     if (
@@ -74,6 +77,7 @@ function sendInit() {
       mainGlobals.backgroundWindow.webContents.send("peersFound", peers);
     }
   });
+  */
 }
 
 function showDock() {

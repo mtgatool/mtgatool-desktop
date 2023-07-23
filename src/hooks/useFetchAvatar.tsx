@@ -13,18 +13,25 @@ export default function useFetchAvatar() {
   const fetchAvatar = useCallback(
     (pubKey: string) => {
       globalData.fetchedAvatars.push(pubKey);
-
-      if (!avatars[pubKey]) {
-        reduxAction(dispatch, {
-          type: "SET_AVATAR",
-          arg: { pubKey, avatar: "" },
-        });
-      }
-      window.toolDb.getData<string>(`:${pubKey}.avatar`).then((avatar) => {
-        reduxAction(dispatch, {
-          type: "SET_AVATAR",
-          arg: { pubKey, avatar: avatar || DEFAULT_AVATAR },
-        });
+      return new Promise<string>((resolve, reject) => {
+        if (!avatars[pubKey]) {
+          reduxAction(dispatch, {
+            type: "SET_AVATAR",
+            arg: { pubKey, avatar: "" },
+          });
+          window.toolDb
+            .getData<string>(`:${pubKey}.avatar`, false, 1000)
+            .then((avatar) => {
+              reduxAction(dispatch, {
+                type: "SET_AVATAR",
+                arg: { pubKey, avatar: avatar || DEFAULT_AVATAR },
+              });
+              resolve(avatar || DEFAULT_AVATAR);
+            })
+            .catch(reject);
+        } else {
+          resolve(avatars[pubKey]);
+        }
       });
     },
     [avatars, dispatch]
