@@ -162,7 +162,6 @@ export default function BestRanksFeed() {
         const promises = data.map((rankInfo) =>
           finallyThen(fetchAvatar(rankInfo.pubKey)).then((avatar) =>
             finallyThen(fetchUsername(rankInfo.pubKey)).then((name) => {
-              console.log("rankInfo", name, avatar?.slice(0, 10));
               return {
                 ...rankInfo,
                 pubKey: rankInfo.pubKey,
@@ -174,7 +173,6 @@ export default function BestRanksFeed() {
         );
 
         Promise.all(promises).then((ranks) => {
-          console.log("ranks", ranks);
           setAllRanks(ranks);
         });
       });
