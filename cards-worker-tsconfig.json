@@ -7,7 +7,7 @@
     ],
     "module": "commonjs",
     "sourceMap": false,
-    "outDir": "./dist-worker",
+    "outDir": "./dist-cards-worker",
     "downlevelIteration": true,
     "strict": true,
     "moduleResolution": "classic",

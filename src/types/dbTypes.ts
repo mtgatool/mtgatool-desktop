@@ -14,6 +14,7 @@ import { OverlayHandler } from "../common/overlayHandler";
 declare global {
   interface Window {
     toolDb: ToolDb;
+    toolDbWorker: Worker;
     toolDbInitialized: boolean;
     database: DatabaseClass;
     overlayHandler: OverlayHandler | undefined;

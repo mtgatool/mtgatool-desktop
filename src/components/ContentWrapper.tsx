@@ -73,8 +73,12 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
 
   const workerRef = useRef<Worker | null>(null);
 
+  const toolDbWorkerRef = useRef<Worker | null>(null);
+
   useEffect(() => {
-    workerRef.current = new Worker("worker/index.js", { type: "module" });
+    workerRef.current = new Worker("cards-worker/index.js", { type: "module" });
+    toolDbWorkerRef.current = new Worker("tooldb-worker/index.js", { type: "module" });
+    window.toolDbWorker = toolDbWorkerRef.current;
   }, []);
 
   const os = forceOs || (isElectron() ? process.platform : "");
