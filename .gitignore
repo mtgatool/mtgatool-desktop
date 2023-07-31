@@ -2,7 +2,7 @@
 
 # dependencies
 /node_modules
-/src/tooldb-worker/node_modules
+/tooldb-worker/node_modules
 /.pnp
 .pnp.js
 

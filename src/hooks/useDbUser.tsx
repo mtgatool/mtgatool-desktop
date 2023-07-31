@@ -12,6 +12,8 @@ export default function useDbUser(): [ToolDb["user"], boolean] {
       intervalRef.current = setInterval(() => {
         if (window.toolDb.user) {
           setLoggedIn(true);
+          clearInterval(intervalRef.current as any);
+          intervalRef.current = undefined;
         }
       }, 100);
     }

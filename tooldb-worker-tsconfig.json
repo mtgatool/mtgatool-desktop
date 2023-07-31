@@ -16,6 +16,6 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "src/tooldb-worker"
+    "tooldb-worker"
   ]
 }

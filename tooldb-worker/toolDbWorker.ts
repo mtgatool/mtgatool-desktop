@@ -2,12 +2,13 @@
 
 import { ToolDb, ToolDbNetwork } from "mtgatool-db";
 
-export const DEFAULT_PEERS: string[] = [
-  "ccdde0f639db3ccb18ed2d48ed405323eac3ce86762923c1010796433e9a392dec3771400f524d4f0a466c0701cad99bbd8b509df3a467c8ca76fab7dc5504bb",
-];
+import { DEFAULT_PEERS } from "./constants";
+import login from "./login";
+import signup from "./signup";
 
 const toolDb = new ToolDb({
   topic: "mtgatool-db-swarm-v4",
+  debug: true,
   server: false,
 });
 
@@ -20,10 +21,29 @@ DEFAULT_PEERS.forEach((peer) => {
 
 toolDb.onConnect = () => {
   toolDb.onConnect = () => {
-    //
+    window.postMessage({ type: "CONNECTED" });
   };
 };
 
+window.toolDb = toolDb;
+
 self.onmessage = (e: any) => {
   const { type } = e.data;
+
+  switch (type) {
+    case "LOGIN":
+      login(e.data.username, e.data.password);
+      break;
+
+    case "KEYS_LOGIN":
+      login(e.data.username, e.data.keys);
+      break;
+
+    case "SIGNUP":
+      signup(e.data.username, e.data.password);
+      break;
+
+    default:
+      break;
+  }
 };

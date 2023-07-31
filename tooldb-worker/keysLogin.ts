@@ -6,7 +6,7 @@ import {
   UserRootData,
 } from "mtgatool-db";
 
-import { afterLogin } from "./login";
+import afterLogin from "./afterLogin";
 
 export default function keysLogin(
   username: string,

@@ -1,7 +1,7 @@
 /* eslint-disable import/no-webpack-loader-syntax */
 /* eslint-disable no-nested-ternary */
 import _ from "lodash";
-import { sha1, ToolDb, ToolDbNetwork } from "mtgatool-db";
+import { sha1 } from "mtgatool-db";
 import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,11 +9,10 @@ import { Route, Switch, useHistory } from "react-router-dom";
 
 import overlayHandler from "../common/overlayHandler";
 // import liveDraftVerification from "../toolDb/liveDraftVerification";
-import { DEFAULT_PEERS } from "../constants";
 import info from "../info.json";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
-import login from "../toolDb/login";
+import { login } from "../toolDb/worker-wrapper";
 import electron from "../utils/electron/electronWrapper";
 import isElectron from "../utils/electron/isElectron";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
@@ -43,7 +42,7 @@ function App(props: AppProps) {
   const { forceOs } = props;
   const history = useHistory();
   const dispatch = useDispatch();
-  const [canLogin, setCanLogin] = useState(isElectron());
+  const [canLogin, setCanLogin] = useState(false);
 
   const { loginState, loading, backgroundGrpid, matchInProgress } = useSelector(
     (state: AppState) => state.renderer
@@ -51,40 +50,32 @@ function App(props: AppProps) {
 
   const os = forceOs || (isElectron() ? process.platform : "");
 
+  const toolDbWorkerRef = useRef<Worker | null>(null);
+
   useEffect(() => {
-    if (!window.toolDbInitialized) {
-      const storedPeers = JSON.parse(
-        getLocalSetting("saved-peer-keys")
-      ) as string[];
+    toolDbWorkerRef.current = new Worker("tooldb-worker/index.js", {
+      type: "module",
+    });
+    window.toolDbWorker = toolDbWorkerRef.current;
 
-      const mergedPeers = _.uniqWith(
-        isElectron() ? storedPeers : DEFAULT_PEERS,
-        _.isEqual
-      );
+    window.toolDbWorker.onmessage = (e) => {
+      if (e.data.type === "REDUX_ACTION") {
+        const action = e.data.arg;
+        reduxAction(dispatch, {
+          type: action.type,
+          arg: action.arg,
+        });
+      }
+    };
 
-      console.log("Merged Peers: ", mergedPeers);
-      window.toolDb = new ToolDb({
-        topic: "mtgatool-db-swarm-v4",
-        server: false,
-      });
-
-      window.toolDb.on("init", (key) =>
-        console.warn("ToolDb initialized!", key)
-      );
-
-      mergedPeers.forEach((peer) => {
-        const networkModule = window.toolDb.network as ToolDbNetwork;
-        networkModule.findServer(peer);
-      });
-
-      window.toolDb.onConnect = () => {
-        window.toolDb.onConnect = () => {
-          //
-        };
+    const listener = (e: any) => {
+      const { type } = e.data;
+      if (type === "CONNECTED") {
         setCanLogin(true);
-      };
-      window.toolDbInitialized = true;
-    }
+        window.toolDbWorker.removeEventListener("message", listener);
+      }
+    };
+    window.toolDbWorker.onmessage = listener;
   }, []);
 
   useEffect(() => {
@@ -109,7 +100,6 @@ function App(props: AppProps) {
             arg: LOGIN_OK,
           });
 
-          console.log("pathname", history.location.pathname);
           if (
             history.location.pathname === "" ||
             history.location.pathname === "/"
