@@ -3,11 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable no-restricted-globals */
 const mtgatool_db_1 = require("mtgatool-db");
 const afterLogin_1 = __importDefault(require("./afterLogin"));
 function keysLogin(username, keys) {
     return new Promise((resolve, reject) => {
-        window.toolDb
+        self.toolDb
             .getData(`==${username}`, false, 5000)
             .then((user) => {
             if (user) {
@@ -17,9 +18,7 @@ function keysLogin(username, keys) {
                             .then((skpub) => (0, mtgatool_db_1.encodeKeyString)(skpub))
                             .then((pubKey) => {
                             if (pubKey === user.keys.skpub) {
-                                window.toolDb
-                                    .keysSignIn(importedKeys, username)
-                                    .then(() => {
+                                self.toolDb.keysSignIn(importedKeys, username).then(() => {
                                     (0, afterLogin_1.default)();
                                     resolve();
                                 });

@@ -16,7 +16,7 @@ function waitMs(ms) {
  * @returns Promise<PutMessage>
  */
 function signup(username, password) {
-    return window.toolDb
+    return self.toolDb
         .signUp(username, password)
         .then((msg) => {
         // console.log("Sent signup! now wait");
@@ -24,7 +24,7 @@ function signup(username, password) {
             // console.log("wait finished, now login");
             return (0, login_1.default)(username, password).then((_keys) => {
                 // console.log("login ok!?");
-                return window.toolDb
+                return self.toolDb
                     .putData("userids", {}, true)
                     .then((_put) => {
                     return msg;
@@ -33,7 +33,7 @@ function signup(username, password) {
         });
     })
         .catch((err) => {
-        window.postMessage({ type: "SIGNUP_ERR", err });
+        self.postMessage({ type: "SIGNUP_ERR", err });
     });
 }
 exports.default = signup;

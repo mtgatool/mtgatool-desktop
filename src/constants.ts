@@ -14,3 +14,8 @@ typeIcons.lan = "type-lan";
 typeIcons.pla = "type-pla";
 typeIcons.sor = "type-sor";
 typeIcons.bat = "type-bat";
+
+export const LOGIN_AUTH = 1;
+export const LOGIN_WAITING = 2;
+export const LOGIN_OK = 3;
+export const LOGIN_FAILED = 4;

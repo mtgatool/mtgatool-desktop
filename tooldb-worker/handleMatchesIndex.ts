@@ -1,19 +1,20 @@
+/* eslint-disable no-restricted-globals */
 import reduxAction from "./reduxAction";
 
 export default function handleMatchesIndex(matchesIndex: string[] | null) {
-  window.globalData.matchesIndex = [
-    ...new Set([...window.globalData.matchesIndex, ...(matchesIndex || [])]),
+  self.globalData.matchesIndex = [
+    ...new Set([...self.globalData.matchesIndex, ...(matchesIndex || [])]),
   ];
-  console.log("handleMatchesIndex", window.globalData.matchesIndex);
+  console.log("handleMatchesIndex", self.globalData.matchesIndex);
 
   // Fetch any match we dont have locally
-  window.globalData.matchesIndex.forEach((id: string) => {
-    window.toolDb.store.get(id, (err, data) => {
+  self.globalData.matchesIndex.forEach((id: string) => {
+    self.toolDb.store.get(id, (err, data) => {
       if (!data) {
-        window.toolDb.getData(id, false, 2000);
+        self.toolDb.getData(id, false, 2000);
       }
     });
   });
 
-  reduxAction("SET_MATCHES_INDEX", window.globalData.matchesIndex);
+  reduxAction("SET_MATCHES_INDEX", self.globalData.matchesIndex);
 }

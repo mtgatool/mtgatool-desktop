@@ -9,25 +9,25 @@ const handleMatchesIndex_1 = __importDefault(require("./handleMatchesIndex"));
 const reduxAction_1 = __importDefault(require("./reduxAction"));
 function afterLogin() {
     const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
-    if (window.toolDb.user) {
-        // setLocalSetting("pubkey", window.toolDb.user.pubKey);
-        window.toolDb
-            .queryKeys(`:${window.toolDb.user.pubKey}.matches-`)
+    if (self.toolDb.user) {
+        // setLocalSetting("pubkey", self.toolDb.user.pubKey);
+        self.toolDb
+            .queryKeys(`:${self.toolDb.user.pubKey}.matches-`)
             .then(handleMatchesIndex_1.default);
-        window.toolDb
-            .queryKeys(`:${window.toolDb.user.pubKey}.draft-`)
+        self.toolDb
+            .queryKeys(`:${self.toolDb.user.pubKey}.draft-`)
             .then(handleDraftsIndex_1.default);
     }
-    window.toolDb.addKeyListener(`matches-livefeed-${currentDay}`, handleLiveFeed_1.default);
-    window.toolDb.subscribeData("userids", true);
-    window.toolDb.subscribeData(`matches-livefeed-${currentDay}`);
-    window.toolDb.getData("hiddenDecks", true, 5000).then((hidden) => {
+    self.toolDb.addKeyListener(`matches-livefeed-${currentDay}`, handleLiveFeed_1.default);
+    self.toolDb.subscribeData("userids", true);
+    self.toolDb.subscribeData(`matches-livefeed-${currentDay}`);
+    self.toolDb.getData("hiddenDecks", true, 5000).then((hidden) => {
         if (hidden) {
-            window.globalData.hiddenDecks = hidden;
+            self.globalData.hiddenDecks = hidden;
             (0, reduxAction_1.default)("SET_HIDDEN_DECKS", hidden);
         }
     });
-    window.toolDb
+    self.toolDb
         .getData("userids", true, 5000)
         .then((data) => {
         let newest = "";
@@ -37,13 +37,13 @@ function afterLogin() {
                 newestDate = data[uuid];
                 newest = uuid;
             }
-            window.toolDb.addKeyListener(window.toolDb.getUserNamespacedKey(`${uuid}-cards`), (msg) => {
+            self.toolDb.addKeyListener(self.toolDb.getUserNamespacedKey(`${uuid}-cards`), (msg) => {
                 if (msg.type === "put") {
                     (0, reduxAction_1.default)("SET_UUID_CARDS_DATA", { cards: msg.v, uuid });
                 }
             });
-            window.toolDb.subscribeData(`${uuid}-cards`, true);
-            window.toolDb.addKeyListener(window.toolDb.getUserNamespacedKey(`${uuid}-inventory`), (msg) => {
+            self.toolDb.subscribeData(`${uuid}-cards`, true);
+            self.toolDb.addKeyListener(self.toolDb.getUserNamespacedKey(`${uuid}-inventory`), (msg) => {
                 if (msg.type === "put") {
                     (0, reduxAction_1.default)("SET_UUID_INVENTORY_DATA", {
                         inventory: msg.v,
@@ -51,13 +51,13 @@ function afterLogin() {
                     });
                 }
             });
-            window.toolDb.subscribeData(`${uuid}-inventory`, true);
-            window.toolDb.addKeyListener(window.toolDb.getUserNamespacedKey(`${uuid}-rank`), (msg) => {
+            self.toolDb.subscribeData(`${uuid}-inventory`, true);
+            self.toolDb.addKeyListener(self.toolDb.getUserNamespacedKey(`${uuid}-rank`), (msg) => {
                 if (msg.type === "put") {
                     (0, reduxAction_1.default)("SET_UUID_RANK_DATA", { rank: msg.v, uuid });
                 }
             });
-            window.toolDb.subscribeData(`${uuid}-rank`, true);
+            self.toolDb.subscribeData(`${uuid}-rank`, true);
             (0, reduxAction_1.default)("SET_UUID", newest);
         });
     })

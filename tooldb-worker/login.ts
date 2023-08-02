@@ -1,17 +1,21 @@
+/* eslint-disable no-restricted-globals */
 import afterLogin from "./afterLogin";
+import reduxAction from "./reduxAction";
 
 export default function login(username: string, password: string) {
-  return window.toolDb
+  return self.toolDb
     .signIn(username, password)
     .then((keys) => {
-      window.toolDb.putData("username", username, true);
+      self.toolDb.putData("username", username, true);
       afterLogin();
 
-      window.postMessage({ type: "LOGIN_OK" });
+      self.postMessage({ type: "LOGIN_OK" });
+
+      reduxAction("SET_PUBKEY", self.toolDb.user?.pubKey);
 
       return keys;
     })
     .catch((err) => {
-      window.postMessage({ type: "LOGIN_ERR", err });
+      self.postMessage({ type: "LOGIN_ERR", err });
     });
 }

@@ -1,19 +1,20 @@
+/* eslint-disable no-restricted-globals */
 import reduxAction from "./reduxAction";
 
 export default function handleDraftsIndex(draftsIndex: string[] | null) {
-  window.globalData.draftsIndex = [
-    ...new Set([...window.globalData.draftsIndex, ...(draftsIndex || [])]),
+  self.globalData.draftsIndex = [
+    ...new Set([...self.globalData.draftsIndex, ...(draftsIndex || [])]),
   ];
-  console.log("handleDraftsIndex", window.globalData.draftsIndex);
+  console.log("handleDraftsIndex", self.globalData.draftsIndex);
 
   // Fetch any match we dont have locally
-  window.globalData.draftsIndex.forEach((id: string) => {
-    window.toolDb.store.get(id, (err, data) => {
+  self.globalData.draftsIndex.forEach((id: string) => {
+    self.toolDb.store.get(id, (err, data) => {
       if (!data) {
-        window.toolDb.getData(id, false, 2000);
+        self.toolDb.getData(id, false, 2000);
       }
     });
   });
 
-  reduxAction("SET_DRAFTS_INDEX", window.globalData.draftsIndex);
+  reduxAction("SET_DRAFTS_INDEX", self.globalData.draftsIndex);
 }

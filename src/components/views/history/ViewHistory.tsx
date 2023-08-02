@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
 
-import useDbUser from "../../../hooks/useDbUser";
+import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import { AppState } from "../../../redux/stores/rendererStore";
 import getMatchesData, { MatchData } from "./getMatchesData";
 import HistoryList from "./HistoryList";
@@ -16,7 +16,7 @@ interface ViewHistoryProps {
 export default function ViewHistory(props: ViewHistoryProps) {
   const { openHistoryStatsPopup, datePickerDoShow } = props;
   const { url } = useRouteMatch();
-  const [, loggedIn] = useDbUser();
+  const loggedIn = useIsLoggedIn();
 
   const currentUUID = useSelector(
     (state: AppState) => state.mainData.currentUUID

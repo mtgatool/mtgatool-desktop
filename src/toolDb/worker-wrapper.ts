@@ -1,4 +1,4 @@
-import { ParsedKeys } from "mtgatool-db";
+import { FunctionReturn, ParsedKeys } from "mtgatool-db";
 
 const login = (username: string, password: string) => {
   return new Promise((resolve, reject) => {
@@ -20,9 +20,8 @@ const login = (username: string, password: string) => {
           reject(e.data.err);
           window.toolDbWorker.removeEventListener("message", listener);
         }
-        window.toolDbWorker.removeEventListener("message", listener);
       };
-      window.toolDbWorker.onmessage = listener;
+      window.toolDbWorker.addEventListener("message", listener);
     } else {
       reject(new Error("toolDbWorker not available"));
     }
@@ -50,7 +49,7 @@ const keysLogin = (username: string, keys: ParsedKeys) => {
           window.toolDbWorker.removeEventListener("message", listener);
         }
       };
-      window.toolDbWorker.onmessage = listener;
+      window.toolDbWorker.addEventListener("message", listener);
     } else {
       reject(new Error("toolDbWorker not available"));
     }
@@ -78,11 +77,94 @@ const signup = (username: string, password: string) => {
           window.toolDbWorker.removeEventListener("message", listener);
         }
       };
-      window.toolDbWorker.onmessage = listener;
+      window.toolDbWorker.addEventListener("message", listener);
     } else {
       reject(new Error("toolDbWorker not available"));
     }
   });
 };
 
-export { keysLogin, login, signup };
+const putData = <T = any>(key: string, data: T, userNamespaced = false) => {
+  return new Promise((resolve, reject) => {
+    if (window.toolDbWorker) {
+      window.toolDbWorker.postMessage({
+        type: "PUT_DATA",
+        key,
+        data,
+        userNamespaced,
+      });
+
+      resolve(true);
+    } else {
+      reject(new Error("toolDbWorker not available"));
+    }
+  });
+};
+
+const getData = <T = any>(
+  key: string,
+  userNamespaced = false
+): Promise<T | null> => {
+  return new Promise((resolve, reject) => {
+    if (window.toolDbWorker) {
+      const id = Math.random().toString(36).substring(7);
+      window.toolDbWorker.postMessage({
+        type: "GET_DATA",
+        key,
+        userNamespaced,
+        id,
+      });
+
+      const listener = (e: any) => {
+        const { type, value } = e.data;
+
+        if (type === `${id}_OK`) {
+          resolve(value);
+          window.toolDbWorker.removeEventListener("message", listener);
+        }
+        if (type === `${id}_ERR`) {
+          reject(e.data.err);
+          window.toolDbWorker.removeEventListener("message", listener);
+        }
+      };
+      window.toolDbWorker.addEventListener("message", listener);
+    } else {
+      reject(new Error("toolDbWorker not available"));
+    }
+  });
+};
+
+const doFunction = <T = any>(
+  fname: string,
+  args = {}
+): Promise<FunctionReturn<T | null>> => {
+  return new Promise((resolve, reject) => {
+    if (window.toolDbWorker) {
+      const id = Math.random().toString(36).substring(7);
+      window.toolDbWorker.postMessage({
+        type: "DO_FUNCTION",
+        fname,
+        args,
+        id,
+      });
+
+      const listener = (e: any) => {
+        const { type, value } = e.data;
+
+        if (type === `${id}_OK`) {
+          resolve(value);
+          window.toolDbWorker.removeEventListener("message", listener);
+        }
+        if (type === `${id}_ERR`) {
+          reject(e.data.err);
+          window.toolDbWorker.removeEventListener("message", listener);
+        }
+      };
+      window.toolDbWorker.addEventListener("message", listener);
+    } else {
+      reject(new Error("toolDbWorker not available"));
+    }
+  });
+};
+
+export { doFunction, getData, keysLogin, login, putData, signup };

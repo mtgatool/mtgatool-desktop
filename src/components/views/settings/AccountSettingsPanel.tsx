@@ -7,9 +7,12 @@ import { useHistory } from "react-router-dom";
 import { ReactComponent as KeysIcon } from "../../../assets/images/svg/keys.svg";
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
+import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
 import saveKeysCallback from "../../../toolDb/saveKeysCallback";
+import { getData, putData } from "../../../toolDb/worker-wrapper";
+import getLocalSetting from "../../../utils/getLocalSetting";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
 import PassphraseGenerate from "../../PassphraseGenerate";
@@ -46,7 +49,9 @@ export default function AccountSettingsPanel(
   props: SettingsPanelProps
 ): JSX.Element {
   const avatars = useSelector((state: AppState) => state.avatars.avatars);
+  const pubKey = useSelector((state: AppState) => state.renderer.pubKey);
   const fetchAvatar = useFetchAvatar();
+  const isLoggedIn = useIsLoggedIn();
 
   const { doClose } = props;
   const dispatch = useDispatch();
@@ -62,19 +67,14 @@ export default function AccountSettingsPanel(
   );
 
   const changeAlias = useCallback(() => {
-    if (window.toolDb.user) {
-      window.toolDb.getData(`==${window.toolDb.user.name}`).then((userData) => {
+    if (isLoggedIn) {
+      getData(`==${getLocalSetting("username")}`).then((userData) => {
         if (userData) {
-          window.toolDb
-            .putData(`==${newAlias}`, userData)
-            .then((newUserdata) => {
-              if (newUserdata && window.toolDb.user) {
-                window.toolDb.putData("username", newAlias, true);
-                window.toolDb.user.name = newAlias;
-                setLocalSetting("username", newAlias);
-                setNewAlias("");
-              }
-            });
+          putData(`==${newAlias}`, userData).then(() => {
+            window.toolDb.putData("username", newAlias, true);
+            setLocalSetting("username", newAlias);
+            setNewAlias("");
+          });
         }
       });
     }
@@ -87,33 +87,32 @@ export default function AccountSettingsPanel(
 
         FR.addEventListener("load", (ev: any) => {
           resizeBase64Img(ev.target.result, 128, 128).then((img) => {
-            window.toolDb.putData("avatar", img, true);
-            fetchAvatar(window.toolDb.user?.pubKey || "");
+            putData("avatar", img, true);
+            fetchAvatar(pubKey);
           });
         });
 
         FR.readAsDataURL(e.target.files[0]);
       }
     },
-    [fetchAvatar]
+    [fetchAvatar, pubKey]
   );
 
   useEffect(() => {
     if (avatarInputRef.current) {
-      window.toolDb
-        .getData<string>("avatar", true)
+      getData<string>("avatar", true)
         .then((av) => {
-          if (av && window.toolDb.user) {
+          if (av) {
             reduxAction(dispatch, {
               type: "SET_AVATAR",
-              arg: { pubKey: window.toolDb.user.pubKey, avatar: av },
+              arg: { pubKey, avatar: av },
             });
           }
         })
         .catch(console.warn);
       avatarInputRef.current.addEventListener("change", changeAvatar);
     }
-  }, [changeAvatar, avatarInputRef]);
+  }, [changeAvatar, pubKey, avatarInputRef]);
 
   return (
     <>
@@ -121,13 +120,11 @@ export default function AccountSettingsPanel(
         <div
           className="avatar-med"
           style={{
-            backgroundImage: `url(${
-              avatars[window.toolDb.user?.pubKey || ""]
-            })`,
+            backgroundImage: `url(${avatars[pubKey]})`,
           }}
         />
         <h2 style={{ marginLeft: "32px", marginRight: "auto" }}>
-          {window.toolDb.user?.name || "???"}
+          {getLocalSetting("username") || "???"}
         </h2>
         <label htmlFor="avatarInput" style={{ margin: "0" }}>
           <Button text="Edit Avatar" onClick={vodiFn} />
@@ -193,7 +190,6 @@ export default function AccountSettingsPanel(
         text="Logout"
         className="button-simple-red"
         onClick={() => {
-          window.toolDb.user = undefined;
           doClose();
           setLocalSetting("savedPass", "");
           setLocalSetting("autoLogin", "false");

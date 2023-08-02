@@ -3,6 +3,8 @@
 import { ToolDb, ToolDbNetwork } from "mtgatool-db";
 
 import { DEFAULT_PEERS } from "./constants";
+import doFunction from "./doFunction";
+import getData from "./getData";
 import login from "./login";
 import signup from "./signup";
 
@@ -20,12 +22,11 @@ DEFAULT_PEERS.forEach((peer) => {
 });
 
 toolDb.onConnect = () => {
-  toolDb.onConnect = () => {
-    window.postMessage({ type: "CONNECTED" });
-  };
+  console.warn("ToolDb connected!");
+  self.postMessage({ type: "CONNECTED" });
 };
 
-window.toolDb = toolDb;
+self.toolDb = toolDb;
 
 self.onmessage = (e: any) => {
   const { type } = e.data;
@@ -41,6 +42,18 @@ self.onmessage = (e: any) => {
 
     case "SIGNUP":
       signup(e.data.username, e.data.password);
+      break;
+
+    case "PUT_DATA":
+      self.toolDb.putData(e.data.key, e.data.data, e.data.userNamespaced);
+      break;
+
+    case "GET_DATA":
+      getData(e.data.id, e.data.key, e.data.userNamespaced);
+      break;
+
+    case "DO_FUNCTION":
+      doFunction(e.data.id, e.data.fname, e.data.args);
       break;
 
     default:

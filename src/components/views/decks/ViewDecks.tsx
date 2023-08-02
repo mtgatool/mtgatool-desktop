@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
 
-import useDbUser from "../../../hooks/useDbUser";
+import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import { AppState } from "../../../redux/stores/rendererStore";
 import DecksList from "./DecksList";
 import DeckView from "./DeckView";
@@ -13,7 +13,7 @@ interface ViewDecksProps {
 
 export default function ViewDecks(props: ViewDecksProps) {
   const { url } = useRouteMatch();
-  const [, loggedIn] = useDbUser();
+  const loggedIn = useIsLoggedIn();
 
   const { openHistoryStatsPopup, datePickerDoShow } = props;
 

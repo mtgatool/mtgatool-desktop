@@ -1,8 +1,8 @@
 import _ from "lodash";
 import { InternalDraftv2 } from "mtgatool-shared";
-import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 
 import { overlayTitleToId } from "../common/maps";
+import { LOGIN_OK } from "../constants";
 import fetchCards from "../daemon/fetchCards";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";

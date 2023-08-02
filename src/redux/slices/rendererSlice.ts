@@ -1,14 +1,14 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Format, InternalDraftv2 } from "mtgatool-shared";
+
 import {
+  DEFAULT_PEERS,
   LOGIN_AUTH,
   LOGIN_FAILED,
   LOGIN_OK,
   LOGIN_WAITING,
-} from "mtgatool-shared/dist/shared/constants";
-
-import { DEFAULT_PEERS } from "../../constants";
+} from "../../constants";
 
 export interface Peer {
   host: string;
@@ -24,6 +24,7 @@ export interface Popup {
 
 export const initialRendererState = {
   peers: DEFAULT_PEERS,
+  pubKey: "",
   archivedCache: {} as Record<string, boolean>,
   backgroundGrpid: null as number | null,
   loading: false,
@@ -59,6 +60,9 @@ const rendererSlice = createSlice({
   reducers: {
     setPeers: (state: RendererState, action: PayloadAction<string[]>): void => {
       state.peers = action.payload;
+    },
+    setPubKey: (state: RendererState, action: PayloadAction<string>): void => {
+      state.pubKey = action.payload;
     },
     setReadingLog: (
       state: RendererState,
@@ -188,6 +192,7 @@ const rendererSlice = createSlice({
 
 export const {
   setPeers,
+  setPubKey,
   setReadingLog,
   showPostSignup,
   setLoginState,

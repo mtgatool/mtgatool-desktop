@@ -48,7 +48,7 @@
   "scripts": {
     "start": "npm run build:cards-worker && nf start -p 3001",
     "cm": "git-cz",
-    "build:tooldb-worker": "tsc --p tooldb-worker-tsconfig.json && browserify ./dist-tooldb-worker/toolDbWorker.js --standalone tooldbworker > ./dist-tooldb-worker/index.js && uglifyjs ./dist-tooldb-worker/index.js -c > ./public/tooldb-worker/index.js",
+    "build:tooldb-worker": "tsc --p tooldb-worker-tsconfig.json && browserify ./dist-tooldb-worker/toolDbWorker.js --standalone tooldbworker > ./public/tooldb-worker/index.js",
     "build:cards-worker": "tsc --p cards-worker-tsconfig.json && browserify ./dist-cards-worker/cards-worker/collectionDataWorker.js --standalone cardsworker > ./dist-cards-worker/index.js && uglifyjs ./dist-cards-worker/index.js -c > ./public/cards-worker/index.js",
     "react-start": "node generateInfo.js && craco start",
     "react-build": "craco build",

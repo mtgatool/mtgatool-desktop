@@ -2,13 +2,12 @@
 /* eslint-disable no-nested-ternary */
 import _ from "lodash";
 import { sha1 } from "mtgatool-db";
-import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Switch, useHistory } from "react-router-dom";
 
 import overlayHandler from "../common/overlayHandler";
-// import liveDraftVerification from "../toolDb/liveDraftVerification";
+import { LOGIN_OK } from "../constants";
 import info from "../info.json";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
@@ -58,7 +57,8 @@ function App(props: AppProps) {
     });
     window.toolDbWorker = toolDbWorkerRef.current;
 
-    window.toolDbWorker.onmessage = (e) => {
+    window.toolDbWorker.addEventListener("message", (e) => {
+      console.warn("Worker message", e.data.type, e.data);
       if (e.data.type === "REDUX_ACTION") {
         const action = e.data.arg;
         reduxAction(dispatch, {
@@ -66,16 +66,10 @@ function App(props: AppProps) {
           arg: action.arg,
         });
       }
-    };
-
-    const listener = (e: any) => {
-      const { type } = e.data;
-      if (type === "CONNECTED") {
+      if (e.data.type === "CONNECTED") {
         setCanLogin(true);
-        window.toolDbWorker.removeEventListener("message", listener);
       }
-    };
-    window.toolDbWorker.onmessage = listener;
+    });
   }, []);
 
   useEffect(() => {

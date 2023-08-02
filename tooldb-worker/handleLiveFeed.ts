@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import Automerge from "automerge";
 import { base64ToBinaryDocument, CrdtMessage, PutMessage } from "mtgatool-db";
 
@@ -6,22 +7,22 @@ import reduxAction from "./reduxAction";
 export default function handleLiveFeed(msg: CrdtMessage | PutMessage<any>) {
   // console.log("Key Listener live feed ", msg);
   if (msg && msg.type === "crdt") {
-    if (window.globalData.liveFeed) {
+    if (self.globalData.liveFeed) {
       const doc = Automerge.load<Record<string, number>>(
         base64ToBinaryDocument(msg.doc)
       );
 
       try {
-        window.globalData.liveFeed = Automerge.merge(Automerge.init(), doc);
+        self.globalData.liveFeed = Automerge.merge(Automerge.init(), doc);
       } catch (e) {
         console.warn(e);
       }
 
-      const filteredLiveFeed = Object.keys(window.globalData.liveFeed)
+      const filteredLiveFeed = Object.keys(self.globalData.liveFeed)
         .sort((a, b) => {
-          if (window.globalData.liveFeed[a] > window.globalData.liveFeed[b])
+          if (self.globalData.liveFeed[a] > self.globalData.liveFeed[b])
             return -1;
-          if (window.globalData.liveFeed[a] < window.globalData.liveFeed[b])
+          if (self.globalData.liveFeed[a] < self.globalData.liveFeed[b])
             return 1;
           return 0;
         })
@@ -31,9 +32,9 @@ export default function handleLiveFeed(msg: CrdtMessage | PutMessage<any>) {
 
       // Fetch any match we dont have locally
       filteredLiveFeed.forEach((id: string) => {
-        window.toolDb.store.get(id, (err, data) => {
+        self.toolDb.store.get(id, (err, data) => {
           if (!data) {
-            window.toolDb.getData(id, false).then((match) => {
+            self.toolDb.getData(id, false).then((match) => {
               reduxAction("SET_LIVE_FEED_MATCH", { key: id, match: match });
             });
           } else {

@@ -8,6 +8,7 @@ import usePagingControls from "../../../hooks/usePagingControls";
 import reduxAction from "../../../redux/reduxAction";
 import { selectCurrentFilterDate } from "../../../redux/slices/FilterSlice";
 import { AppState } from "../../../redux/stores/rendererStore";
+import getUserNamespacedKey from "../../../toolDb/getUserNamespacedKey";
 import aggregateStats from "../../../utils/aggregateStats";
 import doHistoryFilter from "../../../utils/tables/doHistoryFilter";
 import PagingControls from "../../PagingControls";
@@ -28,6 +29,7 @@ export default function HistoryList(props: HistoryListProps) {
     (state: AppState) => state.filter.matchDataFilters
   );
   const filterDate = useSelector(selectCurrentFilterDate);
+  const pubKey = useSelector((state: AppState) => state.renderer.pubKey);
   const history = useHistory();
   const dispatch = useDispatch();
   const { openHistoryStatsPopup, matchesData, datePickerDoShow } = props;
@@ -58,11 +60,11 @@ export default function HistoryList(props: HistoryListProps) {
     (match: MatchData) => {
       history.push(
         `/history/${encodeURIComponent(
-          window.toolDb.getUserNamespacedKey(`matches-${match.matchId}`)
+          getUserNamespacedKey(pubKey, `matches-${match.matchId}`)
         )}`
       );
     },
-    [history]
+    [pubKey, history]
   );
 
   return (
