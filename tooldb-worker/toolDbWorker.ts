@@ -5,6 +5,7 @@ import { ToolDb, ToolDbNetwork } from "mtgatool-db";
 import { DEFAULT_PEERS } from "./constants";
 import doFunction from "./doFunction";
 import { beginDataQuery } from "./exploreAggregation";
+import getConnectionData from "./getConnectionData";
 import getData from "./getData";
 import getDataLocal from "./getDataLocal";
 import getMatchesData from "./getMatchesData";
@@ -77,6 +78,14 @@ self.onmessage = (e: any) => {
 
     case "DO_FUNCTION":
       doFunction(e.data.id, e.data.fname, e.data.args);
+      break;
+
+    case "GET_CONNECTION_DATA":
+      getConnectionData();
+      break;
+
+    case "FIND_SERVER":
+      (self.toolDb.network as ToolDbNetwork).findServer(e.data.host);
       break;
 
     // application specific handlers
