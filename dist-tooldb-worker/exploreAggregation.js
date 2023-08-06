@@ -62,9 +62,9 @@ function beginDataQuery(_day, _eventId) {
             .filter((k) => !queriedIds.includes(k))
             .splice(0, 1)
             .forEach((id) => {
+            queriedIds = [...queriedIds, id];
             self.toolDb.getData(id).then((d) => {
                 data[id] = d;
-                queriedIds = [...queriedIds, id];
                 continnuousCheck();
             });
         });

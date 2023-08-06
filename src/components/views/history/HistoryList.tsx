@@ -15,7 +15,7 @@ import PagingControls from "../../PagingControls";
 import SortControls, { Sort } from "../../SortControls";
 import FilterSection from "../../ui/FilterSection";
 import Section from "../../ui/Section";
-import { MatchData } from "./getMatchesData";
+import { MatchData } from "./convertDbMatchData";
 import ListItemMatch from "./ListItemMatch";
 
 interface HistoryListProps {

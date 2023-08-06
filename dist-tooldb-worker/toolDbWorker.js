@@ -10,6 +10,7 @@ const doFunction_1 = __importDefault(require("./doFunction"));
 const exploreAggregation_1 = require("./exploreAggregation");
 const getData_1 = __importDefault(require("./getData"));
 const getDataLocal_1 = __importDefault(require("./getDataLocal"));
+const getMatchesData_1 = __importDefault(require("./getMatchesData"));
 const login_1 = __importDefault(require("./login"));
 const queryKeys_1 = __importDefault(require("./queryKeys"));
 const signup_1 = __importDefault(require("./signup"));
@@ -37,7 +38,7 @@ self.globalData = {
 };
 self.onmessage = (e) => {
     const { type } = e.data;
-    console.log("Worker onmessage", e.data.type, e.data);
+    console.log("Worker received message:", e.type, e.data);
     switch (type) {
         case "LOGIN":
             (0, login_1.default)(e.data.username, e.data.password);
@@ -66,6 +67,9 @@ self.onmessage = (e) => {
         // application specific handlers
         case "EXPLORE_DATA_QUERY":
             (0, exploreAggregation_1.beginDataQuery)(e.data.days, e.data.event);
+            break;
+        case "GET_MATCHES_DATA":
+            (0, getMatchesData_1.default)(e.data.matchesIndex, e.data.uuid);
             break;
         default:
             break;

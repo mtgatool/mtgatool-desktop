@@ -7,6 +7,7 @@ import doFunction from "./doFunction";
 import { beginDataQuery } from "./exploreAggregation";
 import getData from "./getData";
 import getDataLocal from "./getDataLocal";
+import getMatchesData from "./getMatchesData";
 import login from "./login";
 import queryKeys from "./queryKeys";
 import signup from "./signup";
@@ -41,6 +42,8 @@ self.globalData = {
 
 self.onmessage = (e: any) => {
   const { type } = e.data;
+
+  // console.log("Worker received message:", e.type, e.data);
 
   switch (type) {
     case "LOGIN":
@@ -79,6 +82,10 @@ self.onmessage = (e: any) => {
 
     case "EXPLORE_DATA_QUERY":
       beginDataQuery(e.data.days, e.data.event);
+      break;
+
+    case "GET_MATCHES_DATA":
+      getMatchesData(e.data.matchesIndex, e.data.uuid);
       break;
 
     default:

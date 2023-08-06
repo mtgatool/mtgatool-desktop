@@ -3,7 +3,7 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { Sort } from "../../components/SortControls";
-import { MatchData } from "../../components/views/history/getMatchesData";
+import { MatchData } from "../../components/views/history/convertDbMatchData";
 import { StatsDeck } from "../../types/dbTypes";
 import {
   Filters,

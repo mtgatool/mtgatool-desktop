@@ -1,7 +1,7 @@
 /* eslint-disable radix */
 import { Colors, database } from "mtgatool-shared";
 
-import { MatchData } from "../components/views/history/getMatchesData";
+import { MatchData } from "../components/views/history/convertDbMatchData";
 import { CardWinrateData, StatsDeck } from "../types/dbTypes";
 import { Filters } from "../types/genericFilterTypes";
 import doHistoryFilter from "./tables/doHistoryFilter";

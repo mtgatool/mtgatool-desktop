@@ -1,6 +1,5 @@
 import { InternalMatch } from "mtgatool-shared/dist";
 
-import { getLocalData } from "../../../toolDb/worker-wrapper";
 import { DbMatch } from "../../../types/dbTypes";
 import getRankFilterVal from "./getRankFilterVal";
 
@@ -39,16 +38,4 @@ export function convertDbMatchToData(match: DbMatch): MatchData {
     playerLosses: match.playerLosses,
     rank: getRankFilterVal(internalMatch.player.rank),
   };
-}
-
-export default function getMatchesData(
-  matchesIds: string[]
-): Promise<MatchData[]> {
-  const promises = matchesIds.map((id) => {
-    return getLocalData<DbMatch>(id);
-  });
-
-  return Promise.all(promises).then((matches) =>
-    matches.filter((m) => m).map((m: any) => convertDbMatchToData(m))
-  );
 }
