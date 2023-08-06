@@ -23,6 +23,8 @@ ipfs
 .idea
 
 /public/worker.js
+/public/cards-worker/index.js
+/public/tooldb-worker/index.js
 
 npm-debug.log*
 yarn-debug.log*
@@ -31,3 +33,5 @@ build-storybook.log
 storybook-static/**
 src/info.json
 dist-worker
+dist-cards-worker
+dist-tooldb-worker
