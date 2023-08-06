@@ -9,6 +9,7 @@ import getConnectionData from "./getConnectionData";
 import getData from "./getData";
 import getDataLocal from "./getDataLocal";
 import getMatchesData from "./getMatchesData";
+import getSaveKeysJson from "./getSaveKeysJson";
 import handleMatchesIndex from "./handleMatchesIndex";
 import login from "./login";
 import queryKeys from "./queryKeys";
@@ -86,6 +87,10 @@ self.onmessage = (e: any) => {
 
     case "FIND_SERVER":
       (self.toolDb.network as ToolDbNetwork).findServer(e.data.host);
+      break;
+
+    case "GET_SAVE_KEYS_JSON":
+      getSaveKeysJson();
       break;
 
     // application specific handlers
