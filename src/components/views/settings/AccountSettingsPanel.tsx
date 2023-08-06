@@ -71,7 +71,7 @@ export default function AccountSettingsPanel(
       getData(`==${getLocalSetting("username")}`).then((userData) => {
         if (userData) {
           putData(`==${newAlias}`, userData).then(() => {
-            window.toolDb.putData("username", newAlias, true);
+            putData("username", newAlias, true);
             setLocalSetting("username", newAlias);
             setNewAlias("");
           });

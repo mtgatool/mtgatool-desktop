@@ -8,6 +8,7 @@ import { beginDataQuery } from "./exploreAggregation";
 import getData from "./getData";
 import getDataLocal from "./getDataLocal";
 import getMatchesData from "./getMatchesData";
+import handleMatchesIndex from "./handleMatchesIndex";
 import login from "./login";
 import queryKeys from "./queryKeys";
 import signup from "./signup";
@@ -86,6 +87,14 @@ self.onmessage = (e: any) => {
 
     case "GET_MATCHES_DATA":
       getMatchesData(e.data.matchesIndex, e.data.uuid);
+      break;
+
+    case "REFRESH_MATCHES":
+      if (self.toolDb.user) {
+        self.toolDb
+          .queryKeys(`:${self.toolDb.user.pubKey}.matches-`)
+          .then(handleMatchesIndex);
+      }
       break;
 
     default:
