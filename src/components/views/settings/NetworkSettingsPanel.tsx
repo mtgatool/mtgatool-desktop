@@ -1,21 +1,13 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable radix */
 import _ from "lodash";
-import { Peer, ServerPeerData } from "mtgatool-db";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 
+import { ConnectionData } from "../../../types/app";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
 import Button from "../../ui/Button";
-
-interface ConnectionData {
-  peerId: string;
-  peerData: Peer;
-  serverPeerData: ServerPeerData;
-  host: string;
-  isConnected: boolean;
-}
 
 export default function NetworkSettingsPanel(): JSX.Element {
   const peers: string[] = JSON.parse(getLocalSetting("saved-peer-keys"));
