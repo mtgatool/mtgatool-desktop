@@ -103,7 +103,8 @@ const putData = <T = any>(key: string, data: T, userNamespaced = false) => {
 
 const getData = <T = any>(
   key: string,
-  userNamespaced = false
+  userNamespaced = false,
+  timeoutMs = 5000
 ): Promise<T | null> => {
   return new Promise((resolve, reject) => {
     if (window.toolDbWorker) {
@@ -112,6 +113,7 @@ const getData = <T = any>(
         type: "GET_DATA",
         key,
         userNamespaced,
+        timeoutMs,
         id,
       });
 
@@ -167,4 +169,81 @@ const doFunction = <T = any>(
   });
 };
 
-export { doFunction, getData, keysLogin, login, putData, signup };
+const getLocalData = <T = any>(
+  key: string,
+  userNamespaced = false
+): Promise<T | null> => {
+  return new Promise((resolve, reject) => {
+    if (window.toolDbWorker) {
+      const id = Math.random().toString(36).substring(7);
+      window.toolDbWorker.postMessage({
+        type: "GET_LOCAL_DATA",
+        key,
+        userNamespaced,
+        id,
+      });
+
+      const listener = (e: any) => {
+        const { type, value } = e.data;
+
+        if (type === `${id}_OK`) {
+          resolve(value);
+          window.toolDbWorker.removeEventListener("message", listener);
+        }
+        if (type === `${id}_ERR`) {
+          reject(e.data.err);
+          window.toolDbWorker.removeEventListener("message", listener);
+        }
+      };
+      window.toolDbWorker.addEventListener("message", listener);
+    } else {
+      reject(new Error("toolDbWorker not available"));
+    }
+  });
+};
+
+const queryKeys = (
+  key: string,
+  userNamespaced = false,
+  timeoutMs = 5000
+): Promise<string[] | null> => {
+  return new Promise((resolve, reject) => {
+    if (window.toolDbWorker) {
+      const id = Math.random().toString(36).substring(7);
+      window.toolDbWorker.postMessage({
+        type: "QUERY_KEYS",
+        key,
+        userNamespaced,
+        timeoutMs,
+        id,
+      });
+
+      const listener = (e: any) => {
+        const { type, value } = e.data;
+
+        if (type === `${id}_OK`) {
+          resolve(value);
+          window.toolDbWorker.removeEventListener("message", listener);
+        }
+        if (type === `${id}_ERR`) {
+          reject(e.data.err);
+          window.toolDbWorker.removeEventListener("message", listener);
+        }
+      };
+      window.toolDbWorker.addEventListener("message", listener);
+    } else {
+      reject(new Error("toolDbWorker not available"));
+    }
+  });
+};
+
+export {
+  doFunction,
+  getData,
+  getLocalData,
+  keysLogin,
+  login,
+  putData,
+  queryKeys,
+  signup,
+};

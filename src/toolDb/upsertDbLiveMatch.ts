@@ -1,4 +1,5 @@
 import { OverlayUpdateMatchState } from "../background/store/types";
+import { putData } from "./worker-wrapper";
 
 export default async function upsertDbLiveMatch(
   match: OverlayUpdateMatchState
@@ -14,5 +15,5 @@ export default async function upsertDbLiveMatch(
   delete newLiveMatchData.statsHeatMap;
   delete newLiveMatchData.cardsCast;
 
-  window.toolDb.putData(liveMatchKey, newLiveMatchData);
+  putData(liveMatchKey, newLiveMatchData);
 }

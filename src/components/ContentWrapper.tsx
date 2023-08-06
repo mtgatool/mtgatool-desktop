@@ -12,7 +12,7 @@ import {
   setDateOption,
 } from "../redux/slices/FilterSlice";
 import { AppState } from "../redux/stores/rendererStore";
-import getLocalDbValue from "../toolDb/getLocalDbValue";
+import { getLocalData } from "../toolDb/worker-wrapper";
 import { CardsData } from "../types/collectionTypes";
 import { DbMatch, defaultCardsData } from "../types/dbTypes";
 import aggregateStats from "../utils/aggregateStats";
@@ -113,7 +113,7 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   useEffect(() => {
     if (params.page === "decks") {
       const promises = matchesIndex.map((id) => {
-        return getLocalDbValue<DbMatch>(id);
+        return getLocalData<DbMatch>(id);
       });
 
       Promise.all(promises).then((matches: any) => {

@@ -1,13 +1,13 @@
 /* eslint-disable no-restricted-globals */
 
-export default function getData(
+export default function queryKeys(
   msgId: string,
   key: string,
   userNamespaced: boolean,
   timeoutMs = 5000
 ) {
   return self.toolDb
-    .getData(key, userNamespaced, timeoutMs)
+    .queryKeys(key, userNamespaced, timeoutMs)
     .then((value) => {
       self.postMessage({ type: `${msgId}_OK`, value });
     })

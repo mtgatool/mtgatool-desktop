@@ -20,6 +20,7 @@ export default function afterLogin() {
   }
 
   self.toolDb.addKeyListener(`matches-livefeed-${currentDay}`, handleLiveFeed);
+  self.toolDb.getData(`matches-livefeed-${currentDay}`);
 
   self.toolDb.subscribeData("userids", true);
   self.toolDb.subscribeData(`matches-livefeed-${currentDay}`);

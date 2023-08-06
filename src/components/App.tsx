@@ -58,9 +58,9 @@ function App(props: AppProps) {
     window.toolDbWorker = toolDbWorkerRef.current;
 
     window.toolDbWorker.addEventListener("message", (e) => {
-      console.warn("Worker message", e.data.type, e.data);
       if (e.data.type === "REDUX_ACTION") {
         const action = e.data.arg;
+        console.warn("Worker REDUX_ACTION", action.type, action.arg);
         reduxAction(dispatch, {
           type: action.type,
           arg: action.arg,

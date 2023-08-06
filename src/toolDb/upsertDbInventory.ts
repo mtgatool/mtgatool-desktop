@@ -6,7 +6,7 @@ import {
   defaultInventoryData,
 } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
-import getLocalDbValue from "./getLocalDbValue";
+import { getLocalData } from "./worker-wrapper";
 
 export default async function upsertDbInventory(
   inventory: Partial<DbInventoryInfo>
@@ -16,7 +16,7 @@ export default async function upsertDbInventory(
   const uuid = getLocalSetting("playerId") || "default";
   const { dispatch } = store;
 
-  getLocalDbValue(window.toolDb.getUserNamespacedKey(`${uuid}-inventory`)).then(
+  getLocalData(window.toolDb.getUserNamespacedKey(`${uuid}-inventory`)).then(
     (uuidData) => {
       if (uuidData) {
         const newData: DbInventoryData = {

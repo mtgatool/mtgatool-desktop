@@ -19,6 +19,7 @@ function afterLogin() {
             .then(handleDraftsIndex_1.default);
     }
     self.toolDb.addKeyListener(`matches-livefeed-${currentDay}`, handleLiveFeed_1.default);
+    self.toolDb.getData(`matches-livefeed-${currentDay}`);
     self.toolDb.subscribeData("userids", true);
     self.toolDb.subscribeData(`matches-livefeed-${currentDay}`);
     self.toolDb.getData("hiddenDecks", true, 5000).then((hidden) => {

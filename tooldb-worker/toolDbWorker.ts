@@ -4,8 +4,11 @@ import { ToolDb, ToolDbNetwork } from "mtgatool-db";
 
 import { DEFAULT_PEERS } from "./constants";
 import doFunction from "./doFunction";
+import { beginDataQuery } from "./exploreAggregation";
 import getData from "./getData";
+import getDataLocal from "./getDataLocal";
 import login from "./login";
+import queryKeys from "./queryKeys";
 import signup from "./signup";
 
 const toolDb = new ToolDb({
@@ -28,6 +31,14 @@ toolDb.onConnect = () => {
 
 self.toolDb = toolDb;
 
+self.globalData = {
+  hiddenDecks: [],
+  liveFeed: {},
+  fetchedAvatars: [],
+  matchesIndex: [],
+  draftsIndex: [],
+};
+
 self.onmessage = (e: any) => {
   const { type } = e.data;
 
@@ -49,11 +60,25 @@ self.onmessage = (e: any) => {
       break;
 
     case "GET_DATA":
-      getData(e.data.id, e.data.key, e.data.userNamespaced);
+      getData(e.data.id, e.data.key, e.data.userNamespaced, e.data.timeoutMs);
+      break;
+
+    case "GET_LOCAL_DATA":
+      getDataLocal(e.data.id, e.data.key);
+      break;
+
+    case "QUERY_KEYS":
+      queryKeys(e.data.id, e.data.key, e.data.userNamespaced, e.data.timeoutMs);
       break;
 
     case "DO_FUNCTION":
       doFunction(e.data.id, e.data.fname, e.data.args);
+      break;
+
+    // application specific handlers
+
+    case "EXPLORE_DATA_QUERY":
+      beginDataQuery(e.data.days, e.data.event);
       break;
 
     default:

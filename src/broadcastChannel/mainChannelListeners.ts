@@ -11,6 +11,7 @@ import upsertDbCards from "../toolDb/upsertDbCards";
 import upsertDbInventory from "../toolDb/upsertDbInventory";
 import upsertDbLiveMatch from "../toolDb/upsertDbLiveMatch";
 import upsertDbRank from "../toolDb/upsertDbRank";
+import { putData } from "../toolDb/worker-wrapper";
 import LogEntry from "../types/logDecoder";
 import bcConnect from "../utils/bcConnect";
 import electron from "../utils/electron/electronWrapper";
@@ -144,7 +145,7 @@ export default function mainChannelListeners() {
             type: "SET_CURRENT_DRAFT",
             arg: msg.data.value,
           });
-          window.toolDb.putData<InternalDraftv2>(
+          putData<InternalDraftv2>(
             `draft-${msg.data.value.id}`,
             msg.data.value,
             true
@@ -195,7 +196,7 @@ export default function mainChannelListeners() {
     }
 
     if (msg.data.type === "UPDATE_ACTIVE_EVENTS") {
-      window.toolDb.putData("activeEvents", msg.data.value);
+      putData("activeEvents", msg.data.value);
     }
   };
 }

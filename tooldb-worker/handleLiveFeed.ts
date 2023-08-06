@@ -5,7 +5,7 @@ import { base64ToBinaryDocument, CrdtMessage, PutMessage } from "mtgatool-db";
 import reduxAction from "./reduxAction";
 
 export default function handleLiveFeed(msg: CrdtMessage | PutMessage<any>) {
-  // console.log("Key Listener live feed ", msg);
+  console.log("Key Listener live feed ", msg);
   if (msg && msg.type === "crdt") {
     if (self.globalData.liveFeed) {
       const doc = Automerge.load<Record<string, number>>(

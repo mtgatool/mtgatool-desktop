@@ -138,8 +138,6 @@ export default function BestRanksFeed() {
     isLoadingRef.current = true;
 
     doFunction<DbRankDataWithKey[]>("getLatestRanks", {}).then((fnRet) => {
-      console.warn("fnRet", fnRet);
-
       const data: DbRankDataWithKey[] =
         fnRet.code === "OK" && fnRet.return ? fnRet.return : [];
 

@@ -1,8 +1,7 @@
-import Automerge from "automerge";
-import { base64ToBinaryDocument } from "mtgatool-db";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 
+import { putData, queryKeys } from "../../../toolDb/worker-wrapper";
 import { DbMatch } from "../../../types/dbTypes";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import Flex from "../../Flex";
@@ -27,12 +26,50 @@ export default function ViewExploreAggregator() {
 
   const [eventsList, setEventsList] = useState<string[]>([]);
 
+  const [data, setData] = useState<Record<string, DbMatch>>({});
+
+  const [queryDataState, setQueryDataState] = useState<{
+    foundKeys: number;
+    queriedKeys: number;
+    savedKeys: number;
+    loadingPercent: number;
+  }>({
+    foundKeys: 0,
+    queriedKeys: 0,
+    savedKeys: 0,
+    loadingPercent: 0,
+  });
+
+  const beginDataQuery = useCallback((days: number, event: string) => {
+    if (window.toolDbWorker) {
+      window.toolDbWorker.postMessage({
+        type: "EXPLORE_DATA_QUERY",
+        days,
+        event,
+      });
+    }
+  }, []);
+
+  const doAggregation = useCallback(() => {
+    setIsOk(false);
+    const aggregatedData = doExploreAggregation(Object.values(data));
+    if (aggregatedData.data && Object.values(aggregatedData.data).length > 0) {
+      putData<DbExploreAggregated>(`exploredata-${eventId}`, aggregatedData)
+        .then((res) => {
+          if (res) {
+            setIsOk(true);
+          }
+        })
+        .catch(console.warn);
+    }
+  }, [eventId, data]);
+
   useEffect(() => {
     const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
     const finalEventList: string[] = [];
 
     async function queryDayKeys(day: number): Promise<string[]> {
-      const dayKeys = await window.toolDb.queryKeys(`explore-${day}-`);
+      const dayKeys = await queryKeys(`explore-${day}-`);
       return (
         dayKeys?.map((k: string) => k.slice(`explore-${day}-`.length, -5)) || []
       );
@@ -57,129 +94,26 @@ export default function ViewExploreAggregator() {
     }
 
     doQueryLoop();
+
+    const listener = (e: any) => {
+      const { type, value } = e.data;
+      if (type === `EXPLORE_DATA_QUERY_STATE`) {
+        setQueryDataState(value);
+      }
+      if (type === `EXPLORE_DATA_QUERY`) {
+        setData(value);
+      }
+    };
+    if (window.toolDbWorker) {
+      window.toolDbWorker.addEventListener("message", listener);
+    }
+
+    return () => {
+      if (window.toolDbWorker) {
+        window.toolDbWorker.removeEventListener("message", listener);
+      }
+    };
   }, []);
-
-  const crdt = useRef<Automerge.FreezeObject<Record<string, number>>>(
-    Automerge.init({})
-  );
-  const data = useRef<Record<string, DbMatch>>({});
-
-  const [queriedIds, setQueriedIds] = useState<string[] | null>(null);
-
-  const handleExploreData = useCallback(
-    (msg) => {
-      if (msg && msg.type === "crdt") {
-        const doc = Automerge.load<Record<string, number>>(
-          base64ToBinaryDocument(msg.doc)
-        );
-
-        try {
-          crdt.current = Automerge.merge(crdt.current, doc);
-          setQueriedIds([]);
-        } catch (e) {
-          console.warn(e);
-        }
-      }
-    },
-    [crdt]
-  );
-
-  const beginDataQuery = useCallback(
-    (_day, _eventId) => {
-      crdt.current = Automerge.init({});
-      data.current = {};
-      setIsOk(false);
-      setQueriedIds(null);
-
-      function queryForEvent(ev: string) {
-        for (let i = 0; i < _day; i += 1) {
-          const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
-          const queryKey = `explore-${currentDay - i}-${ev}`;
-          window.toolDb.addKeyListener(queryKey, handleExploreData);
-          window.toolDb.subscribeData(queryKey);
-        }
-      }
-
-      if (_eventId === "aggregated-standard") {
-        queryForEvent("Ladder");
-        queryForEvent("Play");
-        queryForEvent("Constructed_BestOf3");
-        queryForEvent("Constructed_Event_2020");
-        queryForEvent("Constructed_Event_2021");
-        queryForEvent("Constructed_Event_v2");
-        queryForEvent("Traditional_Cons_Event_2020");
-        queryForEvent("Traditional_Cons_Event_2021");
-        queryForEvent("Traditional_Cons_Event_2022");
-        queryForEvent("Traditional_Cons_Event_2023");
-        queryForEvent("Traditional_Ladder");
-        queryForEvent("Standard_Challenge_20230421");
-      } else if (_eventId === "aggregated-historic") {
-        queryForEvent("Historic_Ladder");
-        queryForEvent("Historic_Play");
-        queryForEvent("Historic_Event_v2");
-        queryForEvent("Historic_Event");
-        queryForEvent("Traditional_Historic_Event");
-        queryForEvent("Traditional_Historic_Play");
-        queryForEvent("Traditional_Historic_Ladder");
-      } else if (_eventId === "aggregated-alchemy") {
-        queryForEvent("Alchemy_Ladder");
-        queryForEvent("Alchemy_Play");
-        queryForEvent("Alchemy_Event");
-        queryForEvent("Traditional_Alchemy_Event_2022");
-        queryForEvent("Traditional_Alchemy_Event_2023");
-        queryForEvent("Traditional_Alchemy_Event");
-        queryForEvent("Traditional_Alchemy_Play");
-        queryForEvent("Traditional_Alchemy_Ladder");
-      } else if (_eventId === "aggregated-explorer") {
-        queryForEvent("Explorer_Ladder");
-        queryForEvent("Explorer_Play");
-        queryForEvent("Explorer_Event");
-        queryForEvent("Explorer_Event_v2");
-        queryForEvent("Traditional_Explorer_Event");
-        queryForEvent("Traditional_Explorer_Play");
-        queryForEvent("Traditional_Explorer_Ladder");
-      } else {
-        queryForEvent(_eventId);
-      }
-    },
-    [handleExploreData]
-  );
-
-  useEffect(() => {
-    if (queriedIds) {
-      Object.keys(crdt.current)
-        .filter((k) => !queriedIds.includes(k))
-        .splice(0, 1)
-        .forEach((id) => {
-          window.toolDb.getData(id).then((d) => {
-            data.current[id] = d;
-            setQueriedIds([...queriedIds, id]);
-          });
-        });
-    }
-  }, [crdt, queriedIds]);
-
-  const doAggregation = useCallback(() => {
-    const aggregatedData = doExploreAggregation(Object.values(data.current));
-    if (aggregatedData.data && Object.values(aggregatedData.data).length > 0) {
-      window.toolDb
-        .putData<DbExploreAggregated>(`exploredata-${eventId}`, aggregatedData)
-        .then((res) => {
-          if (res) {
-            setIsOk(true);
-          }
-        })
-        .catch(console.warn);
-    }
-  }, [eventId, data]);
-
-  const loadingPercent =
-    Object.keys(data.current).length > 0
-      ? Math.round(
-          (100 / Object.keys(crdt.current).length) *
-            Object.keys(data.current).length
-        )
-      : 0;
 
   // Get default events list to filter
   const transformedEvents = transformEventsList(eventsList);
@@ -219,15 +153,17 @@ export default function ViewExploreAggregator() {
           {!isOk && (
             <>
               <Flex style={{ flexDirection: "column", marginBottom: "16px" }}>
-                <div>{Object.keys(crdt.current).length} found</div>
-                <div>{queriedIds?.length || 0} queried</div>
-                <div>{Object.keys(data.current).length} saved</div>
+                <div>{queryDataState.foundKeys} found</div>
+                <div>{queryDataState.queriedKeys} queried</div>
+                <div>{queryDataState.savedKeys} saved</div>
               </Flex>
-              <div className="loader-title">{loadingPercent}%</div>
+              <div className="loader-title">
+                {queryDataState.loadingPercent}%
+              </div>
               <div className="loader-bar">
                 <div
                   className="loader-bar-fill"
-                  style={{ width: `${loadingPercent}%` }}
+                  style={{ width: `${queryDataState.loadingPercent}%` }}
                 />
               </div>
             </>
@@ -236,9 +172,8 @@ export default function ViewExploreAggregator() {
         <Flex style={{ justifyContent: "center" }}>
           <Button
             disabled={
-              Object.keys(crdt.current).length !==
-                Object.keys(data.current).length ||
-              Object.keys(data.current).length === 0
+              queryDataState.foundKeys !== queryDataState.savedKeys ||
+              queryDataState.savedKeys === 0
             }
             onClick={doAggregation}
             text="Aggregate"

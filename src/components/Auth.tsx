@@ -120,7 +120,6 @@ export default function Auth(props: AuthProps) {
   useEffect(() => {
     if (loginState === LOGIN_OK) {
       if (rememberme) {
-        // setLocalSetting("pubkey", window.toolDb.user?.pubKey || "");
         setLocalSetting("username", username);
         setLocalSetting("savedPass", pass);
       } else {

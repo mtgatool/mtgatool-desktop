@@ -1,9 +1,9 @@
 "use strict";
 /* eslint-disable no-restricted-globals */
 Object.defineProperty(exports, "__esModule", { value: true });
-function getData(msgId, key, userNamespaced, timeoutMs = 5000) {
+function queryKeys(msgId, key, userNamespaced, timeoutMs = 5000) {
     return self.toolDb
-        .getData(key, userNamespaced, timeoutMs)
+        .queryKeys(key, userNamespaced, timeoutMs)
         .then((value) => {
         self.postMessage({ type: `${msgId}_OK`, value });
     })
@@ -11,4 +11,4 @@ function getData(msgId, key, userNamespaced, timeoutMs = 5000) {
         self.postMessage({ type: `${msgId}_ERR`, err });
     });
 }
-exports.default = getData;
+exports.default = queryKeys;

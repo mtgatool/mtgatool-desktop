@@ -9,6 +9,7 @@ import getLocalSetting from "../utils/getLocalSetting";
 import globalData from "../utils/globalData";
 import pushToExplore from "./pushToExplore";
 import pushToLiveFeed from "./pushToLivefeed";
+import { putData } from "./worker-wrapper";
 
 export default async function setDbMatch(match: InternalMatch) {
   console.log("> Set match", match);
@@ -32,7 +33,7 @@ export default async function setDbMatch(match: InternalMatch) {
   };
 
   // Put this match
-  window.toolDb.putData<DbMatch>(`matches-${match.id}`, newDbMatch, true);
+  putData<DbMatch>(`matches-${match.id}`, newDbMatch, true);
 
   const remoteKey = window.toolDb.getUserNamespacedKey(`matches-${match.id}`);
 

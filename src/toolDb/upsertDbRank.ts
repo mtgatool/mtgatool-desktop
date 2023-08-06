@@ -7,7 +7,7 @@ import {
   defaultRankData,
 } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
-import getLocalDbValue from "./getLocalDbValue";
+import { getLocalData } from "./worker-wrapper";
 
 export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
   console.log("> Upsert rank", rank);
@@ -17,7 +17,7 @@ export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
 
   const pubKey = getLocalSetting("pubkey");
 
-  getLocalDbValue(window.toolDb.getUserNamespacedKey(`${uuid}-rank`)).then(
+  getLocalData(window.toolDb.getUserNamespacedKey(`${uuid}-rank`)).then(
     (uuidData) => {
       if (uuidData) {
         const newData: DbRankData = {

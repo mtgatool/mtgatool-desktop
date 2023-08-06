@@ -8,7 +8,7 @@ const automerge_1 = __importDefault(require("automerge"));
 const mtgatool_db_1 = require("mtgatool-db");
 const reduxAction_1 = __importDefault(require("./reduxAction"));
 function handleLiveFeed(msg) {
-    // console.log("Key Listener live feed ", msg);
+    console.log("Key Listener live feed ", msg);
     if (msg && msg.type === "crdt") {
         if (self.globalData.liveFeed) {
             const doc = automerge_1.default.load((0, mtgatool_db_1.base64ToBinaryDocument)(msg.doc));

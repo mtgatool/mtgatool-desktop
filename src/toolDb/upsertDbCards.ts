@@ -4,7 +4,8 @@ import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import { DbCardsData, defaultCardsData } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
-import getLocalDbValue from "./getLocalDbValue";
+import getUserNamespacedKey from "./getUserNamespacedKey";
+import { getLocalData, putData } from "./worker-wrapper";
 
 export default async function upsertDbCards(cards: Cards) {
   console.log("> Upsert cards", cards);
@@ -12,7 +13,9 @@ export default async function upsertDbCards(cards: Cards) {
   const uuid = getLocalSetting("playerId") || "default";
   const { dispatch } = store;
 
-  getLocalDbValue(window.toolDb.getUserNamespacedKey(`${uuid}-cards`)).then(
+  const { pubKey } = store.getState().renderer;
+
+  getLocalData(getUserNamespacedKey(pubKey, `${uuid}-cards`)).then(
     (uuidData) => {
       if (uuidData) {
         const newData = {
@@ -30,9 +33,9 @@ export default async function upsertDbCards(cards: Cards) {
           arg: { cards: newData, uuid },
         });
 
-        window.toolDb.putData<DbCardsData>(`${uuid}-cards`, newData, true);
+        putData<DbCardsData>(`${uuid}-cards`, newData, true);
       } else {
-        window.toolDb.putData<DbCardsData>(
+        putData<DbCardsData>(
           `${uuid}-cards`,
           {
             ...defaultCardsData,
