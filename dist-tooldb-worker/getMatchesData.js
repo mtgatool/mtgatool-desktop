@@ -46,15 +46,12 @@ function getLocalData(key) {
     });
 }
 function getMatchesData(matchesIds, uuid) {
-    console.log("getMatchesData", matchesIds, uuid);
     const promises = matchesIds.map((id) => {
-        console.log(id);
         return getLocalData(id);
     });
     Promise.all(promises)
         .then((matches) => matches.filter((m) => m).map((m) => convertDbMatchToData(m)))
         .then((data) => {
-        console.log("getMatchesData data out", data.length, "matches");
         self.postMessage({
             type: "MATCHES_DATA",
             value: data.filter((m) => m.uuid === uuid),

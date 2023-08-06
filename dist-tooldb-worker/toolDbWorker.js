@@ -38,7 +38,7 @@ self.globalData = {
 };
 self.onmessage = (e) => {
     const { type } = e.data;
-    console.log("Worker received message:", e.type, e.data);
+    // console.log("Worker received message:", e.type, e.data);
     switch (type) {
         case "LOGIN":
             (0, login_1.default)(e.data.username, e.data.password);
