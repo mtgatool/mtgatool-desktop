@@ -41,6 +41,7 @@ export default function ViewExploreAggregator() {
   });
 
   const beginDataQuery = useCallback((days: number, event: string) => {
+    setIsOk(false);
     if (window.toolDbWorker) {
       window.toolDbWorker.postMessage({
         type: "EXPLORE_DATA_QUERY",
