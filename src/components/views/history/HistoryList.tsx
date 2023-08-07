@@ -30,6 +30,13 @@ export default function HistoryList(props: HistoryListProps) {
   );
   const filterDate = useSelector(selectCurrentFilterDate);
   const pubKey = useSelector((state: AppState) => state.renderer.pubKey);
+
+  const matchesTotal = useSelector(
+    (state: AppState) => state.renderer.matchesTotal
+  );
+  const matchesSaved = useSelector(
+    (state: AppState) => state.renderer.matchesSaved
+  );
   const history = useHistory();
   const dispatch = useDispatch();
   const { openHistoryStatsPopup, matchesData, datePickerDoShow } = props;
@@ -67,60 +74,84 @@ export default function HistoryList(props: HistoryListProps) {
     [pubKey, history]
   );
 
+  const isFetching =
+    matchesData.length === 0 &&
+    matchesTotal > 0 &&
+    matchesTotal !== matchesSaved;
+
   return (
     <>
       <FilterSection
         openHistoryStatsPopup={openHistoryStatsPopup}
         datePickerDoShow={datePickerDoShow}
       />
-      <Section style={{ marginBottom: "16px" }}>
-        <div className="history-table-wrapper">
-          <SortControls<MatchData>
-            setSortCallback={setSortValue}
-            defaultSort={sortValue}
-            columnKeys={[
-              "timestamp",
-              "rank",
-              "duration",
-              "playerWins",
-              "playerLosses",
-              "eventId",
-              "oppDeckColors",
-              "playerDeckColors",
-            ]}
-            columnNames={[
-              "Date",
-              "Rank",
-              "Duration",
-              "Wins",
-              "Losses",
-              "Event",
-              "Opponent Colors",
-              "Player Colors",
-            ]}
-          />
-          {filteredData
-            .slice(
-              pagingControlProps.pageIndex * pagingControlProps.pageSize,
-              (pagingControlProps.pageIndex + 1) * pagingControlProps.pageSize
-            )
-            .map((match) => {
-              return (
-                <ListItemMatch
-                  key={match.matchId}
-                  match={match}
-                  openMatchCallback={openMatch}
-                />
-              );
-            })}
-          <div style={{ marginTop: "10px" }}>
-            <PagingControls
-              {...pagingControlProps}
-              pageSizeOptions={[10, 25, 50, 100]}
+      {isFetching ? (
+        <Section
+          style={{
+            marginBottom: "16px",
+            flexDirection: "column",
+            textAlign: "center",
+          }}
+        >
+          <div className="loading-sign" />
+          <h2 style={{ margin: "8px 0", color: "var(--color-g)" }}>
+            Synchronizing matches data
+          </h2>
+          <p style={{ marginBottom: "16px" }}>
+            {matchesTotal - matchesSaved} left ({matchesTotal} total)
+          </p>
+        </Section>
+      ) : (
+        <Section style={{ marginBottom: "16px" }}>
+          <div className="history-table-wrapper">
+            <SortControls<MatchData>
+              setSortCallback={setSortValue}
+              defaultSort={sortValue}
+              columnKeys={[
+                "timestamp",
+                "rank",
+                "duration",
+                "playerWins",
+                "playerLosses",
+                "eventId",
+                "oppDeckColors",
+                "playerDeckColors",
+              ]}
+              columnNames={[
+                "Date",
+                "Rank",
+                "Duration",
+                "Wins",
+                "Losses",
+                "Event",
+                "Opponent Colors",
+                "Player Colors",
+              ]}
             />
+
+            {filteredData
+              .slice(
+                pagingControlProps.pageIndex * pagingControlProps.pageSize,
+                (pagingControlProps.pageIndex + 1) * pagingControlProps.pageSize
+              )
+              .map((match) => {
+                return (
+                  <ListItemMatch
+                    key={match.matchId}
+                    match={match}
+                    openMatchCallback={openMatch}
+                  />
+                );
+              })}
+            <div style={{ marginTop: "10px" }}>
+              <PagingControls
+                {...pagingControlProps}
+                pageSizeOptions={[10, 25, 50, 100]}
+              />
+            </div>
           </div>
-        </div>
-      </Section>
+        </Section>
+      )}
     </>
   );
 }

@@ -50,6 +50,8 @@ export const initialRendererState = {
   currentDraft: null as InternalDraftv2 | null,
   currentScene: "",
   readingLog: false,
+  matchesTotal: 0,
+  matchesSaved: 0,
 };
 
 type RendererState = typeof initialRendererState;
@@ -92,6 +94,16 @@ const rendererSlice = createSlice({
       action: PayloadAction<number>
     ): void => {
       state.logCompletion = action.payload;
+    },
+    setMatchesFetchState: (
+      state: RendererState,
+      action: PayloadAction<{
+        total: number;
+        saved: number;
+      }>
+    ): void => {
+      state.matchesTotal = action.payload.total;
+      state.matchesSaved = action.payload.saved;
     },
     setBackgroundGrpid: (
       state: RendererState,
@@ -197,6 +209,7 @@ export const {
   showPostSignup,
   setLoginState,
   setLogCompletion,
+  setMatchesFetchState,
   setBackgroundGrpid,
   setLoading,
   setNoLog,

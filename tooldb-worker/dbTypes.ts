@@ -26,26 +26,26 @@ export interface InventoryInfo {
   Boosters: { CollationId: number; SetCode: string; Count: number }[];
   Vouchers: any;
   Cosmetics:
-    | any
-    | {
-        ArtStyles: {
-          Type: string;
-          Id: string;
-          ArtId: number;
-          Variant: string;
-        }[];
-        Avatars: { Id: string; Type: string }[];
-        Pets: { Type: string; Id: string; Name: string; Variant: string }[];
-        Sleeves: { Id: string; Type: string }[];
-        Emotes: {
-          Id: string;
-          Type: string;
-          Page: string;
-          FlipType: string;
-          Category: string;
-          Treatment: string;
-        }[];
-      };
+  | any
+  | {
+    ArtStyles: {
+      Type: string;
+      Id: string;
+      ArtId: number;
+      Variant: string;
+    }[];
+    Avatars: { Id: string; Type: string }[];
+    Pets: { Type: string; Id: string; Name: string; Variant: string }[];
+    Sleeves: { Id: string; Type: string }[];
+    Emotes: {
+      Id: string;
+      Type: string;
+      Page: string;
+      FlipType: string;
+      Category: string;
+      Treatment: string;
+    }[];
+  };
 }
 
 export interface CombinedRankInfo {
@@ -76,6 +76,7 @@ interface GlobalData {
   draftsIndex: string[];
   hiddenDecks: string[];
   liveFeed: Automerge.Doc<Record<string, number>>;
+  currentUUID: string;
 }
 
 declare global {

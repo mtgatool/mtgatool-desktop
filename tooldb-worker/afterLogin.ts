@@ -76,6 +76,7 @@ export default function afterLogin() {
         );
         self.toolDb.subscribeData(`${uuid}-rank`, true);
 
+        self.globalData.currentUUID = newest;
         reduxAction("SET_UUID", newest);
       });
     })

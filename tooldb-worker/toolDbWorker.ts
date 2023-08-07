@@ -17,7 +17,7 @@ import signup from "./signup";
 
 const toolDb = new ToolDb({
   topic: "mtgatool-db-swarm-v4",
-  debug: true,
+  // debug: true,
   server: false,
 });
 
@@ -41,12 +41,13 @@ self.globalData = {
   fetchedAvatars: [],
   matchesIndex: [],
   draftsIndex: [],
+  currentUUID: "",
 };
 
 self.onmessage = (e: any) => {
   const { type } = e.data;
 
-  // console.log("Worker received message:", e.type, e.data);
+  console.log("Worker onmessage:", e.type, e.data);
 
   switch (type) {
     case "LOGIN":
