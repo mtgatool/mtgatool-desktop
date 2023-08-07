@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { ConnectionData } from "../types/app";
+
 export default function ActivePeers() {
   const [_refresh, setRefresh] = useState(0);
 
@@ -12,7 +14,29 @@ export default function ActivePeers() {
     return () => clearInterval(interval);
   });
 
-  const connections = (window.toolDb.network as any)._connections;
+  const [connectionData, setConnectionData] = useState<ConnectionData[]>([]);
+
+  useEffect(() => {
+    const listener = (e: any) => {
+      const { type, value } = e.data;
+      if (type === `CONNECTION_DATA`) {
+        setConnectionData(value);
+      }
+    };
+
+    if (window.toolDbWorker) {
+      window.toolDbWorker.postMessage({
+        type: "GET_CONNECTION_DATA",
+      });
+      window.toolDbWorker.addEventListener("message", listener);
+    }
+
+    return () => {
+      if (window.toolDbWorker) {
+        window.toolDbWorker.removeEventListener("message", listener);
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -31,10 +55,10 @@ export default function ActivePeers() {
           marginTop: "8px",
         }}
       >
-        {Object.keys(connections).map((url) => {
+        {connectionData.map((conn) => {
           return (
             <div
-              key={`${url}-active-peer`}
+              key={`${conn.peerId}-active-peer`}
               style={{
                 display: "flex",
                 height: "16px",
@@ -46,11 +70,9 @@ export default function ActivePeers() {
               }}
             >
               <div
-                className={`log-status-${
-                  connections[url].peer.readyState === 1 ? "ok" : "warn"
-                }`}
+                className={`log-status-${conn.isConnected ? "ok" : "warn"}`}
               />
-              <div style={{ margin: "auto" }}>{url}</div>
+              <div style={{ margin: "auto" }}>{conn.host}</div>
             </div>
           );
         })}

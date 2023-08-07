@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
+import { getData } from "../toolDb/worker-wrapper";
 import cleanUsername from "../utils/cleanUsername";
 
 export default function useFetchUsername() {
@@ -17,8 +18,7 @@ export default function useFetchUsername() {
             type: "SET_USERNAME",
             arg: { pubKey, username: "" },
           });
-          window.toolDb
-            .getData<string>(`:${pubKey}.username`, false, 1000)
+          getData<string>(`:${pubKey}.username`, false, 1000)
             .then((username) => {
               reduxAction(dispatch, {
                 type: "SET_USERNAME",

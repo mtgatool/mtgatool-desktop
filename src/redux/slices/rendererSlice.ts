@@ -1,14 +1,14 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Format, InternalDraftv2 } from "mtgatool-shared";
+
 import {
+  DEFAULT_PEERS,
   LOGIN_AUTH,
   LOGIN_FAILED,
   LOGIN_OK,
   LOGIN_WAITING,
-} from "mtgatool-shared/dist/shared/constants";
-
-import { DEFAULT_PEERS } from "../../constants";
+} from "../../constants";
 
 export interface Peer {
   host: string;
@@ -24,6 +24,7 @@ export interface Popup {
 
 export const initialRendererState = {
   peers: DEFAULT_PEERS,
+  pubKey: "",
   archivedCache: {} as Record<string, boolean>,
   backgroundGrpid: null as number | null,
   loading: false,
@@ -49,6 +50,8 @@ export const initialRendererState = {
   currentDraft: null as InternalDraftv2 | null,
   currentScene: "",
   readingLog: false,
+  matchesTotal: 0,
+  matchesSaved: 0,
 };
 
 type RendererState = typeof initialRendererState;
@@ -59,6 +62,9 @@ const rendererSlice = createSlice({
   reducers: {
     setPeers: (state: RendererState, action: PayloadAction<string[]>): void => {
       state.peers = action.payload;
+    },
+    setPubKey: (state: RendererState, action: PayloadAction<string>): void => {
+      state.pubKey = action.payload;
     },
     setReadingLog: (
       state: RendererState,
@@ -88,6 +94,16 @@ const rendererSlice = createSlice({
       action: PayloadAction<number>
     ): void => {
       state.logCompletion = action.payload;
+    },
+    setMatchesFetchState: (
+      state: RendererState,
+      action: PayloadAction<{
+        total: number;
+        saved: number;
+      }>
+    ): void => {
+      state.matchesTotal = action.payload.total;
+      state.matchesSaved = action.payload.saved;
     },
     setBackgroundGrpid: (
       state: RendererState,
@@ -188,10 +204,12 @@ const rendererSlice = createSlice({
 
 export const {
   setPeers,
+  setPubKey,
   setReadingLog,
   showPostSignup,
   setLoginState,
   setLogCompletion,
+  setMatchesFetchState,
   setBackgroundGrpid,
   setLoading,
   setNoLog,

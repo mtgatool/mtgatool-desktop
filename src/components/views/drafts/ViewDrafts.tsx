@@ -1,13 +1,13 @@
 import { Route, Switch, useRouteMatch } from "react-router-dom";
 
-import useDbUser from "../../../hooks/useDbUser";
+import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import Section from "../../ui/Section";
 import DraftsHome from "./DraftsHome";
 import LiveDraftView from "./LiveDraftView";
 
 export default function ViewDrafts() {
   const { url } = useRouteMatch();
-  const [, loggedIn] = useDbUser();
+  const loggedIn = useIsLoggedIn();
 
   return (
     <Section

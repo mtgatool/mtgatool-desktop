@@ -20,7 +20,19 @@
   background-image: url("../assets/images/work.jpg");
   width: 400px;
   height: 292px;
-  background-size: contain;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 16px auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.loading-sign {
+  background-image: url("../assets/images/loading.jpg");
+  width: 400px;
+  height: 292px;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   margin: 16px auto;

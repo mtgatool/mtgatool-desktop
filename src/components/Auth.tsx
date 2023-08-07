@@ -1,9 +1,4 @@
 import { sha1 } from "mtgatool-db";
-import {
-  LOGIN_AUTH,
-  LOGIN_OK,
-  LOGIN_WAITING,
-} from "mtgatool-shared/dist/shared/constants";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
@@ -14,13 +9,12 @@ import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
 import { ReactComponent as PutKey } from "../assets/images/svg/put-key.svg";
 import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
+import { LOGIN_AUTH, LOGIN_OK, LOGIN_WAITING } from "../constants";
 import fetchCards from "../daemon/fetchCards";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
 import checkPassphrase from "../toolDb/checkPassphrase";
-import keysLogin from "../toolDb/keysLogin";
-import login from "../toolDb/login";
-import signup from "../toolDb/signup";
+import { keysLogin, login, signup } from "../toolDb/worker-wrapper";
 import electron from "../utils/electron/electronWrapper";
 import getLocalSetting from "../utils/getLocalSetting";
 import setLocalSetting from "../utils/setLocalSetting";
@@ -126,7 +120,6 @@ export default function Auth(props: AuthProps) {
   useEffect(() => {
     if (loginState === LOGIN_OK) {
       if (rememberme) {
-        setLocalSetting("pubkey", window.toolDb.user?.pubKey || "");
         setLocalSetting("username", username);
         setLocalSetting("savedPass", pass);
       } else {

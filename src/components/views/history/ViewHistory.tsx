@@ -1,37 +1,26 @@
-import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
 
-import useDbUser from "../../../hooks/useDbUser";
+import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import { AppState } from "../../../redux/stores/rendererStore";
-import getMatchesData, { MatchData } from "./getMatchesData";
+import { MatchData } from "./convertDbMatchData";
 import HistoryList from "./HistoryList";
 import MatchView from "./MatchView";
 
 interface ViewHistoryProps {
   openHistoryStatsPopup: () => void;
   datePickerDoShow: () => void;
+  matchesData: MatchData[];
 }
 
 export default function ViewHistory(props: ViewHistoryProps) {
-  const { openHistoryStatsPopup, datePickerDoShow } = props;
+  const { openHistoryStatsPopup, datePickerDoShow, matchesData } = props;
   const { url } = useRouteMatch();
-  const [, loggedIn] = useDbUser();
-
-  const currentUUID = useSelector(
-    (state: AppState) => state.mainData.currentUUID
-  );
+  const loggedIn = useIsLoggedIn();
 
   const matchesIndex = useSelector(
     (state: AppState) => state.mainData.matchesIndex
   );
-  const [matchesData, setMatchesData] = useState<MatchData[]>([]);
-
-  useEffect(() => {
-    getMatchesData(matchesIndex).then((data) =>
-      setMatchesData(data.filter((m) => m.uuid === currentUUID))
-    );
-  }, [matchesIndex, currentUUID]);
 
   return (
     <>

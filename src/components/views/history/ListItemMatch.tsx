@@ -18,7 +18,7 @@ import ManaCost from "../../ManaCost";
 import RankIcon from "../../RankIcon";
 import RankSmall from "../../RankSmall";
 import ResultDetails from "../../ResultDetails";
-import { MatchData } from "./getMatchesData";
+import { MatchData } from "./convertDbMatchData";
 
 const { DEFAULT_TILE } = constants;
 

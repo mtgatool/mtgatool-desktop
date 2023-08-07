@@ -7,7 +7,8 @@ import {
   defaultRankData,
 } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
-import getLocalDbValue from "./getLocalDbValue";
+import getUserNamespacedKey from "./getUserNamespacedKey";
+import { getLocalData, putData } from "./worker-wrapper";
 
 export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
   console.log("> Upsert rank", rank);
@@ -17,7 +18,7 @@ export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
 
   const pubKey = getLocalSetting("pubkey");
 
-  getLocalDbValue(window.toolDb.getUserNamespacedKey(`${uuid}-rank`)).then(
+  getLocalData(getUserNamespacedKey(pubKey, `${uuid}-rank`)).then(
     (uuidData) => {
       if (uuidData) {
         const newData: DbRankData = {
@@ -31,14 +32,14 @@ export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
           arg: { rank: newData, uuid },
         });
 
-        window.toolDb.putData<DbRankData>(`${uuid}-rank`, newData, true);
-        window.toolDb.putData<DbRankDataWithKey>(`rank-${pubKey}`, {
+        putData<DbRankData>(`${uuid}-rank`, newData, true);
+        putData<DbRankDataWithKey>(`rank-${pubKey}`, {
           ...newData,
           uuid,
           pubKey: pubKey,
         });
       } else {
-        window.toolDb.putData<DbRankData>(
+        putData<DbRankData>(
           `${uuid}-rank`,
           {
             ...defaultRankData,
@@ -46,7 +47,7 @@ export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
           },
           true
         );
-        window.toolDb.putData<DbRankDataWithKey>(`rank-${pubKey}`, {
+        putData<DbRankDataWithKey>(`rank-${pubKey}`, {
           ...defaultRankData,
           updated: new Date().getTime(),
           uuid,

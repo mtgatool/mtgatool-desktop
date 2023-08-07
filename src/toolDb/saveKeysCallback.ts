@@ -1,20 +1,29 @@
-import { ParsedKeys, saveKeysComb } from "mtgatool-db";
+import { ParsedKeys } from "mtgatool-db";
 
-function getKeysJson(): Promise<ParsedKeys | null> {
-  return new Promise((resolve) => {
-    if (window.toolDb.user) {
-      saveKeysComb(
-        window.toolDb.user.keys.signKeys,
-        window.toolDb.user.keys.encryptionKeys
-      ).then(resolve);
+function getKeysJson(): Promise<{ keys: ParsedKeys; userName: string }> {
+  return new Promise((resolve, reject) => {
+    if (window.toolDbWorker) {
+      window.toolDbWorker.postMessage({
+        type: "GET_SAVE_KEYS_JSON",
+      });
+
+      const listener = (e: any) => {
+        const { type, value } = e.data;
+        if (type === `SAVE_KEYS_JSON`) {
+          resolve(value);
+          window.toolDbWorker.removeEventListener("message", listener);
+        }
+      };
+      window.toolDbWorker.addEventListener("message", listener);
     } else {
-      resolve(null);
+      reject();
     }
   });
 }
 
 export default function saveKeysCallback() {
-  getKeysJson().then((keys) => {
+  getKeysJson().then((value: { keys: ParsedKeys; userName: string }) => {
+    const { keys, userName } = value;
     const element = document.createElement("a");
     element.setAttribute(
       "href",
@@ -22,10 +31,7 @@ export default function saveKeysCallback() {
         JSON.stringify(keys)
       )}`
     );
-    element.setAttribute(
-      "download",
-      `${window.toolDb.user?.name || "user"}-keys.json`
-    );
+    element.setAttribute("download", `${userName || "user"}-keys.json`);
 
     element.style.display = "none";
     document.body.appendChild(element);

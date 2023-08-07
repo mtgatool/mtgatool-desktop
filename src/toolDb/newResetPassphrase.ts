@@ -8,6 +8,7 @@ import {
 import randomWords from "random-words";
 
 import { UserRecoveryData } from "../types/dbTypes";
+import { putData } from "./worker-wrapper";
 
 export default function newResetPassphrase(reminder: string) {
   const passphrase = randomWords({
@@ -20,7 +21,7 @@ export default function newResetPassphrase(reminder: string) {
   const iv = generateIv();
   return proofOfWork(passphrase, 3).then(({ hash }) =>
     encryptWithPass(reminder, hash, iv).then((encrypted) => {
-      window.toolDb.putData<UserRecoveryData>(
+      putData<UserRecoveryData>(
         "recovery",
         {
           recovery: toBase64(encrypted || ""),

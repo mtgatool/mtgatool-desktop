@@ -6,6 +6,7 @@
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 
+import { queryKeys } from "../../../toolDb/worker-wrapper";
 import getEventExplorerSection from "../../../utils/getEventExplorerSection";
 import Flex from "../../Flex";
 import Section from "../../ui/Section";
@@ -30,13 +31,13 @@ export default function ViewExploreHome() {
   useEffect(() => {
     const finalEventList: string[] = [];
 
-    async function queryKeys(): Promise<string[]> {
-      const dayKeys = await window.toolDb.queryKeys(`exploredata-`);
+    async function queryExploreKeys(): Promise<string[]> {
+      const dayKeys = await queryKeys(`exploredata-`);
       return dayKeys?.map((k: string) => k.slice(`exploredata-`.length)) || [];
     }
 
     async function doQueryLoop() {
-      const dayKeys = await queryKeys();
+      const dayKeys = await queryExploreKeys();
       finalEventList.push(...dayKeys);
 
       const fixedList = finalEventList.filter(eventsBlacklist);

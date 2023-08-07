@@ -1,3 +1,5 @@
+import { Peer, ServerPeerData } from "mtgatool-db";
+
 export const WINDOW_BACKGROUND = "mtgatool-background";
 
 export const WINDOW_HOVER = "mtgatool-hover";
@@ -23,3 +25,11 @@ export const ALL_OVERLAYS = [
   WINDOW_OVERLAY_3,
   WINDOW_OVERLAY_4,
 ];
+
+export interface ConnectionData {
+  peerId: string;
+  peerData: Peer;
+  serverPeerData: ServerPeerData;
+  host: string;
+  isConnected: boolean;
+}

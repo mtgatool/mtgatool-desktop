@@ -1,13 +1,13 @@
 import { VerificationData } from "mtgatool-db";
 
 import { DbliveDraftV1 } from "../types/dbTypes";
+import { getData } from "./worker-wrapper";
 
 export default function liveDraftVerification(
   msg: VerificationData<DbliveDraftV1>
 ): Promise<boolean> {
   return new Promise((resolve) => {
-    window.toolDb
-      .getData<DbliveDraftV1>(msg.k)
+    getData<DbliveDraftV1>(msg.k)
       .then((originalDraft) => {
         if (originalDraft) {
           if (originalDraft.owner === msg.p) {

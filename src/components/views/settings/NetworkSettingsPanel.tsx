@@ -1,9 +1,9 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable radix */
 import _ from "lodash";
-import { ToolDbNetwork } from "mtgatool-db";
-import { ChangeEvent, useCallback, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
 
+import { ConnectionData } from "../../../types/app";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
@@ -15,9 +15,31 @@ export default function NetworkSettingsPanel(): JSX.Element {
 
   const [newHost, setNewHost] = useState("");
 
-  setTimeout(() => setRerender(new Date().getTime()), 500);
+  const [connectionData, setConnectionData] = useState<ConnectionData[]>([]);
 
-  const networkModule = window.toolDb.network as ToolDbNetwork;
+  useEffect(() => {
+    const listener = (e: any) => {
+      const { type, value } = e.data;
+      if (type === `CONNECTION_DATA`) {
+        setConnectionData(value);
+      }
+    };
+
+    if (window.toolDbWorker) {
+      window.toolDbWorker.postMessage({
+        type: "GET_CONNECTION_DATA",
+      });
+      window.toolDbWorker.addEventListener("message", listener);
+    }
+
+    return () => {
+      if (window.toolDbWorker) {
+        window.toolDbWorker.removeEventListener("message", listener);
+      }
+    };
+  }, []);
+
+  setTimeout(() => setRerender(new Date().getTime()), 500);
 
   const handleSetHost = useCallback(
     (event: ChangeEvent<HTMLInputElement>): void => {
@@ -26,12 +48,14 @@ export default function NetworkSettingsPanel(): JSX.Element {
     []
   );
 
-  const connections = Object.keys(networkModule.clientToSend);
-
   const addPeer = () => {
     const newPeers = [...peers, newHost];
-
-    networkModule.findServer(newHost);
+    if (window.toolDbWorker) {
+      window.toolDbWorker.postMessage({
+        type: "FIND_SERVER",
+        host: newHost,
+      });
+    }
     setNewHost("");
     setLocalSetting("saved-peer-keys", JSON.stringify(newPeers));
   };
@@ -39,14 +63,10 @@ export default function NetworkSettingsPanel(): JSX.Element {
   return (
     <>
       <p>Peers:</p>
-      {connections.map((peerId: string) => {
-        const peerData = networkModule.serverPeerData[peerId];
-        const host = window.toolDb.peers[peerId.slice(-20)]?.host;
-        const peerHost =
-          !host || host === "127.0.0.1" ? peerId.slice(-20) : host;
+      {connectionData.map((conn) => {
         return (
           <div
-            key={`${peerId}-active-peer`}
+            key={`${conn.peerId}-active-peer`}
             style={{
               display: "flex",
               height: "24px",
@@ -55,28 +75,15 @@ export default function NetworkSettingsPanel(): JSX.Element {
               margin: "0px auto",
             }}
           >
-            <div
-              className={`log-status-${
-                networkModule.isClientConnected[peerId]
-                  ? networkModule.isClientConnected[peerId]()
-                    ? "ok"
-                    : "warn"
-                  : "err"
-              }`}
-            />
+            <div className={`log-status-${conn.isConnected ? "ok" : "err"}`} />
 
             <div style={{ width: "500px" }}>
-              {peerData?.name || peerHost}
-              {networkModule.isServer(peerId) ? <i> (server)</i> : ""}
+              {conn.host}
+              {conn.peerData.isServer ? <i> (server)</i> : ""}
             </div>
 
             <Button
-              text={
-                networkModule.isClientConnected[peerId] &&
-                networkModule.isClientConnected[peerId]()
-                  ? "Disconnect"
-                  : "Connect"
-              }
+              text={conn.isConnected ? "Disconnect" : "Connect"}
               style={{ margin: "0 8px", minWidth: "100px", width: "100px" }}
               className="button-simple button-edit"
               onClick={vodiFn}

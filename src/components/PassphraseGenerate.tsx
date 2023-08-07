@@ -4,7 +4,9 @@ import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
 import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
 import newResetPassphrase from "../toolDb/newResetPassphrase";
+import { getData } from "../toolDb/worker-wrapper";
 import copyToClipboard from "../utils/copyToClipboard";
+import getLocalSetting from "../utils/getLocalSetting";
 import Button from "./ui/Button";
 
 export default function PassphraseGenerate(): JSX.Element {
@@ -15,21 +17,17 @@ export default function PassphraseGenerate(): JSX.Element {
   const [hint, setHint] = useState("");
 
   useEffect(() => {
-    window.toolDb.store.get(
-      `==${window.toolDb.user?.name || ""}`,
-      (_err, data) => {
-        if (data) {
-          const userData = JSON.parse(data);
-          if (userData) {
-            setIsValid(sha256(sha1(hint)) === userData.v.pass);
-          } else {
-            setIsValid(false);
-          }
+    getData(`==${getLocalSetting("username")}`).then((userData) => {
+      if (userData) {
+        if (userData) {
+          setIsValid(sha256(sha1(hint)) === userData.pass);
         } else {
           setIsValid(false);
         }
+      } else {
+        setIsValid(false);
       }
-    );
+    });
   }, [hint]);
 
   const handleSetHint = useCallback(
