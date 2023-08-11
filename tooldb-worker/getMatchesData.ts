@@ -41,21 +41,20 @@ export function convertDbMatchToData(match: DbMatch): MatchData {
   };
 }
 
-function getLocalData<T>(key: string): Promise<T> {
-  return new Promise((resolve, reject) => {
+function getLocalData<T>(key: string): Promise<T | undefined> {
+  return new Promise((resolve) => {
     self.toolDb.store.get(key, (err, data) => {
       if (err) {
-        reject(err);
+        resolve(undefined);
       } else if (data) {
         try {
           const json = JSON.parse(data);
-
           resolve(json.v);
-        } catch (e) {
-          reject(e);
+        } catch (_e) {
+          resolve(undefined);
         }
       } else {
-        reject(new Error("No data"));
+        resolve(undefined);
       }
     });
   });

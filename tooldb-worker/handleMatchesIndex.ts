@@ -36,15 +36,15 @@ export default function handleMatchesIndex(matchesIndex: string[] | null) {
 
   // Fetch any match we dont have locally
   self.globalData.matchesIndex.forEach((id: string) => {
-    self.toolDb.store.get(id, (err, data) => {
-      if (!data) {
-        self.toolDb.getData(id, false, 2000).then(() => {
+    self.toolDb.store.get(id, (err) => {
+      if (!err) {
+        saved += 1;
+        debounceUpdateState();
+      } else {
+        self.toolDb.getData(id, false, 2000).finally(() => {
           saved += 1;
           debounceUpdateState();
         });
-      } else {
-        saved += 1;
-        debounceUpdateState();
       }
     });
   });
