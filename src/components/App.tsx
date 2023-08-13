@@ -60,7 +60,7 @@ function App(props: AppProps) {
     window.toolDbWorker.addEventListener("message", (e) => {
       if (e.data.type === "REDUX_ACTION") {
         const action = e.data.arg;
-        console.warn("Worker REDUX_ACTION", action.type, action.arg);
+        // console.warn("Worker REDUX_ACTION", action.type, action.arg);
         reduxAction(dispatch, {
           type: action.type,
           arg: action.arg,
