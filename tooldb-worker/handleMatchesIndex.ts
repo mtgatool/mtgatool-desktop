@@ -18,7 +18,10 @@ export default function handleMatchesIndex(matchesIndex: string[] | null) {
       saved,
     });
 
-    if (saved === self.globalData.matchesIndex.length) {
+    if (
+      saved === self.globalData.matchesIndex.length &&
+      self.globalData.matchesIndex.length > 0
+    ) {
       reduxAction("SET_MATCHES_INDEX", self.globalData.matchesIndex);
 
       getMatchesData(self.globalData.matchesIndex, self.globalData.currentUUID);
@@ -49,8 +52,5 @@ export default function handleMatchesIndex(matchesIndex: string[] | null) {
     });
   });
 
-  reduxAction("SET_MATCHES_FETCH_STATE", {
-    total: self.globalData.matchesIndex.length,
-    saved,
-  });
+  updateState();
 }

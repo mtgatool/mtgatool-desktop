@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import { DbUserids } from "./dbTypes";
 import login from "./login";
 

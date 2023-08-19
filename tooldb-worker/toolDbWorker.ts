@@ -107,7 +107,7 @@ self.onmessage = (e: any) => {
     case "REFRESH_MATCHES":
       if (self.toolDb.user) {
         self.toolDb
-          .queryKeys(`:${self.toolDb.user.pubKey}.matches-`)
+          .queryKeys(`:${self.toolDb.user.pubKey}.matches-`, false, 5000)
           .then(handleMatchesIndex);
       }
       break;
