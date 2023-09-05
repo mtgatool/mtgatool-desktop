@@ -8,6 +8,7 @@ import {
 } from "mtgatool-db";
 
 import afterLogin from "./afterLogin";
+import reduxAction from "./reduxAction";
 
 export default function keysLogin(
   username: string,
@@ -25,6 +26,8 @@ export default function keysLogin(
                 .then((pubKey) => {
                   if (pubKey === user.keys.skpub) {
                     self.toolDb.keysSignIn(importedKeys, username).then(() => {
+                      self.postMessage({ type: "LOGIN_OK" });
+                      reduxAction("SET_PUBKEY", pubKey);
                       afterLogin();
                       resolve();
                     });

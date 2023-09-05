@@ -11,6 +11,7 @@ import getDataLocal from "./getDataLocal";
 import getMatchesData from "./getMatchesData";
 import getSaveKeysJson from "./getSaveKeysJson";
 import handleMatchesIndex from "./handleMatchesIndex";
+import keysLogin from "./keysLogin";
 import login from "./login";
 import queryKeys from "./queryKeys";
 import signup from "./signup";
@@ -55,7 +56,7 @@ self.onmessage = (e: any) => {
       break;
 
     case "KEYS_LOGIN":
-      login(e.data.username, e.data.keys);
+      keysLogin(e.data.username, e.data.keys);
       break;
 
     case "SIGNUP":
