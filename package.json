@@ -1,6 +1,6 @@
 {
   "name": "mtgatool-desktop",
-  "version": "6.3.0",
+  "version": "6.3.1",
   "private": true,
   "main": "public/electron.js",
   "homepage": "./",
