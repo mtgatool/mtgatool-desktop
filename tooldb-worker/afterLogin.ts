@@ -9,7 +9,7 @@ export default function afterLogin() {
   const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
 
   if (self.toolDb.user) {
-    // setLocalSetting("pubkey", self.toolDb.user.pubKey);
+    reduxAction("SET_PUBKEY", self.toolDb.user.pubKey);
     self.toolDb
       .queryKeys(`:${self.toolDb.user.pubKey}.matches-`)
       .then(handleMatchesIndex);

@@ -11,7 +11,7 @@ const reduxAction_1 = __importDefault(require("./reduxAction"));
 function afterLogin() {
     const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
     if (self.toolDb.user) {
-        // setLocalSetting("pubkey", self.toolDb.user.pubKey);
+        (0, reduxAction_1.default)("SET_PUBKEY", self.toolDb.user.pubKey);
         self.toolDb
             .queryKeys(`:${self.toolDb.user.pubKey}.matches-`)
             .then(handleMatchesIndex_1.default);
@@ -280,7 +280,7 @@ function getDataLocal(msgId, key) {
     return new Promise((resolve) => {
         self.toolDb.store.get(key, (err, data) => {
             if (err) {
-                self.postMessage({ type: `${msgId}_ERR` });
+                self.postMessage({ type: `${msgId}_ERR`, err });
             }
             else if (data) {
                 try {
@@ -289,11 +289,11 @@ function getDataLocal(msgId, key) {
                     resolve(json.v);
                 }
                 catch (_e) {
-                    self.postMessage({ type: `${msgId}_ERR` });
+                    self.postMessage({ type: `${msgId}_ERR`, err: _e });
                 }
             }
             else {
-                self.postMessage({ type: `${msgId}_ERR` });
+                self.postMessage({ type: `${msgId}_ERR`, err: "No data" });
             }
         });
     });

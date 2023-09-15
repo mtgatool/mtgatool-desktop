@@ -9,6 +9,7 @@ import {
   LOGIN_OK,
   LOGIN_WAITING,
 } from "../../constants";
+import setLocalSetting from "../../utils/setLocalSetting";
 
 export interface Peer {
   host: string;
@@ -64,6 +65,7 @@ const rendererSlice = createSlice({
       state.peers = action.payload;
     },
     setPubKey: (state: RendererState, action: PayloadAction<string>): void => {
+      setLocalSetting("pubkey", action.payload);
       state.pubKey = action.payload;
     },
     setReadingLog: (

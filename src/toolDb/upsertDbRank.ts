@@ -16,17 +16,15 @@ export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
   const { dispatch } = store;
 
   const pubKey = getLocalSetting("pubkey");
+  console.warn("pubKey", { pubKey: pubKey });
 
   getData(`${uuid}-rank`, true).then((uuidData) => {
-    console.warn("uuidData", uuidData);
     if (uuidData) {
       const newData: DbRankData = {
         ...(uuidData as DbRankData),
         ...rank,
         updated: new Date().getTime(),
       };
-
-      console.warn("newData", newData);
 
       reduxAction(dispatch, {
         type: "SET_UUID_RANK_DATA",
@@ -40,7 +38,6 @@ export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
         pubKey: pubKey,
       });
     } else {
-      console.warn("defaultRankData", defaultRankData);
       putData<DbRankData>(
         `${uuid}-rank`,
         {
