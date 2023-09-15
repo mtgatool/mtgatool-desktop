@@ -7,8 +7,7 @@ import {
   defaultRankData,
 } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
-import getUserNamespacedKey from "./getUserNamespacedKey";
-import { getLocalData, putData } from "./worker-wrapper";
+import { getData, putData } from "./worker-wrapper";
 
 export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
   console.log("> Upsert rank", rank);
@@ -18,42 +17,44 @@ export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
 
   const pubKey = getLocalSetting("pubkey");
 
-  getLocalData(getUserNamespacedKey(pubKey, `${uuid}-rank`)).then(
-    (uuidData) => {
-      if (uuidData) {
-        const newData: DbRankData = {
-          ...(uuidData as DbRankData),
-          ...rank,
-          updated: new Date().getTime(),
-        };
+  getData(`${uuid}-rank`, true).then((uuidData) => {
+    console.warn("uuidData", uuidData);
+    if (uuidData) {
+      const newData: DbRankData = {
+        ...(uuidData as DbRankData),
+        ...rank,
+        updated: new Date().getTime(),
+      };
 
-        reduxAction(dispatch, {
-          type: "SET_UUID_RANK_DATA",
-          arg: { rank: newData, uuid },
-        });
+      console.warn("newData", newData);
 
-        putData<DbRankData>(`${uuid}-rank`, newData, true);
-        putData<DbRankDataWithKey>(`rank-${pubKey}`, {
-          ...newData,
-          uuid,
-          pubKey: pubKey,
-        });
-      } else {
-        putData<DbRankData>(
-          `${uuid}-rank`,
-          {
-            ...defaultRankData,
-            updated: new Date().getTime(),
-          },
-          true
-        );
-        putData<DbRankDataWithKey>(`rank-${pubKey}`, {
+      reduxAction(dispatch, {
+        type: "SET_UUID_RANK_DATA",
+        arg: { rank: newData, uuid },
+      });
+
+      putData<DbRankData>(`${uuid}-rank`, newData, true);
+      putData<DbRankDataWithKey>(`rank-${pubKey}`, {
+        ...newData,
+        uuid,
+        pubKey: pubKey,
+      });
+    } else {
+      console.warn("defaultRankData", defaultRankData);
+      putData<DbRankData>(
+        `${uuid}-rank`,
+        {
           ...defaultRankData,
           updated: new Date().getTime(),
-          uuid,
-          pubKey: pubKey,
-        });
-      }
+        },
+        true
+      );
+      putData<DbRankDataWithKey>(`rank-${pubKey}`, {
+        ...defaultRankData,
+        updated: new Date().getTime(),
+        uuid,
+        pubKey: pubKey,
+      });
     }
-  );
+  });
 }

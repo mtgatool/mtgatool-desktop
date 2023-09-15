@@ -4,7 +4,7 @@ export default function getDataLocal(msgId: string, key: string) {
   return new Promise((resolve) => {
     self.toolDb.store.get(key, (err, data) => {
       if (err) {
-        self.postMessage({ type: `${msgId}_ERR` });
+        self.postMessage({ type: `${msgId}_ERR`, err });
       } else if (data) {
         try {
           const json = JSON.parse(data);
@@ -13,10 +13,10 @@ export default function getDataLocal(msgId: string, key: string) {
 
           resolve(json.v);
         } catch (_e) {
-          self.postMessage({ type: `${msgId}_ERR` });
+          self.postMessage({ type: `${msgId}_ERR`, err: _e });
         }
       } else {
-        self.postMessage({ type: `${msgId}_ERR` });
+        self.postMessage({ type: `${msgId}_ERR`, err: "No data" });
       }
     });
   });

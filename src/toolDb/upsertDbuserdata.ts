@@ -1,7 +1,7 @@
 import { DbUserids } from "../types/dbTypes";
 import { getData, putData } from "./worker-wrapper";
 
-export default async function upsertDbUserids(newData: DbUserids) {
+export default async function upsertDbUserdata(newData: DbUserids) {
   console.log("> Upsert userdata", newData);
 
   getData<DbUserids>("userids", true)
