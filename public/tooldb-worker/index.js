@@ -39,6 +39,15 @@ function afterLogin() {
                 newestDate = data[uuid];
                 newest = uuid;
             }
+            self.toolDb.addKeyListener(self.toolDb.getUserNamespacedKey(`${uuid}-displayname`), (msg) => {
+                if (msg.type === "put") {
+                    (0, reduxAction_1.default)("SET_UUID_DISPLAYNAME", {
+                        displayName: msg.v.displayName,
+                        uuid,
+                    });
+                }
+            });
+            self.toolDb.subscribeData(`${uuid}-displayname`, true);
             self.toolDb.addKeyListener(self.toolDb.getUserNamespacedKey(`${uuid}-cards`), (msg) => {
                 if (msg.type === "put") {
                     (0, reduxAction_1.default)("SET_UUID_CARDS_DATA", { cards: msg.v, uuid });

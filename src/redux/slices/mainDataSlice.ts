@@ -22,6 +22,7 @@ const mainState = {
       rank: DbRankData;
       inventory: DbInventoryData;
       cards: DbCardsData;
+      displayName: string | null;
     }
   >,
   liveFeed: [] as string[],
@@ -41,6 +42,7 @@ export function makeDefaultUUIDData(): MainState["uuidData"][""] {
     rank: { ...defaultRankData, updated: 0 },
     inventory: { ...defaultInventoryData, updated: 0 },
     cards: defaultCardsData,
+    displayName: null,
   };
 }
 
@@ -71,6 +73,20 @@ const mainDataSlice = createSlice({
     },
     setUUID: (state: MainState, action: PayloadAction<string>): void => {
       state.currentUUID = action.payload;
+    },
+    setUUIDDisplayName: (
+      state: MainState,
+      action: PayloadAction<{ displayName: string | null; uuid: string }>
+    ): void => {
+      if (!state.uuidData[action.payload.uuid]) {
+        state.uuidData[action.payload.uuid] = {
+          ...makeDefaultUUIDData(),
+          displayName: action.payload.displayName,
+        };
+      } else {
+        state.uuidData[action.payload.uuid].displayName =
+          action.payload.displayName;
+      }
     },
     setUUIDRank: (
       state: MainState,
@@ -152,6 +168,7 @@ export const {
   setLiveFeedMatch,
   setUUID,
   setForceCollection,
+  setUUIDDisplayName,
   setUUIDRank,
   setUUIDInventory,
   setUUIDCards,

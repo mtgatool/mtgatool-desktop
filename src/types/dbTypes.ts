@@ -93,6 +93,11 @@ export type DbInventoryInfo = Omit<
   "SeqId" | "Changes" | "CustomTokens" | "Vouchers" | "Cosmetics"
 >;
 
+export type DbDisplayName = {
+  displayName: string | null;
+  updated: number;
+};
+
 export type DbCardsData = {
   cards: Cards;
   prevCards: Cards;

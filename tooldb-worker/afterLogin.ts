@@ -1,5 +1,10 @@
 /* eslint-disable no-restricted-globals */
-import { DbCardsData, DbInventoryData, DbRankData } from "./dbTypes";
+import {
+  DbCardsData,
+  DbDisplayName,
+  DbInventoryData,
+  DbRankData,
+} from "./dbTypes";
 import handleDraftsIndex from "./handleDraftsIndex";
 import handleLiveFeed from "./handleLiveFeed";
 import handleMatchesIndex from "./handleMatchesIndex";
@@ -42,6 +47,19 @@ export default function afterLogin() {
           newestDate = data[uuid];
           newest = uuid;
         }
+
+        self.toolDb.addKeyListener<DbDisplayName>(
+          self.toolDb.getUserNamespacedKey(`${uuid}-displayname`),
+          (msg) => {
+            if (msg.type === "put") {
+              reduxAction("SET_UUID_DISPLAYNAME", {
+                displayName: msg.v.displayName,
+                uuid,
+              });
+            }
+          }
+        );
+        self.toolDb.subscribeData(`${uuid}-displayname`, true);
 
         self.toolDb.addKeyListener<DbCardsData>(
           self.toolDb.getUserNamespacedKey(`${uuid}-cards`),

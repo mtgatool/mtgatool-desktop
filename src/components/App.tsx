@@ -61,7 +61,7 @@ function App(props: AppProps) {
       // console.warn("Worker REDUX_ACTION", action.type, action.arg);
       if (e.data.type === "REDUX_ACTION") {
         const action = e.data.arg;
-        console.warn("Worker REDUX_ACTION", action.type, action.arg);
+        // console.warn("Worker REDUX_ACTION", action.type, action.arg);
         reduxAction(dispatch, {
           type: action.type,
           arg: action.arg,

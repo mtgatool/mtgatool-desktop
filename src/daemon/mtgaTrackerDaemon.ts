@@ -13,6 +13,13 @@ import getLocalSetting from "../utils/getLocalSetting";
 import globalData from "../utils/globalData";
 import setLocalSetting from "../utils/setLocalSetting";
 
+interface DaemonPlayerId {
+  playerId: string;
+  displayName?: string;
+  personaId?: string;
+  elapsedTime: number;
+}
+
 interface DaemonInventory {
   gems: number;
   gold: number;
@@ -272,11 +279,11 @@ export default class MtgaTrackerDaemon {
       .catch(() => []);
   }
 
-  public getPlayerId(): Promise<string | null> {
+  public getPlayerId(): Promise<DaemonPlayerId | null> {
     console.log("mtgaTrackerDaemon getPlayerId()");
     return axios
-      .get(`${this._url}/playerId`)
-      .then((d) => d.data.playerId)
+      .get<DaemonPlayerId>(`${this._url}/playerId`)
+      .then((d) => d.data)
       .catch(() => null);
   }
 
