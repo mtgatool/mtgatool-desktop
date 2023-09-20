@@ -34,7 +34,9 @@ function afterLogin() {
         .then((data) => {
         let newest = "";
         let newestDate = 0;
-        Object.keys(data).forEach((uuid) => {
+        Object.keys(data)
+            .filter((k) => k && k !== "undefined")
+            .forEach((uuid) => {
             if (data[uuid] > newestDate) {
                 newestDate = data[uuid];
                 newest = uuid;

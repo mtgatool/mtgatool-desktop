@@ -42,61 +42,63 @@ export default function afterLogin() {
     .then((data) => {
       let newest = "";
       let newestDate = 0;
-      Object.keys(data).forEach((uuid) => {
-        if (data[uuid] > newestDate) {
-          newestDate = data[uuid];
-          newest = uuid;
-        }
-
-        self.toolDb.addKeyListener<DbDisplayName>(
-          self.toolDb.getUserNamespacedKey(`${uuid}-displayname`),
-          (msg) => {
-            if (msg.type === "put") {
-              reduxAction("SET_UUID_DISPLAYNAME", {
-                displayName: msg.v.displayName,
-                uuid,
-              });
-            }
+      Object.keys(data)
+        .filter((k) => k && k !== "undefined")
+        .forEach((uuid) => {
+          if (data[uuid] > newestDate) {
+            newestDate = data[uuid];
+            newest = uuid;
           }
-        );
-        self.toolDb.subscribeData(`${uuid}-displayname`, true);
 
-        self.toolDb.addKeyListener<DbCardsData>(
-          self.toolDb.getUserNamespacedKey(`${uuid}-cards`),
-          (msg) => {
-            if (msg.type === "put") {
-              reduxAction("SET_UUID_CARDS_DATA", { cards: msg.v, uuid });
+          self.toolDb.addKeyListener<DbDisplayName>(
+            self.toolDb.getUserNamespacedKey(`${uuid}-displayname`),
+            (msg) => {
+              if (msg.type === "put") {
+                reduxAction("SET_UUID_DISPLAYNAME", {
+                  displayName: msg.v.displayName,
+                  uuid,
+                });
+              }
             }
-          }
-        );
-        self.toolDb.subscribeData(`${uuid}-cards`, true);
+          );
+          self.toolDb.subscribeData(`${uuid}-displayname`, true);
 
-        self.toolDb.addKeyListener<DbInventoryData>(
-          self.toolDb.getUserNamespacedKey(`${uuid}-inventory`),
-          (msg) => {
-            if (msg.type === "put") {
-              reduxAction("SET_UUID_INVENTORY_DATA", {
-                inventory: msg.v,
-                uuid,
-              });
+          self.toolDb.addKeyListener<DbCardsData>(
+            self.toolDb.getUserNamespacedKey(`${uuid}-cards`),
+            (msg) => {
+              if (msg.type === "put") {
+                reduxAction("SET_UUID_CARDS_DATA", { cards: msg.v, uuid });
+              }
             }
-          }
-        );
-        self.toolDb.subscribeData(`${uuid}-inventory`, true);
+          );
+          self.toolDb.subscribeData(`${uuid}-cards`, true);
 
-        self.toolDb.addKeyListener<DbRankData>(
-          self.toolDb.getUserNamespacedKey(`${uuid}-rank`),
-          (msg) => {
-            if (msg.type === "put") {
-              reduxAction("SET_UUID_RANK_DATA", { rank: msg.v, uuid });
+          self.toolDb.addKeyListener<DbInventoryData>(
+            self.toolDb.getUserNamespacedKey(`${uuid}-inventory`),
+            (msg) => {
+              if (msg.type === "put") {
+                reduxAction("SET_UUID_INVENTORY_DATA", {
+                  inventory: msg.v,
+                  uuid,
+                });
+              }
             }
-          }
-        );
-        self.toolDb.subscribeData(`${uuid}-rank`, true);
+          );
+          self.toolDb.subscribeData(`${uuid}-inventory`, true);
 
-        self.globalData.currentUUID = newest;
-        reduxAction("SET_UUID", newest);
-      });
+          self.toolDb.addKeyListener<DbRankData>(
+            self.toolDb.getUserNamespacedKey(`${uuid}-rank`),
+            (msg) => {
+              if (msg.type === "put") {
+                reduxAction("SET_UUID_RANK_DATA", { rank: msg.v, uuid });
+              }
+            }
+          );
+          self.toolDb.subscribeData(`${uuid}-rank`, true);
+
+          self.globalData.currentUUID = newest;
+          reduxAction("SET_UUID", newest);
+        });
     })
     .catch(console.warn);
 }

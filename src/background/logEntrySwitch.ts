@@ -1,3 +1,4 @@
+import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import LogEntry from "../types/logDecoder";
 import * as Labels from "./onLabel";
 
@@ -19,6 +20,14 @@ export default function logEntrySwitch(entry: LogEntry): void {
     case "detailedLogs":
       Labels.DetailedLogs(entry);
       break;
+
+    case "Graph_GetGraphState":
+      // We just logged in, try grabbing UUID and DisplayName
+      postChannelMessage({
+        type: "DAEMON_GET_PLAYER_ID",
+      });
+      break;
+
     case "GreToClientEvent":
       Labels.GreToClient(entry);
       break;
@@ -117,12 +126,6 @@ export default function logEntrySwitch(entry: LogEntry): void {
     case "PostMatch.Update":
       if (entry.arrow == "<==") {
         Labels.PostMatchUpdate(entry);
-      }
-      break;
-
-    case "PlayerInventory.GetPlayerInventory":
-      if (entry.arrow == "<==") {
-        Labels.InPlayerInventoryGetPlayerInventory(entry);
       }
       break;
 

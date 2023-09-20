@@ -90,7 +90,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
     actionLog(-99, globalStore.currentMatch.logTime, "");
     resetCurrentMatch();
     const playerId = getLocalSetting("playerId");
-    let oppId = "";
+    // let oppId = "";
 
     const course = globalStore.currentCourses[eventId];
     if (course) {
@@ -130,7 +130,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
         });
       } else {
         console.log(`vs ${player.playerName}`);
-        oppId = player.userId;
+        // oppId = player.userId;
         setOpponent({
           seat: player.systemSeatId,
           name: player.playerName,
@@ -142,6 +142,8 @@ export default function onLabelMatchGameRoomStateChangedEvent(
       }
     });
 
+    // Maybe deprecated?
+    /*
     const metadata = (gameRoom.gameRoomConfig as any).clientMetadata;
 
     if (metadata) {
@@ -164,6 +166,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
       };
       setPlayer(player);
     }
+    */
 
     if ((window as any).daemon) {
       const isLimited = isLimitedEventId(gameRoom.gameRoomConfig.eventId);

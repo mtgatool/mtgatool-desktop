@@ -4,6 +4,7 @@ import { InternalDraftv2 } from "mtgatool-shared";
 import { overlayTitleToId } from "../common/maps";
 import { LOGIN_OK } from "../constants";
 import fetchCards from "../daemon/fetchCards";
+import fetchPlayerId from "../daemon/fetchPlayerId";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import setDbMatch from "../toolDb/setDbMatch";
@@ -91,8 +92,16 @@ export default function mainChannelListeners() {
       }
     }
 
+    if (msg.data.type === "DAEMON_GET_PLAYER_ID") {
+      fetchPlayerId();
+    }
+
     if (msg.data.type === "SET_UUID") {
       switchPlayerUUID(msg.data.value);
+    }
+
+    if (msg.data.type === "SET_UUID_DISPLAYNAME") {
+      switchPlayerUUID(msg.data.value.uuid, msg.data.value.displayName);
     }
 
     if (msg.data.type === "LOG_CHECK") {
