@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
@@ -9,8 +11,9 @@ import {
 import getLocalSetting from "../utils/getLocalSetting";
 import { getData, putData } from "./worker-wrapper";
 
-export default async function upsertDbRank(rank: Partial<CombinedRankInfo>) {
-  console.log("> Upsert rank", rank);
+export default async function upsertDbRank(arg: Partial<CombinedRankInfo>) {
+  const rank = _(arg).omitBy(_.isUndefined).omitBy(_.isNull).value();
+  console.log("> Upsert rank", arg, rank);
 
   const uuid = getLocalSetting("playerId") || "default";
   const { dispatch } = store;
