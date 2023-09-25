@@ -7,12 +7,12 @@ export default function fetchPlayerId(): Promise<string | undefined> {
       globalData.daemon.getPlayerId().then((d) => {
         if (
           d &&
-          d.playerId !== "undefined" &&
-          d.playerId !== "" &&
-          d.playerId
+          d.personaId !== "undefined" &&
+          d.personaId !== "" &&
+          d.personaId
         ) {
-          switchPlayerUUID(d.playerId, d.displayName);
-          resolve(d.playerId);
+          switchPlayerUUID(d.personaId, d.displayName);
+          resolve(d.personaId);
         } else {
           resolve(undefined);
         }
