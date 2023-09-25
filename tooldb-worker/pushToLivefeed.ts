@@ -1,14 +1,14 @@
+/* eslint-disable no-restricted-globals */
 /* eslint-disable no-param-reassign */
 import Automerge from "automerge";
 
-import { DbMatch } from "../types/dbTypes";
-import globalData from "../utils/globalData";
+import { DbMatch } from "./dbTypes";
 
 export default async function pushToLiveFeed(key: string, match: DbMatch) {
-  if (!globalData.liveFeed[key]) {
+  if (!self.globalData.liveFeed[key]) {
     // Create CRDT document with the new match added to it
     try {
-      const newLiveFeed = Automerge.change(globalData.liveFeed, (doc) => {
+      const newLiveFeed = Automerge.change(self.globalData.liveFeed, (doc) => {
         doc[key] = new Date(match.internalMatch.date).getTime();
       });
 
@@ -16,11 +16,11 @@ export default async function pushToLiveFeed(key: string, match: DbMatch) {
       window.toolDb
         .putCrdt(
           `matches-livefeed-${currentDay}`,
-          Automerge.getChanges(globalData.liveFeed, newLiveFeed),
+          Automerge.getChanges(self.globalData.liveFeed, newLiveFeed),
           false
         )
         .catch(console.error);
-      // globalData.liveFeed = newLiveFeed;
+      // self.globalData.liveFeed = newLiveFeed;
     } catch (e) {
       console.warn(e);
     }

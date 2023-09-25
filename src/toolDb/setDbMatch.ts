@@ -8,8 +8,6 @@ import { DbMatch } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
 import globalData from "../utils/globalData";
 import getUserNamespacedKey from "./getUserNamespacedKey";
-import pushToExplore from "./pushToExplore";
-import pushToLiveFeed from "./pushToLivefeed";
 import { putData } from "./worker-wrapper";
 
 export default async function setDbMatch(match: InternalMatch) {
@@ -40,8 +38,11 @@ export default async function setDbMatch(match: InternalMatch) {
 
   const remoteKey = getUserNamespacedKey(pubKey, `matches-${match.id}`);
 
-  pushToLiveFeed(remoteKey, newDbMatch);
-  pushToExplore(remoteKey, newDbMatch);
+  window.toolDbWorker.postMessage({
+    type: "PUSH_DB_MATCH",
+    key: remoteKey,
+    match: newDbMatch,
+  });
 
   // Create CRDT document with the new match added to it
   if (!globalData.matchesIndex.includes(remoteKey)) {

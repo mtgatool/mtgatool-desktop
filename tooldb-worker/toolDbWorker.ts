@@ -13,6 +13,8 @@ import getSaveKeysJson from "./getSaveKeysJson";
 import handleMatchesIndex from "./handleMatchesIndex";
 import keysLogin from "./keysLogin";
 import login from "./login";
+import pushToExplore from "./pushToExplore";
+import pushToLiveFeed from "./pushToLivefeed";
 import queryKeys from "./queryKeys";
 import signup from "./signup";
 
@@ -96,6 +98,11 @@ self.onmessage = (e: any) => {
       break;
 
     // application specific handlers
+
+    case "PUSH_DB_MATCH":
+      pushToExplore(e.data.key, e.data.match);
+      pushToLiveFeed(e.data.key, e.data.match);
+      break;
 
     case "EXPLORE_DATA_QUERY":
       beginDataQuery(e.data.days, e.data.event);
