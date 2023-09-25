@@ -1,8 +1,8 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { ReactComponent as Close } from "../../assets/images/svg/close.svg";
+import reduxAction from "../../redux/reduxAction";
 import { AppState } from "../../redux/stores/rendererStore";
-import switchPlayerUUID from "../../utils/switchPlayerUUID";
 import Radio from "../ui/Radio";
 
 interface ArenaIdSelectorProps {
@@ -16,6 +16,8 @@ export default function ArenaIdSelector(props: ArenaIdSelectorProps) {
     (state: AppState) => state.mainData.currentUUID
   );
   const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
+
+  const dispatch = useDispatch();
 
   return (
     <>
@@ -47,7 +49,10 @@ export default function ArenaIdSelector(props: ArenaIdSelectorProps) {
                   }
                   value={selected}
                   callback={() => {
-                    switchPlayerUUID(uuid);
+                    reduxAction(dispatch, {
+                      type: "SET_UUID",
+                      arg: uuid,
+                    });
                   }}
                 />
               </div>
