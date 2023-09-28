@@ -1,6 +1,7 @@
 /* eslint-disable radix */
 import { GREToClientMessage } from "mtgatool-shared/dist/types/greTypes";
 
+import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import LogEntry from "../../types/logDecoder";
 import GREMessage from "../greToClientInterpreter";
 import { setCurrentMatchMany } from "../store/currentMatchStore";
@@ -14,10 +15,17 @@ interface EntryJson {
 }
 
 interface Entry extends LogEntry {
+  playerId?: string;
   json: EntryJson;
 }
 
 export default function GreToClient(entry: Entry): void {
+  if (entry.playerId) {
+    postChannelMessage({
+      type: "SET_UUID",
+      value: entry.playerId,
+    });
+  }
   if (
     entry.jsonString &&
     entry.jsonString ==

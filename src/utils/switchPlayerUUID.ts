@@ -10,8 +10,7 @@ export default async function switchPlayerUUID(
   uuid: string,
   displayName?: string
 ) {
-  console.info("switchPlayerUUID", uuid);
-  if ((uuid && uuid === "undefined") || uuid === "") {
+  if (uuid && uuid !== "" && uuid !== "undefined") {
     setLocalSetting("playerId", uuid);
     const { dispatch, getState } = store;
 
@@ -20,11 +19,12 @@ export default async function switchPlayerUUID(
         type: "SET_UUID",
         arg: uuid,
       });
-      if (displayName) {
-        upsertDbDisplayName(displayName, uuid);
-      }
 
       upsertDbUserdata({ [uuid]: new Date().getTime() });
+    }
+
+    if (displayName) {
+      upsertDbDisplayName(displayName, uuid);
     }
   }
 }
