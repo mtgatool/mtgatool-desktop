@@ -6,6 +6,7 @@ import { DEFAULT_PEERS } from "./constants";
 import doFunction from "./doFunction";
 import { beginDataQuery } from "./exploreAggregation";
 import getConnectionData from "./getConnectionData";
+import getCrdt from "./getCrdt";
 import getData from "./getData";
 import getDataLocal from "./getDataLocal";
 import getMatchesData from "./getMatchesData";
@@ -71,6 +72,10 @@ self.onmessage = (e: any) => {
 
     case "GET_DATA":
       getData(e.data.id, e.data.key, e.data.userNamespaced, e.data.timeoutMs);
+      break;
+
+    case "GET_CRDT":
+      getCrdt(e.data.id, e.data.key, e.data.userNamespaced, e.data.timeoutMs);
       break;
 
     case "GET_LOCAL_DATA":
