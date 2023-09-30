@@ -57,25 +57,47 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
     }
   };
 
+  const sortSetByName = (a: Set, b: Set): number => {
+    return a.name.localeCompare(b.name);
+  };
+
   const otherSets: Set[] = [];
-  const allSets: Set[] = filterSets.filter((s) => s?.code);
+  const allSets: Set[] = filterSets
+    .filter((s) => s?.code)
+    .sort((a, b) => {
+      return new Date(a.release).getTime() - new Date(b.release).getTime();
+    });
+
   const standardSets: Set[] = [];
+  const historicSets: Set[] = [];
   const alchemySets: Set[] = [];
 
   const standard = allFormats.Standard.sets;
-  const alchemy = allFormats.Explorer.sets;
+  // const _historic = allFormats.Historic.sets;
+  // const _alchemy = allFormats.Alchemy.sets;
+  // const _explorer = allFormats.Explorer.sets;
 
   allSets.forEach((s) => {
     if (standard.includes(s.arenacode) || standard.includes(s.code)) {
       standardSets.push(s);
-    } else if (alchemy.includes(s.arenacode) || alchemy.includes(s.code)) {
+    } else if (
+      s.arenacode.startsWith("Y23") ||
+      s.code.startsWith("Y23") ||
+      s.arenacode.startsWith("Y22") ||
+      s.code.startsWith("Y22")
+    ) {
       alchemySets.push(s);
+    } else if (
+      s.arenacode.startsWith("AHA") ||
+      s.code.startsWith("AHA") ||
+      s.code.startsWith("EA") ||
+      s.code.startsWith("EA")
+    ) {
+      historicSets.push(s);
     } else {
       otherSets.push(s);
     }
   });
-
-  console.log(otherSets);
 
   return (
     <div
@@ -85,7 +107,7 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
       }}
     >
       <div className="set-division">
-        {alchemySets.map((set) => {
+        {standardSets.map((set) => {
           const svgData = set.svg;
           const setClass = `set-filter ${
             filtered.indexOf(set.code.toLowerCase()) == -1
@@ -104,7 +126,30 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
             />
           );
         })}
-        {standardSets.map((set) => {
+      </div>
+      <div className="set-division">
+        {historicSets.sort(sortSetByName).map((set) => {
+          const svgData = set.svg;
+          const setClass = `set-filter ${
+            filtered.indexOf(set.code.toLowerCase()) == -1
+              ? "set-filter-on"
+              : ""
+          }`;
+          return (
+            <div
+              key={set.code.toLowerCase()}
+              style={{
+                backgroundImage: `url(data:image/svg+xml;base64,${svgData})`,
+              }}
+              title={set.name}
+              className={setClass}
+              onClick={(): void => setFilteredSet(set.code.toLowerCase())}
+            />
+          );
+        })}
+      </div>
+      <div className="set-division">
+        {alchemySets.sort(sortSetByName).map((set) => {
           const svgData = set.svg;
           const setClass = `set-filter ${
             filtered.indexOf(set.code.toLowerCase()) == -1
