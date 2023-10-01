@@ -19,11 +19,10 @@ function afterLogin() {
             .queryKeys(`:${self.toolDb.user.pubKey}.draft-`)
             .then(handleDraftsIndex_1.default);
     }
+    self.toolDb.addKeyListener(`matches-livefeed-${currentDay}`, handleLiveFeed_1.default);
+    self.toolDb.getData(`matches-livefeed-${currentDay}`);
     self.toolDb.subscribeData("userids", true);
-    const liveFeedToday = `matches-livefeed-${currentDay}`;
-    self.toolDb.addKeyListener(liveFeedToday, handleLiveFeed_1.default);
-    self.toolDb.subscribeData(liveFeedToday);
-    self.toolDb.getData(liveFeedToday);
+    self.toolDb.subscribeData(`matches-livefeed-${currentDay}`);
     self.toolDb.getData("hiddenDecks", true, 5000).then((hidden) => {
         if (hidden) {
             self.globalData.hiddenDecks = hidden;
@@ -703,12 +702,13 @@ async function pushToLiveFeed(key, match) {
     if (!self.globalData.liveFeed[key]) {
         // Create CRDT document with the new match added to it
         try {
-            const newLiveFeed = automerge_1.default.change(self.globalData.liveFeed, (doc) => {
+            const origDoc = automerge_1.default.init();
+            const newLiveFeed = automerge_1.default.change(origDoc, (doc) => {
                 doc[key] = new Date(match.internalMatch.date).getTime();
             });
             const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
-            window.toolDb
-                .putCrdt(`matches-livefeed-${currentDay}`, automerge_1.default.getChanges(self.globalData.liveFeed, newLiveFeed), false)
+            self.toolDb
+                .putCrdt(`matches-livefeed-${currentDay}`, automerge_1.default.getChanges(origDoc, newLiveFeed), false)
                 .catch(console.error);
             // self.globalData.liveFeed = newLiveFeed;
         }
