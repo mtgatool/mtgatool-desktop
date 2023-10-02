@@ -114,7 +114,7 @@ self.onmessage = (e: any) => {
       break;
 
     case "GET_MATCHES_DATA":
-      getMatchesData(e.data.matchesIndex, e.data.uuid);
+      getMatchesData(e.data.id, e.data.matchesIndex, e.data.uuid);
       break;
 
     case "REFRESH_MATCHES":

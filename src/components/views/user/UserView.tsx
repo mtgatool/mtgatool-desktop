@@ -1,4 +1,3 @@
-import { UserRootData } from "mtgatool-db";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -8,10 +7,14 @@ import useDebounce from "../../../hooks/useDebounce";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
 import { AppState } from "../../../redux/stores/rendererStore";
-import getLocalDbValue from "../../../toolDb/getLocalDbValue";
-import { DbMatch, DbRankData } from "../../../types/dbTypes";
+import {
+  getData,
+  getMatchesData,
+  queryKeys,
+} from "../../../toolDb/worker-wrapper";
+import { DbRankData } from "../../../types/dbTypes";
 import Section from "../../ui/Section";
-import { convertDbMatchToData, MatchData } from "../history/getMatchesData";
+import { MatchData } from "../history/convertDbMatchData";
 import UserHistoryList from "./UserHistoryList";
 import UserRank from "./UserRank";
 
@@ -24,7 +27,7 @@ export default function UserView() {
   useEffect(() => {
     const decoded = decodeURIComponent(key);
     if (!decoded.startsWith("MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE")) {
-      window.toolDb.getData<UserRootData>(`==${decoded}`).then((userData) => {
+      getData(`==${decoded}`).then((userData) => {
         if (userData) {
           setPubKey(userData.keys.skpub);
         }
@@ -48,46 +51,37 @@ export default function UserView() {
       fetchAvatar(pubKey);
       fetchUsername(pubKey);
 
-      window.toolDb.queryKeys(`:${pubKey}.matches-`).then((matchesIndex) => {
-        if (matchesIndex && matches.current) {
-          matchesIndex.forEach((id: string) => {
-            getLocalDbValue<DbMatch>(id).then((dbm) => {
-              if (dbm) {
-                matches.current[id] = convertDbMatchToData(dbm);
-                deboucer(() => setMatchesList(Object.values(matches.current)));
-              } else {
-                window.toolDb.getData<DbMatch>(id, false, 2000).then((data) => {
-                  if (data) {
-                    matches.current[id] = convertDbMatchToData(data);
-                    deboucer(() =>
-                      setMatchesList(Object.values(matches.current))
-                    );
-                  }
-                });
-              }
-            });
-          });
-        }
-      });
+      console.log("fetching user data", pubKey);
 
-      window.toolDb.getData(`:${pubKey}.userids`).then((data) => {
+      getData(`:${pubKey}.userids`).then((data) => {
+        console.log("got user data", data);
         if (data) {
           let newest = "";
           let newestDate = 0;
           Object.keys(data).forEach((uuid) => {
-            if (data[uuid] > newestDate) {
+            if (uuid && uuid !== "undefined" && data[uuid] > newestDate) {
               newestDate = data[uuid];
               newest = uuid;
             }
           });
 
-          window.toolDb
-            .getData<DbRankData>(`:${pubKey}.${newest}-rank`)
-            .then((rd) => {
-              if (rd) {
-                setRankData(rd);
-              }
-            });
+          queryKeys(`:${pubKey}.matches-`).then((matchesIndex) => {
+            if (matchesIndex && matches.current) {
+              console.log("got matches", matchesIndex);
+              getMatchesData(matchesIndex).then((d) => {
+                console.log("got matches data", d);
+                if (d) {
+                  setMatchesList(d);
+                }
+              });
+            }
+          });
+
+          getData<DbRankData>(`:${pubKey}.${newest}-rank`).then((rd) => {
+            if (rd) {
+              setRankData(rd);
+            }
+          });
         }
       });
     }

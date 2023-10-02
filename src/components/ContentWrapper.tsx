@@ -12,6 +12,7 @@ import {
   setDateOption,
 } from "../redux/slices/FilterSlice";
 import { AppState } from "../redux/stores/rendererStore";
+import { getMatchesData } from "../toolDb/worker-wrapper";
 import { CardsData } from "../types/collectionTypes";
 import { defaultCardsData } from "../types/dbTypes";
 import aggregateStats from "../utils/aggregateStats";
@@ -99,19 +100,21 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   const [matchesData, setMatchesData] = useState<MatchData[]>([]);
 
   useEffect(() => {
+    getMatchesData(matchesIndex, currentUUID).then((d) => {
+      if (d) {
+        setMatchesData(d);
+      }
+    });
+
+    // hacky hack to listen for the after login matches data message
     const listener = (e: any) => {
       const { type, value } = e.data;
-      if (type === `MATCHES_DATA`) {
+      if (type === `MATCHES_DATA_OK`) {
         setMatchesData(value);
       }
     };
 
     if (window.toolDbWorker) {
-      window.toolDbWorker.postMessage({
-        type: "GET_MATCHES_DATA",
-        matchesIndex,
-        uuid: currentUUID,
-      });
       window.toolDbWorker.addEventListener("message", listener);
     }
 

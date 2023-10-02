@@ -60,7 +60,11 @@ function getLocalData<T>(key: string): Promise<T | undefined> {
   });
 }
 
-export default function getMatchesData(matchesIds: string[], uuid: string) {
+export default function getMatchesData(
+  msgId: string,
+  matchesIds: string[],
+  uuid?: string
+) {
   const promises = matchesIds.map((id) => {
     return getLocalData<DbMatch>(id);
   });
@@ -71,8 +75,8 @@ export default function getMatchesData(matchesIds: string[], uuid: string) {
     )
     .then((data) => {
       self.postMessage({
-        type: "MATCHES_DATA",
-        value: data.filter((m) => m.uuid === uuid),
+        type: `${msgId}_OK`,
+        value: data.filter((m) => (uuid ? m.uuid === uuid : true)),
       });
     });
 }

@@ -10,7 +10,7 @@ import { AppState } from "../../../redux/stores/rendererStore";
 import doHistoryFilter from "../../../utils/tables/doHistoryFilter";
 import PagingControls from "../../PagingControls";
 import SortControls, { Sort } from "../../SortControls";
-import { MatchData } from "../history/getMatchesData";
+import { MatchData } from "../history/convertDbMatchData";
 import ListItemMatch from "../history/ListItemMatch";
 
 interface UserHistoryListProps {

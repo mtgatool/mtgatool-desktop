@@ -2,10 +2,8 @@
 import getMatchesData from "./getMatchesData";
 import reduxAction from "./reduxAction";
 
-export default function handleMatchesIndex(matchesIndex: string[] | null) {
-  self.globalData.matchesIndex = [
-    ...new Set([...self.globalData.matchesIndex, ...(matchesIndex || [])]),
-  ];
+export default function handleMatchesIndex(matchesIds: string[] | null) {
+  const matchesIndex = [...new Set([...(matchesIds || [])])];
 
   let saved = 0;
   let timeout: NodeJS.Timeout | null = null;
@@ -14,17 +12,14 @@ export default function handleMatchesIndex(matchesIndex: string[] | null) {
   function updateState() {
     timeout = null;
     reduxAction("SET_MATCHES_FETCH_STATE", {
-      total: self.globalData.matchesIndex.length,
+      total: matchesIndex.length,
       saved,
     });
 
-    if (
-      saved === self.globalData.matchesIndex.length &&
-      self.globalData.matchesIndex.length > 0
-    ) {
-      reduxAction("SET_MATCHES_INDEX", self.globalData.matchesIndex);
+    if (saved === matchesIndex.length && matchesIndex.length > 0) {
+      reduxAction("SET_MATCHES_INDEX", matchesIndex);
 
-      getMatchesData(self.globalData.matchesIndex, self.globalData.currentUUID);
+      getMatchesData("MATCHES_DATA", matchesIndex, self.globalData.currentUUID);
     }
   }
 
@@ -38,7 +33,7 @@ export default function handleMatchesIndex(matchesIndex: string[] | null) {
   }
 
   // Fetch any match we dont have locally
-  self.globalData.matchesIndex.forEach((id: string) => {
+  matchesIndex.forEach((id: string) => {
     self.toolDb.store.get(id, (err) => {
       if (!err) {
         saved += 1;

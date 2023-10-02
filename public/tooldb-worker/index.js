@@ -375,7 +375,7 @@ function getLocalData(key) {
         });
     });
 }
-function getMatchesData(matchesIds, uuid) {
+function getMatchesData(msgId, matchesIds, uuid) {
     const promises = matchesIds.map((id) => {
         return getLocalData(id);
     });
@@ -383,8 +383,8 @@ function getMatchesData(matchesIds, uuid) {
         .then((matches) => matches.filter((m) => m).map((m) => convertDbMatchToData(m)))
         .then((data) => {
         self.postMessage({
-            type: "MATCHES_DATA",
-            value: data.filter((m) => m.uuid === uuid),
+            type: `${msgId}_OK`,
+            value: data.filter((m) => (uuid ? m.uuid === uuid : true)),
         });
     });
 }
@@ -555,7 +555,7 @@ function handleMatchesIndex(matchesIndex) {
         if (saved === self.globalData.matchesIndex.length &&
             self.globalData.matchesIndex.length > 0) {
             (0, reduxAction_1.default)("SET_MATCHES_INDEX", self.globalData.matchesIndex);
-            (0, getMatchesData_1.default)(self.globalData.matchesIndex, self.globalData.currentUUID);
+            (0, getMatchesData_1.default)("MATCHES_DATA", self.globalData.matchesIndex, self.globalData.currentUUID);
         }
     }
     function debounceUpdateState() {
@@ -881,7 +881,7 @@ self.onmessage = (e) => {
             (0, exploreAggregation_1.beginDataQuery)(e.data.days, e.data.event);
             break;
         case "GET_MATCHES_DATA":
-            (0, getMatchesData_1.default)(e.data.matchesIndex, e.data.uuid);
+            (0, getMatchesData_1.default)(e.data.id, e.data.matchesIndex, e.data.uuid);
             break;
         case "REFRESH_MATCHES":
             if (self.toolDb.user) {
