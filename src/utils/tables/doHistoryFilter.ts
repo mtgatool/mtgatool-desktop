@@ -1,7 +1,7 @@
 import _ from "lodash";
 
 import { Sort } from "../../components/SortControls";
-import { MatchData } from "../../components/views/history/getMatchesData";
+import { MatchData } from "../../components/views/history/convertDbMatchData";
 import { Filters } from "../../types/genericFilterTypes";
 import applySort from "./applySort";
 import bitsFilterFn from "./filters/bitsFilterFn";

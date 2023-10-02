@@ -20,6 +20,7 @@ export type MessageType =
   | "LOG_READ_FINISHED"
   | "ACTION_LOG"
   | "SET_UUID"
+  | "SET_UUID_DISPLAYNAME"
   | "OVERLAY_UPDATE"
   | "OVERLAY_SET_SETTINGS"
   | "OVERLAY_UPDATE_SETTINGS"
@@ -37,7 +38,8 @@ export type MessageType =
   | "DRAFT_STATUS"
   | "DRAFT_VOTES"
   | "DRAFT_END"
-  | "UPDATE_ACTIVE_EVENTS";
+  | "UPDATE_ACTIVE_EVENTS"
+  | "DAEMON_GET_PLAYER_ID";
 
 export interface ChannelMessageBase {
   type: MessageType;
@@ -78,6 +80,14 @@ export interface LogFinishedMessage extends ChannelMessageBase {
 export interface SetUUIDMessage extends ChannelMessageBase {
   type: "SET_UUID";
   value: string;
+}
+
+export interface SetUUIDDisplayNameMessage extends ChannelMessageBase {
+  type: "SET_UUID_DISPLAYNAME";
+  value: {
+    uuid: string;
+    displayName?: string;
+  };
 }
 
 export interface OverlayUpdateMessage extends ChannelMessageBase {
@@ -168,6 +178,10 @@ export interface UpdateActiveEventsMessage extends ChannelMessageBase {
   value: string[];
 }
 
+export interface DaemonGetPlayerId extends ChannelMessageBase {
+  type: "DAEMON_GET_PLAYER_ID";
+}
+
 export type ChannelMessage =
   | PopupMessage
   | LogCheckMessage
@@ -177,6 +191,7 @@ export type ChannelMessage =
   | LogMessageRecvMessage
   | LogFinishedMessage
   | SetUUIDMessage
+  | SetUUIDDisplayNameMessage
   | OverlayUpdateMessage
   | OverlayUpdateSettingsMessage
   | OverlaySetSettingsMessage
@@ -194,4 +209,5 @@ export type ChannelMessage =
   | DraftStatusMessage
   | DraftVotesMessage
   | DraftEndMessage
-  | UpdateActiveEventsMessage;
+  | UpdateActiveEventsMessage
+  | DaemonGetPlayerId;

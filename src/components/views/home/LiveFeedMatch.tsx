@@ -21,7 +21,7 @@ import {
 import ManaCost from "../../ManaCost";
 import RankIcon from "../../RankIcon";
 import ResultDetails from "../../ResultDetails";
-import { MatchData } from "../history/getMatchesData";
+import { MatchData } from "../history/convertDbMatchData";
 
 const { DEFAULT_TILE } = constants;
 

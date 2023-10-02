@@ -1,9 +1,10 @@
 import _ from "lodash";
 import { InternalDraftv2 } from "mtgatool-shared";
-import { LOGIN_OK } from "mtgatool-shared/dist/shared/constants";
 
 import { overlayTitleToId } from "../common/maps";
+import { LOGIN_OK } from "../constants";
 import fetchCards from "../daemon/fetchCards";
+import fetchPlayerId from "../daemon/fetchPlayerId";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import setDbMatch from "../toolDb/setDbMatch";
@@ -11,6 +12,7 @@ import upsertDbCards from "../toolDb/upsertDbCards";
 import upsertDbInventory from "../toolDb/upsertDbInventory";
 import upsertDbLiveMatch from "../toolDb/upsertDbLiveMatch";
 import upsertDbRank from "../toolDb/upsertDbRank";
+import { putData } from "../toolDb/worker-wrapper";
 import LogEntry from "../types/logDecoder";
 import bcConnect from "../utils/bcConnect";
 import electron from "../utils/electron/electronWrapper";
@@ -90,8 +92,16 @@ export default function mainChannelListeners() {
       }
     }
 
+    if (msg.data.type === "DAEMON_GET_PLAYER_ID") {
+      fetchPlayerId();
+    }
+
     if (msg.data.type === "SET_UUID") {
       switchPlayerUUID(msg.data.value);
+    }
+
+    if (msg.data.type === "SET_UUID_DISPLAYNAME") {
+      switchPlayerUUID(msg.data.value.uuid, msg.data.value.displayName);
     }
 
     if (msg.data.type === "LOG_CHECK") {
@@ -144,7 +154,7 @@ export default function mainChannelListeners() {
             type: "SET_CURRENT_DRAFT",
             arg: msg.data.value,
           });
-          window.toolDb.putData<InternalDraftv2>(
+          putData<InternalDraftv2>(
             `draft-${msg.data.value.id}`,
             msg.data.value,
             true
@@ -195,7 +205,7 @@ export default function mainChannelListeners() {
     }
 
     if (msg.data.type === "UPDATE_ACTIVE_EVENTS") {
-      window.toolDb.putData("activeEvents", msg.data.value);
+      putData("activeEvents", msg.data.value);
     }
   };
 }

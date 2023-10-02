@@ -8,10 +8,7 @@
   .set-division {
     display: flex;
     justify-content: center;
-    
-    @media screen and (max-width: 600px) {
-      flex-wrap: wrap;
-    }
+    flex-wrap: wrap;
   }
 
   .set-filter {

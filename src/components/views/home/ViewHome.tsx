@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 
 import { AppState } from "../../../redux/stores/rendererStore";
 import Section from "../../ui/Section";
-import { convertDbMatchToData } from "../history/getMatchesData";
+import { convertDbMatchToData } from "../history/convertDbMatchData";
 import BestRanksFeed from "./BestRanksFeed";
 import LiveFeedMatch from "./LiveFeedMatch";
 

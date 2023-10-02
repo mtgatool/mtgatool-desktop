@@ -3,6 +3,7 @@
 import { MutableRefObject, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import { ReactComponent as SyncIcon } from "../../assets/images/svg/cloud-sync.svg";
 import { ReactComponent as StatsIcon } from "../../assets/images/svg/stats.svg";
 import {
   DateOption,
@@ -88,6 +89,14 @@ export default function FilterSection(props: FilterSectionProps) {
     ...new Set(transformedEvents),
   ];
 
+  const refreshMatches = useCallback(() => {
+    if (window.toolDbWorker) {
+      window.toolDbWorker.postMessage({
+        type: "REFRESH_MATCHES",
+      });
+    }
+  }, []);
+
   return (
     <>
       <div className="FilterSection">
@@ -123,11 +132,21 @@ export default function FilterSection(props: FilterSectionProps) {
           />
 
           <SvgButton
-            svg={StatsIcon}
+            svg={SyncIcon}
             style={{
               height: "24px",
               width: "24px",
               margin: "auto 0 auto auto",
+              padding: "4px",
+            }}
+            onClick={refreshMatches}
+          />
+          <SvgButton
+            svg={StatsIcon}
+            style={{
+              height: "24px",
+              width: "24px",
+              margin: "auto 0 auto 16px",
               padding: "4px",
             }}
             onClick={openHistoryStatsPopup}

@@ -14,6 +14,7 @@ import { OverlayHandler } from "../common/overlayHandler";
 declare global {
   interface Window {
     toolDb: ToolDb;
+    toolDbWorker: Worker;
     toolDbInitialized: boolean;
     database: DatabaseClass;
     overlayHandler: OverlayHandler | undefined;
@@ -91,6 +92,11 @@ export type DbInventoryInfo = Omit<
   InventoryInfo,
   "SeqId" | "Changes" | "CustomTokens" | "Vouchers" | "Cosmetics"
 >;
+
+export type DbDisplayName = {
+  displayName: string | null;
+  updated: number;
+};
 
 export type DbCardsData = {
   cards: Cards;

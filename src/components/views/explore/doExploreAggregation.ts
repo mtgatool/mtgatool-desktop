@@ -3,6 +3,7 @@
 import { Colors, database, DbCardDataV2, v2cardsList } from "mtgatool-shared";
 import { DEFAULT_TILE } from "mtgatool-shared/dist/shared/constants";
 
+import store from "../../../redux/stores/rendererStore";
 import { DbMatch } from "../../../types/dbTypes";
 import { Winrate } from "../../../utils/aggregateStats";
 import getWinrateValue from "../../../utils/getWinrateValue";
@@ -137,11 +138,12 @@ export function limitRecord(
 
 export default function doExploreAggregation(allData: DbMatch[]) {
   // console.log(allData);
+  const { pubKey } = store.getState().renderer;
 
   const tempCards: Record<string, ExploreTempCardData> = {};
 
   const aggregated: DbExploreAggregated = {
-    aggregator: window.toolDb.user?.pubKey || "",
+    aggregator: pubKey || "",
     eventId: allData[0]?.eventId || "",
     custom: false,
     from: new Date().getTime(),

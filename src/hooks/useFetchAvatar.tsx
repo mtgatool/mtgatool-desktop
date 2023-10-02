@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { DEFAULT_AVATAR } from "../constants";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
+import { getData } from "../toolDb/worker-wrapper";
 import globalData from "../utils/globalData";
 
 export default function useFetchAvatar() {
@@ -19,8 +20,7 @@ export default function useFetchAvatar() {
             type: "SET_AVATAR",
             arg: { pubKey, avatar: "" },
           });
-          window.toolDb
-            .getData<string>(`:${pubKey}.avatar`, false, 1000)
+          getData<string>(`:${pubKey}.avatar`, false, 1000)
             .then((avatar) => {
               reduxAction(dispatch, {
                 type: "SET_AVATAR",

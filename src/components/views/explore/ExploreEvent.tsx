@@ -7,6 +7,7 @@ import { useHistory } from "react-router-dom";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
 import { AppState } from "../../../redux/stores/rendererStore";
+import { getData } from "../../../toolDb/worker-wrapper";
 import getEventExplorerSection from "../../../utils/getEventExplorerSection";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import timeAgo from "../../../utils/timeAgo";
@@ -30,16 +31,18 @@ export default function ExploreEvent(props: ExploreEventProps) {
   const fetchUsername = useFetchUsername();
 
   useEffect(() => {
-    window.toolDb
-      .getData<Partial<DbExploreAggregated>>(`exploredata-${eventId}`)
-      .then((d) => {
-        if (d) {
-          (d as any).size = Object.values(d.data || {}).length;
-          setEventData(d);
-          fetchUsername(d.aggregator || "");
-          fetchAvatar(d.aggregator || "");
+    if (eventId && eventId !== "") {
+      getData<Partial<DbExploreAggregated>>(`exploredata-${eventId}`).then(
+        (d) => {
+          if (d) {
+            (d as any).size = Object.values(d.data || {}).length;
+            setEventData(d);
+            fetchUsername(d.aggregator || "");
+            fetchAvatar(d.aggregator || "");
+          }
         }
-      });
+      );
+    }
   }, [eventId]);
 
   const username = usernames[eventData?.aggregator || ""];

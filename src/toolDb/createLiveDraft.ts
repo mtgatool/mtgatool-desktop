@@ -4,18 +4,22 @@ import { base64ToBinaryDocument } from "mtgatool-db";
 import { InternalDraftv2 } from "mtgatool-shared";
 
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
+import { LOGIN_OK } from "../constants";
+import store from "../redux/stores/rendererStore";
 import { DbliveDraftV1 } from "../types/dbTypes";
+import getUserNamespacedKey from "./getUserNamespacedKey";
 
 export default function createLiveDraft(draft: InternalDraftv2): null | string {
-  if (window.toolDb.user) {
+  const { pubKey, loginState } = store.getState().renderer;
+  if (loginState === LOGIN_OK) {
     const key = `live-draft-v1-${draft.id}`;
 
     const origDoc = Automerge.init<DbliveDraftV1>();
 
     const newDoc = Automerge.change(origDoc, (doc) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      doc.owner = window.toolDb.user?.pubKey || "";
-      doc.ref = window.toolDb.getUserNamespacedKey(`draft-${draft.id}`);
+      doc.owner = pubKey || "";
+      doc.ref = getUserNamespacedKey(pubKey, `draft-${draft.id}`);
       doc.votes = {};
     });
 

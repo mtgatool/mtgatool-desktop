@@ -1,7 +1,8 @@
+/* eslint-disable no-restricted-globals */
 /* eslint-disable no-param-reassign */
 import Automerge from "automerge";
 
-import { DbMatch } from "../types/dbTypes";
+import { DbMatch } from "./dbTypes";
 
 export default async function pushToExplore(key: string, match: DbMatch) {
   // Create CRDT document with the new match added to it
@@ -15,7 +16,7 @@ export default async function pushToExplore(key: string, match: DbMatch) {
       });
 
       const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
-      window.toolDb
+      self.toolDb
         .putCrdt(
           `explore-${currentDay}-${eventId}`,
           Automerge.getChanges(docInit, newDocument),

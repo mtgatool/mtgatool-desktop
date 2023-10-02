@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/tooldb-worker/node_modules
 /.pnp
 .pnp.js
 
@@ -21,8 +22,6 @@
 ipfs
 .idea
 
-/public/worker.js
-
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -30,3 +29,5 @@ build-storybook.log
 storybook-static/**
 src/info.json
 dist-worker
+dist-cards-worker
+dist-tooldb-worker

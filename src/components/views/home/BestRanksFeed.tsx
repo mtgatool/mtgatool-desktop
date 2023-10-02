@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom";
 import { DEFAULT_AVATAR } from "../../../constants";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
+import { doFunction } from "../../../toolDb/worker-wrapper";
 import { DbRankDataWithKey } from "../../../types/dbTypes";
 import cleanUsername from "../../../utils/cleanUsername";
 import timeAgo from "../../../utils/timeAgo";
@@ -153,29 +154,27 @@ export default function BestRanksFeed() {
     if (isLoadingRef.current) return;
     isLoadingRef.current = true;
 
-    window.toolDb
-      .doFunction<DbRankDataWithKey[]>("getLatestRanks", {})
-      .then((fnRet) => {
-        const data: DbRankDataWithKey[] =
-          fnRet.code === "OK" && fnRet.return ? fnRet.return : [];
+    doFunction<DbRankDataWithKey[]>("getLatestRanks", {}).then((fnRet) => {
+      const data: DbRankDataWithKey[] =
+        fnRet.code === "OK" && fnRet.return ? fnRet.return : [];
 
-        const promises = data.map((rankInfo) =>
-          finallyThen(fetchAvatar(rankInfo.pubKey)).then((avatar) =>
-            finallyThen(fetchUsername(rankInfo.pubKey)).then((name) => {
-              return {
-                ...rankInfo,
-                pubKey: rankInfo.pubKey,
-                avatar: avatar || DEFAULT_AVATAR,
-                name: name || "",
-              };
-            })
-          )
-        );
+      const promises = data.map((rankInfo) =>
+        finallyThen(fetchAvatar(rankInfo.pubKey)).then((avatar) =>
+          finallyThen(fetchUsername(rankInfo.pubKey)).then((name) => {
+            return {
+              ...rankInfo,
+              pubKey: rankInfo.pubKey,
+              avatar: avatar || DEFAULT_AVATAR,
+              name: name || "",
+            };
+          })
+        )
+      );
 
-        Promise.all(promises).then((ranks) => {
-          setAllRanks(ranks);
-        });
+      Promise.all(promises).then((ranks) => {
+        setAllRanks(ranks);
       });
+    });
   }, [isLoadingRef, fetchAvatar, fetchUsername]);
 
   const bestConstructed = allRanks.sort(sortConstructedRanks).slice(0, 8);

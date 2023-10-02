@@ -9,6 +9,7 @@ import { useHistory, useParams } from "react-router-dom";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
 import { AppState } from "../../../redux/stores/rendererStore";
+import { getData } from "../../../toolDb/worker-wrapper";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import Flex from "../../Flex";
 import Button from "../../ui/Button";
@@ -40,15 +41,13 @@ export default function ViewExploreEvent() {
   const fetchUsername = useFetchUsername();
 
   useEffect(() => {
-    window.toolDb
-      .getData<DbExploreAggregated>(`exploredata-${params.id}`)
-      .then((d) => {
-        if (d) {
-          setData(d);
-          fetchUsername(d.aggregator);
-          fetchAvatar(d.aggregator);
-        }
-      });
+    getData<DbExploreAggregated>(`exploredata-${params.id}`).then((d) => {
+      if (d) {
+        setData(d);
+        fetchUsername(d.aggregator);
+        fetchAvatar(d.aggregator);
+      }
+    });
   }, [params]);
 
   return (

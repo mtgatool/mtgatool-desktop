@@ -1,10 +1,6 @@
 import Automerge from "automerge";
 
 import MtgaTrackerDaemon from "../daemon/mtgaTrackerDaemon";
-import setupIdb from "../toolDb/setupIdb";
-
-const idb: any = setupIdb();
-idb.start();
 
 const globalData = {
   backgroundProcess: null as any | null,
@@ -19,7 +15,6 @@ const globalData = {
   hiddenDecks: [] as string[],
   liveFeed: Automerge.init<Record<string, number>>(),
   lastLogCheck: 0,
-  idb,
   daemon: null as MtgaTrackerDaemon | null,
   latestDaemon: null as any | null,
 };

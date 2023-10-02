@@ -14,8 +14,11 @@ export default function onAuthenticateResponse(entry: Entry): void {
   if (json.authenticateResponse && json.authenticateResponse.clientId) {
     setLocalSetting("playerId", json.authenticateResponse.clientId);
     postChannelMessage({
-      type: "SET_UUID",
-      value: json.authenticateResponse.clientId,
+      type: "SET_UUID_DISPLAYNAME",
+      value: {
+        uuid: json.authenticateResponse.clientId,
+        displayName: json.authenticateResponse.screenName || undefined,
+      },
     });
   }
 }

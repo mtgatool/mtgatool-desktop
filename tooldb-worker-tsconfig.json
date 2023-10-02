@@ -7,15 +7,15 @@
     ],
     "module": "commonjs",
     "sourceMap": false,
-    "outDir": "./dist-worker",
+    "outDir": "./dist-tooldb-worker",
     "downlevelIteration": true,
     "strict": true,
-    "moduleResolution": "classic",
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "src/cards-worker"
+    "tooldb-worker"
   ]
 }

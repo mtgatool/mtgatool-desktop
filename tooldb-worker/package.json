@@ -1,0 +1,16 @@
+{
+  "name": "tdbworker",
+  "version": "1.0.0",
+  "author": "",
+  "description": "Internal mtgatool-db web worker wrapper",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "automerge": "^1.0.1-preview.7",
+    "mtgatool-db": "^2.1.6",
+    "mtgatool-shared": "^2.2.0"
+  }
+}

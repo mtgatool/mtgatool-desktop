@@ -1,13 +1,13 @@
 import { DbUserids } from "../types/dbTypes";
+import { getData, putData } from "./worker-wrapper";
 
-export default async function upsertDbUserids(newData: DbUserids) {
+export default async function upsertDbUserdata(newData: DbUserids) {
   console.log("> Upsert userdata", newData);
 
-  window.toolDb
-    .getData<DbUserids>("userids", true)
+  getData<DbUserids>("userids", true)
     .then((userids) => {
       if (userids) {
-        window.toolDb.putData<DbUserids>(
+        putData<DbUserids>(
           "userids",
           {
             ...userids,
@@ -16,10 +16,10 @@ export default async function upsertDbUserids(newData: DbUserids) {
           true
         );
       } else {
-        window.toolDb.putData<DbUserids>("userids", newData, true);
+        putData<DbUserids>("userids", newData, true);
       }
     })
     .catch((_e) => {
-      window.toolDb.putData<DbUserids>("userids", newData, true);
+      putData<DbUserids>("userids", newData, true);
     });
 }

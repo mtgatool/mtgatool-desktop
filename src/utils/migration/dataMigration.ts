@@ -73,15 +73,6 @@ export default async function dataMigration(
             const match = convertOldInternalToDbMatch(parsed);
             if (match) {
               resolve(match);
-              // getLocalDbValue<DbMatch>(
-              //   window.toolDb.getUserNamespacedKey(`matches-${match.matchId}`)
-              // ).then((previousMatch) => {
-              //   if (!previousMatch) {
-              //     resolve(match);
-              //   } else {
-              //     resolve(undefined);
-              //   }
-              // });
             } else {
               resolve(undefined);
             }

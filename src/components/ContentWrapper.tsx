@@ -12,9 +12,8 @@ import {
   setDateOption,
 } from "../redux/slices/FilterSlice";
 import { AppState } from "../redux/stores/rendererStore";
-import getLocalDbValue from "../toolDb/getLocalDbValue";
 import { CardsData } from "../types/collectionTypes";
-import { DbMatch, defaultCardsData } from "../types/dbTypes";
+import { defaultCardsData } from "../types/dbTypes";
 import aggregateStats from "../utils/aggregateStats";
 import isElectron from "../utils/electron/isElectron";
 import getCssQuality from "../utils/getCssQuality";
@@ -29,7 +28,7 @@ import ViewDecks from "./views/decks/ViewDecks";
 import ViewDrafts from "./views/drafts/ViewDrafts";
 import ViewExplore from "./views/explore/ViewExplore";
 import ViewExploreAggregator from "./views/explore/ViewExploreAggregator";
-import { convertDbMatchToData } from "./views/history/getMatchesData";
+import { MatchData } from "./views/history/convertDbMatchData";
 import HistoryStats from "./views/history/HistoryStats";
 import ViewHistory from "./views/history/ViewHistory";
 import ViewHome from "./views/home/ViewHome";
@@ -76,7 +75,7 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   const workerRef = useRef<Worker | null>(null);
 
   useEffect(() => {
-    workerRef.current = new Worker("worker/index.js", { type: "module" });
+    workerRef.current = new Worker("cards-worker/index.js", { type: "module" });
   }, []);
 
   const os = forceOs || (isElectron() ? process.platform : "");
@@ -97,6 +96,32 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
     (state: AppState) => state.mainData.matchesIndex
   );
 
+  const [matchesData, setMatchesData] = useState<MatchData[]>([]);
+
+  useEffect(() => {
+    const listener = (e: any) => {
+      const { type, value } = e.data;
+      if (type === `MATCHES_DATA`) {
+        setMatchesData(value);
+      }
+    };
+
+    if (window.toolDbWorker) {
+      window.toolDbWorker.postMessage({
+        type: "GET_MATCHES_DATA",
+        matchesIndex,
+        uuid: currentUUID,
+      });
+      window.toolDbWorker.addEventListener("message", listener);
+    }
+
+    return () => {
+      if (window.toolDbWorker) {
+        window.toolDbWorker.removeEventListener("message", listener);
+      }
+    };
+  }, [matchesIndex, currentUUID]);
+
   useEffect(() => {
     if (workerRef.current) {
       workerRef.current.postMessage({
@@ -114,31 +139,22 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
 
   useEffect(() => {
     if (params.page === "decks") {
-      const promises = matchesIndex.map((id) => {
-        return getLocalDbValue<DbMatch>(id);
+      reduxAction(dispatch, {
+        type: "SET_FULL_STATS",
+        arg: aggregateStats(matchesData, matchFilters),
       });
 
-      Promise.all(promises).then((matches: any) => {
+      if (matchFilters) {
+        const filtered = doHistoryFilter(matchesData, matchFilters, undefined);
+
+        const newHistoryStats = aggregateStats(filtered);
         reduxAction(dispatch, {
-          type: "SET_FULL_STATS",
-          arg: aggregateStats(
-            matches.filter((m: any) => m).map(convertDbMatchToData),
-            matchFilters
-          ),
+          type: "SET_HISTORY_STATS",
+          arg: newHistoryStats,
         });
-
-        if (matchFilters) {
-          const filtered = doHistoryFilter(matches, matchFilters, undefined);
-
-          const newHistoryStats = aggregateStats(filtered);
-          reduxAction(dispatch, {
-            type: "SET_HISTORY_STATS",
-            arg: newHistoryStats,
-          });
-        }
-      });
+      }
     }
-  }, [dispatch, params, matchesIndex, matchFilters]);
+  }, [dispatch, params, matchesData, matchFilters]);
 
   const prevIndex = Object.keys(views).findIndex(
     (k) => k == paths.current[paths.current.length - 1]
@@ -255,6 +271,7 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
                       }
                       openHistoryStatsPopup={openHistoryStatsPopup.current}
                       datePickerDoShow={datePickerDoShow}
+                      matchesData={matchesData}
                     />
                   </animated.div>
                 );
@@ -272,6 +289,7 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
                   }
                   openHistoryStatsPopup={openHistoryStatsPopup.current}
                   datePickerDoShow={datePickerDoShow}
+                  matchesData={matchesData}
                 />
               </div>
             )}

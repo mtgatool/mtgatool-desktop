@@ -19,6 +19,7 @@ import { ReactComponent as IconCrown } from "../../../assets/images/svg/crown.sv
 import { ReactComponent as IconEvent } from "../../../assets/images/svg/event.svg";
 import { ReactComponent as IconTime } from "../../../assets/images/svg/time.svg";
 import reduxAction from "../../../redux/reduxAction";
+import { getData } from "../../../toolDb/worker-wrapper";
 import { DbMatch } from "../../../types/dbTypes";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { toMMSS } from "../../../utils/dateTo";
@@ -142,13 +143,13 @@ export default function MatchView(): JSX.Element {
   const [matchData, setMatchData] = useState<DbMatch>();
 
   useEffect(() => {
-    window.toolDb
-      .getData<DbMatch>(decodeURIComponent(params.id))
-      .then((match: DbMatch | null) => {
+    getData<DbMatch>(decodeURIComponent(params.id)).then(
+      (match: DbMatch | null) => {
         if (match) {
           setMatchData(match);
         }
-      });
+      }
+    );
   }, [params]);
 
   const [view, setView] = useState(VIEW_MATCH);
