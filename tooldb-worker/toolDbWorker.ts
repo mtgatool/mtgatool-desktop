@@ -9,7 +9,7 @@ import getConnectionData from "./getConnectionData";
 import getCrdt from "./getCrdt";
 import getData from "./getData";
 import getDataLocal from "./getDataLocal";
-import getMatchesData from "./getMatchesData";
+import { getMatchesData } from "./getMatchesData";
 import getSaveKeysJson from "./getSaveKeysJson";
 import handleMatchesIndex from "./handleMatchesIndex";
 import keysLogin from "./keysLogin";
