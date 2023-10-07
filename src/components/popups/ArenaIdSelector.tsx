@@ -1,8 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
 
 import { ReactComponent as Close } from "../../assets/images/svg/close.svg";
+import { ReactComponent as DeleteIcon } from "../../assets/images/svg/trash.svg";
 import reduxAction from "../../redux/reduxAction";
 import { AppState } from "../../redux/stores/rendererStore";
+import upsertDbUserdata from "../../toolDb/upsertDbuserdata";
+import removePlayerUUID from "../../utils/removePlayerUUID";
+import SvgButton from "../SvgButton";
 import Radio from "../ui/Radio";
 
 interface ArenaIdSelectorProps {
@@ -32,8 +36,11 @@ export default function ArenaIdSelector(props: ArenaIdSelectorProps) {
             const { displayName } = uuidData[uuid];
             const selected = currentUUID === uuid;
             return (
-              <div key={`uuid-selector-${uuid}`}>
+              <div style={{ display: "flex" }} key={`uuid-selector-${uuid}`}>
                 <Radio
+                  containerStyle={{
+                    width: "100%",
+                  }}
                   text={
                     <p>
                       {displayName || "Unknown"}
@@ -49,11 +56,22 @@ export default function ArenaIdSelector(props: ArenaIdSelectorProps) {
                   }
                   value={selected}
                   callback={() => {
+                    upsertDbUserdata({ [uuid]: new Date().getTime() });
                     reduxAction(dispatch, {
                       type: "SET_UUID",
                       arg: uuid,
                     });
                   }}
+                />
+                <SvgButton
+                  style={{
+                    height: "44px",
+                    width: "44px",
+                    background: "var(--color-section)",
+                    margin: "auto 0 auto 8px",
+                  }}
+                  svg={DeleteIcon}
+                  onClick={() => removePlayerUUID(uuid)}
                 />
               </div>
             );
