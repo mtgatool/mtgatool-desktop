@@ -6,10 +6,11 @@ export interface RadioProps {
   callback: (value: boolean) => void;
   disabled?: boolean;
   style?: React.CSSProperties;
+  containerStyle?: React.CSSProperties;
 }
 
 export default function Radio(props: RadioProps): JSX.Element {
-  const { disabled, value, text, callback, style } = props;
+  const { disabled, value, text, callback, style, containerStyle } = props;
   const [currentValue, setCurrentValue] = useState(value);
 
   const click = (): void => {
@@ -30,7 +31,7 @@ export default function Radio(props: RadioProps): JSX.Element {
   }, [value]);
 
   return (
-    <div className="radio-container">
+    <div className="radio-container" style={containerStyle}>
       <input type="radio" checked={currentValue} disabled />
       <label
         style={disabled ? disabledLabelStyle : { ...style }}

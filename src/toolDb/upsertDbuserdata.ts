@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 import { DbUserids } from "../types/dbTypes";
 import { getData, putData } from "./worker-wrapper";
 
@@ -7,14 +9,15 @@ export default async function upsertDbUserdata(newData: DbUserids) {
   getData<DbUserids>("userids", true)
     .then((userids) => {
       if (userids) {
-        putData<DbUserids>(
-          "userids",
+        const data = _.omit(
           {
             ...userids,
             ...newData,
           },
-          true
+          ["", "undefined"]
         );
+
+        putData<DbUserids>("userids", data, true);
       } else {
         putData<DbUserids>("userids", newData, true);
       }

@@ -74,6 +74,9 @@ const mainDataSlice = createSlice({
     setUUID: (state: MainState, action: PayloadAction<string>): void => {
       state.currentUUID = action.payload;
     },
+    removeUUID: (state: MainState, action: PayloadAction<string>): void => {
+      state.uuidData = _.omit(state.uuidData, action.payload);
+    },
     setUUIDDisplayName: (
       state: MainState,
       action: PayloadAction<{ displayName: string | null; uuid: string }>
@@ -167,6 +170,7 @@ export const {
   setLiveFeed,
   setLiveFeedMatch,
   setUUID,
+  removeUUID,
   setForceCollection,
   setUUIDDisplayName,
   setUUIDRank,

@@ -19,6 +19,7 @@ export const actions = {
   SET_LIVE_FEED: MainDataSlice.setLiveFeed,
   SET_LIVE_FEED_MATCH: MainDataSlice.setLiveFeedMatch,
   SET_UUID: MainDataSlice.setUUID,
+  REMOVE_UUID: MainDataSlice.removeUUID,
   SET_UUID_DISPLAYNAME: MainDataSlice.setUUIDDisplayName,
   SET_UUID_RANK_DATA: MainDataSlice.setUUIDRank,
   SET_UUID_INVENTORY_DATA: MainDataSlice.setUUIDInventory,
