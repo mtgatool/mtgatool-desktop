@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
 
-import { ToolDb, ToolDbNetwork } from "mtgatool-db";
+import { ServerPeerData, ToolDb, ToolDbNetwork } from "mtgatool-db";
 
 import { DEFAULT_PEERS } from "./constants";
 import doFunction from "./doFunction";
@@ -27,14 +27,40 @@ const toolDb = new ToolDb({
 
 toolDb.on("init", (key) => console.warn("ToolDb initialized!", key));
 
-DEFAULT_PEERS.forEach((peer) => {
-  const networkModule = toolDb.network as ToolDbNetwork;
-  networkModule.findServer(peer);
+// Try to conenct to servers from cache
+toolDb.store.get("servers", (err, data) => {
+  let serversData: Record<string, ServerPeerData> = {};
+  if (err) {
+    console.error("Error getting servers from cache:", err);
+  } else if (data) {
+    try {
+      serversData = JSON.parse(data);
+    } catch (_e) {
+      console.error("Error parsing servers from cache:", _e);
+    }
+  }
+
+  console.log("Got servers from cache:", serversData);
+
+  DEFAULT_PEERS.forEach((peer) => {
+    const networkModule = toolDb.network as ToolDbNetwork;
+    if (serversData[peer]) {
+      networkModule.connectTo(serversData[peer]);
+    } else {
+      networkModule.findServer(peer);
+    }
+  });
 });
 
 toolDb.onConnect = () => {
+  const networkModule = toolDb.network as ToolDbNetwork;
   console.warn("ToolDb connected!");
   self.postMessage({ type: "CONNECTED" });
+  toolDb.store.put(
+    "servers",
+    JSON.stringify(networkModule.serverPeerData),
+    () => console.log("Saved servers to cache", networkModule.serverPeerData)
+  );
 };
 
 self.toolDb = toolDb;

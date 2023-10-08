@@ -822,13 +822,35 @@ const toolDb = new mtgatool_db_1.ToolDb({
     server: false,
 });
 toolDb.on("init", (key) => console.warn("ToolDb initialized!", key));
-constants_1.DEFAULT_PEERS.forEach((peer) => {
-    const networkModule = toolDb.network;
-    networkModule.findServer(peer);
+toolDb.store.get("servers", (err, data) => {
+    let serversData = {};
+    if (err) {
+        console.error("Error getting servers from cache:", err);
+    }
+    else if (data) {
+        try {
+            serversData = JSON.parse(data);
+        }
+        catch (_e) {
+            console.error("Error parsing servers from cache:", _e);
+        }
+    }
+    console.log("Got servers from cache:", serversData);
+    constants_1.DEFAULT_PEERS.forEach((peer) => {
+        const networkModule = toolDb.network;
+        if (serversData[peer]) {
+            networkModule.connectTo(serversData[peer]);
+        }
+        else {
+            networkModule.findServer(peer);
+        }
+    });
 });
 toolDb.onConnect = () => {
+    const networkModule = toolDb.network;
     console.warn("ToolDb connected!");
     self.postMessage({ type: "CONNECTED" });
+    toolDb.store.put("servers", JSON.stringify(networkModule.serverPeerData), () => console.log("Saved servers to cache", networkModule.serverPeerData));
 };
 self.toolDb = toolDb;
 self.globalData = {
