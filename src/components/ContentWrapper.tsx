@@ -12,6 +12,7 @@ import {
   setDateOption,
 } from "../redux/slices/FilterSlice";
 import { AppState } from "../redux/stores/rendererStore";
+import { getMatchesData } from "../toolDb/worker-wrapper";
 import { CardsData } from "../types/collectionTypes";
 import { defaultCardsData } from "../types/dbTypes";
 import aggregateStats from "../utils/aggregateStats";
@@ -33,6 +34,7 @@ import HistoryStats from "./views/history/HistoryStats";
 import ViewHistory from "./views/history/ViewHistory";
 import ViewHome from "./views/home/ViewHome";
 import ViewLiveMatch from "./views/livematch/ViewLiveMatch";
+import ViewUser from "./views/user/ViewUser";
 import ViewWip from "./views/wip/ViewWip";
 
 const views = {
@@ -45,6 +47,7 @@ const views = {
   explore: ViewExplore,
   collection: ViewCollection,
   aggregator: ViewExploreAggregator,
+  user: ViewUser,
 };
 
 function delay(transition: any, timeout: number): any {
@@ -97,19 +100,21 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   const [matchesData, setMatchesData] = useState<MatchData[]>([]);
 
   useEffect(() => {
+    getMatchesData(matchesIndex, currentUUID).then((d) => {
+      if (d) {
+        setMatchesData(d);
+      }
+    });
+
+    // hacky hack to listen for the after login matches data message
     const listener = (e: any) => {
       const { type, value } = e.data;
-      if (type === `MATCHES_DATA`) {
+      if (type === `MATCHES_DATA_OK`) {
         setMatchesData(value);
       }
     };
 
     if (window.toolDbWorker) {
-      window.toolDbWorker.postMessage({
-        type: "GET_MATCHES_DATA",
-        matchesIndex,
-        uuid: currentUUID,
-      });
       window.toolDbWorker.addEventListener("message", listener);
     }
 

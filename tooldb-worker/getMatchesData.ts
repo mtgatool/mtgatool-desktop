@@ -60,7 +60,11 @@ function getLocalData<T>(key: string): Promise<T | undefined> {
   });
 }
 
-export default function getMatchesData(matchesIds: string[], uuid: string) {
+export function getMatchesDataLocal(
+  msgId: string,
+  matchesIds: string[],
+  uuid?: string
+) {
   const promises = matchesIds.map((id) => {
     return getLocalData<DbMatch>(id);
   });
@@ -71,8 +75,59 @@ export default function getMatchesData(matchesIds: string[], uuid: string) {
     )
     .then((data) => {
       self.postMessage({
-        type: "MATCHES_DATA",
-        value: data.filter((m) => m.uuid === uuid),
+        type: `${msgId}_OK`,
+        value: data.filter((m) => (uuid ? m.uuid === uuid : true)),
       });
     });
+}
+
+export function getMatchesData(
+  msgId: string,
+  matchesIds: string[] | null,
+  uuid?: string,
+  updateCallback?: (total: number, saved: number) => void
+) {
+  const matchesIndex = [...new Set([...(matchesIds || [])])];
+
+  let saved = 0;
+  let timeout: NodeJS.Timeout | null = null;
+  let lastUpdate = new Date().getTime();
+
+  function updateState() {
+    timeout = null;
+
+    if (updateCallback) {
+      updateCallback(matchesIndex.length, saved);
+    }
+
+    if (saved === matchesIndex.length && matchesIndex.length > 0) {
+      getMatchesDataLocal(msgId, matchesIndex, uuid);
+    }
+  }
+
+  function debounceUpdateState() {
+    if (timeout) clearTimeout(timeout);
+    if (new Date().getTime() - lastUpdate > 1000) {
+      lastUpdate = new Date().getTime();
+      updateState();
+    }
+    timeout = setTimeout(updateState, 100);
+  }
+
+  // Fetch any match we dont have locally
+  matchesIndex.forEach((id: string) => {
+    self.toolDb.store.get(id, (err) => {
+      if (!err) {
+        saved += 1;
+        debounceUpdateState();
+      } else {
+        self.toolDb.getData(id, false, 2000).finally(() => {
+          saved += 1;
+          debounceUpdateState();
+        });
+      }
+    });
+  });
+
+  updateState();
 }

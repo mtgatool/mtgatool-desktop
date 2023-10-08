@@ -68,8 +68,19 @@ export default function ViewExploreEvent() {
                 and {new Date(data.to).toDateString()}
               </i>
               <div className="maker-container">
-                <i className="maker-name">
-                  {`Pushed by ${usernames[data.aggregator]}`}
+                <i className="maker-name">Pushed by</i>
+                <i
+                  className="maker-name link"
+                  style={{ margin: "0 0 0 4px" }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    history.push(
+                      `/user/${encodeURIComponent(data.aggregator || "")}`
+                    );
+                  }}
+                >
+                  {usernames[data.aggregator]}
                 </i>
                 <div
                   className="maker-avatar"

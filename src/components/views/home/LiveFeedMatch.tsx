@@ -2,6 +2,7 @@ import _ from "lodash";
 import { Colors, constants } from "mtgatool-shared";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
@@ -34,6 +35,7 @@ export default function LiveFeedMatch({
   pubKey,
 }: ListItemMatchProps): JSX.Element {
   const { internalMatch } = match;
+  const history = useHistory();
 
   const avatars = useSelector((state: AppState) => state.avatars.avatars);
   const usernames = useSelector((state: AppState) => state.usernames.usernames);
@@ -74,6 +76,11 @@ export default function LiveFeedMatch({
           <div
             title={username}
             className="livefeed-avatar"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              history.push(`/user/${encodeURIComponent(pubKey)}`);
+            }}
             style={{
               backgroundImage: `url(${avatar})`,
             }}

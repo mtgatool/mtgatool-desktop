@@ -64,6 +64,7 @@
       line-height: 48px;
       margin-bottom: 4px;
       padding: 4px 12px;
+      cursor: normal;
 
       &.loading {
         animation-duration: 2s;
@@ -100,6 +101,11 @@
           text-overflow: ellipsis;
           white-space: pre;
           overflow: hidden;
+
+          &:hover {
+            cursor: pointer;
+            text-decoration: underline;
+          }
         }
 
         .rank-time {

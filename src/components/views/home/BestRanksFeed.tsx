@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useHistory } from "react-router-dom";
 
 import { DEFAULT_AVATAR } from "../../../constants";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
@@ -16,12 +17,15 @@ function DrawConstructedRank(props: DbRankInfo) {
     updated,
     name,
     avatar,
+    pubKey,
     constructedClass,
     constructedLevel,
     constructedStep,
     constructedPercentile,
     constructedLeaderboardPlace,
   } = props;
+
+  const history = useHistory();
 
   const mythicRankTitle =
     constructedLeaderboardPlace == 0
@@ -37,7 +41,12 @@ function DrawConstructedRank(props: DbRankInfo) {
         }}
       />
       <div className="rank-name-container">
-        <div className="rank-name">{cleanUsername(name || "-")}</div>
+        <div
+          className="rank-name"
+          onClick={() => history.push(`/user/${encodeURIComponent(pubKey)}`)}
+        >
+          {cleanUsername(name || "-")}
+        </div>
         <div className="rank-time">{timeAgo(updated)}</div>
       </div>
       <div className="rank-icon">
@@ -63,12 +72,15 @@ function DrawLimitedRank(props: DbRankInfo) {
     updated,
     name,
     avatar,
+    pubKey,
     limitedClass,
     limitedLevel,
     limitedStep,
     limitedPercentile,
     limitedLeaderboardPlace,
   } = props;
+
+  const history = useHistory();
 
   const mythicRankTitle =
     limitedLeaderboardPlace == 0
@@ -84,7 +96,12 @@ function DrawLimitedRank(props: DbRankInfo) {
         }}
       />
       <div className="rank-name-container">
-        <div className="rank-name">{name || "-"}</div>
+        <div
+          className="rank-name"
+          onClick={() => history.push(`/user/${encodeURIComponent(pubKey)}`)}
+        >
+          {name || "-"}
+        </div>
         <div className="rank-time">{timeAgo(updated)}</div>
       </div>
       <div className="rank-icon">
@@ -146,6 +163,7 @@ export default function BestRanksFeed() {
           finallyThen(fetchUsername(rankInfo.pubKey)).then((name) => {
             return {
               ...rankInfo,
+              pubKey: rankInfo.pubKey,
               avatar: avatar || DEFAULT_AVATAR,
               name: name || "",
             };

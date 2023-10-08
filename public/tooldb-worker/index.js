@@ -333,7 +333,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertDbMatchToData = void 0;
+exports.getMatchesData = exports.getMatchesDataLocal = exports.convertDbMatchToData = void 0;
 const getRankFilterVal_1 = __importDefault(require("./getRankFilterVal"));
 function convertDbMatchToData(match) {
     const { internalMatch } = match;
@@ -375,7 +375,7 @@ function getLocalData(key) {
         });
     });
 }
-function getMatchesData(matchesIds, uuid) {
+function getMatchesDataLocal(msgId, matchesIds, uuid) {
     const promises = matchesIds.map((id) => {
         return getLocalData(id);
     });
@@ -383,12 +383,53 @@ function getMatchesData(matchesIds, uuid) {
         .then((matches) => matches.filter((m) => m).map((m) => convertDbMatchToData(m)))
         .then((data) => {
         self.postMessage({
-            type: "MATCHES_DATA",
-            value: data.filter((m) => m.uuid === uuid),
+            type: `${msgId}_OK`,
+            value: data.filter((m) => (uuid ? m.uuid === uuid : true)),
         });
     });
 }
-exports.default = getMatchesData;
+exports.getMatchesDataLocal = getMatchesDataLocal;
+function getMatchesData(msgId, matchesIds, uuid, updateCallback) {
+    const matchesIndex = [...new Set([...(matchesIds || [])])];
+    let saved = 0;
+    let timeout = null;
+    let lastUpdate = new Date().getTime();
+    function updateState() {
+        timeout = null;
+        if (updateCallback) {
+            updateCallback(matchesIndex.length, saved);
+        }
+        if (saved === matchesIndex.length && matchesIndex.length > 0) {
+            getMatchesDataLocal(msgId, matchesIndex, uuid);
+        }
+    }
+    function debounceUpdateState() {
+        if (timeout)
+            clearTimeout(timeout);
+        if (new Date().getTime() - lastUpdate > 1000) {
+            lastUpdate = new Date().getTime();
+            updateState();
+        }
+        timeout = setTimeout(updateState, 100);
+    }
+    // Fetch any match we dont have locally
+    matchesIndex.forEach((id) => {
+        self.toolDb.store.get(id, (err) => {
+            if (!err) {
+                saved += 1;
+                debounceUpdateState();
+            }
+            else {
+                self.toolDb.getData(id, false, 2000).finally(() => {
+                    saved += 1;
+                    debounceUpdateState();
+                });
+            }
+        });
+    });
+    updateState();
+}
+exports.getMatchesData = getMatchesData;
 
 },{"./getRankFilterVal":10}],10:[function(require,module,exports){
 "use strict";
@@ -537,52 +578,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 /* eslint-disable no-restricted-globals */
-const getMatchesData_1 = __importDefault(require("./getMatchesData"));
+const getMatchesData_1 = require("./getMatchesData");
 const reduxAction_1 = __importDefault(require("./reduxAction"));
-function handleMatchesIndex(matchesIndex) {
-    self.globalData.matchesIndex = [
-        ...new Set([...self.globalData.matchesIndex, ...(matchesIndex || [])]),
-    ];
-    let saved = 0;
-    let timeout = null;
-    let lastUpdate = new Date().getTime();
-    function updateState() {
-        timeout = null;
-        (0, reduxAction_1.default)("SET_MATCHES_FETCH_STATE", {
-            total: self.globalData.matchesIndex.length,
-            saved,
+function handleMatchesIndex(matchesIds) {
+    if (matchesIds) {
+        (0, reduxAction_1.default)("SET_MATCHES_INDEX", matchesIds);
+        (0, getMatchesData_1.getMatchesData)("MATCHES_DATA", matchesIds, self.globalData.currentUUID, (total, saved) => {
+            (0, reduxAction_1.default)("SET_MATCHES_FETCH_STATE", {
+                total,
+                saved,
+            });
         });
-        if (saved === self.globalData.matchesIndex.length &&
-            self.globalData.matchesIndex.length > 0) {
-            (0, reduxAction_1.default)("SET_MATCHES_INDEX", self.globalData.matchesIndex);
-            (0, getMatchesData_1.default)(self.globalData.matchesIndex, self.globalData.currentUUID);
-        }
     }
-    function debounceUpdateState() {
-        if (timeout)
-            clearTimeout(timeout);
-        if (new Date().getTime() - lastUpdate > 1000) {
-            lastUpdate = new Date().getTime();
-            updateState();
-        }
-        timeout = setTimeout(updateState, 100);
-    }
-    // Fetch any match we dont have locally
-    self.globalData.matchesIndex.forEach((id) => {
-        self.toolDb.store.get(id, (err) => {
-            if (!err) {
-                saved += 1;
-                debounceUpdateState();
-            }
-            else {
-                self.toolDb.getData(id, false, 2000).finally(() => {
-                    saved += 1;
-                    debounceUpdateState();
-                });
-            }
-        });
-    });
-    updateState();
 }
 exports.default = handleMatchesIndex;
 
@@ -800,7 +807,7 @@ const getConnectionData_1 = __importDefault(require("./getConnectionData"));
 const getCrdt_1 = __importDefault(require("./getCrdt"));
 const getData_1 = __importDefault(require("./getData"));
 const getDataLocal_1 = __importDefault(require("./getDataLocal"));
-const getMatchesData_1 = __importDefault(require("./getMatchesData"));
+const getMatchesData_1 = require("./getMatchesData");
 const getSaveKeysJson_1 = __importDefault(require("./getSaveKeysJson"));
 const handleMatchesIndex_1 = __importDefault(require("./handleMatchesIndex"));
 const keysLogin_1 = __importDefault(require("./keysLogin"));
@@ -815,13 +822,35 @@ const toolDb = new mtgatool_db_1.ToolDb({
     server: false,
 });
 toolDb.on("init", (key) => console.warn("ToolDb initialized!", key));
-constants_1.DEFAULT_PEERS.forEach((peer) => {
-    const networkModule = toolDb.network;
-    networkModule.findServer(peer);
+toolDb.store.get("servers", (err, data) => {
+    let serversData = {};
+    if (err) {
+        console.error("Error getting servers from cache:", err);
+    }
+    else if (data) {
+        try {
+            serversData = JSON.parse(data);
+        }
+        catch (_e) {
+            console.error("Error parsing servers from cache:", _e);
+        }
+    }
+    console.log("Got servers from cache:", serversData);
+    constants_1.DEFAULT_PEERS.forEach((peer) => {
+        const networkModule = toolDb.network;
+        if (serversData[peer]) {
+            networkModule.connectTo(serversData[peer]);
+        }
+        else {
+            networkModule.findServer(peer);
+        }
+    });
 });
 toolDb.onConnect = () => {
+    const networkModule = toolDb.network;
     console.warn("ToolDb connected!");
     self.postMessage({ type: "CONNECTED" });
+    toolDb.store.put("servers", JSON.stringify(networkModule.serverPeerData), () => console.log("Saved servers to cache", networkModule.serverPeerData));
 };
 self.toolDb = toolDb;
 self.globalData = {
@@ -881,7 +910,7 @@ self.onmessage = (e) => {
             (0, exploreAggregation_1.beginDataQuery)(e.data.days, e.data.event);
             break;
         case "GET_MATCHES_DATA":
-            (0, getMatchesData_1.default)(e.data.matchesIndex, e.data.uuid);
+            (0, getMatchesData_1.getMatchesData)(e.data.id, e.data.matchesIndex, e.data.uuid);
             break;
         case "REFRESH_MATCHES":
             if (self.toolDb.user) {

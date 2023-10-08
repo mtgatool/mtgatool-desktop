@@ -1,5 +1,7 @@
 import { FunctionReturn, ParsedKeys } from "mtgatool-db";
 
+import { MatchData } from "../components/views/history/convertDbMatchData";
+
 const login = (username: string, password: string) => {
   return new Promise((resolve, reject) => {
     if (window.toolDbWorker) {
@@ -237,10 +239,53 @@ const queryKeys = (
   });
 };
 
+const getMatchesData = (
+  matchesIndex: string[],
+  uuid?: string
+): Promise<MatchData[] | null> => {
+  return new Promise((resolve, reject) => {
+    if (window.toolDbWorker) {
+      const id = Math.random().toString(36).substring(7);
+      window.toolDbWorker.postMessage({
+        type: "GET_MATCHES_DATA",
+        matchesIndex,
+        uuid,
+        id,
+      });
+
+      const listener = (e: any) => {
+        const { type, value } = e.data;
+
+        if (type === `${id}_OK`) {
+          resolve(value);
+          window.toolDbWorker.removeEventListener("message", listener);
+        }
+        if (type === `${id}_ERR`) {
+          reject(e.data.err);
+          window.toolDbWorker.removeEventListener("message", listener);
+        }
+      };
+      window.toolDbWorker.addEventListener("message", listener);
+    } else {
+      reject(new Error("toolDbWorker not available"));
+    }
+  });
+};
+
+window.toolDb = {
+  doFunction,
+  getData,
+  getLocalData,
+  getMatchesData,
+  putData,
+  queryKeys,
+} as any;
+
 export {
   doFunction,
   getData,
   getLocalData,
+  getMatchesData,
   keysLogin,
   login,
   putData,

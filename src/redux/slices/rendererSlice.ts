@@ -3,7 +3,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Format, InternalDraftv2 } from "mtgatool-shared";
 
 import {
-  DEFAULT_PEERS,
   LOGIN_AUTH,
   LOGIN_FAILED,
   LOGIN_OK,
@@ -24,7 +23,6 @@ export interface Popup {
 }
 
 export const initialRendererState = {
-  peers: DEFAULT_PEERS,
   pubKey: "",
   archivedCache: {} as Record<string, boolean>,
   backgroundGrpid: null as number | null,
@@ -61,9 +59,6 @@ const rendererSlice = createSlice({
   name: "renderer",
   initialState: initialRendererState,
   reducers: {
-    setPeers: (state: RendererState, action: PayloadAction<string[]>): void => {
-      state.peers = action.payload;
-    },
     setPubKey: (state: RendererState, action: PayloadAction<string>): void => {
       setLocalSetting("pubkey", action.payload);
       state.pubKey = action.payload;
@@ -205,7 +200,6 @@ const rendererSlice = createSlice({
 });
 
 export const {
-  setPeers,
   setPubKey,
   setReadingLog,
   showPostSignup,
