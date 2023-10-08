@@ -7,11 +7,7 @@ import useDebounce from "../../../hooks/useDebounce";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
 import { AppState } from "../../../redux/stores/rendererStore";
-import {
-  getData,
-  getMatchesData,
-  queryKeys,
-} from "../../../toolDb/worker-wrapper";
+import { getData } from "../../../toolDb/worker-wrapper";
 import { DbRankData } from "../../../types/dbTypes";
 import Section from "../../ui/Section";
 import { MatchData } from "../history/convertDbMatchData";
@@ -51,10 +47,7 @@ export default function UserView() {
       fetchAvatar(pubKey);
       fetchUsername(pubKey);
 
-      console.log("fetching user data", pubKey);
-
       getData(`:${pubKey}.userids`).then((data) => {
-        console.log("got user data", data);
         if (data) {
           let newest = "";
           let newestDate = 0;
@@ -65,17 +58,16 @@ export default function UserView() {
             }
           });
 
-          queryKeys(`:${pubKey}.matches-`).then((matchesIndex) => {
-            if (matchesIndex && matches.current) {
-              console.log("got matches", matchesIndex);
-              getMatchesData(matchesIndex).then((d) => {
-                console.log("got matches data", d);
-                if (d) {
-                  setMatchesList(d);
-                }
-              });
-            }
-          });
+          window.toolDb
+            .doFunction<string>("getLatestMatches", {
+              pubKey: pubKey,
+              items: 10,
+            })
+            .then((d) => {
+              if (d.return) {
+                setMatchesList(d.return as any);
+              }
+            });
 
           getData<DbRankData>(`:${pubKey}.${newest}-rank`).then((rd) => {
             if (rd) {

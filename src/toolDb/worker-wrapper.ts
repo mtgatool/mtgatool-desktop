@@ -272,6 +272,15 @@ const getMatchesData = (
   });
 };
 
+window.toolDb = {
+  doFunction,
+  getData,
+  getLocalData,
+  getMatchesData,
+  putData,
+  queryKeys,
+} as any;
+
 export {
   doFunction,
   getData,

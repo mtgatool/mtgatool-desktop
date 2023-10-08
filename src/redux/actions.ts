@@ -29,7 +29,6 @@ export const actions = {
   SET_MATCHES_INDEX: MainDataSlice.setMatchesIndex,
   SET_DRAFTS_INDEX: MainDataSlice.setDraftsIndex,
   SET_HIDDEN_DECKS: MainDataSlice.setHiddenDecks,
-  SET_PEERS: RendererSlice.setPeers,
   SET_PUBKEY: RendererSlice.setPubKey,
   SET_READING_LOG: RendererSlice.setReadingLog,
   SHOW_POST_SIGNUP: RendererSlice.showPostSignup,
