@@ -52,7 +52,7 @@ function App(props: AppProps) {
   const toolDbWorkerRef = useRef<Worker | null>(null);
 
   useEffect(() => {
-    toolDbWorkerRef.current = new Worker("../tooldb-worker/index.js", {
+    toolDbWorkerRef.current = new Worker("tooldb-worker/index.js", {
       type: "module",
     });
     window.toolDbWorker = toolDbWorkerRef.current;
