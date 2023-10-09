@@ -821,8 +821,10 @@ const toolDb = new mtgatool_db_1.ToolDb({
     // debug: true,
     server: false,
 });
+const SERVERS_KEY = (0, mtgatool_db_1.sha1)("-.servers.-");
 toolDb.on("init", (key) => console.warn("ToolDb initialized!", key));
-toolDb.store.get("servers", (err, data) => {
+// Try to conenct to servers from cache
+toolDb.store.get(SERVERS_KEY, (err, data) => {
     let serversData = {};
     if (err) {
         console.error("Error getting servers from cache:", err);
@@ -850,7 +852,7 @@ toolDb.onConnect = () => {
     const networkModule = toolDb.network;
     console.warn("ToolDb connected!");
     self.postMessage({ type: "CONNECTED" });
-    toolDb.store.put("servers", JSON.stringify(networkModule.serverPeerData), () => console.log("Saved servers to cache", networkModule.serverPeerData));
+    toolDb.store.put(SERVERS_KEY, JSON.stringify(networkModule.serverPeerData), () => console.log("Saved servers to cache", networkModule.serverPeerData));
 };
 self.toolDb = toolDb;
 self.globalData = {

@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
 
-import { ServerPeerData, ToolDb, ToolDbNetwork } from "mtgatool-db";
+import { ServerPeerData, sha1, ToolDb, ToolDbNetwork } from "mtgatool-db";
 
 import { DEFAULT_PEERS } from "./constants";
 import doFunction from "./doFunction";
@@ -25,10 +25,12 @@ const toolDb = new ToolDb({
   server: false,
 });
 
+const SERVERS_KEY = sha1("-.servers.-");
+
 toolDb.on("init", (key) => console.warn("ToolDb initialized!", key));
 
 // Try to conenct to servers from cache
-toolDb.store.get("servers", (err, data) => {
+toolDb.store.get(SERVERS_KEY, (err, data) => {
   let serversData: Record<string, ServerPeerData> = {};
   if (err) {
     console.error("Error getting servers from cache:", err);
@@ -57,7 +59,7 @@ toolDb.onConnect = () => {
   console.warn("ToolDb connected!");
   self.postMessage({ type: "CONNECTED" });
   toolDb.store.put(
-    "servers",
+    SERVERS_KEY,
     JSON.stringify(networkModule.serverPeerData),
     () => console.log("Saved servers to cache", networkModule.serverPeerData)
   );
