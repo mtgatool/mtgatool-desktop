@@ -31,6 +31,10 @@ import globalData from "./utils/globalData";
 import initDirectories from "./utils/initDirectories";
 import registerShortcuts from "./utils/registerShortcuts";
 
+window.toolDbWorker = new Worker("tooldb-worker/index.js", {
+  type: "module",
+});
+
 const title = getWindowTitle();
 
 if (title == WINDOW_UPDATER) {

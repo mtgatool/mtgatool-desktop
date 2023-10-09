@@ -16,6 +16,13 @@ import { loadDbFromCache } from "./utils/database-wrapper";
 import defaultLocalSettings from "./utils/defaultLocalSettings";
 import getLocalSetting from "./utils/getLocalSetting";
 
+window.toolDbWorker = new Worker(
+  `${window.location.origin}/tooldb-worker/index.js`,
+  {
+    type: "module",
+  }
+);
+
 document.title = "MTG Arena Tool";
 
 defaultLocalSettings();

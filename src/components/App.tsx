@@ -49,14 +49,7 @@ function App(props: AppProps) {
 
   const os = forceOs || (isElectron() ? process.platform : "");
 
-  const toolDbWorkerRef = useRef<Worker | null>(null);
-
   useEffect(() => {
-    toolDbWorkerRef.current = new Worker("tooldb-worker/index.js", {
-      type: "module",
-    });
-    window.toolDbWorker = toolDbWorkerRef.current;
-
     window.toolDbWorker.addEventListener("message", (e) => {
       // console.warn("Worker REDUX_ACTION", action.type, action.arg);
       if (e.data.type === "REDUX_ACTION") {
