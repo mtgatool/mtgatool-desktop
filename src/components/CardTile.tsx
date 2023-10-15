@@ -240,7 +240,9 @@ function MissingCardSprite(props: MissingCardsProps): JSX.Element {
   const { missing, cardRarity, listStyle, ww } = props;
 
   const xoff =
-    CARD_RARITIES.filter((r) => r !== "land").indexOf(cardRarity) * -24;
+    CARD_RARITIES.filter((r) => r !== "land" && r !== "token").indexOf(
+      cardRarity
+    ) * -24;
   const yoff = missing * -24;
 
   let className = "not-owned-sprite";
@@ -263,8 +265,8 @@ function MissingCardSprite(props: MissingCardsProps): JSX.Element {
 function WildcardsNeeded(props: WildcardsNeededProps): JSX.Element {
   const { card, deck, isSideboard, listStyle, ww } = props;
   if (
-    card.Types.indexOf("Basic Land") === -1 &&
-    card.Types.indexOf("Basic Snow Land") === -1
+    card.Types.indexOf("Land") === -1 &&
+    card.Supertypes.indexOf("Basic") === -1
   ) {
     const missing = getWildcardsMissing(deck, card.GrpId, isSideboard);
     const cardRarity = card.Rarity as Rarity;
