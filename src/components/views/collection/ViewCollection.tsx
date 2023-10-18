@@ -21,6 +21,7 @@ import Toggle from "../../ui/Toggle";
 import CardCollection from "./CardCollection";
 import getFiltersFromQuery from "./collectionQuery";
 import { getCollectionStats } from "./collectionStats";
+import makeExportSetForScryfallFn from "./exportSetForScryfall";
 import SetsView from "./SetsView";
 
 interface ViewCollectionProps {
@@ -38,6 +39,8 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
   const { collectionData, openAdvancedCollectionSearch } = props;
   const dispatch = useDispatch();
+
+  makeExportSetForScryfallFn(collectionData);
 
   const [filterSets, setFilterSets] = useState<string[]>([]);
 
