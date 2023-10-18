@@ -80,12 +80,7 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
   allSets.forEach((s) => {
     if (standard.includes(s.arenacode) || standard.includes(s.code)) {
       standardSets.push(s);
-    } else if (
-      s.arenacode.startsWith("Y23") ||
-      s.code.startsWith("Y23") ||
-      s.arenacode.startsWith("Y22") ||
-      s.code.startsWith("Y22")
-    ) {
+    } else if (s.arenacode.startsWith("Y2") || s.code.startsWith("Y2")) {
       alchemySets.push(s);
     } else if (
       s.arenacode.startsWith("AHA") ||
