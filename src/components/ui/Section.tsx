@@ -6,10 +6,13 @@ export type SectionProps = React.PropsWithChildren<{
   style?: CSSProperties;
   onClick?: () => void;
   className?: string;
+  showIf?: boolean;
 }>;
 
 export default function Section(props: SectionProps): JSX.Element {
-  const { children, style, onClick, className } = props;
+  const { children, style, onClick, className, showIf } = props;
+
+  if (showIf === false) return <></>;
 
   return (
     <div

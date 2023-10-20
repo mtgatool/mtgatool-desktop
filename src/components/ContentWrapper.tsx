@@ -234,7 +234,7 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
         open={false}
         className={getPopupClass(os)}
         width="1000px"
-        height="540px"
+        height="620px"
         openFnRef={openAdvancedCollectionSearch}
         closeFnRef={closeAdvancedCollectionSearch}
       >

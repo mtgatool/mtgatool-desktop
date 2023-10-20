@@ -42,7 +42,6 @@ export const initialRendererState = {
   topArtist: "Thoughtseize by Aleksi Briclot",
   updateState: "",
   collectionQuery: "f:standard r>token",
-  forceQuery: 0,
   matchInProgress: false,
   draftInProgress: false,
   showPostSignup: null as null | string,
@@ -168,12 +167,9 @@ const rendererSlice = createSlice({
     },
     setCollectionQuery: (
       state: RendererState,
-      action: PayloadAction<{ query: string; forceQuery: boolean }>
+      action: PayloadAction<{ query: string }>
     ): void => {
       state.collectionQuery = action.payload.query;
-      if (action.payload.forceQuery) {
-        state.forceQuery = new Date().getTime();
-      }
     },
     setMatchInProgress: (
       state: RendererState,

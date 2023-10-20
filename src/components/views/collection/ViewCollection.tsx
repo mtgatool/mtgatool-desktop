@@ -6,11 +6,10 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 
 import usePagingControls from "../../../hooks/usePagingControls";
 import reduxAction from "../../../redux/reduxAction";
-import store, { AppState } from "../../../redux/stores/rendererStore";
+import { AppState } from "../../../redux/stores/rendererStore";
 import { CardsData } from "../../../types/collectionTypes";
 import { Filters } from "../../../types/genericFilterTypes";
 import doCollectionFilter from "../../../utils/tables/doCollectionFilter";
-import setFilter from "../../../utils/tables/filters/setFilter";
 import InputContainer from "../../InputContainer";
 import PagingControls from "../../PagingControls";
 import SetsFilter from "../../SetsFilter";
@@ -19,7 +18,7 @@ import Button from "../../ui/Button";
 import Section from "../../ui/Section";
 import Toggle from "../../ui/Toggle";
 import CardCollection from "./CardCollection";
-import getFiltersFromQuery from "./collectionQuery";
+import getFiltersFromQuery, { removeFilterFromQuery } from "./collectionQuery";
 import { getCollectionStats } from "./collectionStats";
 import makeExportSetForScryfallFn from "./exportSetForScryfall";
 import SetsView from "./SetsView";
@@ -42,22 +41,28 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
   makeExportSetForScryfallFn(collectionData);
 
-  const [filterSets, setFilterSets] = useState<string[]>([]);
-
   const [filters, setFilters] = useState<Filters<CardsData>>();
   const [sortValue, setSortValue] = useState<Sort<CardsData>>({
     key: "setCode",
     sort: -1,
   });
 
+  const filterSets = useMemo(() => {
+    const sets: string[] = [];
+    if (filters) {
+      filters.forEach((f) => {
+        if (f.type === "array" && f.id === "setCode") {
+          f.value.arr.forEach((setCode) => sets.push(setCode));
+        }
+      });
+    }
+    return sets;
+  }, [filters]);
+
   const toggleView = useCallback(() => {
     if (viewMode === "cards") setViewMode("set");
     else if (viewMode === "set") setViewMode("cards");
   }, [viewMode]);
-
-  const forceQuery = useSelector(
-    (state: AppState) => state.renderer.forceQuery
-  );
 
   const collectionQuery = useSelector(
     (state: AppState) => state.renderer.collectionQuery
@@ -74,33 +79,16 @@ export default function ViewCollection(props: ViewCollectionProps) {
   const pagingControlProps = usePagingControls(filteredData.length, 24);
 
   useEffect(() => {
-    const newFilters = getFiltersFromQuery(
-      store.getState().renderer.collectionQuery
-    );
+    const newFilters = getFiltersFromQuery(collectionQuery);
     setFilters(newFilters);
-    newFilters.forEach((f) => {
-      if (f.id === "setCode" && f.type === "array") {
-        setFilterSets(f.value.arr);
-      }
-    });
-  }, [forceQuery]);
-
-  useEffect(() => {
-    if (filters) {
-      filters.forEach((f) => {
-        if (f.id === "setCode" && f.type === "array") {
-          setFilterSets(f.value.arr);
-        }
-      });
-    }
-  }, [filters]);
+  }, [collectionQuery]);
 
   useEffect(() => {
     if (match) {
       const { query } = match.params;
       reduxAction(dispatch, {
         type: "SET_COLLECTION_QUERY",
-        arg: { query, forceQuery: true },
+        arg: { query },
       });
     }
   }, []);
@@ -114,55 +102,33 @@ export default function ViewCollection(props: ViewCollectionProps) {
     (query: string) => {
       reduxAction(dispatch, {
         type: "SET_COLLECTION_QUERY",
-        arg: { query, forceQuery: true },
+        arg: { query },
       });
     },
     [dispatch]
   );
 
-  const setFilterSetsPre = useCallback(
+  const setFilterSets = useCallback(
     (sets: string[]) => {
-      // if (filters) {
-      //   const newFilters = setFilter(filters, {
-      //     type: "array",
-      //     id: "setCode",
-      //     value: {
-      //       mode: ":",
-      //       arr: sets,
-      //       not: false,
-      //     },
-      //   });
-      //   setFilters(newFilters);
-      // }
-
+      let newQuery = removeFilterFromQuery(collectionQuery, ["s", "set"]);
+      if (sets.length > 0) {
+        newQuery += ` s:${sets.join(",")}`;
+      }
       reduxAction(dispatch, {
         type: "SET_COLLECTION_QUERY",
         arg: {
-          query: sets.length > 0 ? `s:${sets.join(",")}` : "",
-          forceQuery: true,
+          query: newQuery,
         },
       });
-
-      const newFilters: Filters<CardsData> = setFilter([], {
-        type: "array",
-        id: "setCode",
-        value: {
-          mode: ":",
-          arr: sets,
-          not: false,
-        },
-      });
-
-      setFilters(newFilters);
     },
-    [dispatch, filters]
+    [dispatch, filters, collectionQuery]
   );
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>): void => {
       reduxAction(dispatch, {
         type: "SET_COLLECTION_QUERY",
-        arg: { query: e.currentTarget.value, forceQuery: false },
+        arg: { query: e.currentTarget.value },
       });
     },
     [dispatch]
@@ -285,17 +251,12 @@ export default function ViewCollection(props: ViewCollectionProps) {
             text={viewMode === "set" ? "Cards view" : "Set view"}
           />
           <div style={{ width: "100%" }}>
-            <SetsFilter callback={setFilterSetsPre} filtered={filterSets} />
+            <SetsFilter callback={setFilterSets} filtered={filterSets} />
           </div>
         </div>
       </Section>
       {viewMode === "set" && (
-        <SetsView
-          setQuery={setQuery}
-          filterSets={filterSets}
-          filters={filters || []}
-          stats={stats}
-        />
+        <SetsView setQuery={setQuery} filters={filters || []} stats={stats} />
       )}
       {viewMode === "cards" && (
         <Section className="collection-sort-controls">

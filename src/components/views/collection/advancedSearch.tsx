@@ -247,7 +247,7 @@ export default function AdvancedSearch(
     history.push(`/collection/${query}`);
     reduxAction(dispatch, {
       type: "SET_COLLECTION_QUERY",
-      arg: { query, forceQuery: true },
+      arg: { query },
     });
     handleClose();
   }, [history, handleClose, dispatch, query]);

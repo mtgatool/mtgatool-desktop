@@ -37,7 +37,7 @@ const { WHITE, BLUE, RED, BLACK, GREEN, COLORLESS } = constants;
  * Matches a query string and returns an array to be used in the filters converter
  * @param filterValue Query string
  */
-function parseFilterValue(filterValue: string): ParsedToken[] {
+export function parseFilterValue(filterValue: string): ParsedToken[] {
   const reg =
     /(([^\s"]+)(\b[>=|<=|:|=|!=|>|<]{1,2})([^\s"]+))|(([^\s"]+)(\b[>=|<=|:|=|!=|>|<]{1,2})("[^"]*"))|(([^\s"]+))|(("[^"]*"+))/;
   const filterPattern = new RegExp(reg, "g");
@@ -481,7 +481,7 @@ export default function getFiltersFromQuery(query: string): Filters<CardsData> {
 export function removeFilterFromQuery(query: string, keys: string[]): string {
   const results = parseFilterValue(query);
   const newQuery: string[] = [];
-  results.forEach((match: any) => {
+  results.forEach((match) => {
     const [tokenKey, separator, tokenVal] = match;
     const nKey = tokenKey.startsWith("-") ? tokenKey.slice(1) : tokenKey;
     if (!keys.includes(nKey)) {

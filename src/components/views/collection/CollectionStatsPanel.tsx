@@ -75,8 +75,8 @@ export default function CollectionStatsPanel({
 
   let boostersMode = inBoostersMode[0];
 
-  defaultFilters.forEach((f: any) => {
-    if (f.id == "boosters") {
+  defaultFilters.forEach((f) => {
+    if (f.id == "booster" && f.type == "inbool") {
       const filter: InBoolFilter = f.value;
       if (filter.not == false) boostersMode = inBoostersMode[1];
       if (filter.not == true) boostersMode = inBoostersMode[0];
@@ -98,13 +98,16 @@ export default function CollectionStatsPanel({
   if (!stats) {
     return <></>;
   }
+
   const setStats = stats.complete;
   const wanted: { [key: string]: number } = {};
   const missing: { [key: string]: number } = {};
+
   const filteredRarities = CARD_RARITIES.filter((rarity) => {
     const key = getRarityKey(rarity);
     return !!key && setStats[key].total > 0;
   });
+
   filteredRarities.forEach((rarity) => {
     const key = getRarityKey(rarity);
     if (key) {
