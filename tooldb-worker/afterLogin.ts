@@ -19,6 +19,12 @@ export default function afterLogin() {
       .queryKeys(`:${self.toolDb.user.pubKey}.matches-`)
       .then(handleMatchesIndex);
 
+    self.toolDb.store
+      .query(`:${self.toolDb.user.pubKey}.matches-`)
+      .then((matches) => {
+        reduxAction("SET_LOCAL_MATCHES_INDEX", matches);
+      });
+
     self.toolDb
       .queryKeys(`:${self.toolDb.user.pubKey}.draft-`)
       .then(handleDraftsIndex);

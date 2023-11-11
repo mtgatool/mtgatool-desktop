@@ -28,6 +28,7 @@ const mainState = {
   liveFeed: [] as string[],
   liveFeedMatches: {} as Record<string, DbMatch>,
   matchesIndex: [] as string[],
+  localMatchesIndex: [] as string[],
   draftsIndex: [] as string[],
   hiddenDecks: [] as string[],
   decksIndex: {} as Record<string, number>,
@@ -149,6 +150,15 @@ const mainDataSlice = createSlice({
     ): void => {
       state.matchesIndex = _.uniq([...state.matchesIndex, ...action.payload]);
     },
+    setLocalMatchesIndex: (
+      state: MainState,
+      action: PayloadAction<string[]>
+    ): void => {
+      state.localMatchesIndex = _.uniq([
+        ...state.localMatchesIndex,
+        ...action.payload,
+      ]);
+    },
     setDraftsIndex: (
       state: MainState,
       action: PayloadAction<string[]>
@@ -178,6 +188,7 @@ export const {
   setUUIDCards,
   setDecksIndex,
   setMatchesIndex,
+  setLocalMatchesIndex,
   setDraftsIndex,
   setHiddenDecks,
 } = mainDataSlice.actions;

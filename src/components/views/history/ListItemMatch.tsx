@@ -1,6 +1,10 @@
 import _ from "lodash";
 import { Colors, constants } from "mtgatool-shared";
+import { useSelector } from "react-redux";
 
+import { ReactComponent as IconUpload } from "../../../assets/images/svg/upload.svg";
+import { AppState } from "../../../redux/stores/rendererStore";
+import setDbMatch from "../../../toolDb/setDbMatch";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { toMMSS } from "../../../utils/dateTo";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
@@ -33,6 +37,14 @@ export default function ListItemMatch({
 }: ListItemMatchProps): JSX.Element {
   const { internalMatch } = match;
 
+  const matchesIndex = useSelector(
+    (state: AppState) => state.mainData.matchesIndex
+  );
+
+  const pubKey = useSelector((state: AppState) => state.renderer.pubKey);
+
+  const matchKey = `:${pubKey}.matches-${match.matchId}`;
+
   const onRowClick = (): void => {
     if (openMatchCallback) {
       openMatchCallback(match);
@@ -48,6 +60,10 @@ export default function ListItemMatch({
 
   const isLimited = isLimitedEventId(match.eventId);
 
+  function uploadMatch(): void {
+    setDbMatch(match.internalMatch);
+  }
+
   return (
     <ListItem click={openMatchCallback ? onRowClick : undefined}>
       <div
@@ -60,6 +76,17 @@ export default function ListItemMatch({
         }}
       />
       <HoverTile grpId={internalMatch.playerDeck.deckTileId || DEFAULT_TILE}>
+        {!matchesIndex.includes(matchKey) ? (
+          <IconUpload
+            style={{
+              margin: "auto auto auto 8px",
+              width: "32px",
+              height: "24px",
+            }}
+            onClick={uploadMatch}
+            fill="#FFF"
+          />
+        ) : null}
         {internalMatch.player.rank ? (
           <RankIcon
             rank={internalMatch.player.rank}
@@ -68,9 +95,7 @@ export default function ListItemMatch({
             leaderboardPlace={internalMatch.player.leaderboardPlace || 0}
             format={isLimited ? "limited" : "constructed"}
           />
-        ) : (
-          <></>
-        )}
+        ) : null}
       </HoverTile>
 
       <Column className="list-item-left">

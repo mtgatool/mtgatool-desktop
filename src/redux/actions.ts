@@ -27,6 +27,7 @@ export const actions = {
   FORCE_COLLECTION: MainDataSlice.setForceCollection,
   SET_DECKS_INDEX: MainDataSlice.setDecksIndex,
   SET_MATCHES_INDEX: MainDataSlice.setMatchesIndex,
+  SET_LOCAL_MATCHES_INDEX: MainDataSlice.setLocalMatchesIndex,
   SET_DRAFTS_INDEX: MainDataSlice.setDraftsIndex,
   SET_HIDDEN_DECKS: MainDataSlice.setHiddenDecks,
   SET_PUBKEY: RendererSlice.setPubKey,

@@ -41,7 +41,7 @@ function App(props: AppProps) {
   const { forceOs } = props;
   const history = useHistory();
   const dispatch = useDispatch();
-  const [canLogin, setCanLogin] = useState(false);
+  const [canLogin, _setCanLogin] = useState(true);
 
   const { loginState, loading, backgroundGrpid, matchInProgress } = useSelector(
     (state: AppState) => state.renderer
@@ -60,9 +60,10 @@ function App(props: AppProps) {
           arg: action.arg,
         });
       }
-      if (e.data.type === "CONNECTED") {
-        setCanLogin(true);
-      }
+      // lets experiment removing this
+      // if (e.data.type === "CONNECTED") {
+      //   setCanLogin(true);
+      // }
     });
   }, []);
 
