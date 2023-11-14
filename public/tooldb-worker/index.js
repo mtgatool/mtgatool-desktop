@@ -51625,6 +51625,9 @@ function afterLogin() {
         self.toolDb
             .queryKeys(`:${self.toolDb.user.pubKey}.draft-`)
             .then(handleDraftsIndex_1.default);
+        self.toolDb.getData(`privateMode`, true).then((settingPrivate) => {
+            (0, reduxAction_1.default)("SET_SETTINGS", { privateMode: settingPrivate === true });
+        });
     }
     self.toolDb.addKeyListener(`matches-livefeed-${currentDay}`, handleLiveFeed_1.default);
     self.toolDb.getData(`matches-livefeed-${currentDay}`);

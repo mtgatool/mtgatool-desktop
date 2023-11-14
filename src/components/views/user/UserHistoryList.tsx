@@ -33,7 +33,7 @@ export default function UserHistoryList(props: UserHistoryListProps) {
   });
 
   const filteredData = useMemo(() => {
-    if (filters) {
+    if (filters && matchesData) {
       const filtered = doHistoryFilter(matchesData, filters, sortValue);
 
       return filtered;

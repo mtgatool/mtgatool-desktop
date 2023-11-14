@@ -42,36 +42,43 @@ export default function UserView() {
   const fetchAvatar = useFetchAvatar();
   const fetchUsername = useFetchUsername();
 
+  const [isPrivate, setIsPrivate] = useState(false);
+
   useEffect(() => {
     if (pubKey) {
       fetchAvatar(pubKey);
       fetchUsername(pubKey);
 
-      getData(`:${pubKey}.userids`).then((data) => {
-        if (data) {
-          let newest = "";
-          let newestDate = 0;
-          Object.keys(data).forEach((uuid) => {
-            if (uuid && uuid !== "undefined" && data[uuid] > newestDate) {
-              newestDate = data[uuid];
-              newest = uuid;
-            }
-          });
+      getData(`:${pubKey}.privateMode`).then((privateMode) => {
+        setIsPrivate(!!privateMode);
+        if (!privateMode) {
+          getData(`:${pubKey}.userids`).then((data) => {
+            if (data) {
+              let newest = "";
+              let newestDate = 0;
+              Object.keys(data).forEach((uuid) => {
+                if (uuid && uuid !== "undefined" && data[uuid] > newestDate) {
+                  newestDate = data[uuid];
+                  newest = uuid;
+                }
+              });
 
-          window.toolDb
-            .doFunction<string>("getLatestMatches", {
-              pubKey: pubKey,
-              items: 10,
-            })
-            .then((d) => {
-              if (d.return) {
-                setMatchesList(d.return as any);
-              }
-            });
+              window.toolDb
+                .doFunction<string>("getLatestMatches", {
+                  pubKey: pubKey,
+                  items: 10,
+                })
+                .then((d) => {
+                  if (d && d.return) {
+                    setMatchesList(d.return as any);
+                  }
+                });
 
-          getData<DbRankData>(`:${pubKey}.${newest}-rank`).then((rd) => {
-            if (rd) {
-              setRankData(rd);
+              getData<DbRankData>(`:${pubKey}.${newest}-rank`).then((rd) => {
+                if (rd) {
+                  setRankData(rd);
+                }
+              });
             }
           });
         }
@@ -97,6 +104,11 @@ export default function UserView() {
               />
               <h2 className="username">{decodeURIComponent(username)}</h2>
             </div>
+            {isPrivate ? (
+              <h3 style={{ color: "var(--color-r)", margin: "auto 0" }}>
+                User profile is private
+              </h3>
+            ) : null}
             {rankData && (
               <div className="top-ranks">
                 <UserRank

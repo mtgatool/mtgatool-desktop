@@ -29,8 +29,8 @@ export default function afterLogin() {
       .queryKeys(`:${self.toolDb.user.pubKey}.draft-`)
       .then(handleDraftsIndex);
 
-    self.toolDb.getData(`setting-private`).then((settingPrivate) => {
-      reduxAction("SET_SETTINGS", { privateMode: settingPrivate === "true" });
+    self.toolDb.getData(`privateMode`, true).then((settingPrivate) => {
+      reduxAction("SET_SETTINGS", { privateMode: settingPrivate === true });
     });
   }
 
