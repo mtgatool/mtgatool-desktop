@@ -28,6 +28,10 @@ export default function afterLogin() {
     self.toolDb
       .queryKeys(`:${self.toolDb.user.pubKey}.draft-`)
       .then(handleDraftsIndex);
+
+    self.toolDb.getData(`setting-private`).then((settingPrivate) => {
+      reduxAction("SET_SETTINGS", { privateMode: settingPrivate === "true" });
+    });
   }
 
   self.toolDb.addKeyListener(`matches-livefeed-${currentDay}`, handleLiveFeed);

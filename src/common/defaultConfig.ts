@@ -61,6 +61,7 @@ export const defaultConfig = {
   matchesTableState: undefined,
   matchesTableMode: MATCHES_LIST_MODE,
   skipFirstpass: false,
+  privateMode: false,
   enableKeyboardShortcuts: true,
   shortcutOverlay1: "Alt+Shift+1",
   shortcutOverlay2: "Alt+Shift+2",

@@ -14,6 +14,7 @@ export default async function setDbMatch(match: InternalMatch) {
   console.log("> Set match", match);
 
   const { pubKey } = store.getState().renderer;
+  const { privateMode } = store.getState().settings;
 
   const newDbMatch: DbMatch = {
     matchId: match.id,
@@ -38,11 +39,14 @@ export default async function setDbMatch(match: InternalMatch) {
 
   const remoteKey = getUserNamespacedKey(pubKey, `matches-${match.id}`);
 
-  window.toolDbWorker.postMessage({
-    type: "PUSH_DB_MATCH",
-    key: remoteKey,
-    match: newDbMatch,
-  });
+  if (!privateMode) {
+    // Send to explore and livefeed
+    window.toolDbWorker.postMessage({
+      type: "PUSH_DB_MATCH",
+      key: remoteKey,
+      match: newDbMatch,
+    });
+  }
 
   // Create CRDT document with the new match added to it
   if (!globalData.matchesIndex.includes(remoteKey)) {

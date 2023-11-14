@@ -16,7 +16,9 @@ export default async function upsertDbRank(arg: Partial<CombinedRankInfo>) {
   console.log("> Upsert rank", arg, rank);
 
   const uuid = getLocalSetting("playerId") || "default";
-  const { dispatch } = store;
+  const { dispatch, getState } = store;
+
+  const { privateMode } = getState().settings;
 
   const pubKey = getLocalSetting("pubkey");
   console.warn("pubKey", { pubKey: pubKey });
@@ -35,11 +37,14 @@ export default async function upsertDbRank(arg: Partial<CombinedRankInfo>) {
       });
 
       putData<DbRankData>(`${uuid}-rank`, newData, true);
-      putData<DbRankDataWithKey>(`rank-${pubKey}`, {
-        ...newData,
-        uuid,
-        pubKey: pubKey,
-      });
+
+      if (!privateMode) {
+        putData<DbRankDataWithKey>(`rank-${pubKey}`, {
+          ...newData,
+          uuid,
+          pubKey: pubKey,
+        });
+      }
     } else {
       putData<DbRankData>(
         `${uuid}-rank`,
@@ -49,12 +54,15 @@ export default async function upsertDbRank(arg: Partial<CombinedRankInfo>) {
         },
         true
       );
-      putData<DbRankDataWithKey>(`rank-${pubKey}`, {
-        ...defaultRankData,
-        updated: new Date().getTime(),
-        uuid,
-        pubKey: pubKey,
-      });
+
+      if (!privateMode) {
+        putData<DbRankDataWithKey>(`rank-${pubKey}`, {
+          ...defaultRankData,
+          updated: new Date().getTime(),
+          uuid,
+          pubKey: pubKey,
+        });
+      }
     }
   });
 }

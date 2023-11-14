@@ -17,6 +17,7 @@ import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
 import PassphraseGenerate from "../../PassphraseGenerate";
 import Button from "../../ui/Button";
+import Toggle from "../../ui/Toggle";
 import { SettingsPanelProps } from "./ViewSettings";
 
 function resizeBase64Img(
@@ -50,6 +51,9 @@ export default function AccountSettingsPanel(
 ): JSX.Element {
   const avatars = useSelector((state: AppState) => state.avatars.avatars);
   const pubKey = useSelector((state: AppState) => state.renderer.pubKey);
+  const privateMode = useSelector(
+    (state: AppState) => state.settings.privateMode
+  );
   const fetchAvatar = useFetchAvatar();
   const isLoggedIn = useIsLoggedIn();
 
@@ -96,6 +100,22 @@ export default function AccountSettingsPanel(
       }
     },
     [fetchAvatar, pubKey]
+  );
+
+  const setPrivateMode = useCallback(
+    (value: boolean) => {
+      if (value) {
+        putData(`rank-${pubKey}`, null, false);
+      }
+      reduxAction(dispatch, {
+        type: "SET_SETTINGS",
+        arg: {
+          privateMode: value,
+        },
+      });
+      putData("privateMode", value, true);
+    },
+    [dispatch]
   );
 
   useEffect(() => {
@@ -156,6 +176,12 @@ export default function AccountSettingsPanel(
           onClick={changeAlias}
         />
       </div>
+      <Toggle
+        text="Private mode"
+        value={privateMode}
+        style={{ margin: "auto" }}
+        callback={setPrivateMode}
+      />
       <PassphraseGenerate />
       <p
         style={{
