@@ -82,10 +82,10 @@
     {
       "name": "3Sets",
       "sets": [
-        "ONE",
         "MOM",
         "MAT",
-        "WOE"
+        "WOE",
+        "LCI"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -115,7 +115,10 @@
         "WOE",
         "Y23_ONE",
         "Y23_BRO",
-        "Y23_DMU"
+        "Y23_DMU",
+        "Y24",
+        "Y24_WOE",
+        "LCI"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -184,24 +187,30 @@
         "EA2",
         "EA3",
         "AKR",
-        "KLR"
+        "KLR",
+        "LCI"
       ],
       "bannedTitleIds": [
         488847,
         352244,
         352156,
         352080,
+        8595,
         428587,
         1679,
         414260,
         414166,
+        15162,
+        5088,
+        314,
         336891,
         477509,
         420184,
         420429,
         352113,
         279929,
-        428552
+        428552,
+        400
       ],
       "suspendedTitleIds": [],
       "allowedTitleIds": [
@@ -1578,17 +1587,22 @@
         352244,
         352156,
         352080,
+        8595,
         428587,
         1679,
         414260,
         414166,
+        15162,
+        5088,
+        314,
         336891,
         477509,
         420184,
         420429,
         352113,
         279929,
-        428552
+        428552,
+        400
       ],
       "FormatType": "Constructed",
       "mainDeckQuota": {
@@ -1653,24 +1667,30 @@
         "EA2",
         "EA3",
         "AKR",
-        "KLR"
+        "KLR",
+        "LCI"
       ],
       "bannedTitleIds": [
         488847,
         352244,
         352156,
         352080,
+        8595,
         428587,
         1679,
         414260,
         414166,
+        15162,
+        5088,
+        314,
         336891,
         477509,
         420184,
         420429,
         352113,
         279929,
-        428552
+        428552,
+        400
       ],
       "suspendedTitleIds": [],
       "allowedTitleIds": [
@@ -3043,7 +3063,13 @@
         42839,
         48491
       ],
-      "supressedTitleIds": [],
+      "supressedTitleIds": [
+        8595,
+        15162,
+        5088,
+        314,
+        400
+      ],
       "FormatType": "Constructed",
       "mainDeckQuota": {
         "min": 60,
@@ -3189,7 +3215,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [
         351741,
@@ -4865,7 +4894,10 @@
         "WOE",
         "Y23_ONE",
         "Y23_BRO",
-        "Y23_DMU"
+        "Y23_DMU",
+        "Y24",
+        "Y24_WOE",
+        "LCI"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -5036,7 +5068,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [
         351741,
@@ -5091,17 +5126,21 @@
         "WOE",
         "Y23_ONE",
         "Y23_BRO",
-        "Y23_DMU"
+        "Y23_DMU",
+        "Y24",
+        "Y24_WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
-        436934,
-        476986,
-        546360,
-        498308
+        701908,
+        683716,
+        3142
       ],
       "suspendedTitleIds": [],
       "allowedTitleIds": [],
-      "supressedTitleIds": [],
+      "supressedTitleIds": [
+        3142
+      ],
       "FormatType": "Constructed",
       "mainDeckQuota": {
         "min": 60,
@@ -5124,7 +5163,8 @@
         "ONE",
         "MOM",
         "MAT",
-        "WOE"
+        "WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
         351741,
@@ -5305,7 +5345,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -5458,7 +5501,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [
         351741,
@@ -5526,7 +5572,8 @@
         "ONE",
         "MOM",
         "MAT",
-        "WOE"
+        "WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
         437805
@@ -5697,7 +5744,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [
         173532,
@@ -5809,7 +5859,8 @@
         "ONE",
         "MOM",
         "MAT",
-        "WOE"
+        "WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
         5159,
@@ -5871,7 +5922,8 @@
         "ONE",
         "MOM",
         "MAT",
-        "WOE"
+        "WOE",
+        "LCI"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -6064,7 +6116,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -6235,12 +6290,23 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
-      "bannedTitleIds": [],
+      "bannedTitleIds": [
+        21415,
+        12194,
+        477509
+      ],
       "suspendedTitleIds": [],
       "allowedTitleIds": [],
-      "supressedTitleIds": [],
+      "supressedTitleIds": [
+        21415,
+        12194,
+        477509
+      ],
       "FormatType": "Constructed",
       "mainDeckQuota": {
         "min": 60,
@@ -6262,7 +6328,8 @@
         "ONE",
         "MOM",
         "MAT",
-        "WOE"
+        "WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
         352252,
@@ -6337,7 +6404,10 @@
         "WOE",
         "Y23_ONE",
         "Y23_BRO",
-        "Y23_DMU"
+        "Y23_DMU",
+        "Y24",
+        "Y24_WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
         336370,
@@ -6526,7 +6596,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -6538,7 +6611,7 @@
         "max": 250
       },
       "sideBoardQuota": {
-        "max": 7
+        "max": 15
       }
     },
     {
@@ -9171,7 +9244,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [
         351741,
@@ -9255,7 +9331,9 @@
         "VOW",
         "BRO",
         "ONE",
-        "MOM"
+        "MOM",
+        "LCI",
+        "WOE"
       ],
       "bannedTitleIds": [
         557819,
@@ -9297,7 +9375,10 @@
         "WOE",
         "Y23_ONE",
         "Y23_BRO",
-        "Y23_DMU"
+        "Y23_DMU",
+        "Y24",
+        "Y24_WOE",
+        "LCI"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -9324,7 +9405,8 @@
         "ONE",
         "MOM",
         "MAT",
-        "WOE"
+        "WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
         557819,
@@ -9501,7 +9583,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [
         351741,
@@ -9568,7 +9653,10 @@
         "WOE",
         "Y23_ONE",
         "Y23_BRO",
-        "Y23_DMU"
+        "Y23_DMU",
+        "Y24",
+        "Y24_WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
         478018,
@@ -9633,10 +9721,12 @@
         "WOE",
         "Y23_ONE",
         "Y23_BRO",
-        "Y23_DMU"
+        "Y23_DMU",
+        "Y24",
+        "Y24_WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
-        557819,
         3142,
         3142,
         3142,
@@ -9658,6 +9748,24 @@
       "useRebalancedCards": true
     },
     {
+      "name": "LCI",
+      "sets": [
+        "LCI"
+      ],
+      "bannedTitleIds": [],
+      "suspendedTitleIds": [],
+      "allowedTitleIds": [],
+      "supressedTitleIds": [],
+      "FormatType": "Constructed",
+      "mainDeckQuota": {
+        "min": 60,
+        "max": 250
+      },
+      "sideBoardQuota": {
+        "max": 15
+      }
+    },
+    {
       "name": "TCSingleton",
       "sets": [
         "ANB",
@@ -9672,7 +9780,10 @@
         "WOE",
         "Y23_ONE",
         "Y23_BRO",
-        "Y23_DMU"
+        "Y23_DMU",
+        "Y24",
+        "Y24_WOE",
+        "LCI"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -9824,7 +9935,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -10044,7 +10158,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [
         351741,
@@ -10221,7 +10338,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [
         487194,
@@ -10402,7 +10522,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [
         279584
@@ -10556,7 +10679,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -10709,7 +10835,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [
         351741,
@@ -10780,7 +10909,8 @@
         "ONE",
         "MOM",
         "MAT",
-        "WOE"
+        "WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
         557819,
@@ -10942,7 +11072,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -10973,7 +11106,10 @@
         "WOE",
         "Y23_ONE",
         "Y23_BRO",
-        "Y23_DMU"
+        "Y23_DMU",
+        "Y24",
+        "Y24_WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
         181902,
@@ -11148,7 +11284,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [
         21415,
@@ -11211,7 +11350,8 @@
         "ONE",
         "MOM",
         "MAT",
-        "WOE"
+        "WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
         352244,
@@ -11247,7 +11387,10 @@
         "WOE",
         "Y23_ONE",
         "Y23_BRO",
-        "Y23_DMU"
+        "Y23_DMU",
+        "Y24",
+        "Y24_WOE",
+        "LCI"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -11399,7 +11542,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -11453,7 +11599,10 @@
         "WOE",
         "Y23_ONE",
         "Y23_BRO",
-        "Y23_DMU"
+        "Y23_DMU",
+        "Y24",
+        "Y24_WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
         488856,
@@ -11646,7 +11795,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [
         352244,
@@ -11680,7 +11832,10 @@
         "WOE",
         "Y23_ONE",
         "Y23_BRO",
-        "Y23_DMU"
+        "Y23_DMU",
+        "Y24",
+        "Y24_WOE",
+        "LCI"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -11711,7 +11866,10 @@
         "WOE",
         "Y23_ONE",
         "Y23_BRO",
-        "Y23_DMU"
+        "Y23_DMU",
+        "Y24",
+        "Y24_WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
         557819,
@@ -11779,7 +11937,8 @@
         "MAT",
         "DMU",
         "ONE",
-        "BRO"
+        "BRO",
+        "LCI"
       ],
       "bannedTitleIds": [
         557819,
@@ -11936,7 +12095,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [
         1679
@@ -12582,7 +12744,10 @@
         "WOE",
         "Y23_ONE",
         "Y23_BRO",
-        "Y23_DMU"
+        "Y23_DMU",
+        "Y24",
+        "Y24_WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
         436934,
@@ -12755,7 +12920,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [],
       "suspendedTitleIds": [],
@@ -12786,7 +12954,10 @@
         "WOE",
         "Y23_ONE",
         "Y23_BRO",
-        "Y23_DMU"
+        "Y23_DMU",
+        "Y24",
+        "Y24_WOE",
+        "LCI"
       ],
       "bannedTitleIds": [
         498276,
@@ -12944,7 +13115,10 @@
         "Y23_DMU",
         "Y22_SNC",
         "Y22_NEO",
-        "Y22_MID"
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC"
       ],
       "bannedTitleIds": [
         351741,
