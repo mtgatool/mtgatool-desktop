@@ -1,4 +1,3 @@
-import electron from "electron";
 import {
   constants,
   getJumpstartThemes,
@@ -9,6 +8,7 @@ import {
 import { ResultSpec } from "mtgatool-shared/dist/types/greTypes";
 
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
+import remote from "../utils/electron/remoteWrapper";
 import getToolVersion from "../utils/getToolVersion";
 import getOpponentDeck from "./getOpponentDeck";
 import globalStore from "./store";
@@ -82,7 +82,7 @@ function generateInternalMatch(): InternalMatch {
     duration,
     gameStats: currentMatch.matchGameStats,
     toolVersion: getToolVersion(),
-    toolRunFromSource: !electron.remote?.app.isPackaged,
+    toolRunFromSource: !remote?.app.isPackaged,
     arenaId: currentMatch.player.name,
     playerDeckHash: globalStore.currentMatch.originalDeck.getHash(),
     actionLog: globalStore.currentActionLog,

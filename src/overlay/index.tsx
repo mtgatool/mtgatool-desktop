@@ -1,3 +1,4 @@
+import { BrowserWindow } from "electron";
 import { Chances, compareCards, Deck, InternalDraftv2 } from "mtgatool-shared";
 import {
   OVERLAY_DRAFT,
@@ -18,14 +19,14 @@ import TopBar from "../components/TopBar";
 import useDebounce from "../hooks/useDebounce";
 import { DbDraftVote } from "../types/dbTypes";
 import bcConnect from "../utils/bcConnect";
-import electron from "../utils/electron/electronWrapper";
+import remote from "../utils/electron/remoteWrapper";
 import getLocalSetting from "../utils/getLocalSetting";
 import getPlayerNameWithoutSuffix from "../utils/getPlayerNameWithoutSuffix";
 import Clock from "./Clock";
 import DraftOverlay from "./DraftOverlay";
 
 function getCurrentOverlayId(): number {
-  const title = electron?.remote.getCurrentWindow().getTitle() || "";
+  const title = remote.getCurrentWindow().getTitle() || "";
   return overlayTitleToId[title] || 0;
 }
 
@@ -42,8 +43,8 @@ export default function Overlay() {
   const allSettings = JSON.parse(getLocalSetting("settings")) as Settings;
 
   const updateNewBounds = useCallback(() => {
-    if (electron) {
-      const window = electron.remote.getCurrentWindow();
+    if (remote) {
+      const window = remote.getCurrentWindow() as BrowserWindow;
       postChannelMessage({
         type: "OVERLAY_UPDATE_BOUNDS",
         value: { bounds: window.getBounds(), window: window.getTitle() },
@@ -54,8 +55,8 @@ export default function Overlay() {
   const deboucer = useDebounce(500);
 
   const closeOverlay = useCallback(() => {
-    if (electron) {
-      const window = electron.remote.getCurrentWindow();
+    if (remote) {
+      const window = remote.getCurrentWindow() as BrowserWindow;
       postChannelMessage({
         type: "OVERLAY_SET_SETTINGS",
         value: { settings: { show: false }, window: window.getTitle() },
@@ -102,21 +103,17 @@ export default function Overlay() {
 
   useEffect(() => {
     // if (electron) {
-    //   const { setIgnoreMouseEvents } = electron.remote.getCurrentWindow();
+    //   const { setIgnoreMouseEvents } = remote.getCurrentWindow();
     //   setIgnoreMouseEvents(false);
     // }
 
     const channel = bcConnect() as any;
     channel.onmessage = channelMessageHandler;
 
-    if (electron) {
-      electron.remote.getCurrentWindow().removeAllListeners();
-      electron.remote
-        .getCurrentWindow()
-        .on("move", () => deboucer(updateNewBounds));
-      electron.remote
-        .getCurrentWindow()
-        .on("resize", () => deboucer(updateNewBounds));
+    if (remote) {
+      remote.getCurrentWindow().removeAllListeners();
+      remote.getCurrentWindow().on("move", () => deboucer(updateNewBounds));
+      remote.getCurrentWindow().on("resize", () => deboucer(updateNewBounds));
     }
   }, [deboucer]);
 
@@ -146,8 +143,8 @@ export default function Overlay() {
     }
   }, [settings, matchState]);
 
-  if (electron && settings?.autosize && heightDivAdjustRef.current) {
-    electron.remote.getCurrentWindow().setBounds({
+  if (remote && settings?.autosize && heightDivAdjustRef.current) {
+    remote.getCurrentWindow().setBounds({
       // 24px topbar
       // 12px margin
       height:

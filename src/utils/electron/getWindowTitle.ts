@@ -1,8 +1,6 @@
 import { WINDOW_MAIN } from "../../types/app";
-import electron from "./electronWrapper";
+import remote from "./remoteWrapper";
 
 export default function getWindowTitle(): string {
-  return electron
-    ? electron.remote.getCurrentWindow().getTitle() || ""
-    : WINDOW_MAIN;
+  return remote ? remote.getCurrentWindow().getTitle() || "" : WINDOW_MAIN;
 }

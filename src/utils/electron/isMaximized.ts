@@ -1,8 +1,8 @@
-import electron from "./electronWrapper";
+import remote from "./remoteWrapper";
 
 export default function isMaximized() {
-  if (electron) {
-    return electron.remote.getCurrentWindow().isMaximized();
+  if (remote) {
+    return remote.getCurrentWindow().isMaximized();
   }
   return false;
 }

@@ -5,6 +5,7 @@ import _ from "lodash";
 import { database, loadDbFromCache as loadDbFromShared } from "mtgatool-shared";
 
 import electron from "./electron/electronWrapper";
+import remote from "./electron/remoteWrapper";
 
 // import distributedDb from "../assets/resources/database.json";
 
@@ -12,13 +13,9 @@ let cachePath: string | null = null;
 if (electron) {
   // eslint-disable-next-line no-undef
   const path = __non_webpack_require__("path");
-  cachePath =
-    electron.app || (electron.remote && electron.remote.app)
-      ? path.join(
-          (electron.app || electron.remote.app).getPath("userData"),
-          "database.json"
-        )
-      : null;
+  cachePath = remote
+    ? path.join(remote.app.getPath("userData"), "database.json")
+    : null;
 }
 
 /*

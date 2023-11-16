@@ -9,6 +9,9 @@ const { autoUpdater } = require("electron-updater");
 const mainIpcInitialize = require("./ipcHandlers");
 const mainGlobals = require("./mainGlobals");
 const installDevTools = require("./devtools");
+const openDevTools = require("./openDevTools");
+
+require("@electron/remote/main").initialize();
 
 const iconNormal = "icon.png";
 const iconTrayOsx = "icon-tray-osx.png";
@@ -134,6 +137,11 @@ function createCardHoverWindow() {
     },
   });
 
+  // eslint-disable-next-line global-require
+  require("@electron/remote/main").enable(
+    mainGlobals.cardHoverWindow.webContents
+  );
+
   mainGlobals.cardHoverWindow.removeMenu();
   mainGlobals.cardHoverWindow.loadURL(
     process.env.ELECTRON_START_URL ||
@@ -180,6 +188,11 @@ function createWindow() {
     },
   });
 
+  // eslint-disable-next-line global-require
+  require("@electron/remote/main").enable(
+    mainGlobals.backgroundWindow.webContents
+  );
+
   mainGlobals.backgroundWindow.loadURL(
     process.env.ELECTRON_START_URL ||
       url.format({
@@ -212,6 +225,9 @@ function createWindow() {
       enableRemoteModule: true,
     },
   });
+
+  // eslint-disable-next-line global-require
+  require("@electron/remote/main").enable(mainGlobals.mainWindow.webContents);
 
   mainGlobals.mainWindow.loadURL(
     process.env.ELECTRON_START_URL ||
@@ -264,6 +280,8 @@ function createWindow() {
   });
 
   mainGlobals.mainWindow.webContents.once("dom-ready", () => {
+    openDevTools();
+
     mainGlobals.mainWindow.show();
     mainGlobals.mainWindow.focus();
     sendInit();

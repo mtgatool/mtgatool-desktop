@@ -1,6 +1,7 @@
+import { BrowserWindow } from "electron";
 import { useCallback, useLayoutEffect, useRef } from "react";
 
-import electron from "../utils/electron/electronWrapper";
+import remote from "../utils/electron/remoteWrapper";
 import globalData from "../utils/globalData";
 
 export default function useTransparentFix(debug?: boolean) {
@@ -8,8 +9,9 @@ export default function useTransparentFix(debug?: boolean) {
 
   const doMouseFix = useCallback((event) => {
     // eslint-disable-next-line global-require
-    if (electron) {
-      const { setIgnoreMouseEvents } = electron.remote.getCurrentWindow();
+    if (remote) {
+      const { setIgnoreMouseEvents } =
+        remote.getCurrentWindow() as BrowserWindow;
 
       const target = event.target as HTMLElement;
       if (debug) console.log(target.classList, event);

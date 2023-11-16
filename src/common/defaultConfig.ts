@@ -1,6 +1,7 @@
 import { CardQuality, constants } from "mtgatool-shared";
 
 import electron from "../utils/electron/electronWrapper";
+import remote from "../utils/electron/remoteWrapper";
 
 const {
   COLLECTION_CARD_MODE,
@@ -14,9 +15,9 @@ const {
 
 let primaryX = 0;
 let primaryY = 0;
-if (electron) {
-  primaryX = electron.remote.screen.getPrimaryDisplay().bounds.x;
-  primaryY = electron.remote.screen.getPrimaryDisplay().bounds.y;
+if (remote) {
+  primaryX = remote.screen.getPrimaryDisplay().bounds.x;
+  primaryY = remote.screen.getPrimaryDisplay().bounds.y;
 }
 
 const overlayCfg = {

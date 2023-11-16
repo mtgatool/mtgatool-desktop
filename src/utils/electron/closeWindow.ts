@@ -1,5 +1,5 @@
-import electron from "./electronWrapper";
+import remote from "./remoteWrapper";
 
 export default function closeWindow() {
-  if (electron) electron.remote.getCurrentWindow().close();
+  if (remote) remote.getCurrentWindow().close();
 }
