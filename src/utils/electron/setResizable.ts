@@ -1,5 +1,5 @@
-import electron from "./electronWrapper";
+import remote from "./remoteWrapper";
 
 export default function setResizable(set: boolean) {
-  if (electron) electron.remote.getCurrentWindow().setResizable(set);
+  if (remote) remote.getCurrentWindow().setResizable(set);
 }

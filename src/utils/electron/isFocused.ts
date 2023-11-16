@@ -1,8 +1,8 @@
-import electron from "./electronWrapper";
+import remote from "./remoteWrapper";
 
 export default function isFocused() {
-  if (electron) {
-    return electron.remote.getCurrentWindow().isFocused();
+  if (remote) {
+    return remote.getCurrentWindow().isFocused();
   }
   return false;
 }

@@ -1,10 +1,11 @@
 import electron from "./electron/electronWrapper";
+import remote from "./electron/remoteWrapper";
 
 export default function defaultLogUri(): string {
   if (!electron) return "";
 
   if (process.platform == "darwin") {
-    return `${electron.remote.app.getPath(
+    return `${remote.app.getPath(
       "home"
     )}/Library/Logs/Wizards Of The Coast/MTGA/Player.log`;
   }
@@ -15,7 +16,7 @@ export default function defaultLogUri(): string {
   const windowsMtgaLogFolder =
     "LocalLow\\Wizards Of The Coast\\MTGA\\Player.log";
 
-  return electron?.remote.app
+  return remote?.app
     .getPath("appData")
     .replace("Roaming", windowsMtgaLogFolder);
 }

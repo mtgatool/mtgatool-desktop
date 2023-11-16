@@ -1,10 +1,12 @@
+import { BrowserWindow } from "electron";
+
 import { ALL_OVERLAYS } from "../types/app";
-import electron from "../utils/electron/electronWrapper";
+import remote from "../utils/electron/remoteWrapper";
 
 export default function closeOverlay(id: number) {
-  if (electron) {
+  if (remote) {
     const overlayTitle = ALL_OVERLAYS[id];
-    electron.remote.BrowserWindow.getAllWindows().forEach((w) => {
+    remote.BrowserWindow.getAllWindows().forEach((w: BrowserWindow) => {
       if (w.getTitle() == overlayTitle) {
         w.close();
         w.destroy();

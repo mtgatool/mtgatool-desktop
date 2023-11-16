@@ -9,6 +9,7 @@ import zlib from "zlib";
 import downloadFile from "../utils/downloadFile";
 import electron from "../utils/electron/electronWrapper";
 import isElectron from "../utils/electron/isElectron";
+import remote from "../utils/electron/remoteWrapper";
 import getLocalSetting from "../utils/getLocalSetting";
 import globalData from "../utils/globalData";
 import setLocalSetting from "../utils/setLocalSetting";
@@ -107,8 +108,7 @@ export default class MtgaTrackerDaemon {
         return;
       }
 
-      const electronApp =
-        electron.app || (electron.remote && electron.remote.app);
+      const electronApp = remote && remote.app;
 
       this._daemonExecutablePath = path.join(
         electronApp.getPath("userData"),
@@ -176,8 +176,7 @@ export default class MtgaTrackerDaemon {
     if (!electron) return;
     console.log("mtgaTrackerDaemon Setup Daemon");
 
-    const electronApp =
-      electron.app || (electron.remote && electron.remote.app);
+    const electronApp = remote && remote.app;
 
     this._daemonExecutablePath = path.join(
       electronApp.getPath("userData"),

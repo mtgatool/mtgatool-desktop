@@ -1,9 +1,9 @@
-import electron from "./electronWrapper";
 import isElectron from "./isElectron";
+import remote from "./remoteWrapper";
 
 export default function restartApp() {
-  if (isElectron() && electron) {
-    electron.remote.app.relaunch();
-    electron.remote.app.quit();
+  if (isElectron() && remote) {
+    remote.app.relaunch();
+    remote.app.quit();
   }
 }

@@ -1,3 +1,4 @@
+import { BrowserWindow } from "electron";
 import { Chances, constants } from "mtgatool-shared";
 import {
   CSSProperties,
@@ -25,6 +26,7 @@ import {
 } from "../types/app";
 import bcConnect from "../utils/bcConnect";
 import electron from "../utils/electron/electronWrapper";
+import remote from "../utils/electron/remoteWrapper";
 import setTopMost from "../utils/electron/setTopMost";
 import getBackUrl from "../utils/getBackUrl";
 import { getCardImage } from "../utils/getCardArtCrop";
@@ -36,8 +38,8 @@ const { LANDS_HACK } = constants;
 
 export default function Hover() {
   useTransparentFix();
-  if (electron) {
-    electron.remote.getCurrentWindow().setFocusable(false);
+  if (remote) {
+    remote.getCurrentWindow().setFocusable(false);
     setTopMost(true);
   }
   const [hovering, setHovering] = useState(false);
@@ -62,10 +64,9 @@ export default function Hover() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const calculatePosition = useCallback(() => {
-    const remote = electron?.remote;
-    if (remote) {
-      const allWindowNames = remote.BrowserWindow.getAllWindows().map((w) =>
-        w.getTitle()
+    if (remote && electron) {
+      const allWindowNames = remote.BrowserWindow.getAllWindows().map(
+        (w: BrowserWindow) => w.getTitle()
       );
 
       const hasOverlay =
@@ -76,17 +77,15 @@ export default function Hover() {
         allWindowNames.includes(WINDOW_OVERLAY_4);
 
       let display = remote.screen.getPrimaryDisplay();
-      remote.BrowserWindow.getAllWindows().forEach((w) => {
-        if (electron) {
-          if (hasOverlay) {
-            if (ALL_OVERLAYS.includes(w.getTitle())) {
-              const bounds = w.getBounds();
-              display = remote.screen.getDisplayMatching(bounds);
-            }
-          } else if (w.getTitle() === WINDOW_MAIN) {
+      remote.BrowserWindow.getAllWindows().forEach((w: BrowserWindow) => {
+        if (hasOverlay) {
+          if (ALL_OVERLAYS.includes(w.getTitle())) {
             const bounds = w.getBounds();
             display = remote.screen.getDisplayMatching(bounds);
           }
+        } else if (w.getTitle() === WINDOW_MAIN) {
+          const bounds = w.getBounds();
+          display = remote.screen.getDisplayMatching(bounds);
         }
       });
       const bounds = remote.getCurrentWindow().getBounds();
@@ -168,8 +167,8 @@ export default function Hover() {
     const width = Math.round(cardWidth * 2 + 64);
     const height = Math.round(cardHeight + 48);
 
-    if (electron) {
-      electron.remote.getCurrentWindow().setBounds({ width, height });
+    if (remote) {
+      remote.getCurrentWindow().setBounds({ width, height });
     }
   }, [hoverSize]);
 
@@ -239,10 +238,10 @@ export default function Hover() {
     }
     if (hovering && settings?.overlayHover) {
       calculatePosition();
-      electron.remote.getCurrentWindow().show();
+      remote.getCurrentWindow().show();
     } else {
       hideRef.current = setTimeout(() => {
-        if (electron) electron.remote.getCurrentWindow().hide();
+        if (remote) remote.getCurrentWindow().hide();
       }, 250);
     }
     if (grpId) {

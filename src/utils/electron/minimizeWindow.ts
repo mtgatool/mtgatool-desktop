@@ -1,5 +1,5 @@
-import electron from "./electronWrapper";
+import remote from "./remoteWrapper";
 
 export default function minimizeWindow() {
-  if (electron) electron.remote.getCurrentWindow().minimize();
+  if (remote) remote.getCurrentWindow().minimize();
 }

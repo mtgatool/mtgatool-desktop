@@ -9,7 +9,7 @@ import {
   WINDOW_OVERLAY_3,
   WINDOW_OVERLAY_4,
 } from "../types/app";
-import electron from "../utils/electron/electronWrapper";
+import remote from "../utils/electron/remoteWrapper";
 import getLocalSetting from "../utils/getLocalSetting";
 
 const overlayIdToTitle = [
@@ -24,12 +24,12 @@ export default function createOverlay(
   id: number,
   callback?: () => void
 ): Promise<void> {
-  if (!electron) return new Promise((a, r) => r());
+  if (!remote) return new Promise((a, r) => r());
 
   const allSettings = JSON.parse(getLocalSetting("settings")) as Settings;
   const settings: OverlaySettings = allSettings.overlays[id];
 
-  const newWindow = new electron.remote.BrowserWindow({
+  const newWindow = new remote.BrowserWindow({
     transparent: allSettings.overlaysTransparency,
     // resizable: false,
     // skipTaskbar: true,
@@ -48,7 +48,6 @@ export default function createOverlay(
       webSecurity: false,
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true,
     },
   });
 
@@ -57,7 +56,7 @@ export default function createOverlay(
 
   const proc: any = process;
   newWindow.loadURL(
-    electron.remote.app.isPackaged
+    remote.app.isPackaged
       ? url.format({
           pathname: path.join(
             proc.resourcesPath,
@@ -71,11 +70,13 @@ export default function createOverlay(
       : "http://localhost:3001"
   );
 
+  remote.require("@electron/remote/main").enable(newWindow.webContents);
+
   return new Promise<void>((resolve) => {
     newWindow.webContents.once("dom-ready", () => {
       // eslint-disable-next-line func-names
-      if (electron && process.env.NODE_ENV === "development") {
-        const overlayDevtools = new electron.remote.BrowserWindow({
+      if (remote && process.env.NODE_ENV === "development") {
+        const overlayDevtools = new remote.BrowserWindow({
           title: "MTG Arena Tool - overlay debug",
           icon: path.join(__dirname, "logo512.png"),
         });

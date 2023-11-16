@@ -1,3 +1,4 @@
+import { BrowserWindow } from "electron";
 import {
   OVERLAY_DRAFT,
   OVERLAY_DRAFT_BREW,
@@ -13,7 +14,7 @@ import closeOverlay from "../overlay/closeOverlay";
 import createOverlay from "../overlay/createOverlay";
 import store from "../redux/stores/rendererStore";
 import { ALL_OVERLAYS } from "../types/app";
-import electron from "../utils/electron/electronWrapper";
+import remote from "../utils/electron/remoteWrapper";
 import { overlayTitleToId } from "./maps";
 
 export class OverlayHandler {
@@ -21,8 +22,8 @@ export class OverlayHandler {
 
   private _checkOverlaysState = () => {
     const currentStates = [false, false, false, false, false];
-    if (electron) {
-      electron.remote.BrowserWindow.getAllWindows().forEach((w) => {
+    if (remote) {
+      remote.BrowserWindow.getAllWindows().forEach((w: BrowserWindow) => {
         if (ALL_OVERLAYS.includes(w.getTitle())) {
           const id = overlayTitleToId[w.getTitle()];
           currentStates[id] = true;

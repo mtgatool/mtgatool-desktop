@@ -1,4 +1,5 @@
 /* eslint-disable no-nested-ternary */
+import { BrowserWindow } from "electron";
 import { COLORS_ALL } from "mtgatool-shared/dist/shared/constants";
 import { CSSProperties, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -14,12 +15,12 @@ import { ReactComponent as WinRestore } from "../assets/images/svg/win-restore.s
 import { overlayTitleToId } from "../common/maps";
 import store, { AppState } from "../redux/stores/rendererStore";
 import { ALL_OVERLAYS, WINDOW_MAIN } from "../types/app";
-import electron from "../utils/electron/electronWrapper";
 import getWindowTitle from "../utils/electron/getWindowTitle";
 import hideWindow from "../utils/electron/hideWindow";
 import isFocused from "../utils/electron/isFocused";
 import isMaximized from "../utils/electron/isMaximized";
 import minimizeWindow from "../utils/electron/minimizeWindow";
+import remote from "../utils/electron/remoteWrapper";
 import setMaximize from "../utils/electron/setMaximize";
 
 function clickMinimize(): void {
@@ -39,8 +40,8 @@ function clickClose(): void {
 }
 
 function clickCloseOverlay(): void {
-  if (electron) {
-    const thisWindowTitle = electron.remote.getCurrentWindow().getTitle();
+  if (remote) {
+    const thisWindowTitle = remote.getCurrentWindow().getTitle();
     // const overlayId = overlayTitleToId[thisWindowTitle];
     // reduxAction(store.dispatch, {
     //   type: "SET_OVERLAY_SETTINGS",
@@ -51,7 +52,7 @@ function clickCloseOverlay(): void {
     //     },
     //   },
     // });
-    electron.remote.BrowserWindow.getAllWindows().forEach((w) => {
+    remote.BrowserWindow.getAllWindows().forEach((w: BrowserWindow) => {
       if (w.getTitle() == thisWindowTitle) {
         w.close();
         w.destroy();
