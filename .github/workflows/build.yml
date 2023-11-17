@@ -28,7 +28,7 @@ jobs:
       run: "npm run jest:ci"
     
     - name: "Install distutils"
-      run: "sudo apt-get install --reinstall python3.7-distutils"
+      run: "pip install setuptools"
 
     - name: "Build (npm)"
       run: "npm run build"
