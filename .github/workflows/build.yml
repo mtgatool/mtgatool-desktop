@@ -26,6 +26,9 @@ jobs:
 
     - name: "Test"
       run: "npm run jest:ci"
+    
+    - name: "Install distutils"
+      run: "pip install setuptools"
 
     - name: "Build (npm)"
       run: "npm run build"
