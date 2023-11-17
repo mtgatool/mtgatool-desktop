@@ -29,6 +29,9 @@ jobs:
     - name: "Generate build information json"
       run: "node generateInfo.js"
 
+    - name: "Install distutils"
+      run: "pip install setuptools"
+    
     - name: "Build release, create GitHub release and upload assets (electron-builder)"
       run: "npm run release"
       env:
