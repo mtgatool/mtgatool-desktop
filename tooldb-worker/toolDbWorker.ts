@@ -1,8 +1,9 @@
 /* eslint-disable no-restricted-globals */
 
-import { ServerPeerData, sha1, ToolDb, ToolDbNetwork } from "mtgatool-db";
+import { ServerPeerData, ToolDb, ToolDbNetwork } from "mtgatool-db";
 
-import { DEFAULT_PEERS } from "./constants";
+import addHost from "./addHost";
+import { DEFAULT_PEERS, SAVED_PEERS_KEY, SERVERS_KEY } from "./constants";
 import doFunction from "./doFunction";
 import { beginDataQuery } from "./exploreAggregation";
 import getConnectionData from "./getConnectionData";
@@ -17,40 +18,55 @@ import login from "./login";
 import pushToExplore from "./pushToExplore";
 import pushToLiveFeed from "./pushToLivefeed";
 import queryKeys from "./queryKeys";
+import removeHost from "./removeHost";
 import signup from "./signup";
 
 const toolDb = new ToolDb({
   topic: "mtgatool-db-swarm-v4",
-  // debug: true,
   server: false,
+  maxRetries: 999,
 });
-
-const SERVERS_KEY = sha1("-.servers.-");
 
 toolDb.on("init", (key) => console.warn("ToolDb initialized!", key));
 
 // Try to conenct to servers from cache
-toolDb.store.get(SERVERS_KEY, (err, data) => {
-  let serversData: Record<string, ServerPeerData> = {};
+toolDb.store.get(SAVED_PEERS_KEY, (err, savedData) => {
+  let savedPeers: string[] = DEFAULT_PEERS;
   if (err) {
-    console.error("Error getting servers from cache:", err);
-  } else if (data) {
+    toolDb.store.put(SAVED_PEERS_KEY, JSON.stringify(DEFAULT_PEERS), () => {
+      console.log("Saved default peers to cache");
+    });
+  } else if (savedData) {
     try {
-      serversData = JSON.parse(data);
+      const newPeers = JSON.parse(savedData);
+      savedPeers = newPeers;
     } catch (_e) {
-      console.error("Error parsing servers from cache:", _e);
+      console.error("Error parsing saved peers from cache:", _e);
     }
   }
 
-  console.log("Got servers from cache:", serversData);
-
-  DEFAULT_PEERS.forEach((peer) => {
-    const networkModule = toolDb.network as ToolDbNetwork;
-    if (serversData[peer]) {
-      networkModule.connectTo(serversData[peer]);
-    } else {
-      networkModule.findServer(peer);
+  toolDb.store.get(SERVERS_KEY, (serr, data) => {
+    let serversData: Record<string, ServerPeerData> = {};
+    if (serr) {
+      console.error("Error getting servers from cache:", serr);
+    } else if (data) {
+      try {
+        serversData = JSON.parse(data);
+      } catch (_e) {
+        console.error("Error parsing servers from cache:", _e);
+      }
     }
+
+    console.log("Got servers from cache:", serversData);
+
+    savedPeers.forEach((peer) => {
+      const networkModule = toolDb.network as ToolDbNetwork;
+      if (serversData[peer]) {
+        networkModule.connectTo(serversData[peer]);
+      } else {
+        networkModule.findServer(peer);
+      }
+    });
   });
 });
 
@@ -122,7 +138,21 @@ self.onmessage = (e: any) => {
       getConnectionData();
       break;
 
+    case "CONNECT":
+      addHost(e.data.peer.pubKey);
+      (self.toolDb.network as ToolDbNetwork).connectTo(e.data.peer);
+      break;
+
+    case "DISCONNECT":
+      (self.toolDb.network as ToolDbNetwork).disconnect(e.data.host);
+      break;
+
+    case "REMOVE_HOST":
+      removeHost(e.data.host);
+      break;
+
     case "FIND_SERVER":
+      addHost(e.data.host);
       (self.toolDb.network as ToolDbNetwork).findServer(e.data.host);
       break;
 

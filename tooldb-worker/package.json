@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "automerge": "^1.0.1-preview.7",
-    "mtgatool-db": "^2.1.6",
+    "mtgatool-db": "^2.1.7",
     "mtgatool-shared": "^2.2.0"
   }
 }

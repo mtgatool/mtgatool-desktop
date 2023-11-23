@@ -1,12 +1,12 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable radix */
 import _ from "lodash";
+import { ServerPeerData } from "mtgatool-db";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 
 import { ConnectionData } from "../../../types/app";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import setLocalSetting from "../../../utils/setLocalSetting";
-import vodiFn from "../../../utils/voidfn";
 import Button from "../../ui/Button";
 
 export default function NetworkSettingsPanel(): JSX.Element {
@@ -17,6 +17,14 @@ export default function NetworkSettingsPanel(): JSX.Element {
 
   const [connectionData, setConnectionData] = useState<ConnectionData[]>([]);
 
+  const requestConnectionData = () => {
+    if (window.toolDbWorker) {
+      window.toolDbWorker.postMessage({
+        type: "GET_CONNECTION_DATA",
+      });
+    }
+  };
+
   useEffect(() => {
     const listener = (e: any) => {
       const { type, value } = e.data;
@@ -26,13 +34,14 @@ export default function NetworkSettingsPanel(): JSX.Element {
     };
 
     if (window.toolDbWorker) {
-      window.toolDbWorker.postMessage({
-        type: "GET_CONNECTION_DATA",
-      });
       window.toolDbWorker.addEventListener("message", listener);
+      requestConnectionData();
     }
 
+    const interval = setInterval(requestConnectionData, 1000);
+
     return () => {
+      clearInterval(interval);
       if (window.toolDbWorker) {
         window.toolDbWorker.removeEventListener("message", listener);
       }
@@ -58,6 +67,33 @@ export default function NetworkSettingsPanel(): JSX.Element {
     }
     setNewHost("");
     setLocalSetting("saved-peer-keys", JSON.stringify(newPeers));
+  };
+
+  const connect = (peer: ServerPeerData) => {
+    if (window.toolDbWorker) {
+      window.toolDbWorker.postMessage({
+        type: "CONNECT",
+        peer,
+      });
+    }
+  };
+
+  const disconnect = (host: string) => {
+    if (window.toolDbWorker) {
+      window.toolDbWorker.postMessage({
+        type: "DISCONNECT",
+        host,
+      });
+    }
+  };
+
+  const remove = (host: string) => {
+    if (window.toolDbWorker) {
+      window.toolDbWorker.postMessage({
+        type: "REMOVE_HOST",
+        host,
+      });
+    }
   };
 
   return (
@@ -86,14 +122,18 @@ export default function NetworkSettingsPanel(): JSX.Element {
               text={conn.isConnected ? "Disconnect" : "Connect"}
               style={{ margin: "0 8px", minWidth: "100px", width: "100px" }}
               className="button-simple button-edit"
-              onClick={vodiFn}
+              onClick={
+                conn.isConnected
+                  ? () => disconnect(conn.serverPeerData.pubKey)
+                  : () => connect(conn.serverPeerData)
+              }
             />
 
             <Button
               text="Remove"
               style={{ margin: "0 8px", minWidth: "100px", width: "100px" }}
               className="button-simple button-edit"
-              onClick={vodiFn}
+              onClick={() => remove(conn.serverPeerData.pubKey)}
             />
           </div>
         );

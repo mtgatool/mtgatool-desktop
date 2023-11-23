@@ -12,12 +12,14 @@ export default function getConnectionData() {
       const host = peerData?.host;
       const peerHost = !host || host === "127.0.0.1" ? peerId.slice(-20) : host;
 
+      const socket = networkModule.clientSocket[peerId];
       return {
         peerId,
         peerData,
         serverPeerData: serverPeerData,
         host: serverPeerData?.name || peerHost,
-        isConnected: networkModule.isClientConnected[peerId](),
+        readyState: socket?.readyState,
+        isConnected: socket?.readyState === socket.OPEN,
       };
     }
   );
