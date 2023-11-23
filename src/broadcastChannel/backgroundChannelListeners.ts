@@ -1,6 +1,9 @@
 import start from "../background/worker";
 import bcConnect from "../utils/bcConnect";
+import defaultLogUri from "../utils/defaultLogUri";
 import electron from "../utils/electron/electronWrapper";
+import getLocalSetting from "../utils/getLocalSetting";
+import setLocalSetting from "../utils/setLocalSetting";
 import { ChannelMessage } from "./channelMessages";
 
 export default function backgroundChannelListeners() {
@@ -22,8 +25,12 @@ export default function backgroundChannelListeners() {
   };
 
   if (electron) {
-    electron.ipcRenderer.on("rendererInit", (event: any, d: any) =>
-      console.log("rendererInit", d)
-    );
+    electron.ipcRenderer.on("rendererInit", (event: any, d: any) => {
+      const logUri = getLocalSetting("logPath");
+      if (!logUri || logUri.indexOf("undefined/") > -1) {
+        setLocalSetting("logPath", defaultLogUri());
+      }
+      console.log("rendererInit", d);
+    });
   }
 }
