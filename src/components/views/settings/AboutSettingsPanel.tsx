@@ -22,7 +22,9 @@ export default function AboutSettingsPanel(): JSX.Element {
       <div
         className="message-sub15 release-notes-link"
         onClick={(): void => {
-          openExternal("https://mtgatool.com/release-notes/");
+          openExternal(
+            "https://github.com/mtgatool/mtgatool-desktop/releases/latest"
+          );
         }}
       >
         {`Version ${info.version}`}
@@ -39,12 +41,7 @@ export default function AboutSettingsPanel(): JSX.Element {
         <></>
       )}
       <div className="message-updates green">{updateState || "-"}</div>
-      <div
-        className="message-sub15 release-notes-link"
-        onClick={(): void => openExternal("https://mtgatool.com/release-notes")}
-      >
-        Release Notes
-      </div>
+
       <div style={{ margin: "16px auto 0px auto" }} className="flex-item">
         <div
           className="discord-link"
@@ -52,12 +49,12 @@ export default function AboutSettingsPanel(): JSX.Element {
         />
         <div
           className="twitter-link"
-          onClick={(): void => openExternal("https://twitter.com/MEtchegaray7")}
+          onClick={(): void => openExternal("https://twitter.com/mtgatool")}
         />
         <div
           className="git-link"
           onClick={(): void =>
-            openExternal("https://github.com/mtgatool/mtgatool-desktop")
+            openExternal("https://github.com/mtgatool/mtgatool-desktop#readme")
           }
         />
       </div>
