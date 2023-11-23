@@ -9,7 +9,6 @@ const { autoUpdater } = require("electron-updater");
 const mainIpcInitialize = require("./ipcHandlers");
 const mainGlobals = require("./mainGlobals");
 const installDevTools = require("./devtools");
-const openDevTools = require("./openDevTools");
 
 require("@electron/remote/main").initialize();
 
@@ -280,8 +279,6 @@ function createWindow() {
   });
 
   mainGlobals.mainWindow.webContents.once("dom-ready", () => {
-    openDevTools();
-
     mainGlobals.mainWindow.show();
     mainGlobals.mainWindow.focus();
     sendInit();
@@ -317,6 +314,11 @@ function createUpdaterWindow() {
       enableRemoteModule: true,
     },
   });
+
+  // eslint-disable-next-line global-require
+  require("@electron/remote/main").enable(win.webContents);
+  // win.webContents.openDevTools({ mode: "detach" });
+
   win.setIcon(path.join(__dirname, "icons", iconNormal));
   win.loadURL(
     process.env.ELECTRON_START_URL ||
