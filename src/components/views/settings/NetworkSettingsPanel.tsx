@@ -143,7 +143,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
         <p>
           You can add a server peer host here. If you are running a server, you
           can add your own host here. Server connection data will be acquired
-          automatically with it Public Key.
+          automatically with its Public Key.
         </p>
       </div>
       <div>
