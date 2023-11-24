@@ -895,7 +895,6 @@ const removeHost_1 = __importDefault(require("./removeHost"));
 const signup_1 = __importDefault(require("./signup"));
 const toolDb = new mtgatool_db_1.ToolDb({
     topic: "mtgatool-db-swarm-v4",
-    debug: true,
     server: false,
     maxRetries: 999,
 });
@@ -959,7 +958,7 @@ self.globalData = {
 };
 self.onmessage = (e) => {
     const { type } = e.data;
-    console.log("Worker onmessage:", e.type, e.data);
+    // console.log("Worker onmessage:", e.type, e.data);
     switch (type) {
         case "LOGIN":
             (0, login_1.default)(e.data.username, e.data.password);
