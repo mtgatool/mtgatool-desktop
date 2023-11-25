@@ -15,15 +15,16 @@ export default function afterLogin() {
 
   if (self.toolDb.user) {
     reduxAction("SET_PUBKEY", self.toolDb.user.pubKey);
-    self.toolDb
-      .queryKeys(`:${self.toolDb.user.pubKey}.matches-`)
-      .then(handleMatchesIndex);
 
     self.toolDb.store
       .query(`:${self.toolDb.user.pubKey}.matches-`)
       .then((matches) => {
         reduxAction("SET_LOCAL_MATCHES_INDEX", matches);
       });
+
+    self.toolDb
+      .queryKeys(`:${self.toolDb.user.pubKey}.matches-`)
+      .then(handleMatchesIndex);
 
     self.toolDb
       .queryKeys(`:${self.toolDb.user.pubKey}.draft-`)
