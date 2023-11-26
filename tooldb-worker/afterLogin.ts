@@ -23,7 +23,7 @@ export default function afterLogin() {
       });
 
     self.toolDb
-      .queryKeys(`:${self.toolDb.user.pubKey}.matches-`)
+      .queryKeys(`:${self.toolDb.user.pubKey}.matches-`, false, 5000, true)
       .then(handleMatchesIndex);
 
     self.toolDb

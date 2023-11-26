@@ -54,7 +54,7 @@ export default async function setDbMatch(match: InternalMatch) {
   }
 
   reduxAction(store.dispatch, {
-    type: "SET_MATCHES_INDEX",
+    type: "SET_REMOTE_MATCHES_INDEX",
     arg: globalData.matchesIndex,
   });
 }

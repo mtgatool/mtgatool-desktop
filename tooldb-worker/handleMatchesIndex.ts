@@ -4,7 +4,7 @@ import reduxAction from "./reduxAction";
 
 export default function handleMatchesIndex(matchesIds: string[] | null) {
   if (matchesIds) {
-    reduxAction("SET_MATCHES_INDEX", matchesIds);
+    reduxAction("SET_REMOTE_MATCHES_INDEX", matchesIds);
 
     getMatchesData(
       "MATCHES_DATA",

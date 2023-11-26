@@ -37,8 +37,8 @@ export default function ListItemMatch({
 }: ListItemMatchProps): JSX.Element {
   const { internalMatch } = match;
 
-  const matchesIndex = useSelector(
-    (state: AppState) => state.mainData.matchesIndex
+  const remoteMatchesIndex = useSelector(
+    (state: AppState) => state.mainData.remoteMatchesIndex
   );
 
   const pubKey = useSelector((state: AppState) => state.renderer.pubKey);
@@ -76,14 +76,18 @@ export default function ListItemMatch({
         }}
       />
       <HoverTile grpId={internalMatch.playerDeck.deckTileId || DEFAULT_TILE}>
-        {!matchesIndex.includes(matchKey) ? (
+        {!remoteMatchesIndex.includes(matchKey) ? (
           <IconUpload
             style={{
               margin: "auto auto auto 8px",
               width: "32px",
               height: "24px",
             }}
-            onClick={uploadMatch}
+            onClick={(e: React.MouseEvent<SVGSVGElement, MouseEvent>): void => {
+              e.stopPropagation();
+              e.nativeEvent.stopImmediatePropagation();
+              uploadMatch();
+            }}
             fill="#FFF"
           />
         ) : null}

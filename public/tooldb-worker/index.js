@@ -49,7 +49,7 @@ function afterLogin() {
             (0, reduxAction_1.default)("SET_LOCAL_MATCHES_INDEX", matches);
         });
         self.toolDb
-            .queryKeys(`:${self.toolDb.user.pubKey}.matches-`)
+            .queryKeys(`:${self.toolDb.user.pubKey}.matches-`, false, 5000, true)
             .then(handleMatchesIndex_1.default);
         self.toolDb
             .queryKeys(`:${self.toolDb.user.pubKey}.draft-`)
@@ -626,7 +626,7 @@ const getMatchesData_1 = require("./getMatchesData");
 const reduxAction_1 = __importDefault(require("./reduxAction"));
 function handleMatchesIndex(matchesIds) {
     if (matchesIds) {
-        (0, reduxAction_1.default)("SET_MATCHES_INDEX", matchesIds);
+        (0, reduxAction_1.default)("SET_REMOTE_MATCHES_INDEX", matchesIds);
         (0, getMatchesData_1.getMatchesData)("MATCHES_DATA", matchesIds, self.globalData.currentUUID, (total, saved) => {
             (0, reduxAction_1.default)("SET_MATCHES_FETCH_STATE", {
                 total,
@@ -1022,7 +1022,7 @@ self.onmessage = (e) => {
         case "REFRESH_MATCHES":
             if (self.toolDb.user) {
                 self.toolDb
-                    .queryKeys(`:${self.toolDb.user.pubKey}.matches-`, false, 5000)
+                    .queryKeys(`:${self.toolDb.user.pubKey}.matches-`, false, 5000, true)
                     .then(handleMatchesIndex_1.default);
             }
             break;
@@ -66510,12 +66510,15 @@ var _1 = require(".");
  * Triggers a QUERY request to other peers.
  * @param key start of the key
  * @param userNamespaced If this key bolongs to a user or its public.
+ * @param timeout Max time to wait for remote.
+ * @param remoteOnly Only query remote peers, do not query local store.
  * @returns Promise<Data>
  */
-function toolDbQueryKeys(key, userNamespaced, timeoutMs) {
+function toolDbQueryKeys(key, userNamespaced, timeoutMs, remoteOnly) {
     var _this = this;
     if (userNamespaced === void 0) { userNamespaced = false; }
     if (timeoutMs === void 0) { timeoutMs = 1000; }
+    if (remoteOnly === void 0) { remoteOnly = false; }
     return new Promise(function (resolve, reject) {
         var _a, _b;
         if (userNamespaced && ((_a = _this.user) === null || _a === void 0 ? void 0 : _a.pubKey) === undefined) {
@@ -66539,12 +66542,14 @@ function toolDbQueryKeys(key, userNamespaced, timeoutMs) {
         var msgId = (0, _1.textRandom)(10);
         var foundKeys = [];
         var timeout;
-        var gotLocalKeys = false;
-        _this.store.query(finalKey).then(function (localKeys) {
-            gotLocalKeys = true;
-            foundKeys = __spreadArray(__spreadArray([], foundKeys, true), localKeys, true);
-            timeout = setTimeout(finishListening, timeoutMs);
-        });
+        var gotLocalKeys = remoteOnly;
+        if (remoteOnly === false) {
+            _this.store.query(finalKey).then(function (localKeys) {
+                gotLocalKeys = true;
+                foundKeys = __spreadArray(__spreadArray([], foundKeys, true), localKeys, true);
+                timeout = setTimeout(finishListening, timeoutMs);
+            });
+        }
         var finishListening = function () {
             resolve(lodash_1.default.uniq(foundKeys));
         };
