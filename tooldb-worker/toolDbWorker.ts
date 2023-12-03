@@ -138,7 +138,7 @@ self.onmessage = (e: any) => {
       break;
 
     case "DO_FUNCTION":
-      doFunction(e.data.id, e.data.fname, e.data.args);
+      doFunction(e.data.id, e.data.fname, e.data.args, e.data.timeoutMs);
       break;
 
     case "GET_CONNECTION_DATA":

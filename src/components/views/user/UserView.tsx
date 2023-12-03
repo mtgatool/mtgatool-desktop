@@ -7,7 +7,7 @@ import useDebounce from "../../../hooks/useDebounce";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
 import { AppState } from "../../../redux/stores/rendererStore";
-import { getData } from "../../../toolDb/worker-wrapper";
+import { doFunction, getData } from "../../../toolDb/worker-wrapper";
 import { DbRankData } from "../../../types/dbTypes";
 import Section from "../../ui/Section";
 import { MatchData } from "../history/convertDbMatchData";
@@ -63,16 +63,18 @@ export default function UserView() {
                 }
               });
 
-              window.toolDb
-                .doFunction<string>("getLatestMatches", {
+              doFunction<string>(
+                "getLatestMatches",
+                {
                   pubKey: pubKey,
                   items: 10,
-                })
-                .then((d) => {
-                  if (d && d.return) {
-                    setMatchesList(d.return as any);
-                  }
-                });
+                },
+                99999
+              ).then((d) => {
+                if (d && d.code === "OK" && d.return) {
+                  setMatchesList(d.return as any);
+                }
+              });
 
               getData<DbRankData>(`:${pubKey}.${newest}-rank`).then((rd) => {
                 if (rd) {

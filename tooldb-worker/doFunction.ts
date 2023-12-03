@@ -3,10 +3,11 @@
 export default function doFunction(
   msgId: string,
   fname: string,
-  args: boolean
+  args: boolean,
+  timeoutMs: number
 ) {
   return self.toolDb
-    .doFunction(fname, args)
+    .doFunction(fname, args, timeoutMs)
     .then((value) => {
       self.postMessage({ type: `${msgId}_OK`, value });
     })

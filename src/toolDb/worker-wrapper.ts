@@ -140,7 +140,8 @@ const getData = <T = any>(
 
 const doFunction = <T = any>(
   fname: string,
-  args = {}
+  args = {},
+  timeoutMs = 5000
 ): Promise<FunctionReturn<T | null>> => {
   return new Promise((resolve, reject) => {
     if (window.toolDbWorker) {
@@ -150,6 +151,7 @@ const doFunction = <T = any>(
         fname,
         args,
         id,
+        timeoutMs,
       });
 
       const listener = (e: any) => {
