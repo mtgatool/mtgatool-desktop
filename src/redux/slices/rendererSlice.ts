@@ -29,7 +29,7 @@ export const initialRendererState = {
   loading: false,
   logCompletion: 0,
   noLog: false,
-  offline: false,
+  offline: true,
   loginState: LOGIN_AUTH,
   patreon: {
     patreon: false,

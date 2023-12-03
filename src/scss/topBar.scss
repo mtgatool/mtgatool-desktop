@@ -107,3 +107,13 @@
 .top-button-mac.close:active {
   background-color: #ca4e4a;
 }
+
+.unlink {
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-right: 0px !important;
+  width: 32px;
+  // height: 100%;
+  background-size: contain;
+  background-image: url(../assets/images/unlink.png);
+}

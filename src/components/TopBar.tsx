@@ -156,7 +156,9 @@ export default function TopBar(props: TopBarProps): JSX.Element {
     </div>
   );
 
-  const isOffline = <div className="unlink" title="You are not logged-in." />;
+  const isOffline = (
+    <div className="unlink" title="You are not connected to any servers." />
+  );
 
   return (
     <div

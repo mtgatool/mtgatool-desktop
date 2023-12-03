@@ -18,6 +18,7 @@ import login from "./login";
 import pushToExplore from "./pushToExplore";
 import pushToLiveFeed from "./pushToLivefeed";
 import queryKeys from "./queryKeys";
+import reduxAction from "./reduxAction";
 import removeHost from "./removeHost";
 import signup from "./signup";
 
@@ -73,13 +74,18 @@ toolDb.store.get(SAVED_PEERS_KEY, (err, savedData) => {
 
 toolDb.onConnect = () => {
   const networkModule = toolDb.network as ToolDbNetwork;
-  console.warn("ToolDb connected!");
+  reduxAction("SET_OFFLINE", false);
+
   self.postMessage({ type: "CONNECTED" });
   toolDb.store.put(
     SERVERS_KEY,
     JSON.stringify(networkModule.serverPeerData),
     () => console.log("Saved servers to cache", networkModule.serverPeerData)
   );
+};
+
+toolDb.onDisconnect = () => {
+  reduxAction("SET_OFFLINE", true);
 };
 
 self.toolDb = toolDb;
