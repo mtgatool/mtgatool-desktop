@@ -3,6 +3,7 @@
 import { ServerPeerData, ToolDb, ToolDbNetwork } from "mtgatool-db";
 
 import addHost from "./addHost";
+import addKeyListener from "./addKeyListener";
 import { DEFAULT_PEERS, SAVED_PEERS_KEY, SERVERS_KEY } from "./constants";
 import doFunction from "./doFunction";
 import { beginDataQuery } from "./exploreAggregation";
@@ -135,6 +136,18 @@ self.onmessage = (e: any) => {
 
     case "QUERY_KEYS":
       queryKeys(e.data.id, e.data.key, e.data.userNamespaced, e.data.timeoutMs);
+      break;
+
+    case "ADD_KEY_LISTENER":
+      addKeyListener(e.data.id, e.data.key);
+      break;
+
+    case "SUBSCRIBE":
+      self.toolDb.subscribeData(e.data.key, e.data.userNamespaced);
+      break;
+
+    case "REMOVE_KEY_LISTENER":
+      self.toolDb.removeKeyListener(e.data.id);
       break;
 
     case "DO_FUNCTION":

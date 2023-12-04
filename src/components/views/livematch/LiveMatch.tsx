@@ -9,6 +9,11 @@ import { ReactComponent as CopyButton } from "../../../assets/images/svg/copy.sv
 import { ReactComponent as IconEvent } from "../../../assets/images/svg/event.svg";
 import { OverlayUpdateMatchState } from "../../../background/store/types";
 import reduxAction from "../../../redux/reduxAction";
+import {
+  addKeyListener,
+  removeKeyListener,
+  subscribeData,
+} from "../../../toolDb/worker-wrapper";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { getCardArtCrop } from "../../../utils/getCardArtCrop";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
@@ -32,22 +37,33 @@ export default function LiveMatch() {
   const liveMatchKey = `livematch-${params.id}`;
 
   useEffect(() => {
-    const liveMatchListener =
-      window.toolDb.addKeyListener<OverlayUpdateMatchState>(
-        liveMatchKey,
-        (msg: any) => {
-          if (msg && msg.type === "put") {
-            setMatchState(msg.v);
-          }
-        }
-      );
+    let listenerId: number | null = null;
+    addKeyListener(liveMatchKey).then((id) => {
+      listenerId = id;
+    });
 
-    window.toolDb.subscribeData(liveMatchKey);
-    window.toolDb.getData(liveMatchKey);
+    const listener = (e: any) => {
+      const { type, value } = e.data;
+      console.log("LIVE MATCH LISTENER", type, value);
+      if (type === `LISTENER_${liveMatchKey}`) {
+        if (value && value.type === "put") {
+          setMatchState(value.v);
+        }
+      }
+    };
+
+    if (window.toolDbWorker) {
+      window.toolDbWorker.addEventListener("message", listener);
+    }
+
+    subscribeData(liveMatchKey);
 
     return () => {
-      if (liveMatchListener) {
-        window.toolDb.removeKeyListener(liveMatchListener);
+      if (listenerId) {
+        removeKeyListener(listenerId);
+      }
+      if (window.toolDbWorker) {
+        window.toolDbWorker.removeEventListener("message", listener);
       }
     };
   }, []);

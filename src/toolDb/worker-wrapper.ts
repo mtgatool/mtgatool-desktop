@@ -241,6 +241,64 @@ const queryKeys = (
   });
 };
 
+const subscribeData = (key: string, userNamespaced = false): Promise<null> => {
+  return new Promise((resolve, reject) => {
+    if (window.toolDbWorker) {
+      const id = Math.random().toString(36).substring(7);
+      window.toolDbWorker.postMessage({
+        type: "SUBSCRIBE",
+        id,
+        key,
+        userNamespaced,
+      });
+    } else {
+      reject(new Error("toolDbWorker not available"));
+    }
+  });
+};
+
+const removeKeyListener = (listenerId: number): Promise<null> => {
+  return new Promise((resolve, reject) => {
+    if (window.toolDbWorker) {
+      window.toolDbWorker.postMessage({
+        type: "REMOVE_KEY_LISTENER",
+        id: listenerId,
+      });
+    } else {
+      reject(new Error("toolDbWorker not available"));
+    }
+  });
+};
+
+const addKeyListener = (key: string): Promise<number> => {
+  return new Promise((resolve, reject) => {
+    if (window.toolDbWorker) {
+      const id = Math.random().toString(36).substring(7);
+      window.toolDbWorker.postMessage({
+        type: "ADD_KEY_LISTENER",
+        key,
+        id,
+      });
+
+      const listener = (e: any) => {
+        const { type, id: listenerId } = e.data;
+
+        if (type === `${id}_ID`) {
+          resolve(listenerId);
+          window.toolDbWorker.removeEventListener("message", listener);
+        }
+        if (type === `${id}_ERR`) {
+          reject(e.data.err);
+          window.toolDbWorker.removeEventListener("message", listener);
+        }
+      };
+      window.toolDbWorker.addEventListener("message", listener);
+    } else {
+      reject(new Error("toolDbWorker not available"));
+    }
+  });
+};
+
 const getMatchesData = (
   matchesIndex: string[],
   uuid?: string
@@ -281,9 +339,13 @@ window.toolDb = {
   getMatchesData,
   putData,
   queryKeys,
+  addKeyListener,
+  removeKeyListener,
+  subscribeData,
 } as any;
 
 export {
+  addKeyListener,
   doFunction,
   getData,
   getLocalData,
@@ -292,5 +354,7 @@ export {
   login,
   putData,
   queryKeys,
+  removeKeyListener,
   signup,
+  subscribeData,
 };
