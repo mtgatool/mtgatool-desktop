@@ -188,14 +188,14 @@ export default function TopBar(props: TopBarProps): JSX.Element {
         ) : (
           <></>
         )}
-        {offline && isReverse && isOffline}
+        {offline && !isOverlay && isReverse && isOffline}
       </div>
       <div
         onMouseEnter={(): void => setHoverControls(true)}
         onMouseLeave={(): void => setHoverControls(false)}
         className={topButtonsContainerClass}
       >
-        {offline && !isReverse && isOffline}
+        {offline && !isOverlay && !isReverse && isOffline}
         {os == "darwin"
           ? [close, minimize, maximize]
           : [minimize, maximize, close]}
