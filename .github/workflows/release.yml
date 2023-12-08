@@ -45,6 +45,15 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
   
+    - name: "Package JSON"
+      run: echo "INFO_JSON=$(jq -c . < ./src/info.json)" >> $GITHUB_ENV
+  
+    - uses: getsentry/action-release@v1
+      with:
+        environment: 'production'
+        version: ${{ fromJson(env.INFO_JSON).version }}
+  
+  
     - name: Create installer
       if: matrix.os == 'ubuntu-latest'
       run: |
