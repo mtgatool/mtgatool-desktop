@@ -31,6 +31,14 @@ jobs:
     - name: Build web
       run: npm run build:web
 
+    - name: "Package JSON"
+      run: echo "PACKAGE_JSON=$(jq -c . < package.json)" >> $GITHUB_ENV
+
+    - uses: getsentry/action-release@v1
+      with:
+        environment: 'development'
+        version: ${{ fromJson(env.PACKAGE_JSON).version }}
+
     - name: Deploy
       uses: SamKirkland/FTP-Deploy-Action@4.1.0
       with:
