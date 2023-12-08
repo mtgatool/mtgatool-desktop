@@ -1,11 +1,13 @@
 // import "./wdyr";
 import "./index.scss";
 
+import * as Sentry from "@sentry/react";
+import { createBrowserHistory } from "history";
 // eslint-disable-next-line no-use-before-define
 import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import { BrowserRouter as Router } from "react-router-dom";
+import { Router } from "react-router-dom";
 
 import backgroundChannelListeners from "./broadcastChannel/backgroundChannelListeners";
 import mainChannelListeners from "./broadcastChannel/mainChannelListeners";
@@ -15,6 +17,7 @@ import Hover from "./hover";
 import Overlay from "./overlay";
 import reduxAction from "./redux/reduxAction";
 import store from "./redux/stores/rendererStore";
+import routes from "./routes";
 import * as serviceWorker from "./serviceWorker";
 import {
   ALL_OVERLAYS,
@@ -36,6 +39,32 @@ window.toolDbWorker = new Worker("tooldb-worker/index.js", {
 });
 
 const title = getWindowTitle();
+
+const history = createBrowserHistory();
+
+Sentry.init({
+  dsn: "https://4ec87bda1b064120a878eada5fc0b10f@o311116.ingest.sentry.io/1778171",
+  integrations: [
+    new Sentry.BrowserTracing({
+      routingInstrumentation: Sentry.reactRouterV5Instrumentation(
+        history,
+        routes
+      ),
+    }),
+  ],
+
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  tracesSampleRate: 1.0,
+
+  // Set `tracePropagationTargets` to control for which URLs distributed tracing should be enabled
+  tracePropagationTargets: ["localhost", /^https:\/\/yourserver\.io\/api/],
+
+  // Capture Replay for 10% of all sessions,
+  // plus for 100% of sessions with an error
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+});
 
 if (title == WINDOW_UPDATER) {
   ReactDOM.render(
@@ -112,7 +141,7 @@ if (title == WINDOW_UPDATER) {
   ReactDOM.render(
     <React.StrictMode>
       <Provider store={store}>
-        <Router>
+        <Router history={history}>
           <App />
         </Router>
       </Provider>
@@ -127,7 +156,7 @@ if (title == WINDOW_UPDATER) {
     ReactDOM.render(
       <React.StrictMode>
         <Provider store={store}>
-          <Router>
+          <Router history={history}>
             <NextApp />
           </Router>
         </Provider>
