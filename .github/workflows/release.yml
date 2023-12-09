@@ -11,8 +11,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-2019, macos-11]
-
-    environment: actions
     steps:
     - name: "Setup node"
       uses: actions/setup-node@v1
@@ -50,6 +48,10 @@ jobs:
       run: echo "INFO_JSON=$(jq -c . < ./src/info.json)" >> $GITHUB_ENV
   
     - uses: getsentry/action-release@v1
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        SENTRY_ORG: mtgatool
+        SENTRY_PROJECT: desktop
       with:
         environment: 'production'
         version: ${{ fromJson(env.INFO_JSON).version }}
