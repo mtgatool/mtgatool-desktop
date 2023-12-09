@@ -12,6 +12,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-2019, macos-11]
 
+    environment: actions
     steps:
     - name: "Setup node"
       uses: actions/setup-node@v1
