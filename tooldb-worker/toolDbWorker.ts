@@ -111,7 +111,7 @@ self.onmessage = (e: any) => {
       break;
 
     case "KEYS_LOGIN":
-      keysLogin(e.data.username, e.data.keys);
+      keysLogin(e.data.keys);
       break;
 
     case "SIGNUP":

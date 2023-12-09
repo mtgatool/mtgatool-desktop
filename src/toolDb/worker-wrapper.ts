@@ -30,12 +30,11 @@ const login = (username: string, password: string) => {
   });
 };
 
-const keysLogin = (username: string, keys: ParsedKeys) => {
+const keysLogin = (keys: ParsedKeys) => {
   return new Promise((resolve, reject) => {
     if (window.toolDbWorker) {
       window.toolDbWorker.postMessage({
         type: "KEYS_LOGIN",
-        username,
         keys,
       });
 

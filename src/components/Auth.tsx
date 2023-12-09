@@ -190,7 +190,7 @@ export default function Auth(props: AuthProps) {
           type: "SET_LOGIN_STATE",
           arg: LOGIN_WAITING,
         });
-        keysLogin(username, keys)
+        keysLogin(keys)
           .then(() => {
             if (electron) {
               postChannelMessage({

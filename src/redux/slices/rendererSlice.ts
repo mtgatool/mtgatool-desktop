@@ -66,6 +66,13 @@ const rendererSlice = createSlice({
       Sentry.setUser({ id: action.payload, username });
       state.pubKey = action.payload;
     },
+    setMyUsername: (
+      state: RendererState,
+      action: PayloadAction<string>
+    ): void => {
+      setLocalSetting("username", action.payload);
+      Sentry.setUser({ id: state.pubKey, username: action.payload });
+    },
     setReadingLog: (
       state: RendererState,
       action: PayloadAction<boolean>
@@ -201,6 +208,7 @@ const rendererSlice = createSlice({
 
 export const {
   setPubKey,
+  setMyUsername,
   setReadingLog,
   showPostSignup,
   setLoginState,

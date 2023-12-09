@@ -659,37 +659,33 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mtgatool_db_1 = require("mtgatool-db");
 const afterLogin_1 = __importDefault(require("./afterLogin"));
 const reduxAction_1 = __importDefault(require("./reduxAction"));
-function keysLogin(username, keys) {
+function keysLogin(keys) {
     return new Promise((resolve, reject) => {
-        self.toolDb
-            .getData(`==${username}`, false, 5000)
-            .then((user) => {
-            if (user) {
-                (0, mtgatool_db_1.loadKeysComb)(keys).then((importedKeys) => {
-                    if (importedKeys) {
-                        (0, mtgatool_db_1.exportKey)("spki", importedKeys.signKeys.publicKey)
-                            .then((skpub) => (0, mtgatool_db_1.encodeKeyString)(skpub))
-                            .then((pubKey) => {
-                            if (pubKey === user.keys.skpub) {
-                                self.toolDb.keysSignIn(importedKeys, username).then(() => {
-                                    self.postMessage({ type: "LOGIN_OK" });
-                                    (0, reduxAction_1.default)("SET_PUBKEY", pubKey);
-                                    (0, afterLogin_1.default)();
-                                    resolve();
-                                });
-                            }
-                            else {
-                                reject(new Error("Public key does not match!"));
-                            }
+        (0, mtgatool_db_1.loadKeysComb)(keys).then((importedKeys) => {
+            if (importedKeys) {
+                (0, mtgatool_db_1.exportKey)("spki", importedKeys.signKeys.publicKey)
+                    .then((skpub) => (0, mtgatool_db_1.encodeKeyString)(skpub))
+                    .then((pubKey) => {
+                    console.log("keys", keys);
+                    console.log("pubKey", pubKey);
+                    self.toolDb
+                        .getData(`:${pubKey}.username`, false, 5000)
+                        .then((username) => {
+                        console.log("username", username);
+                        self.toolDb
+                            .keysSignIn(importedKeys, username || "")
+                            .then(() => {
+                            self.postMessage({ type: "LOGIN_OK" });
+                            (0, reduxAction_1.default)("SET_PUBKEY", pubKey);
+                            (0, reduxAction_1.default)("SET_MY_USERNAME", username);
+                            (0, afterLogin_1.default)();
+                            resolve();
                         });
-                    }
-                    else {
-                        reject(new Error("Something went wrong when importing the keys"));
-                    }
+                    });
                 });
             }
             else {
-                reject(new Error("Could not find user to validate"));
+                reject(new Error("Something went wrong when importing the keys"));
             }
         });
     });
@@ -982,7 +978,7 @@ self.onmessage = (e) => {
             (0, login_1.default)(e.data.username, e.data.password);
             break;
         case "KEYS_LOGIN":
-            (0, keysLogin_1.default)(e.data.username, e.data.keys);
+            (0, keysLogin_1.default)(e.data.keys);
             break;
         case "SIGNUP":
             (0, signup_1.default)(e.data.username, e.data.password);
