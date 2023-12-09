@@ -33,6 +33,7 @@ const history = createBrowserHistory();
 Sentry.init({
   dsn: "https://4ec87bda1b064120a878eada5fc0b10f@o311116.ingest.sentry.io/1778171",
   integrations: [
+    new Sentry.BrowserProfilingIntegration(),
     new Sentry.BrowserTracing({
       routingInstrumentation: Sentry.reactRouterV5Instrumentation(
         history,
