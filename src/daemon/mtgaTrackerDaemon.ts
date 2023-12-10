@@ -137,18 +137,24 @@ export default class MtgaTrackerDaemon {
         globalData.latestDaemon?.tag_name,
         this._version
       );
+
       if (
         globalData.latestDaemon &&
+        globalData.latestDaemon.tag_name !== this._version &&
         globalData.latestDaemon.tag_name > this._version
       ) {
         const downloadUrl = globalData.latestDaemon.assets.filter(
           (a: any) => a.name === zipName
         )[0].browser_download_url;
 
+        console.log("mtgaTrackerDaemon downloadUrl", downloadUrl);
+
         downloadFile(downloadUrl, downloadPath)
           .then(() => {
+            console.log("mtgaTrackerDaemon shutdown");
             this.shutdown()
               .then(() => {
+                console.log("mtgaTrackerDaemon extract");
                 if (os === "win32") {
                   extract(downloadPath, { dir: daemonDir })
                     .then(resolve)
