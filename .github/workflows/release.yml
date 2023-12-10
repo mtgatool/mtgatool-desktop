@@ -55,7 +55,7 @@ jobs:
       with:
         environment: 'production'
         version: ${{ fromJson(env.INFO_JSON).version }}
-  
+        sourcemaps: 'build/static/js/*.js.map'
   
     - name: Create installer
       if: matrix.os == 'ubuntu-latest'
