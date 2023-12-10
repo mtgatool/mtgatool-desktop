@@ -42,7 +42,7 @@ jobs:
       with:
         environment: 'development'
         version: ${{ fromJson(env.INFO_JSON).version }}-${{ fromJson(env.INFO_JSON).branch }}-${{ fromJson(env.INFO_JSON).timestamp }}
-        sourcemaps: 'build/static/js/*.js.map'
+        sourcemaps: 'build/static/js/'
 
     - name: Deploy
       uses: SamKirkland/FTP-Deploy-Action@4.1.0
