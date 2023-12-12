@@ -224,7 +224,9 @@ export default class MtgaTrackerDaemon {
                 if (status) {
                   this._version = status.daemonVersion;
                   if (os === "win32") {
-                    this.downloadLatestDaemon().then(() => this.startDaemon);
+                    this.downloadLatestDaemon()
+                      .then(() => this.startDaemon)
+                      .catch(console.warn);
                   } else {
                     this.checkForUpdates();
                   }
@@ -234,7 +236,9 @@ export default class MtgaTrackerDaemon {
           }
         }
       } else {
-        this.downloadLatestDaemon().then(() => this.startDaemon);
+        this.downloadLatestDaemon()
+          .then(() => this.startDaemon)
+          .catch(console.warn);
       }
     }
   }

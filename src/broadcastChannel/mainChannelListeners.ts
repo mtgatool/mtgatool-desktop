@@ -31,6 +31,7 @@ export default function mainChannelListeners() {
     electron.ipcRenderer.on(
       "mtgaTrackerDaemonVersion",
       (event: any, d: any) => {
+        console.log("mtgaTrackerDaemonVersion", d);
         globalData.latestDaemon = d;
         if (globalData.daemon) {
           globalData.daemon.downloadLatestDaemon().finally(() => {
