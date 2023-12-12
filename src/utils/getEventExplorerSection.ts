@@ -68,6 +68,21 @@ export default function getEventExplorerSection(
     case "Traditional_Historic_Ladder":
       return "Ranked";
 
+    case "Timeless_Ladder":
+      return "Ranked";
+    case "Timeless_Play":
+      return "Play";
+    case "Timeless_Event_v2":
+      return "Constructed";
+    case "Timeless_Event":
+      return "Constructed";
+    case "Traditional_Timeless_Event":
+      return "Constructed";
+    case "Traditional_Timeless_Play":
+      return "Play";
+    case "Traditional_Timeless_Ladder":
+      return "Ranked";
+
     case "Explorer_Ladder":
       return "Ranked";
     case "Explorer_Play":

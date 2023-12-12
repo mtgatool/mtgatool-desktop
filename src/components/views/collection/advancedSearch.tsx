@@ -58,6 +58,7 @@ const formatFilterOptions = [
   "Not set",
   "Standard",
   "Historic",
+  "Timeless",
   "Alchemy",
   "Explorer",
   "Brawl",

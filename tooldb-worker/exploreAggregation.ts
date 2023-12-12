@@ -190,6 +190,14 @@ export function beginDataQuery(_day: number, _eventId: string) {
     queryForEvent("Traditional_Historic_Event");
     queryForEvent("Traditional_Historic_Play");
     queryForEvent("Traditional_Historic_Ladder");
+  } else if (_eventId === "aggregated-timeless") {
+    queryForEvent("Timeless_Ladder");
+    queryForEvent("Timeless_Play");
+    queryForEvent("Timeless_Event_v2");
+    queryForEvent("Timeless_Event");
+    queryForEvent("Traditional_Timeless_Event");
+    queryForEvent("Traditional_Timeless_Play");
+    queryForEvent("Traditional_Timeless_Ladder");
   } else if (_eventId === "aggregated-alchemy") {
     queryForEvent("Alchemy_Ladder");
     queryForEvent("Alchemy_Play");

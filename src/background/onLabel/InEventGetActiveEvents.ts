@@ -31,6 +31,8 @@ type DeckSelectFormats =
   | "DirectGame"
   | "CascadeSingleton"
   | "Historic"
+  | "Timeless"
+  | "TraditionalTimeless"
   | "Standard"
   | "Brawl"
   | "Draft"

@@ -19,6 +19,7 @@ export default function getCardIsCraftable(
     formats.includes("Historic") ||
     formats.includes("Alchemy") ||
     formats.includes("Explorer") ||
+    formats.includes("Timeless") ||
     formats.includes("Singleton")
   ) {
     return true;

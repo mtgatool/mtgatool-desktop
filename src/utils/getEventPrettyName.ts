@@ -90,6 +90,21 @@ export default function getEventPrettyName(event: string): string {
     case "Traditional_Historic_Ladder":
       return "Traditional Ranked Historic";
 
+    case "Timeless_Ladder":
+      return "Timeless Ranked";
+    case "Timeless_Play":
+      return "Timeless";
+    case "Timeless_Event_v2":
+      return "Timeless Event";
+    case "Timeless_Event":
+      return "Timeless Event";
+    case "Traditional_Timeless_Event":
+      return "Traditional Timeless Event";
+    case "Traditional_Timeless_Play":
+      return "Traditional Timeless";
+    case "Traditional_Timeless_Ladder":
+      return "Traditional Ranked Timeless";
+
     case "Explorer_Ladder":
       return "Explorer Ranked";
     case "Explorer_Play":
