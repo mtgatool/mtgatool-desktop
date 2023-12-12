@@ -34,6 +34,8 @@ export default function getEventPrettyName(event: string): string {
       return "Standard";
     case "aggregated-historic":
       return "Historic";
+    case "aggregated-timeless":
+      return "Timeless";
     case "aggregated-alchemy":
       return "Alchemy";
     case "aggregated-explorer":
