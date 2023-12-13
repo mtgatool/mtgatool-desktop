@@ -1,4 +1,5 @@
 import { CardsData } from "../types/collectionTypes";
+import allFormats from "./allFormats";
 import Colors from "./colors";
 import getCardBanned from "./getCardBanned";
 import getCardFormats from "./getCardFormats";
@@ -62,6 +63,7 @@ export default function getCollectionData(
   setNames: any,
   sets: any
 ): any[] {
+  console.warn("allFormats", allFormats);
   return cardsList
     .filter(
       (card) =>

@@ -32,10 +32,11 @@ export default function getCardFormats(
   Object.keys(allFormats).forEach((name) => {
     const format = allFormats[name];
     if (
-      format.allowedTitleIds.includes(card.TitleId) ||
-      format.sets.some(
-        (set: any) => arenaSetCode.indexOf(set.toLowerCase()) >= 0
-      )
+      (format.allowedTitleIds.includes(card.TitleId) ||
+        format.sets.some(
+          (set: any) => arenaSetCode.indexOf(set.toLowerCase()) >= 0
+        )) &&
+      !format.bannedTitleIds.includes(card.TitleId)
     ) {
       if (name == "Pauper" || name == "HistoricPauper") {
         if (card.Rarity == "common") {
