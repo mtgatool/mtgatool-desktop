@@ -63,7 +63,6 @@ export default function getCollectionData(
   setNames: any,
   sets: any
 ): any[] {
-  console.warn("allFormats", allFormats);
   return cardsList
     .filter(
       (card) =>
