@@ -78,6 +78,21 @@ export default function aggregateStats(
   const filtered = matchFilters
     ? doHistoryFilter(matchesList, matchFilters, undefined)
     : matchesList;
+
+  const deckCardsGRPIds: Record<string, Record<string, number>> = {};
+
+  function getSetGRPID(deckHash: string, grpId: number) {
+    const cardName = database.card(grpId)?.Name || "";
+    if (!deckCardsGRPIds[deckHash]) {
+      deckCardsGRPIds[deckHash] = {};
+    }
+    if (!deckCardsGRPIds[deckHash][cardName]) {
+      deckCardsGRPIds[deckHash][cardName] = grpId;
+      return grpId;
+    }
+    return deckCardsGRPIds[deckHash][cardName];
+  }
+
   filtered.forEach((match) => {
     const playerSeat = match.internalMatch.player.seat;
     const hasWon = match.playerWins > match.playerLosses;
@@ -154,7 +169,9 @@ export default function aggregateStats(
       }
     });
 
-    if (!stats.deckIndex[match.internalMatch.playerDeckHash]) {
+    const deckHash = match.internalMatch.playerDeckHash;
+
+    if (!stats.deckIndex[deckHash]) {
       const deckColors: any = playerDeck.colors;
 
       const dc =
@@ -184,7 +201,7 @@ export default function aggregateStats(
           ]
         : undefined;
 
-      stats.deckIndex[match.internalMatch.playerDeckHash] = {
+      stats.deckIndex[deckHash] = {
         id: playerDeck.id,
         deckTileId: playerDeck.deckTileId,
         name: playerDeck.name,
@@ -194,7 +211,7 @@ export default function aggregateStats(
         companions,
         colors: dc,
         playerId: match.uuid,
-        deckHash: match.internalMatch.playerDeckHash,
+        deckHash: deckHash,
         matches: {
           [match.matchId]: hasWon,
         },
@@ -214,12 +231,12 @@ export default function aggregateStats(
       };
 
       if (!stats.decks[playerDeck.id]) {
-        stats.decks[playerDeck.id] = [match.internalMatch.playerDeckHash];
+        stats.decks[playerDeck.id] = [deckHash];
       } else {
-        stats.decks[playerDeck.id].push(match.internalMatch.playerDeckHash);
+        stats.decks[playerDeck.id].push(deckHash);
       }
     } else {
-      const deckToUpdate = stats.deckIndex[match.internalMatch.playerDeckHash];
+      const deckToUpdate = stats.deckIndex[deckHash];
       deckToUpdate.lastUsed =
         match.timestamp > deckToUpdate.lastUsed
           ? match.timestamp
@@ -236,8 +253,7 @@ export default function aggregateStats(
           : 0;
     }
 
-    const winrates =
-      stats.deckIndex[match.internalMatch.playerDeckHash].cardWinrates;
+    const winrates = stats.deckIndex[deckHash].cardWinrates;
     // Cards winrates
     let addDelta: number[] = [];
     let remDelta: number[] = [];
@@ -248,7 +264,9 @@ export default function aggregateStats(
         const losses = game.winner === playerSeat ? 0 : 1;
         // For each card cast
         game.cardsCast?.forEach((cardCast) => {
-          const { grpId, player, turn } = cardCast;
+          const { player, turn } = cardCast;
+          const grpId = getSetGRPID(deckHash, cardCast.grpId);
+
           // Only if we casted it
           if (player == playerSeat) {
             // define
@@ -278,14 +296,16 @@ export default function aggregateStats(
           // Initial hand
           if (hand) {
             if (index == game.handsDrawn.length - 1) {
-              hand.forEach((grpId) => {
+              hand.forEach((id) => {
+                const grpId = getSetGRPID(deckHash, id);
                 // define
                 if (!winrates[grpId]) winrates[grpId] = newCardWinrate(grpId);
                 winrates[grpId].initHandWins += wins;
                 winrates[grpId].initHandsLosses += losses;
               });
             } else {
-              hand.forEach((grpId) => {
+              hand.forEach((id) => {
+                const grpId = getSetGRPID(deckHash, id);
                 if (!winrates[grpId]) winrates[grpId] = newCardWinrate(grpId);
                 winrates[grpId].mulligans += 1;
               });
@@ -297,7 +317,8 @@ export default function aggregateStats(
         addDelta = [...addDelta, ...(game.sideboardChanges?.added || [])];
         remDelta = [...remDelta, ...(game.sideboardChanges?.removed || [])];
 
-        addDelta.forEach((grpId) => {
+        addDelta.forEach((id) => {
+          const grpId = getSetGRPID(deckHash, id);
           // define
           if (!winrates[grpId]) winrates[grpId] = newCardWinrate(grpId);
           winrates[grpId].sidedIn += 1;
@@ -307,7 +328,8 @@ export default function aggregateStats(
             winrates[grpId].sideInLosses += losses;
           }
         });
-        remDelta.forEach((grpId) => {
+        remDelta.forEach((id) => {
+          const grpId = getSetGRPID(deckHash, id);
           // define
           if (!winrates[grpId]) winrates[grpId] = newCardWinrate(grpId);
           winrates[grpId].sidedOut += 1;
