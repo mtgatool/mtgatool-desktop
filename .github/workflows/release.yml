@@ -51,6 +51,7 @@ jobs:
         echo "INFO_TIMESTAMP=$(jq -r .timestamp ./src/info.json)" >> $GITHUB_ENV
 
     - uses: getsentry/action-release@v1
+      if: matrix.os == 'ubuntu-latest'
       env:
         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         SENTRY_ORG: mtgatool
