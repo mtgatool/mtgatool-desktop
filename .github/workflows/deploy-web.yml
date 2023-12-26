@@ -32,7 +32,7 @@ jobs:
       run: npm run build:web
 
     - name: "Package JSON"
-      run: echo "INFO_JSON=$(jq -c . < ./src/info.json)" >> $GITHUB_ENV
+      run: echo "INFO_JSON=$(jq -c ./src/info.json)" >> $GITHUB_ENV
 
     - uses: getsentry/action-release@v1
       env:
