@@ -32,7 +32,10 @@ jobs:
       run: npm run build:web
 
     - name: "Package JSON"
-      run: echo "INFO_JSON=$(jq -c . ./src/info.json)" >> $GITHUB_ENV
+      run: |
+        echo "INFO_VERSION=$(jq -c .version ./src/info.json)" >> $GITHUB_ENV
+        echo "INFO_BRANCH=$(jq -c .branch ./src/info.json)" >> $GITHUB_ENV
+        echo "INFO_TIMESTAMP=$(jq -c .timestamp ./src/info.json)" >> $GITHUB_ENV
 
     - uses: getsentry/action-release@v1
       env:
@@ -41,7 +44,7 @@ jobs:
         SENTRY_PROJECT: desktop
       with:
         environment: 'development'
-        version: ${{ fromJson(env.INFO_JSON).version }}-${{ fromJson(env.INFO_JSON).branch }}-${{ fromJson(env.INFO_JSON).timestamp }}
+        version: ${{ env.INFO_VERSION }}-${{ env.INFO_BRANCH }}-${{ env.INFO_JSON }}
         sourcemaps: 'build/static/js/'
 
     - name: Deploy

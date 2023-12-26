@@ -45,8 +45,11 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
   
     - name: "Package JSON"
-      run: echo "INFO_JSON=$(jq -c . ./src/info.json)" >> $GITHUB_ENV
-  
+      run: |
+        echo "INFO_VERSION=$(jq -c .version ./src/info.json)" >> $GITHUB_ENV
+        echo "INFO_BRANCH=$(jq -c .branch ./src/info.json)" >> $GITHUB_ENV
+        echo "INFO_TIMESTAMP=$(jq -c .timestamp ./src/info.json)" >> $GITHUB_ENV
+
     - uses: getsentry/action-release@v1
       env:
         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -54,7 +57,7 @@ jobs:
         SENTRY_PROJECT: desktop
       with:
         environment: 'production'
-        version: ${{ fromJson(env.INFO_JSON).version }}
+        version: ${{ env.INFO_VERSION }}
         sourcemaps: 'build/static/js/'
   
     - name: Create installer
