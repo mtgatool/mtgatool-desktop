@@ -30,6 +30,7 @@ export const initialRendererState = {
   backgroundGrpid: null as number | null,
   loading: false,
   logCompletion: 0,
+  detailedLogs: null as boolean | null,
   noLog: false,
   offline: true,
   loginState: LOGIN_AUTH,
@@ -101,6 +102,12 @@ const rendererSlice = createSlice({
       action: PayloadAction<number>
     ): void => {
       state.logCompletion = action.payload;
+    },
+    setDetailedLogs: (
+      state: RendererState,
+      action: PayloadAction<boolean>
+    ): void => {
+      state.detailedLogs = action.payload;
     },
     setMatchesFetchState: (
       state: RendererState,
@@ -213,6 +220,7 @@ export const {
   showPostSignup,
   setLoginState,
   setLogCompletion,
+  setDetailedLogs,
   setMatchesFetchState,
   setBackgroundGrpid,
   setLoading,

@@ -20,6 +20,7 @@ export type MessageType =
   | "LOG_READ_FINISHED"
   | "ACTION_LOG"
   | "SET_UUID"
+  | "SET_DETAILED_LOGS"
   | "SET_UUID_DISPLAYNAME"
   | "OVERLAY_UPDATE"
   | "OVERLAY_SET_SETTINGS"
@@ -75,6 +76,11 @@ export interface LogMessageRecvMessage extends ChannelMessageBase {
 
 export interface LogFinishedMessage extends ChannelMessageBase {
   type: "LOG_READ_FINISHED";
+}
+
+export interface SetDetailedLogsMessage extends ChannelMessageBase {
+  type: "SET_DETAILED_LOGS";
+  value: string;
 }
 
 export interface SetUUIDMessage extends ChannelMessageBase {
@@ -190,6 +196,7 @@ export type ChannelMessage =
   | ActionLogMessage
   | LogMessageRecvMessage
   | LogFinishedMessage
+  | SetDetailedLogsMessage
   | SetUUIDMessage
   | SetUUIDDisplayNameMessage
   | OverlayUpdateMessage

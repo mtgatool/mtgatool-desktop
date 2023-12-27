@@ -32,6 +32,7 @@ export default function PopupComponent(props: PopupComponentProps) {
     persistent,
     onClose,
   } = props;
+
   const [state, setState] = useState<{ display: boolean; open: boolean }>({
     display: open,
     open,

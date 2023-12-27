@@ -27,6 +27,7 @@ import LoadingBar from "./LoadingBar";
 import PopupComponent from "./PopupComponent";
 import Popups from "./Popups";
 import ArenaIdSelector from "./popups/ArenaIdSelector";
+import DetailedLogs from "./popups/DetailedLogs";
 import SettingsPersistor from "./SettingsPersistor";
 import TopBar from "./TopBar";
 import TopNav from "./TopNav";
@@ -43,9 +44,13 @@ function App(props: AppProps) {
   const dispatch = useDispatch();
   const [canLogin, _setCanLogin] = useState(true);
 
-  const { loginState, loading, backgroundGrpid, matchInProgress } = useSelector(
-    (state: AppState) => state.renderer
-  );
+  const {
+    detailedLogs,
+    loginState,
+    loading,
+    backgroundGrpid,
+    matchInProgress,
+  } = useSelector((state: AppState) => state.renderer);
 
   const os = forceOs || (isElectron() ? process.platform : "");
 
@@ -122,6 +127,18 @@ function App(props: AppProps) {
   const openArenaIdSelector = useRef<() => void>(vodiFn);
   const closenArenaIdSelector = useRef<() => void>(vodiFn);
 
+  const openDetailedLogs = useRef<() => void>(vodiFn);
+  const closenDetailedLogs = useRef<() => void>(vodiFn);
+
+  useEffect(() => {
+    if (detailedLogs === false) {
+      openDetailedLogs.current();
+    }
+    if (detailedLogs === true) {
+      closenDetailedLogs.current();
+    }
+  }, [detailedLogs]);
+
   return (
     <>
       <SettingsPersistor />
@@ -146,6 +163,17 @@ function App(props: AppProps) {
         persistent={false}
       >
         <ArenaIdSelector onClose={closenArenaIdSelector.current} />
+      </PopupComponent>
+      <PopupComponent
+        open={false}
+        className={getPopupClass(os)}
+        width="800px"
+        height="600px"
+        openFnRef={openDetailedLogs}
+        closeFnRef={closenDetailedLogs}
+        persistent={false}
+      >
+        <DetailedLogs onClose={closenDetailedLogs.current} />
       </PopupComponent>
       {os !== "" && os !== "linux" && <TopBar forceOs={os} />}
       <div

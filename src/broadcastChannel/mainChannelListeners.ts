@@ -97,6 +97,13 @@ export default function mainChannelListeners() {
       fetchPlayerId();
     }
 
+    if (msg.data.type === "SET_DETAILED_LOGS") {
+      reduxAction(store.dispatch, {
+        type: "SET_DETAILED_LOGS",
+        arg: msg.data.value === "ENABLED",
+      });
+    }
+
     if (msg.data.type === "SET_UUID") {
       switchPlayerUUID(msg.data.value);
     }
