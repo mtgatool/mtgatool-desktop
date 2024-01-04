@@ -70,6 +70,12 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
   const cardsSize = useSelector((state: AppState) => state.settings.cardsSize);
 
+  const currentUUID = useSelector(
+    (state: AppState) => state.mainData.currentUUID
+  );
+
+  const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
+
   const filteredData = useMemo(
     () =>
       filters ? doCollectionFilter(collectionData, filters, sortValue) : [],
@@ -199,36 +205,44 @@ export default function ViewCollection(props: ViewCollectionProps) {
   return (
     <>
       <Section style={{ marginTop: "16px" }}>
-        <Toggle
-          style={{ maxWidth: "240px", marginRight: "48px" }}
-          text="Include unowned cards?"
-          value={exportUnowned}
-          callback={setExportUnowned}
-        />
-        <Toggle
-          style={{ maxWidth: "240px", marginRight: "48px" }}
-          text="Include digital sets?"
-          value={exportDigital}
-          callback={setExportDigital}
-        />
-        <i
-          style={{
-            lineHeight: "30px",
-            height: "30px",
-            margin: "auto auto auto 8px",
-            color: "var(--color-text-dark)",
-          }}
-        >
-          Collection is saved in CSV format
-        </i>
-        <Button
-          style={{ margin: "16px" }}
-          className="button-simple"
-          text="Download Collection"
-          onClick={downloadTxtFile}
-        />
+        <div className="flex">
+          <Toggle
+            style={{ maxWidth: "240px", marginRight: "48px" }}
+            text="Include unowned cards?"
+            value={exportUnowned}
+            callback={setExportUnowned}
+          />
+          <Toggle
+            style={{ maxWidth: "240px", marginRight: "48px" }}
+            text="Include digital sets?"
+            value={exportDigital}
+            callback={setExportDigital}
+          />
+          <i
+            style={{
+              lineHeight: "30px",
+              height: "30px",
+              margin: "auto auto auto 8px",
+              color: "var(--color-text-dark)",
+            }}
+          >
+            Collection is saved in CSV format
+          </i>
+          <Button
+            style={{ margin: "16px" }}
+            className="button-simple"
+            text="Download Collection"
+            onClick={downloadTxtFile}
+          />
+        </div>
       </Section>
       <Section style={{ flexDirection: "column", marginTop: "16px" }}>
+        <h3 className="flex" style={{ margin: "0 auto 24px auto" }}>
+          Owned cards data was last updated on{" "}
+          {new Date(
+            uuidData[currentUUID]?.cards?.updated || 0
+          ).toLocaleString()}
+        </h3>
         <div style={{ display: "flex", width: "100%" }}>
           <Button
             onClick={openAdvancedCollectionSearch}
