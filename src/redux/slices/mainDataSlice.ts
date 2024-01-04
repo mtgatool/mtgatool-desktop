@@ -12,6 +12,7 @@ import {
   defaultRankData,
 } from "../../types/dbTypes";
 import { AggregatedStats } from "../../utils/aggregateStats";
+import setLocalSetting from "../../utils/setLocalSetting";
 
 const mainState = {
   forceCollection: 1,
@@ -75,6 +76,7 @@ const mainDataSlice = createSlice({
     },
     setUUID: (state: MainState, action: PayloadAction<string>): void => {
       state.currentUUID = action.payload;
+      setLocalSetting("playerId", action.payload);
     },
     removeUUID: (state: MainState, action: PayloadAction<string>): void => {
       state.uuidData = _.omit(state.uuidData, action.payload);

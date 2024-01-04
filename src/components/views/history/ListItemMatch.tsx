@@ -130,7 +130,9 @@ export default function ListItemMatch({
         </FlexBottom>
       </Column>
 
-      <Column className="list-item-center">{}</Column>
+      <Column className="list-item-center">
+        <></>
+      </Column>
 
       <Column className="list-item-right">
         <FlexTop>
