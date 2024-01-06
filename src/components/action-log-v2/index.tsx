@@ -10,6 +10,7 @@ import LineDraw from "./LineDraw";
 import LineExile from "./LineExile";
 import LineModifiedLife from "./LineModifiedLife";
 import LinePlay from "./LinePlay";
+import LineScry from "./LineScry";
 import LineTarget from "./LineTarget";
 import LineTimedOut from "./LineTimedOut";
 import LineTurnInfo from "./LineTurnInfo";
@@ -38,6 +39,9 @@ function getLineComponent(type: ActionLogLineType) {
     case "DRAW":
       lineComponent = LineDraw;
       break;
+    case "SCRY":
+      lineComponent = LineScry;
+      break;
     case "CAST":
       lineComponent = LineCast;
       break;
@@ -53,11 +57,11 @@ function getLineComponent(type: ActionLogLineType) {
     case "ZONE_RETURN":
       lineComponent = LineZoneReturn;
       break;
-    case "EXILE":
-      lineComponent = LineExile;
-      break;
     case "COUNTERED":
       lineComponent = LineCountered;
+      break;
+    case "EXILE":
+      lineComponent = LineExile;
       break;
     case "DESTROYED":
       lineComponent = LineDestroyed;
@@ -115,7 +119,7 @@ export default function ActionLog(props: ActionLogProps): JSX.Element {
 
         return (
           <LineComponent
-            key={`log-line-${line.timestamp}`}
+            key={`log-line-${line.timestamp}-${line.type}`}
             line={line}
             timeStart={actionLog.lines[1].timestamp}
             players={actionLog.players}

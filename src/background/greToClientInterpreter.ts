@@ -391,7 +391,7 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
       actionLog({
         seat: seat,
         timestamp: globalStore.currentMatch.logTime.getTime(),
-        type: "EXILE",
+        type: "COUNTERED",
         sourceGrpId: affector.grpId,
         abilityId: undefined,
         grpId: affected.grpId,
@@ -401,7 +401,34 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
 
   // A spell or ability destroys something
   if (ann.details.category == "Destroy") {
-    //
+    const affector = instanceIdToObject(ann.affectorId);
+    const affected = instanceIdToObject(ann.affectedIds[0]);
+
+    const seat = affector.ownerSeatId || 0;
+    if (
+      affector.type == "GameObjectType_Ability" &&
+      affector.objectSourceGrpId &&
+      affected.grpId
+    ) {
+      actionLog({
+        seat: seat,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "DESTROYED",
+        sourceGrpId: affector.objectSourceGrpId,
+        abilityId: affector.grpId,
+        grpId: affected.grpId,
+      });
+    }
+    if (isObjectACard(affector) && affected.grpId && affector.grpId) {
+      actionLog({
+        seat: seat,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "DESTROYED",
+        sourceGrpId: affector.grpId,
+        abilityId: undefined,
+        grpId: affected.grpId,
+      });
+    }
   }
 };
 
@@ -566,9 +593,9 @@ const AnnotationType_TargetSpec = (ann: Annotations): void => {
 const AnnotationType_Scry = (ann: Annotations): void => {
   if (ann.type !== "AnnotationType_Scry") return;
   // REVIEW SCRY ANNOTATION
-  let affector = ann.affectorId;
-  if (affector > 3) {
-    affector = instanceIdToObject(affector).ownerSeatId || 0;
+  let affector: GameObjectInfo | undefined;
+  if (ann.affectorId > 3) {
+    affector = instanceIdToObject(ann.affectorId);
   }
   // const { playerSeat } = globalStore.currentMatch;
 
@@ -588,7 +615,7 @@ const AnnotationType_Scry = (ann: Annotations): void => {
   const scrySize = xtop + xbottom;
 
   actionLog({
-    seat: affector,
+    seat: affector?.ownerSeatId || ann.affectorId || 0,
     timestamp: globalStore.currentMatch.logTime.getTime(),
     type: "SCRY",
     amount: scrySize,
