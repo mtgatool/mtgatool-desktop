@@ -10,6 +10,7 @@ import LineDraw from "./LineDraw";
 import LineExile from "./LineExile";
 import LineModifiedLife from "./LineModifiedLife";
 import LinePlay from "./LinePlay";
+import LineTarget from "./LineTarget";
 import LineTimedOut from "./LineTimedOut";
 import LineTurnInfo from "./LineTurnInfo";
 import LineWin from "./LineWon";
@@ -60,6 +61,9 @@ function getLineComponent(type: ActionLogLineType) {
       break;
     case "DESTROYED":
       lineComponent = LineDestroyed;
+      break;
+    case "TARGET":
+      lineComponent = LineTarget;
       break;
     case "TURN_INFO":
       lineComponent = LineTurnInfo;
