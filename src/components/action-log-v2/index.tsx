@@ -113,7 +113,7 @@ export default function ActionLog(props: ActionLogProps): JSX.Element {
           <LineComponent
             key={`log-line-${line.timestamp}`}
             line={line}
-            timeStart={actionLog.lines[0].timestamp}
+            timeStart={actionLog.lines[1].timestamp}
             players={actionLog.players}
           />
         );
