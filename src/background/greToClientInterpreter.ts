@@ -232,6 +232,7 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
     const seat = obj.ownerSeatId || 0;
     const { turnNumber } = globalStore.currentMatch.turnInfo;
 
+    // console.log("CAST", grpId, obj, ann);
     const cast = {
       grpId: grpId,
       turn: turnNumber || 0,
@@ -240,7 +241,7 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
     addCardCast(cast);
 
     actionLog({
-      seat: seat,
+      seat: obj.controllerSeatId || seat,
       timestamp: globalStore.currentMatch.logTime.getTime(),
       type: "CAST",
       grpId,
@@ -1048,7 +1049,7 @@ function checkForStartingLibrary(gameState?: GameStateMessage): boolean {
 }
 
 function checkTurnDiff(turnInfo: TurnInfo): void {
-  console.log("checkTurnDiff", turnInfo);
+  // console.log("checkTurnDiff", turnInfo.turnNumber, turnInfo);
   const { currentMatch } = globalStore;
   const currentTurnInfo = currentMatch.turnInfo;
   const { currentPriority } = currentMatch;
