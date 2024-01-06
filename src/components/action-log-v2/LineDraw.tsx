@@ -11,7 +11,7 @@ export default function LineDraw(props: ActionLogLineProps) {
 
   return (
     <>
-      <div className="log-line">
+      <div className={`log-line seat-${line.seat}`}>
         {playerName}&nbsp;drew&nbsp;
         {line.grpId ? <LogCard grpId={line.grpId} /> : "a card"}
       </div>

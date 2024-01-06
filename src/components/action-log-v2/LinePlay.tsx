@@ -11,7 +11,7 @@ export default function LinePlay(props: ActionLogLineProps) {
 
   return (
     <>
-      <div className="log-line">
+      <div className={`log-line seat-${line.seat}`}>
         {playerName}&nbsp;played&nbsp;
         {line.grpId ? <LogCard grpId={line.grpId} /> : "a land"}
       </div>

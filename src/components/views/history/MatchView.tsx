@@ -436,7 +436,7 @@ export default function MatchView(): JSX.Element {
 
         <Section
           style={{
-            padding: "16px 10px",
+            padding: "16px",
             maxHeight: "78px",
             flexDirection: "column",
             gridArea: "buttons",

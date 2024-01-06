@@ -1,3 +1,4 @@
+import { toMMSS } from "../../utils/dateTo";
 import getPlayerBySeat from "./getPlayerBySeat";
 import { ActionLogLineProps } from "./types";
 
@@ -11,15 +12,20 @@ const phasesMap: Record<string, string> = {
 };
 
 export default function LineTurnInfo(props: ActionLogLineProps) {
-  const { line, players } = props;
+  const { line, players, timeStart } = props;
 
   if (line.type !== "TURN_INFO") return <></>;
+
+  const timeDiff = toMMSS(Math.round((line.timestamp - timeStart) / 1000));
 
   return (
     <>
       {line.subType === "BEGIN" && (
         <div className="turn-info begin">
-          <div>Turn {line.turnNumber}</div>
+          <div>
+            Turn {line.turnNumber}
+            <span className="time">+{timeDiff}</span>
+          </div>
           <div className="name">
             {getPlayerBySeat(line.activePlayer || 0, players)}
           </div>

@@ -10,7 +10,9 @@ export default function LineTimedOut(props: ActionLogLineProps) {
 
   return (
     <>
-      <div className="log-line result">{playerName}&nbsp;timed out.</div>
+      <div className={`log-line seat-${line.seat} result`}>
+        {playerName}&nbsp;timed out.
+      </div>
     </>
   );
 }

@@ -10,7 +10,9 @@ export default function LineConceded(props: ActionLogLineProps) {
 
   return (
     <>
-      <div className="log-line result">{playerName}&nbsp;conceded.</div>
+      <div className={`log-line seat-${line.seat} result`}>
+        {playerName}&nbsp;conceded.
+      </div>
     </>
   );
 }

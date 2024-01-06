@@ -1,19 +1,18 @@
 import getPlayerBySeat from "./getPlayerBySeat";
-import LogCard from "./LogCard";
 import { ActionLogLineProps } from "./types";
 
-export default function LineDiscard(props: ActionLogLineProps) {
+export default function LineModifiedLife(props: ActionLogLineProps) {
   const { line, players } = props;
 
-  if (line.type !== "DISCARD") return <></>;
+  if (line.type !== "MODIFIED_LIFE") return <></>;
 
   const playerName = getPlayerBySeat(line.seat || 0, players);
 
   return (
     <>
       <div className={`log-line seat-${line.seat}`}>
-        {playerName}&nbsp;discarded&nbsp;
-        {line.grpId ? <LogCard grpId={line.grpId} /> : "a card"}
+        {playerName}&nbsp;{line.delta < 0 ? "lost" : "gained"}&nbsp;
+        {Math.abs(line.delta)}&nbsp;life ({line.total}).
       </div>
     </>
   );

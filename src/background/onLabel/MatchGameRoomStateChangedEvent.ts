@@ -87,6 +87,8 @@ export default function onLabelMatchGameRoomStateChangedEvent(
 
   // Now only when a match begins
   if (gameRoom.stateType == "MatchGameRoomStateType_Playing") {
+    globalStore.currentActionLog.lines = [];
+    globalStore.currentActionLog.players = [];
     actionLog({
       seat: -1,
       type: "START",

@@ -8,6 +8,7 @@ import LineDestroyed from "./LineDestroyed";
 import LineDiscard from "./LineDiscard";
 import LineDraw from "./LineDraw";
 import LineExile from "./LineExile";
+import LineModifiedLife from "./LineModifiedLife";
 import LinePlay from "./LinePlay";
 import LineTimedOut from "./LineTimedOut";
 import LineTurnInfo from "./LineTurnInfo";
@@ -66,6 +67,9 @@ function getLineComponent(type: ActionLogLineType) {
     case "ABILITY":
       lineComponent = LineAbility;
       break;
+    case "MODIFIED_LIFE":
+      lineComponent = LineModifiedLife;
+      break;
     case "DAMAGE_DEALT":
       lineComponent = LineDamageDealt;
       break;
@@ -109,6 +113,7 @@ export default function ActionLog(props: ActionLogProps): JSX.Element {
           <LineComponent
             key={`log-line-${line.timestamp}`}
             line={line}
+            timeStart={actionLog.lines[0].timestamp}
             players={actionLog.players}
           />
         );

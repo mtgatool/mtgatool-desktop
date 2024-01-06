@@ -10,7 +10,9 @@ export default function LineWin(props: ActionLogLineProps) {
 
   return (
     <>
-      <div className="log-line winner">{playerName}&nbsp;won!</div>
+      <div className={`log-line seat-${line.seat} winner`}>
+        {playerName}&nbsp;won!
+      </div>
     </>
   );
 }

@@ -5,11 +5,11 @@ import { ActionLogLineProps } from "./types";
 export default function LineAbility(props: ActionLogLineProps) {
   const { line } = props;
 
-  if (line.type !== "ZONE_PUT") return <></>;
+  if (line.type !== "ABILITY") return <></>;
 
   return (
     <>
-      <div className="log-line">
+      <div className={`log-line seat-${line.seat}`}>
         <LogCard grpId={line.sourceGrpId} />
         &apos;s&nbsp;
         {line.abilityId ? <LogAbility abId={line.abilityId} /> : "ability"}

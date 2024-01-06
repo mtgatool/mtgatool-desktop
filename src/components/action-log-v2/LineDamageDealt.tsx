@@ -9,7 +9,7 @@ export default function LineDamageDealt(props: ActionLogLineProps) {
 
   return (
     <>
-      <div className="log-line">
+      <div className={`log-line seat-${line.seat}`}>
         <LogCard grpId={line.sourceGrpId} />
         &nbsp;dealt&nbsp;{line.amount}&nbsp;damage to&nbsp;
         {line.targetType === "PLAYER" ? (

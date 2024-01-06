@@ -11,7 +11,7 @@ export default function LineCast(props: ActionLogLineProps) {
 
   return (
     <>
-      <div className="log-line">
+      <div className={`log-line seat-${line.seat}`}>
         {playerName}&nbsp;cast&nbsp;
         {line.grpId ? <LogCard grpId={line.grpId} /> : "a spell"}
       </div>

@@ -8,9 +8,9 @@ export default function LineAttack(props: ActionLogLineProps) {
   if (line.type !== "ATTACK") return <></>;
 
   return (
-    <div className="log-line">
+    <div className={`log-line seat-${line.seat}`}>
       {getPlayerBySeat(line.seat, players)}
-      &nbsp;attacked with &nbsp;
+      &nbsp;attacked with&nbsp;
       {line.grpIds.map((grpId, index) => {
         const len = line.grpIds.length;
         return (

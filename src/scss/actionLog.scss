@@ -81,8 +81,29 @@
 
   .log-line {
     margin-top: 8px;
-    margin-left: 16px;
     display: flex;
+    font-family: var(--main-font-name-it);
+    flex-wrap: wrap;
+
+    &.seat-1 {
+      &::before {
+        margin-right: 8px;
+        content: "";
+        width: 5px;
+        background-color: var(--color-g);
+        border-radius: 0 3px 3px 0;
+      }
+    }
+
+    &.seat-2 {
+      &::before {
+        margin-right: 8px;
+        content: "";
+        width: 5px;
+        background-color: var(--color-r);
+        border-radius: 0 3px 3px 0;
+      }
+    }
   }
 
   .result {
@@ -107,6 +128,12 @@
     margin-top: 12px;
     display: flex;
     justify-content: space-between;
+    font-family: var(--sub-font-name-it);
+
+    .time {
+      color: var(--color-text-dark);
+      margin-left: 8px;
+    }
   
     .name {
       color: var(--color-text-dark);

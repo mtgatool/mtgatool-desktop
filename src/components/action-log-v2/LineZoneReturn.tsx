@@ -9,7 +9,7 @@ export default function LineZoneReturn(props: ActionLogLineProps) {
 
   return (
     <>
-      <div className="log-line">
+      <div className={`log-line seat-${line.seat}`}>
         {line.abilityId ? (
           <>
             <LogCard grpId={line.sourceGrpId} />

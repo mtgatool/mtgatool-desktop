@@ -199,4 +199,5 @@ export type ActionLogV2 = {
 export interface ActionLogLineProps {
   line: ActionLogLine;
   players: ActionLogPlayer[];
+  timeStart: number;
 }
