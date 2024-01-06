@@ -177,6 +177,7 @@ const AnnotationType_ObjectIdChanged = (ann: Annotations): void => {
   setIdChange(ann.details);
 };
 
+// eslint-disable-next-line complexity
 const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
   if (ann.type !== "AnnotationType_ZoneTransfer") return;
 
