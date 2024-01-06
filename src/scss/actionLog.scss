@@ -73,3 +73,54 @@
   cursor: pointer;
   margin-right: 3px;
 }
+
+.action-log-v2 {
+  font-size: 14px;
+  color: var(--color-text);
+  font-style: italic;
+
+  .log-line {
+    margin-top: 8px;
+    margin-left: 16px;
+    display: flex;
+  }
+
+  .result {
+    font-weight: 600;
+    margin-left: 0px;
+    color: var(--color-text-dark);
+  }
+
+  .winner {
+    font-weight: 600;
+    margin-left: 0px;
+    margin-top: 16px;
+    color: var(--color-text-dark);
+  }
+
+  .card, .ability {
+    color: var(--color-link);
+    text-decoration: underline;
+  }
+
+  .turn-info {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+  
+    .name {
+      color: var(--color-text-dark);
+    }
+
+    &.begin {
+      margin-top: 16px;
+      padding-bottom: 4px;
+      border-bottom: var(--color-link) 1px solid;
+    }
+
+    &.phase {
+      font-weight: 600;
+      color: var(--color-text-dark);
+    }
+  }
+}

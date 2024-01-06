@@ -17,6 +17,7 @@ export type ActionLogLineType =
   | "COUNTERED"
   | "DESTROYED"
   | "ABILITY"
+  | "ATTACK"
   | "DAMAGE_DEALT"
   | "MODIFIED_LIFE"
   | "TARGET"
@@ -117,6 +118,13 @@ export interface ActionLogLineAbility extends ActionLogLineBase {
   abilityId: number;
 }
 
+export interface ActionLogLineAttack extends ActionLogLineBase {
+  type: "ATTACK";
+  grpIds: number[];
+  targetType: string;
+  targetId: number;
+}
+
 export interface ActionLogLineDamageDealt extends ActionLogLineBase {
   type: "DAMAGE_DEALT";
   sourceGrpId: number;
@@ -169,13 +177,14 @@ export type ActionLogLine =
   | ActionLogLineCountered
   | ActionLogLineDestroyed
   | ActionLogLineAbility
+  | ActionLogLineAttack
   | ActionLogLineDamageDealt
   | ActionLogLineModifiedLife
   | ActionLogLineTarget
   | ActionLogLineScry
   | ActionLogLineReveal;
 
-interface ActionLogPlayer {
+export interface ActionLogPlayer {
   name: string;
   seat: number;
   userId: string;
@@ -186,3 +195,8 @@ export type ActionLogV2 = {
   players: ActionLogPlayer[];
   lines: ActionLogLine[];
 };
+
+export interface ActionLogLineProps {
+  line: ActionLogLine;
+  players: ActionLogPlayer[];
+}

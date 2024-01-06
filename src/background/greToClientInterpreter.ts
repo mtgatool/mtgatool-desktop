@@ -22,7 +22,6 @@ import {
   Annotations,
   DetailsKeyType,
   DetailsSrcDestCategoryType,
-  GameObject,
 } from "../types/greInterpreter";
 import db from "../utils/database-wrapper";
 import actionLog from "./actionLog";
@@ -90,7 +89,7 @@ function _setHeat(seat: number, value: number): void {
   }
 }
 
-function getGameObject(id: number): GameObject {
+function getGameObject(id: number): GameObjectInfo {
   return globalStore.currentMatch.gameObjects[id];
 }
 
@@ -134,7 +133,7 @@ function isAnnotationProcessed(id: number): boolean {
 
 const FACE_DOWN_CARD = 3;
 
-function isObjectACard(card: GameObject): boolean {
+function isObjectACard(card: GameObjectInfo): boolean {
   return (
     card.type == "GameObjectType_Card" ||
     card.type == "GameObjectType_SplitCard"
@@ -156,7 +155,7 @@ class NoInstanceException {
   }
 }
 
-function instanceIdToObject(iid: number): GameObject {
+function instanceIdToObject(iid: number): GameObjectInfo {
   let instanceID = iid;
   const orig = instanceID;
   const { idChanges } = globalStore.currentMatch;
@@ -185,7 +184,7 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
   const fromZone = getZone(ann.details.zone_src);
   if (fromZone.type == "ZoneType_Sideboard") {
     const obj = instanceIdToObject(ann.affectedIds[0]);
-    if (obj.ownerSeatId == globalStore.currentMatch.playerSeat) {
+    if (obj.ownerSeatId == globalStore.currentMatch.playerSeat && obj.grpId) {
       addCardFromSideboard([obj.grpId]);
     }
   }
@@ -196,7 +195,7 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
     const grpId = affected.grpId || 0;
 
     actionLog({
-      seat: affected.controllerSeatId,
+      seat: affected.controllerSeatId || 0,
       timestamp: globalStore.currentMatch.logTime.getTime(),
       type: "PLAY",
       grpId,
@@ -269,18 +268,18 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
     const affector = instanceIdToObject(ann.affectorId);
     const seat = obj.ownerSeatId || 0;
 
-    if (affector.type == "GameObjectType_Ability") {
+    if (affector.type == "GameObjectType_Ability" && grpId) {
       actionLog({
         seat: seat,
         timestamp: globalStore.currentMatch.logTime.getTime(),
         type: "ZONE_PUT",
-        sourceGrpId: affector.objectSourceGrpId,
+        sourceGrpId: affector.objectSourceGrpId || 0,
         abilityId: affector.grpId,
         grpId,
         zone: getZoneName(zone || "ZoneType_None"),
       });
     }
-    if (isObjectACard(affector)) {
+    if (isObjectACard(affector) && grpId && affector.grpId) {
       actionLog({
         seat: seat,
         timestamp: globalStore.currentMatch.logTime.getTime(),
@@ -298,9 +297,13 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
     const zone = getZone(ann.details.zone_dest).type;
     const affected = instanceIdToObject(ann.affectedIds[0]);
     const affector = instanceIdToObject(ann.affectorId);
-    const seat = affected.ownerSeatId;
+    const seat = affected.ownerSeatId || 0;
 
-    if (affector.type == "GameObjectType_Ability") {
+    if (
+      affector.type == "GameObjectType_Ability" &&
+      affected.grpId &&
+      affector.objectSourceGrpId
+    ) {
       actionLog({
         seat: seat,
         timestamp: globalStore.currentMatch.logTime.getTime(),
@@ -311,7 +314,7 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
         zone: getZoneName(zone || "ZoneType_None"),
       });
     }
-    if (isObjectACard(affector)) {
+    if (isObjectACard(affector) && affected.grpId && affector.grpId) {
       actionLog({
         seat: seat,
         timestamp: globalStore.currentMatch.logTime.getTime(),
@@ -329,8 +332,13 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
     const affected = instanceIdToObject(ann.affectedIds[0]);
     const affector = instanceIdToObject(ann.affectorId);
 
-    const seat = affector.ownerSeatId;
-    if (affector.type == "GameObjectType_Ability") {
+    const seat = affector.ownerSeatId || 0;
+
+    if (
+      affector.type == "GameObjectType_Ability" &&
+      affector.objectSourceGrpId &&
+      affected.grpId
+    ) {
       actionLog({
         seat: seat,
         timestamp: globalStore.currentMatch.logTime.getTime(),
@@ -340,7 +348,7 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
         grpId: affected.grpId,
       });
     }
-    if (isObjectACard(affector)) {
+    if (isObjectACard(affector) && affected.grpId && affector.grpId) {
       actionLog({
         seat: seat,
         timestamp: globalStore.currentMatch.logTime.getTime(),
@@ -362,8 +370,12 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
     const affector = instanceIdToObject(ann.affectorId);
     const affected = instanceIdToObject(ann.affectedIds[0]);
 
-    const seat = affector.ownerSeatId;
-    if (affector.type == "GameObjectType_Ability") {
+    const seat = affector.ownerSeatId || 0;
+    if (
+      affector.type == "GameObjectType_Ability" &&
+      affector.objectSourceGrpId &&
+      affected.grpId
+    ) {
       actionLog({
         seat: seat,
         timestamp: globalStore.currentMatch.logTime.getTime(),
@@ -373,7 +385,7 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
         grpId: affected.grpId,
       });
     }
-    if (isObjectACard(affector)) {
+    if (isObjectACard(affector) && affected.grpId && affector.grpId) {
       actionLog({
         seat: seat,
         timestamp: globalStore.currentMatch.logTime.getTime(),
@@ -421,7 +433,11 @@ const AnnotationType_ResolutionStart = (ann: Annotations): void => {
   const affected = instanceIdToObject(ann.affectedIds[0]);
   const grpId = ann.details.grpid;
 
-  if (affected.type == "GameObjectType_Ability") {
+  if (
+    affected.type == "GameObjectType_Ability" &&
+    affected.controllerSeatId &&
+    affected.objectSourceGrpId
+  ) {
     // affected.grpId = grpId;
     actionLog({
       seat: affected.controllerSeatId,
@@ -444,27 +460,31 @@ const AnnotationType_DamageDealt = (ann: Annotations): void => {
     targetType = "PLAYER";
   } else {
     const affected = instanceIdToObject(ann.affectedIds[0]);
-    targetId = affected.grpId;
+    targetId = affected.grpId || 0;
     targetType = "PERMANENT";
   }
 
   const affector = instanceIdToObject(ann.affectorId);
   const dmg = ann.details.damage;
+  const affectorGrpId = affector.grpId || 0;
+
   if (affector.controllerSeatId == globalStore.currentMatch.playerSeat) {
     const pstats = globalStore.currentMatch.playerStats;
-    const prev = pstats.damage[affector.grpId];
-    pstats.damage[affector.grpId] = (prev || 0) + dmg;
+
+    const prev = pstats.damage[affectorGrpId];
+    pstats.damage[affectorGrpId] = (prev || 0) + dmg;
   } else {
     const pstats = globalStore.currentMatch.oppStats;
-    const prev = pstats.damage[affector.grpId];
-    pstats.damage[affector.grpId] = (prev || 0) + dmg;
+
+    const prev = pstats.damage[affectorGrpId];
+    pstats.damage[affectorGrpId] = (prev || 0) + dmg;
   }
 
   actionLog({
-    seat: affector.controllerSeatId,
+    seat: affector.controllerSeatId || 0,
     timestamp: globalStore.currentMatch.logTime.getTime(),
     type: "DAMAGE_DEALT",
-    sourceGrpId: affector.grpId,
+    sourceGrpId: affectorGrpId,
     targetId,
     targetType,
     amount: dmg,
@@ -510,14 +530,14 @@ const AnnotationType_TargetSpec = (ann: Annotations): void => {
     targetType = "PLAYER";
   } else {
     const affected = instanceIdToObject(ann.affectedIds[0]);
-    targetId = affected.grpId;
+    targetId = affected.grpId || 0;
     targetType = "PERMANENT";
   }
 
   const affector = instanceIdToObject(ann.affectorId);
-  const seat = affector.ownerSeatId;
+  const seat = affector.ownerSeatId || 0;
 
-  if (affector.type == "GameObjectType_Ability") {
+  if (affector.type == "GameObjectType_Ability" && affector.objectSourceGrpId) {
     actionLog({
       seat,
       timestamp: globalStore.currentMatch.logTime.getTime(),
@@ -528,7 +548,7 @@ const AnnotationType_TargetSpec = (ann: Annotations): void => {
       targetId,
     });
   }
-  if (isObjectACard(affector)) {
+  if (isObjectACard(affector) && affector.grpId) {
     actionLog({
       seat,
       timestamp: globalStore.currentMatch.logTime.getTime(),
@@ -546,7 +566,7 @@ const AnnotationType_Scry = (ann: Annotations): void => {
   // REVIEW SCRY ANNOTATION
   let affector = ann.affectorId;
   if (affector > 3) {
-    affector = instanceIdToObject(affector).ownerSeatId;
+    affector = instanceIdToObject(affector).ownerSeatId || 0;
   }
   // const { playerSeat } = globalStore.currentMatch;
 
@@ -625,7 +645,7 @@ const AnnotationType_ManaPaid = (ann: Annotations): void => {
 
   let affector = ann.affectorId;
   if (affector > 3) {
-    affector = instanceIdToObject(affector).ownerSeatId;
+    affector = instanceIdToObject(affector).ownerSeatId || 0;
   }
 
   if (affector == playerSeat) {
@@ -827,7 +847,7 @@ function getOppUsedCards(): number[] {
           if (obj.ownerSeatId == oppSeat && isObjectACard(obj)) {
             grpId = obj.grpId;
             // debugLog(zone.type, db.card(grpId).name, obj);
-            if (grpId !== FACE_DOWN_CARD) cardsUsed.push(grpId);
+            if (grpId && grpId !== FACE_DOWN_CARD) cardsUsed.push(grpId);
           }
         } catch (e) {
           //
@@ -1001,8 +1021,8 @@ function checkForStartingLibrary(gameState?: GameStateMessage): boolean {
       const mull = player.mulliganCount || 0;
       // If this is the first hand drawn or we made a mulligan
       if (mull > 0 || currentMatch.handsDrawn.length == 0) {
-        const drawn = hand.map((n) => getGameObject(n).grpId);
-        setHandDrawn(mull, drawn);
+        const drawn = hand.map((n) => getGameObject(n).grpId).filter((n) => n);
+        setHandDrawn(mull, drawn as number[]);
         console.log(`Mulligan: ${mull}, ${drawn}`);
       }
     }
@@ -1027,6 +1047,7 @@ function checkForStartingLibrary(gameState?: GameStateMessage): boolean {
 }
 
 function checkTurnDiff(turnInfo: TurnInfo): void {
+  console.log("checkTurnDiff", turnInfo);
   const { currentMatch } = globalStore;
   const currentTurnInfo = currentMatch.turnInfo;
   const { currentPriority } = currentMatch;
@@ -1037,7 +1058,59 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
   ) {
     setOnThePlay(turnInfo.activePlayer);
   }
-  // console.log("checkTurnDiff", currentMatch.logTime);
+
+  if (
+    turnInfo.step === "Step_DeclareBlock" &&
+    currentTurnInfo.step !== turnInfo.step
+  ) {
+    // Find all attacking creatures and add it to the action log
+    const attackersByTarget: Record<number, number[]> = {};
+    if (turnInfo.phase && turnInfo.step === "Step_DeclareBlock") {
+      Object.values(globalStore.currentMatch.zones)
+        .filter((z) => z.type === "ZoneType_Battlefield")
+        .forEach((zone) => {
+          if (zone.objectInstanceIds) {
+            zone.objectInstanceIds.forEach((id: number) => {
+              try {
+                const obj = getGameObject(id);
+                if (
+                  obj.attackState === "AttackState_Attacking" &&
+                  obj.grpId &&
+                  obj.grpId !== FACE_DOWN_CARD &&
+                  obj.attackInfo &&
+                  obj.attackInfo.targetId
+                ) {
+                  const { targetId } = obj.attackInfo;
+
+                  if (attackersByTarget[targetId]) {
+                    attackersByTarget[targetId].push(obj.grpId);
+                  } else {
+                    attackersByTarget[targetId] = [obj.grpId];
+                  }
+                }
+              } catch (e) {
+                //
+              }
+            });
+          }
+        });
+    }
+
+    console.log("attackersByTarget", attackersByTarget);
+    Object.entries(attackersByTarget).forEach(([id, attackers]) => {
+      const targetId = parseInt(id);
+      const targetType = targetId < 5 ? "PLAYER" : "PERMANENT";
+      actionLog({
+        type: "ATTACK",
+        seat: turnInfo.activePlayer || -1,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        grpIds: attackers,
+        targetType,
+        targetId,
+      });
+    });
+  }
+
   if (turnInfo.priorityPlayer !== currentPriority) {
     changePriority(
       currentPriority,
@@ -1055,21 +1128,21 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
       ...turnInfo,
     });
   }
-  if (currentTurnInfo.step !== turnInfo.step) {
-    actionLog({
-      type: "TURN_INFO",
-      seat: -1,
-      timestamp: globalStore.currentMatch.logTime.getTime(),
-      subType: "STEP",
-      ...turnInfo,
-    });
-  }
   if (currentTurnInfo.phase !== turnInfo.phase) {
     actionLog({
       type: "TURN_INFO",
       seat: -1,
       timestamp: globalStore.currentMatch.logTime.getTime(),
       subType: "PHASE",
+      ...turnInfo,
+    });
+  }
+  if (currentTurnInfo.step !== turnInfo.step) {
+    actionLog({
+      type: "TURN_INFO",
+      seat: -1,
+      timestamp: globalStore.currentMatch.logTime.getTime(),
+      subType: "STEP",
       ...turnInfo,
     });
   }
