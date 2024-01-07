@@ -27,6 +27,7 @@ import { getCardArtCrop, getCardImage } from "../../../utils/getCardArtCrop";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
 import isLimitedEventId from "../../../utils/isLimitedEventId";
+import ActionLogV2 from "../../action-log-v2";
 import ActionLog from "../../ActionLog";
 import CardList from "../../CardList";
 import DeckColorsBar from "../../DeckColorsBar";
@@ -166,9 +167,9 @@ export default function MatchView(): JSX.Element {
     : undefined;
 
   const logExists = matchData ? !!matchData.internalMatch.actionLog : undefined;
-  const actionLogDataString = matchData
+  const actionLogData = matchData
     ? matchData.internalMatch.actionLog ?? ""
-    : undefined;
+    : "";
 
   const goBack = (): void => {
     history.push("/history");
@@ -435,7 +436,7 @@ export default function MatchView(): JSX.Element {
 
         <Section
           style={{
-            padding: "16px 10px",
+            padding: "16px",
             maxHeight: "78px",
             flexDirection: "column",
             gridArea: "buttons",
@@ -519,7 +520,11 @@ export default function MatchView(): JSX.Element {
           }}
         >
           {view == VIEW_LOG ? (
-            <ActionLog logStr={actionLogDataString || ""} />
+            typeof actionLogData === "string" ? (
+              <ActionLog logStr={actionLogData as string} />
+            ) : (
+              <ActionLogV2 actionLog={actionLogData} />
+            )
           ) : arrayGameStats[gameSeen] ? (
             <GameStats index={gameSeen} game={arrayGameStats[gameSeen]} />
           ) : (

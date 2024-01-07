@@ -85,7 +85,7 @@ function generateInternalMatch(): InternalMatch {
     toolRunFromSource: !remote?.app.isPackaged,
     arenaId: currentMatch.player.name,
     playerDeckHash: globalStore.currentMatch.originalDeck.getHash(),
-    actionLog: globalStore.currentActionLog,
+    actionLog: globalStore.currentActionLog as any,
     type: "match",
   };
 

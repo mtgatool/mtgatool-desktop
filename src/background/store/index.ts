@@ -1,3 +1,4 @@
+import { ActionLogV2 } from "../../components/action-log-v2/types";
 import { CombinedRankInfo } from "../onLabel/InEventGetCombinedRankInfo";
 import { Course } from "../onLabel/InEventGetCourses";
 import { draftStateObject } from "./currentDraftStore";
@@ -8,7 +9,11 @@ import { matchStateObject } from "./currentMatchStore";
 const globalStore = {
   currentMatch: matchStateObject,
   currentDraft: draftStateObject,
-  currentActionLog: "",
+  currentActionLog: {
+    lines: [],
+    players: [],
+    version: 2,
+  } as ActionLogV2,
   currentCourses: {} as Record<string, Course>,
   rank: {
     constructedSeasonOrdinal: 0,

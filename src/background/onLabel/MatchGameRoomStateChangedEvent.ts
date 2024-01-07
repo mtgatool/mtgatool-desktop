@@ -87,7 +87,13 @@ export default function onLabelMatchGameRoomStateChangedEvent(
 
   // Now only when a match begins
   if (gameRoom.stateType == "MatchGameRoomStateType_Playing") {
-    actionLog(-99, globalStore.currentMatch.logTime, "");
+    globalStore.currentActionLog.lines = [];
+    globalStore.currentActionLog.players = [];
+    actionLog({
+      seat: -1,
+      type: "START",
+      timestamp: globalStore.currentMatch.logTime.getTime(),
+    });
     resetCurrentMatch();
     const playerId = getLocalSetting("playerId");
     // let oppId = "";
@@ -119,6 +125,12 @@ export default function onLabelMatchGameRoomStateChangedEvent(
     }
 
     gameRoom.gameRoomConfig.reservedPlayers.forEach((player) => {
+      globalStore.currentActionLog.players.push({
+        name: player.playerName,
+        seat: player.systemSeatId,
+        userId: player.userId,
+      });
+
       if (player.userId == playerId) {
         setPlayer({
           seat: player.systemSeatId,

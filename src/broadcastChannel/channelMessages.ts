@@ -8,6 +8,7 @@ import {
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { OverlayUpdateMatchState } from "../background/store/types";
 import { OverlaySettings } from "../common/defaultConfig";
+import { ActionLogV2 } from "../components/action-log-v2/types";
 import { DbDraftVote, DbInventoryInfo } from "../types/dbTypes";
 import { ClientSceneChange } from "../types/logDecoder";
 
@@ -66,7 +67,7 @@ export interface StopLogReadingMessage extends ChannelMessageBase {
 
 export interface ActionLogMessage extends ChannelMessageBase {
   type: "ACTION_LOG";
-  value: string;
+  value: ActionLogV2;
 }
 
 export interface LogMessageRecvMessage extends ChannelMessageBase {

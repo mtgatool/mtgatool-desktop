@@ -22,13 +22,11 @@ import {
   Annotations,
   DetailsKeyType,
   DetailsSrcDestCategoryType,
-  GameObject,
 } from "../types/greInterpreter";
 import db from "../utils/database-wrapper";
 import actionLog from "./actionLog";
 import forceDeckUpdate from "./forceDeckUpdate";
 import getMatchGameStats from "./getMatchGameStats";
-import getNameBySeat from "./getNameBySeat";
 import globalStore from "./store";
 import {
   addCardCast,
@@ -69,7 +67,7 @@ function changePriority(previous: number, current: number, time: number): void {
   });
 }
 
-function setHeat(seat: number, value: number): void {
+function _setHeat(seat: number, value: number): void {
   const { turnInfo } = globalStore.currentMatch;
   const heat = {
     value,
@@ -91,7 +89,7 @@ function setHeat(seat: number, value: number): void {
   }
 }
 
-function getGameObject(id: number): GameObject {
+function getGameObject(id: number): GameObjectInfo {
   return globalStore.currentMatch.gameObjects[id];
 }
 
@@ -133,18 +131,9 @@ function isAnnotationProcessed(id: number): boolean {
   return anns.includes(id);
 }
 
-const actionLogGenerateLink = (grpId: number): string => {
-  const card = db.card(grpId);
-  return card ? `<log-card id="${grpId}">${card.Name}</log-card>` : "";
-};
-
-const actionLogGenerateAbilityLink = (abId: number): string => {
-  return `<log-ability id="${abId}">ability</log-ability>`;
-};
-
 const FACE_DOWN_CARD = 3;
 
-function isObjectACard(card: GameObject): boolean {
+function isObjectACard(card: GameObjectInfo): boolean {
   return (
     card.type == "GameObjectType_Card" ||
     card.type == "GameObjectType_SplitCard"
@@ -166,7 +155,7 @@ class NoInstanceException {
   }
 }
 
-function instanceIdToObject(iid: number): GameObject {
+function instanceIdToObject(iid: number): GameObjectInfo {
   let instanceID = iid;
   const orig = instanceID;
   const { idChanges } = globalStore.currentMatch;
@@ -188,6 +177,7 @@ const AnnotationType_ObjectIdChanged = (ann: Annotations): void => {
   setIdChange(ann.details);
 };
 
+// eslint-disable-next-line complexity
 const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
   if (ann.type !== "AnnotationType_ZoneTransfer") return;
 
@@ -195,7 +185,7 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
   const fromZone = getZone(ann.details.zone_src);
   if (fromZone.type == "ZoneType_Sideboard") {
     const obj = instanceIdToObject(ann.affectedIds[0]);
-    if (obj.ownerSeatId == globalStore.currentMatch.playerSeat) {
+    if (obj.ownerSeatId == globalStore.currentMatch.playerSeat && obj.grpId) {
       addCardFromSideboard([obj.grpId]);
     }
   }
@@ -205,37 +195,33 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
     const affected = instanceIdToObject(ann.affectedIds[0]);
     const grpId = affected.grpId || 0;
 
-    const playerName = getNameBySeat(affected.controllerSeatId);
-    setHeat(affected.controllerSeatId, 1);
-    actionLog(
-      affected.controllerSeatId,
-      globalStore.currentMatch.logTime,
-      `${playerName} played ${actionLogGenerateLink(grpId)}`,
-      grpId
-    );
+    actionLog({
+      seat: affected.controllerSeatId || 0,
+      timestamp: globalStore.currentMatch.logTime.getTime(),
+      type: "PLAY",
+      grpId,
+    });
   }
 
   // A player drew a card
   if (ann.details.category == "Draw") {
     const zone = getZone(ann.details.zone_src);
-    const playerName = getNameBySeat(zone.ownerSeatId || 0);
     const obj = getGameObject(ann.affectedIds[0]);
     const { playerSeat } = globalStore.currentMatch;
-    if (zone.ownerSeatId == playerSeat && obj) {
-      setHeat(zone.ownerSeatId, 1);
-      const grpId = obj.grpId || 0;
-      actionLog(
-        zone.ownerSeatId || 0,
-        globalStore.currentMatch.logTime,
-        `${playerName} drew ${actionLogGenerateLink(grpId)}`,
-        grpId
-      );
+    if (zone.ownerSeatId == playerSeat && obj && obj.grpId) {
+      actionLog({
+        seat: zone.ownerSeatId,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "DRAW",
+        grpId: obj.grpId,
+      });
     } else {
-      actionLog(
-        zone.ownerSeatId || 0,
-        globalStore.currentMatch.logTime,
-        `${playerName} drew a card`
-      );
+      actionLog({
+        seat: zone.ownerSeatId || 0,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "DRAW",
+        grpId: null,
+      });
     }
   }
 
@@ -244,22 +230,22 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
     const obj = instanceIdToObject(ann.affectedIds[0]) as GameObjectInfo;
     const grpId = obj.grpId || 0;
     const seat = obj.ownerSeatId || 0;
-    const playerName = getNameBySeat(seat);
     const { turnNumber } = globalStore.currentMatch.turnInfo;
 
+    // console.log("CAST", grpId, obj, ann);
     const cast = {
       grpId: grpId,
       turn: turnNumber || 0,
       player: seat,
     };
     addCardCast(cast);
-    setHeat(seat, 1);
-    actionLog(
-      seat,
-      globalStore.currentMatch.logTime,
-      `${playerName} cast ${actionLogGenerateLink(grpId)}`,
-      grpId
-    );
+
+    actionLog({
+      seat: obj.controllerSeatId || seat,
+      timestamp: globalStore.currentMatch.logTime.getTime(),
+      type: "CAST",
+      grpId,
+    });
   }
 
   // A player discards a card
@@ -267,13 +253,13 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
     const obj = instanceIdToObject(ann.affectedIds[0]);
     const grpId = obj.grpId || 0;
     const seat = obj.ownerSeatId || 0;
-    const playerName = getNameBySeat(seat);
-    actionLog(
-      seat,
-      globalStore.currentMatch.logTime,
-      `${playerName} discarded ${actionLogGenerateLink(grpId)}`,
-      grpId
-    );
+
+    actionLog({
+      seat: seat,
+      timestamp: globalStore.currentMatch.logTime.getTime(),
+      type: "DISCARD",
+      grpId,
+    });
   }
 
   // A player puts a card in a zone
@@ -283,23 +269,29 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
     const { grpId } = obj;
     const affector = instanceIdToObject(ann.affectorId);
     const seat = obj.ownerSeatId || 0;
-    let text = getNameBySeat(seat);
-    if (affector.type == "GameObjectType_Ability") {
-      text = `${actionLogGenerateLink(
-        affector.objectSourceGrpId
-      )}'s ${actionLogGenerateAbilityLink(affector.grpId)}`;
+
+    if (affector.type == "GameObjectType_Ability" && grpId) {
+      actionLog({
+        seat: seat,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "ZONE_PUT",
+        sourceGrpId: affector.objectSourceGrpId || 0,
+        abilityId: affector.grpId,
+        grpId,
+        zone: getZoneName(zone || "ZoneType_None"),
+      });
     }
-    if (isObjectACard(affector)) {
-      text = actionLogGenerateLink(affector.grpId);
+    if (isObjectACard(affector) && grpId && affector.grpId) {
+      actionLog({
+        seat: seat,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "ZONE_PUT",
+        sourceGrpId: affector.grpId,
+        abilityId: undefined,
+        grpId,
+        zone: getZoneName(zone || "ZoneType_None"),
+      });
     }
-    actionLog(
-      seat,
-      globalStore.currentMatch.logTime,
-      `${text} put ${actionLogGenerateLink(grpId)} in ${getZoneName(
-        zone || "ZoneType_None"
-      )}`,
-      grpId
-    );
   }
 
   // A card is returned to a zone
@@ -307,26 +299,34 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
     const zone = getZone(ann.details.zone_dest).type;
     const affected = instanceIdToObject(ann.affectedIds[0]);
     const affector = instanceIdToObject(ann.affectorId);
+    const seat = affected.ownerSeatId || 0;
 
-    let text = "";
-    if (affector.type == "GameObjectType_Ability") {
-      text = `${actionLogGenerateLink(
-        affector.objectSourceGrpId
-      )}'s ${actionLogGenerateAbilityLink(affector.grpId)}`;
+    if (
+      affector.type == "GameObjectType_Ability" &&
+      affected.grpId &&
+      affector.objectSourceGrpId
+    ) {
+      actionLog({
+        seat: seat,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "ZONE_RETURN",
+        sourceGrpId: affector.objectSourceGrpId,
+        abilityId: affector.grpId,
+        grpId: affected.grpId,
+        zone: getZoneName(zone || "ZoneType_None"),
+      });
     }
-    if (isObjectACard(affector)) {
-      text = actionLogGenerateLink(affector.grpId);
+    if (isObjectACard(affector) && affected.grpId && affector.grpId) {
+      actionLog({
+        seat: seat,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "ZONE_RETURN",
+        sourceGrpId: affector.grpId,
+        abilityId: undefined,
+        grpId: affected.grpId,
+        zone: getZoneName(zone || "ZoneType_None"),
+      });
     }
-
-    const seat = affected.ownerSeatId;
-    actionLog(
-      seat,
-      globalStore.currentMatch.logTime,
-      `${text} returned ${actionLogGenerateLink(
-        affected.grpId
-      )} to ${getZoneName(zone || "ZoneType_None")}`,
-      affected.grpId
-    );
   }
 
   // A card was exiled
@@ -334,23 +334,32 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
     const affected = instanceIdToObject(ann.affectedIds[0]);
     const affector = instanceIdToObject(ann.affectorId);
 
-    let text = "";
-    if (affector.type == "GameObjectType_Ability") {
-      text = `${actionLogGenerateLink(
-        affector.objectSourceGrpId
-      )}'s ${actionLogGenerateAbilityLink(affector.grpId)}`;
-    }
-    if (isObjectACard(affector)) {
-      text = actionLogGenerateLink(affector.grpId);
-    }
+    const seat = affector.ownerSeatId || 0;
 
-    const seat = affector.ownerSeatId;
-    actionLog(
-      seat,
-      globalStore.currentMatch.logTime,
-      `${text} exiled ${actionLogGenerateLink(affected.grpId)}`,
+    if (
+      affector.type == "GameObjectType_Ability" &&
+      affector.objectSourceGrpId &&
       affected.grpId
-    );
+    ) {
+      actionLog({
+        seat: seat,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "EXILE",
+        sourceGrpId: affector.objectSourceGrpId,
+        abilityId: affector.grpId,
+        grpId: affected.grpId,
+      });
+    }
+    if (isObjectACard(affector) && affected.grpId && affector.grpId) {
+      actionLog({
+        seat: seat,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "EXILE",
+        sourceGrpId: affector.grpId,
+        abilityId: undefined,
+        grpId: affected.grpId,
+      });
+    }
   }
 
   // Saw this one when Lava coil exiled a creature (??)
@@ -363,40 +372,73 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
     const affector = instanceIdToObject(ann.affectorId);
     const affected = instanceIdToObject(ann.affectedIds[0]);
 
-    let text = "";
-    if (affector.type == "GameObjectType_Ability") {
-      text = `${actionLogGenerateLink(
-        affector.objectSourceGrpId
-      )}'s ${actionLogGenerateAbilityLink(affector.grpId)}`;
-    }
-    if (isObjectACard(affector)) {
-      text = actionLogGenerateLink(affector.grpId);
-    }
-
-    const seat = affector.ownerSeatId;
-    setHeat(seat, 1);
-    actionLog(
-      seat,
-      globalStore.currentMatch.logTime,
-      `${text} countered ${actionLogGenerateLink(affected.grpId)}`,
+    const seat = affector.ownerSeatId || 0;
+    if (
+      affector.type == "GameObjectType_Ability" &&
+      affector.objectSourceGrpId &&
       affected.grpId
-    );
+    ) {
+      actionLog({
+        seat: seat,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "COUNTERED",
+        sourceGrpId: affector.objectSourceGrpId,
+        abilityId: affector.grpId,
+        grpId: affected.grpId,
+      });
+    }
+    if (isObjectACard(affector) && affected.grpId && affector.grpId) {
+      actionLog({
+        seat: seat,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "COUNTERED",
+        sourceGrpId: affector.grpId,
+        abilityId: undefined,
+        grpId: affected.grpId,
+      });
+    }
   }
 
   // A spell or ability destroys something
   if (ann.details.category == "Destroy") {
-    //
+    const affector = instanceIdToObject(ann.affectorId);
+    const affected = instanceIdToObject(ann.affectedIds[0]);
+
+    const seat = affector.ownerSeatId || 0;
+    if (
+      affector.type == "GameObjectType_Ability" &&
+      affector.objectSourceGrpId &&
+      affected.grpId
+    ) {
+      actionLog({
+        seat: seat,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "DESTROYED",
+        sourceGrpId: affector.objectSourceGrpId,
+        abilityId: affector.grpId,
+        grpId: affected.grpId,
+      });
+    }
+    if (isObjectACard(affector) && affected.grpId && affector.grpId) {
+      actionLog({
+        seat: seat,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "DESTROYED",
+        sourceGrpId: affector.grpId,
+        abilityId: undefined,
+        grpId: affected.grpId,
+      });
+    }
   }
 };
 
 const AnnotationType_AbilityInstanceCreated = (ann: Annotations): void => {
+  return;
   if (ann.type !== "AnnotationType_AbilityInstanceCreated") return;
 
-  // const affected = ann.affectedIds[0];
+  /* 
+  const affected = ann.affectedIds[0];
   const affector = instanceIdToObject(ann.affectorId);
-  setHeat(affector.controllerSeatId, 1);
-
-  /*
   if (affector) {
     //currentMatch.gameObjs[affected]
     const newObj = {
@@ -420,57 +462,69 @@ const AnnotationType_ResolutionStart = (ann: Annotations): void => {
   const affected = instanceIdToObject(ann.affectedIds[0]);
   const grpId = ann.details.grpid;
 
-  if (affected.type == "GameObjectType_Ability") {
+  if (
+    affected.type == "GameObjectType_Ability" &&
+    affected.controllerSeatId &&
+    affected.objectSourceGrpId
+  ) {
     // affected.grpId = grpId;
-    setHeat(affected.controllerSeatId, 1);
-    actionLog(
-      affected.controllerSeatId,
-      globalStore.currentMatch.logTime,
-      `${actionLogGenerateLink(
-        affected.objectSourceGrpId
-      )}'s ${actionLogGenerateAbilityLink(grpId)}`,
-      grpId
-    );
+    actionLog({
+      seat: affected.controllerSeatId,
+      timestamp: globalStore.currentMatch.logTime.getTime(),
+      type: "ABILITY",
+      sourceGrpId: affected.objectSourceGrpId,
+      abilityId: grpId,
+    });
   }
 };
 
 const AnnotationType_DamageDealt = (ann: Annotations): void => {
   if (ann.type !== "AnnotationType_DamageDealt") return;
-  let recipient = "";
+
+  let targetId = 0;
+  let targetType = "PERMANENT";
+
   if (ann.affectedIds[0] < 5) {
-    recipient = getNameBySeat(ann.affectedIds[0]);
+    [targetId] = ann.affectedIds;
+    targetType = "PLAYER";
   } else {
     const affected = instanceIdToObject(ann.affectedIds[0]);
-    recipient = actionLogGenerateLink(affected.grpId);
+    targetId = affected.grpId || 0;
+    targetType = "PERMANENT";
   }
 
   const affector = instanceIdToObject(ann.affectorId);
   const dmg = ann.details.damage;
-  setHeat(affector.controllerSeatId, dmg);
+  const affectorGrpId = affector.grpId || 0;
+
   if (affector.controllerSeatId == globalStore.currentMatch.playerSeat) {
     const pstats = globalStore.currentMatch.playerStats;
-    const prev = pstats.damage[affector.grpId];
-    pstats.damage[affector.grpId] = (prev || 0) + dmg;
+
+    const prev = pstats.damage[affectorGrpId];
+    pstats.damage[affectorGrpId] = (prev || 0) + dmg;
   } else {
     const pstats = globalStore.currentMatch.oppStats;
-    const prev = pstats.damage[affector.grpId];
-    pstats.damage[affector.grpId] = (prev || 0) + dmg;
+
+    const prev = pstats.damage[affectorGrpId];
+    pstats.damage[affectorGrpId] = (prev || 0) + dmg;
   }
-  actionLog(
-    affector.controllerSeatId,
-    globalStore.currentMatch.logTime,
-    `${actionLogGenerateLink(
-      affector.grpId
-    )} dealt ${dmg} damage to ${recipient}`,
-    affector.grpId
-  );
+
+  actionLog({
+    seat: affector.controllerSeatId || 0,
+    timestamp: globalStore.currentMatch.logTime.getTime(),
+    type: "DAMAGE_DEALT",
+    sourceGrpId: affectorGrpId,
+    targetId,
+    targetType,
+    amount: dmg,
+  });
 };
 
 const AnnotationType_ModifiedLife = (ann: Annotations): void => {
   if (ann.type !== "AnnotationType_ModifiedLife") return;
   const affected = ann.affectedIds[0];
   const total = getPlayer(affected)?.lifeTotal || 0 + ann.details.life;
-  const lifeStr = (ann.details.life > 0 ? "+" : "") + ann.details.life;
+  // const lifeStr = (ann.details.life > 0 ? "+" : "") + ann.details.life;
 
   const lifeAbs = Math.abs(ann.details.life);
   if (affected == globalStore.currentMatch.playerSeat) {
@@ -485,51 +539,65 @@ const AnnotationType_ModifiedLife = (ann: Annotations): void => {
     globalStore.currentMatch.oppStats.lifeTotals.push(Math.max(0, total));
   }
 
-  actionLog(
-    affected,
-    globalStore.currentMatch.logTime,
-    `${getNameBySeat(affected)} life changed (${lifeStr}) to ${total}`
-  );
+  actionLog({
+    seat: affected,
+    timestamp: globalStore.currentMatch.logTime.getTime(),
+    type: "MODIFIED_LIFE",
+    delta: ann.details.life,
+    total,
+  });
 };
 
 const AnnotationType_TargetSpec = (ann: Annotations): void => {
   if (ann.type !== "AnnotationType_TargetSpec") return;
-  let target;
+
+  let targetId = 0;
+  let targetType = "PERMANENT";
+
   if (ann.affectedIds[0] < 5) {
-    target = getNameBySeat(ann.affectedIds[0]);
+    [targetId] = ann.affectedIds;
+    targetType = "PLAYER";
   } else {
-    const { grpId } = instanceIdToObject(ann.affectedIds[0]);
-    target = actionLogGenerateLink(grpId);
+    const affected = instanceIdToObject(ann.affectedIds[0]);
+    targetId = affected.grpId || 0;
+    targetType = "PERMANENT";
   }
 
   const affector = instanceIdToObject(ann.affectorId);
-  const seat = affector.ownerSeatId;
-  let text = getNameBySeat(seat);
-  setHeat(seat, 1);
-  if (affector.type == "GameObjectType_Ability") {
-    text = `${actionLogGenerateLink(
-      affector.objectSourceGrpId
-    )}'s ${actionLogGenerateAbilityLink(affector.grpId)}`;
+  const seat = affector.ownerSeatId || 0;
+
+  if (affector.type == "GameObjectType_Ability" && affector.objectSourceGrpId) {
+    actionLog({
+      seat,
+      timestamp: globalStore.currentMatch.logTime.getTime(),
+      type: "TARGET",
+      sourceGrpId: affector.objectSourceGrpId,
+      abilityId: affector.grpId,
+      targetType,
+      targetId,
+    });
   }
-  if (isObjectACard(affector)) {
-    text = actionLogGenerateLink(affector.grpId);
+  if (isObjectACard(affector) && affector.grpId) {
+    actionLog({
+      seat,
+      timestamp: globalStore.currentMatch.logTime.getTime(),
+      type: "TARGET",
+      sourceGrpId: affector.grpId,
+      abilityId: undefined,
+      targetType,
+      targetId,
+    });
   }
-  actionLog(
-    seat,
-    globalStore.currentMatch.logTime,
-    `${text} targeted ${target}`
-  );
 };
 
 const AnnotationType_Scry = (ann: Annotations): void => {
   if (ann.type !== "AnnotationType_Scry") return;
   // REVIEW SCRY ANNOTATION
-  let affector = ann.affectorId;
-  if (affector > 3) {
-    affector = instanceIdToObject(affector).ownerSeatId;
+  let affector: GameObjectInfo | undefined;
+  if (ann.affectorId > 3) {
+    affector = instanceIdToObject(ann.affectorId);
   }
-  const { playerSeat } = globalStore.currentMatch;
-  const player = getNameBySeat(affector);
+  // const { playerSeat } = globalStore.currentMatch;
 
   const top = ann.details.topIds;
   const bottom = ann.details.bottomIds;
@@ -545,37 +613,40 @@ const AnnotationType_Scry = (ann: Annotations): void => {
   const xtop = newTop.length;
   const xbottom = newBottom.length;
   const scrySize = xtop + xbottom;
-  setHeat(affector, scrySize);
-  actionLog(
-    affector,
-    globalStore.currentMatch.logTime,
-    `${player} scry ${scrySize}: ${xtop} top, ${xbottom} bottom`
-  );
 
-  if (affector == playerSeat) {
-    if (xtop > 0) {
-      newTop.forEach((instanceId: number) => {
-        const { grpId } = instanceIdToObject(instanceId);
-        actionLog(
-          affector,
-          globalStore.currentMatch.logTime,
-          ` ${actionLogGenerateLink(grpId)} to the top`,
-          grpId
-        );
-      });
-    }
-    if (xbottom > 0) {
-      newBottom.forEach((instanceId: number) => {
-        const { grpId } = instanceIdToObject(instanceId);
-        actionLog(
-          affector,
-          globalStore.currentMatch.logTime,
-          ` ${actionLogGenerateLink(grpId)} to the bottom`,
-          grpId
-        );
-      });
-    }
-  }
+  actionLog({
+    seat: affector?.ownerSeatId || ann.affectorId || 0,
+    timestamp: globalStore.currentMatch.logTime.getTime(),
+    type: "SCRY",
+    amount: scrySize,
+    top: newTop,
+    bottom: newBottom,
+  });
+
+  // if (affector == playerSeat) {
+  //   if (xtop > 0) {
+  //     newTop.forEach((instanceId: number) => {
+  //       const { grpId } = instanceIdToObject(instanceId);
+  //       actionLog(
+  //         affector,
+  //         globalStore.currentMatch.logTime,
+  //         ` ${actionLogGenerateLink(grpId)} to the top`,
+  //         grpId
+  //       );
+  //     });
+  //   }
+  //   if (xbottom > 0) {
+  //     newBottom.forEach((instanceId: number) => {
+  //       const { grpId } = instanceIdToObject(instanceId);
+  //       actionLog(
+  //         affector,
+  //         globalStore.currentMatch.logTime,
+  //         ` ${actionLogGenerateLink(grpId)} to the bottom`,
+  //         grpId
+  //       );
+  //     });
+  //   }
+  // }
 };
 
 const AnnotationType_CardRevealed = (ann: Annotations): void => {
@@ -587,14 +658,13 @@ const AnnotationType_CardRevealed = (ann: Annotations): void => {
     const zone = getZone(ann.details.source_zone);
     const owner = zone.ownerSeatId || 0;
 
-    actionLog(
-      owner,
-      globalStore.currentMatch.logTime,
-      `revealed ${actionLogGenerateLink(grpId)} from ${getZoneName(
-        zone.type || "ZoneType_None"
-      )}`,
-      grpId
-    );
+    actionLog({
+      seat: owner,
+      timestamp: globalStore.currentMatch.logTime.getTime(),
+      type: "REVEAL",
+      grpId,
+      zone: getZoneName(zone.type || "ZoneType_None"),
+    });
   });
 };
 
@@ -604,7 +674,7 @@ const AnnotationType_ManaPaid = (ann: Annotations): void => {
 
   let affector = ann.affectorId;
   if (affector > 3) {
-    affector = instanceIdToObject(affector).ownerSeatId;
+    affector = instanceIdToObject(affector).ownerSeatId || 0;
   }
 
   if (affector == playerSeat) {
@@ -806,7 +876,7 @@ function getOppUsedCards(): number[] {
           if (obj.ownerSeatId == oppSeat && isObjectACard(obj)) {
             grpId = obj.grpId;
             // debugLog(zone.type, db.card(grpId).name, obj);
-            if (grpId !== FACE_DOWN_CARD) cardsUsed.push(grpId);
+            if (grpId && grpId !== FACE_DOWN_CARD) cardsUsed.push(grpId);
           }
         } catch (e) {
           //
@@ -980,8 +1050,8 @@ function checkForStartingLibrary(gameState?: GameStateMessage): boolean {
       const mull = player.mulliganCount || 0;
       // If this is the first hand drawn or we made a mulligan
       if (mull > 0 || currentMatch.handsDrawn.length == 0) {
-        const drawn = hand.map((n) => getGameObject(n).grpId);
-        setHandDrawn(mull, drawn);
+        const drawn = hand.map((n) => getGameObject(n).grpId).filter((n) => n);
+        setHandDrawn(mull, drawn as number[]);
         console.log(`Mulligan: ${mull}, ${drawn}`);
       }
     }
@@ -1006,6 +1076,7 @@ function checkForStartingLibrary(gameState?: GameStateMessage): boolean {
 }
 
 function checkTurnDiff(turnInfo: TurnInfo): void {
+  // console.log("checkTurnDiff", turnInfo.turnNumber, turnInfo);
   const { currentMatch } = globalStore;
   const currentTurnInfo = currentMatch.turnInfo;
   const { currentPriority } = currentMatch;
@@ -1016,7 +1087,59 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
   ) {
     setOnThePlay(turnInfo.activePlayer);
   }
-  // console.log("checkTurnDiff", currentMatch.logTime);
+
+  if (
+    turnInfo.step === "Step_DeclareBlock" &&
+    currentTurnInfo.step !== turnInfo.step
+  ) {
+    // Find all attacking creatures and add it to the action log
+    const attackersByTarget: Record<number, number[]> = {};
+    if (turnInfo.phase && turnInfo.step === "Step_DeclareBlock") {
+      Object.values(globalStore.currentMatch.zones)
+        .filter((z) => z.type === "ZoneType_Battlefield")
+        .forEach((zone) => {
+          if (zone.objectInstanceIds) {
+            zone.objectInstanceIds.forEach((id: number) => {
+              try {
+                const obj = getGameObject(id);
+                if (
+                  obj.attackState === "AttackState_Attacking" &&
+                  obj.grpId &&
+                  obj.grpId !== FACE_DOWN_CARD &&
+                  obj.attackInfo &&
+                  obj.attackInfo.targetId
+                ) {
+                  const { targetId } = obj.attackInfo;
+
+                  if (attackersByTarget[targetId]) {
+                    attackersByTarget[targetId].push(obj.grpId);
+                  } else {
+                    attackersByTarget[targetId] = [obj.grpId];
+                  }
+                }
+              } catch (e) {
+                //
+              }
+            });
+          }
+        });
+    }
+
+    console.log("attackersByTarget", attackersByTarget);
+    Object.entries(attackersByTarget).forEach(([id, attackers]) => {
+      const targetId = parseInt(id);
+      const targetType = targetId < 5 ? "PLAYER" : "PERMANENT";
+      actionLog({
+        type: "ATTACK",
+        seat: turnInfo.activePlayer || -1,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        grpIds: attackers,
+        targetType,
+        targetId,
+      });
+    });
+  }
+
   if (turnInfo.priorityPlayer !== currentPriority) {
     changePriority(
       currentPriority,
@@ -1026,13 +1149,31 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
   }
   if (currentTurnInfo.turnNumber !== turnInfo.turnNumber) {
     currentMatch.totalTurns += 1;
-    actionLog(
-      -1,
-      currentMatch.logTime,
-      `${getNameBySeat(turnInfo.activePlayer || 0)}'s turn begins. (#${
-        turnInfo.turnNumber
-      })`
-    );
+    actionLog({
+      type: "TURN_INFO",
+      seat: -1,
+      timestamp: globalStore.currentMatch.logTime.getTime(),
+      subType: "BEGIN",
+      ...turnInfo,
+    });
+  }
+  if (currentTurnInfo.phase !== turnInfo.phase) {
+    actionLog({
+      type: "TURN_INFO",
+      seat: -1,
+      timestamp: globalStore.currentMatch.logTime.getTime(),
+      subType: "PHASE",
+      ...turnInfo,
+    });
+  }
+  if (currentTurnInfo.step !== turnInfo.step) {
+    actionLog({
+      type: "TURN_INFO",
+      seat: -1,
+      timestamp: globalStore.currentMatch.logTime.getTime(),
+      subType: "STEP",
+      ...turnInfo,
+    });
   }
 }
 
@@ -1128,19 +1269,27 @@ const GREMessageType_IntermissionReq = (msg: GREToClientMessage): void => {
   if (msg.intermissionReq?.result) {
     const result = msg.intermissionReq?.result;
     setGameWinner(result.winningTeamId || 0);
-    const winnerName = getNameBySeat(result.winningTeamId || 0);
-    const loserName = getNameBySeat(result.winningTeamId == 2 ? 1 : 2);
+    const winner = result.winningTeamId || 0;
+    const loser = result.winningTeamId == 2 ? 1 : 2;
 
     if (result.reason == "ResultReason_Concede") {
-      actionLog(-1, globalStore.currentMatch.logTime, `${loserName} conceded.`);
+      actionLog({
+        seat: loser,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "CONCEDED",
+      });
     } else if (result.reason == "ResultReason_Timeout") {
-      actionLog(
-        -1,
-        globalStore.currentMatch.logTime,
-        `${loserName} timed out.`
-      );
+      actionLog({
+        seat: loser,
+        timestamp: globalStore.currentMatch.logTime.getTime(),
+        type: "TIMED_OUT",
+      });
     }
-    actionLog(-1, globalStore.currentMatch.logTime, `${winnerName} wins!`);
+    actionLog({
+      seat: winner,
+      timestamp: globalStore.currentMatch.logTime.getTime(),
+      type: "WIN",
+    });
   }
   getMatchGameStats();
 };

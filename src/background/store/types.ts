@@ -2,7 +2,6 @@ import {
   CardCast,
   Chances,
   Deck,
-  GameObject,
   Heat,
   InternalDeck,
   InternalPlayer,
@@ -12,6 +11,7 @@ import {
 import {
   AnnotationInfo,
   GameInfo,
+  GameObjectInfo,
   GREToClientMessage,
   PlayerInfo,
   TurnInfo,
@@ -61,7 +61,7 @@ export interface MatchState {
   zones: Record<number, ZoneInfo>;
   annotations: Record<number, AnnotationInfo>;
   processedAnnotations: number[];
-  gameObjects: Record<number, GameObject>;
+  gameObjects: Record<number, GameObjectInfo>;
   initialLibraryInstanceIds: number[];
   instanceToCardIdMap: Record<number, number>;
   idChanges: Record<number, number>;

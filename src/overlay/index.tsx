@@ -13,7 +13,8 @@ import { ChannelMessage } from "../broadcastChannel/channelMessages";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { OverlaySettings, Settings } from "../common/defaultConfig";
 import { overlayTitleToId } from "../common/maps";
-import ActionLog from "../components/ActionLog";
+import ActionLog from "../components/action-log-v2";
+import { ActionLogV2 } from "../components/action-log-v2/types";
 import OverlayDeckList from "../components/OverlayDeckList";
 import TopBar from "../components/TopBar";
 import useDebounce from "../hooks/useDebounce";
@@ -36,7 +37,7 @@ export default function Overlay() {
   const [matchState, setMatchState] = useState<OverlayUpdateMatchState>();
   const [draftState, setDraftState] = useState<InternalDraftv2>();
   const [draftVotes, setDraftVotes] = useState<Record<string, DbDraftVote>>({});
-  const [actionLog, setActionLog] = useState<string>("");
+  const [actionLog, setActionLog] = useState<ActionLogV2 | null>(null);
   const [odds, setOdds] = useState<Chances>();
   const heightDivAdjustRef = useRef<HTMLDivElement>(null);
 
@@ -201,8 +202,8 @@ export default function Overlay() {
               }}
             />
           )}
-          {settings && settings.mode === OVERLAY_LOG && (
-            <ActionLog logStr={actionLog} />
+          {settings && settings.mode === OVERLAY_LOG && actionLog && (
+            <ActionLog actionLog={actionLog} />
           )}
           {settings &&
             !!settings.clock &&
