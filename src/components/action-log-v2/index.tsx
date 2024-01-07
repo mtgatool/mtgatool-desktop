@@ -102,7 +102,7 @@ export default function ActionLog(props: ActionLogProps): JSX.Element {
 
   return (
     <div className="action-log-v2">
-      {actionLog.lines.map((line) => {
+      {actionLog.lines.map((line, index) => {
         const LineComponent = getLineComponent(line.type);
 
         // const nextLine = actionLog.lines[i + 1];
@@ -119,7 +119,8 @@ export default function ActionLog(props: ActionLogProps): JSX.Element {
 
         return (
           <LineComponent
-            key={`log-line-${line.timestamp}-${line.type}`}
+            // eslint-disable-next-line react/no-array-index-key
+            key={`log-line-${index}`}
             line={line}
             timeStart={actionLog.lines[1].timestamp}
             players={actionLog.players}
