@@ -49,17 +49,6 @@ jobs:
         echo "INFO_VERSION=$(jq -r .version ./src/info.json)" >> $GITHUB_ENV
         echo "INFO_BRANCH=$(jq -r .branch ./src/info.json)" >> $GITHUB_ENV
         echo "INFO_TIMESTAMP=$(jq -r .timestamp ./src/info.json)" >> $GITHUB_ENV
-
-    - uses: getsentry/action-release@v1
-      if: matrix.os == 'ubuntu-latest'
-      env:
-        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-        SENTRY_ORG: mtgatool
-        SENTRY_PROJECT: desktop
-      with:
-        environment: 'production'
-        version: ${{ env.INFO_VERSION }}
-        sourcemaps: 'build/static/js/'
   
     - name: Create installer
       if: matrix.os == 'ubuntu-latest'

@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import * as Sentry from "@sentry/react";
 import { Format, InternalDraftv2 } from "mtgatool-shared";
 
 import {
@@ -9,7 +8,6 @@ import {
   LOGIN_OK,
   LOGIN_WAITING,
 } from "../../constants";
-import getLocalSetting from "../../utils/getLocalSetting";
 import setLocalSetting from "../../utils/setLocalSetting";
 
 export interface Peer {
@@ -63,8 +61,6 @@ const rendererSlice = createSlice({
   reducers: {
     setPubKey: (state: RendererState, action: PayloadAction<string>): void => {
       setLocalSetting("pubkey", action.payload);
-      const username = getLocalSetting("username");
-      Sentry.setUser({ id: action.payload, username });
       state.pubKey = action.payload;
     },
     setMyUsername: (
@@ -72,7 +68,6 @@ const rendererSlice = createSlice({
       action: PayloadAction<string>
     ): void => {
       setLocalSetting("username", action.payload);
-      Sentry.setUser({ id: state.pubKey, username: action.payload });
     },
     setReadingLog: (
       state: RendererState,
