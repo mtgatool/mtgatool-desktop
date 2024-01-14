@@ -1127,8 +1127,16 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
 
     console.log("attackersByTarget", attackersByTarget);
     Object.entries(attackersByTarget).forEach(([id, attackers]) => {
-      const targetId = parseInt(id);
+      let targetId = parseInt(id);
       const targetType = targetId < 5 ? "PLAYER" : "PERMANENT";
+
+      if (targetType == "PERMANENT") {
+        const obj = getGameObject(targetId);
+        if (obj && obj.grpId) {
+          targetId = obj.grpId;
+        }
+      }
+
       actionLog({
         type: "ATTACK",
         seat: turnInfo.activePlayer || -1,
