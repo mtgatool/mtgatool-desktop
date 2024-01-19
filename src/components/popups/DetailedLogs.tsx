@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { ReactComponent as Close } from "../../assets/images/svg/close.svg";
+import Button from "../ui/Button";
 
 interface DetailedLogsProps {
   onClose: () => void;
@@ -67,17 +68,14 @@ export default function DetailedLogs(props: DetailedLogsProps) {
             width: "100%",
           }}
         >
-          <div
+          <Button
             style={{
-              height: "36px",
-              width: "120px",
+              width: "140px",
               margin: "auto",
             }}
-            className="button-simple"
+            text={page === 0 ? "Next" : "Previous"}
             onClick={() => setPage(page === 0 ? 1 : 0)}
-          >
-            {page === 0 ? "Next" : "Previous"}
-          </div>
+          />
         </div>
       </div>
     </>
