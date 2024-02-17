@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { sha1 } from "mtgatool-db";
 import { LOGIN_AUTH } from "mtgatool-shared/dist/shared/constants";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -209,37 +210,18 @@ export default function AccountSettingsPanel(
           marginBottom: "16px",
         }}
       >
-        Download your keys for password-less access:
-      </p>
-      <Button
-        className="keys-button"
-        onClick={saveKeysCallback}
-        text=""
-        style={{ margin: "8px auto" }}
-      >
-        <KeysIcon />
-        <div>Save</div>
-      </Button>
-      <p
-        style={{
-          textAlign: "center",
-          borderTop: "1px solid var(--color-line-sep)",
-          paddingTop: "24px",
-          marginBottom: "16px",
-        }}
-      >
         Setting a new password will make your old password invalid, and other
         devices will need to login again. You can always use your keys to login
         if you forget your password.
       </p>
-      <div className="form-input-container">
+      <div className="form-input-container" style={{ height: "36px" }}>
         <label>New Password:</label>
         <div
           style={{
             display: "flex",
             position: "relative",
             margin: "auto 16px",
-            width: "calc(100% - 140px)",
+            width: "calc(100% - 160px)",
           }}
         >
           <input
@@ -260,8 +242,32 @@ export default function AccountSettingsPanel(
             {showPass ? <HideIcon /> : <ShowIcon />}
           </div>
         </div>
-        <Button onClick={() => changePassword(newPass)} text="Save" />
+        <Button
+          disabled={newPass.length < 8}
+          onClick={() => changePassword(sha1(newPass))}
+          text="Save"
+        />
       </div>
+      <p
+        style={{
+          textAlign: "center",
+          borderTop: "1px solid var(--color-line-sep)",
+          paddingTop: "24px",
+          marginBottom: "16px",
+        }}
+      >
+        Download your keys for password-less access:
+      </p>
+      <Button
+        className="keys-button"
+        onClick={saveKeysCallback}
+        text=""
+        style={{ margin: "8px auto" }}
+      >
+        <KeysIcon />
+        <div>Save</div>
+      </Button>
+
       <p
         style={{
           borderTop: "1px solid var(--color-line-sep)",

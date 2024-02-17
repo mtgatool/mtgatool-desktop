@@ -722,6 +722,7 @@ function login(username, password) {
         return keys;
     })
         .catch((err) => {
+        console.warn("Login error:", err);
         self.postMessage({ type: "LOGIN_ERR", err });
     });
 }
