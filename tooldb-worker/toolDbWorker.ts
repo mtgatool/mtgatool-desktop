@@ -21,6 +21,7 @@ import pushToLiveFeed from "./pushToLivefeed";
 import queryKeys from "./queryKeys";
 import reduxAction from "./reduxAction";
 import removeHost from "./removeHost";
+import setPassword from "./setPassword";
 import signup from "./signup";
 
 const toolDb = new ToolDb({
@@ -112,6 +113,10 @@ self.onmessage = (e: any) => {
 
     case "KEYS_LOGIN":
       keysLogin(e.data.keys);
+      break;
+
+    case "SET_PASSWORD":
+      setPassword(e.data.password);
       break;
 
     case "SIGNUP":

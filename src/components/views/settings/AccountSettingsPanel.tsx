@@ -1,10 +1,13 @@
 import _ from "lodash";
+import { sha1 } from "mtgatool-db";
 import { LOGIN_AUTH } from "mtgatool-shared/dist/shared/constants";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
+import { ReactComponent as ShowIcon } from "../../../assets/images/svg/archive.svg";
 import { ReactComponent as KeysIcon } from "../../../assets/images/svg/keys.svg";
+import { ReactComponent as HideIcon } from "../../../assets/images/svg/unarchive.svg";
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
@@ -62,6 +65,8 @@ export default function AccountSettingsPanel(
   const history = useHistory();
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [newAlias, setNewAlias] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [newPass, setNewPass] = useState("");
 
   const handleSetAlias = useCallback(
     (event: ChangeEvent<HTMLInputElement>): void => {
@@ -83,6 +88,20 @@ export default function AccountSettingsPanel(
       });
     }
   }, [newAlias]);
+
+  const changePassword = useCallback((newPassword: string) => {
+    window.toolDbWorker.postMessage({
+      type: "SET_PASSWORD",
+      password: newPassword,
+    });
+  }, []);
+
+  const handleSetNewPass = useCallback(
+    (event: ChangeEvent<HTMLInputElement>): void => {
+      setNewPass(event.target.value);
+    },
+    []
+  );
 
   const changeAvatar = useCallback(
     (e) => {
@@ -191,6 +210,52 @@ export default function AccountSettingsPanel(
           marginBottom: "16px",
         }}
       >
+        Setting a new password will make your old password invalid, and other
+        devices will need to login again. You can always use your keys to login
+        if you forget your password.
+      </p>
+      <div className="form-input-container" style={{ height: "36px" }}>
+        <label>New Password:</label>
+        <div
+          style={{
+            display: "flex",
+            position: "relative",
+            margin: "auto 16px",
+            width: "calc(100% - 160px)",
+          }}
+        >
+          <input
+            type={showPass ? "text" : "password"}
+            autoComplete="off"
+            onChange={handleSetNewPass}
+            style={{
+              width: "100%",
+              margin: "auto",
+            }}
+            value={newPass}
+          />
+          <div
+            className="show-password-icon"
+            style={{ margin: "-4px 0" }}
+            onClick={() => setShowPass(!showPass)}
+          >
+            {showPass ? <HideIcon /> : <ShowIcon />}
+          </div>
+        </div>
+        <Button
+          disabled={newPass.length < 8}
+          onClick={() => changePassword(sha1(newPass))}
+          text="Save"
+        />
+      </div>
+      <p
+        style={{
+          textAlign: "center",
+          borderTop: "1px solid var(--color-line-sep)",
+          paddingTop: "24px",
+          marginBottom: "16px",
+        }}
+      >
         Download your keys for password-less access:
       </p>
       <Button
@@ -202,6 +267,7 @@ export default function AccountSettingsPanel(
         <KeysIcon />
         <div>Save</div>
       </Button>
+
       <p
         style={{
           borderTop: "1px solid var(--color-line-sep)",
