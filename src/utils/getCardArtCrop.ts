@@ -29,6 +29,8 @@ export function getCardImage(
       : cardObj.Set
     : "";
 
+  if (cardObj?.Set === "SPG") set = "SPG";
+
   const setName =
     database.setNames[set.toUpperCase()] ||
     database.setNames[set.toLowerCase()];
