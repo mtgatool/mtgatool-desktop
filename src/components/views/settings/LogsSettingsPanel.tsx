@@ -48,8 +48,9 @@ export default function LogsSettingsPanel(): JSX.Element {
 
   return (
     <>
+      <DaemonSettingsPanel />
       <div className="log-status-text">
-        Status:{" "}
+        Log Status:{" "}
         <div
           title={isReading ? `Reading` : "Not reading"}
           className={isReading ? `log-status-ok` : "log-status-err"}
@@ -91,8 +92,6 @@ export default function LogsSettingsPanel(): JSX.Element {
         }}
         text={isReading ? "Stop reading log" : "Re-read log"}
       />
-
-      <DaemonSettingsPanel />
     </>
   );
 }

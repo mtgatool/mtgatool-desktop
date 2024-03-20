@@ -8,10 +8,8 @@ import {
 } from "mtgatool-shared";
 
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
-import MtgaTrackerDaemon from "../../daemon/mtgaTrackerDaemon";
 import LogEntry from "../../types/logDecoder";
 import getLocalSetting from "../../utils/getLocalSetting";
-import isLimitedEventId from "../../utils/isLimitedEventId";
 import actionLog from "../actionLog";
 import saveMatch from "../saveMatch";
 import selectDeck from "../selectDeck";
@@ -29,7 +27,7 @@ interface Entry extends LogEntry {
   json: MatchGameRoomStateChange;
 }
 
-const rankClass: Record<number, string> = {
+export const rankClass: Record<number, string> = {
   "-1": "Unranked",
   "0": "Beginner",
   "1": "Bronze",
@@ -180,53 +178,53 @@ export default function onLabelMatchGameRoomStateChangedEvent(
     }
     */
 
-    if ((window as any).daemon) {
-      const isLimited = isLimitedEventId(gameRoom.gameRoomConfig.eventId);
+    // if ((window as any).daemon) {
+    // const isLimited = isLimitedEventId(gameRoom.gameRoomConfig.eventId);
 
-      ((window as any).daemon as MtgaTrackerDaemon)
-        .getMatchState()
-        .then((state) => {
-          if (
-            state &&
-            state.matchId === gameRoom.gameRoomConfig.matchId &&
-            state.playerRank.class > 0
-          ) {
-            const opponent = {
-              tier: state.opponentRank.tier,
-              rank: rankClass[state.opponentRank.class],
-              percentile: state.opponentRank.mythicPercentile,
-              leaderboardPlace: state.opponentRank.mythicPlacement,
-            };
-            setOpponent(opponent);
+    // ((window as any).daemon as MtgaTrackerDaemon)
+    //   .getMatchState()
+    //   .then((state) => {
+    //     if (
+    //       state &&
+    //       state.matchId === gameRoom.gameRoomConfig.matchId &&
+    //       state.playerRank.class > 0
+    //     ) {
+    //       const opponent = {
+    //         tier: state.opponentRank.tier,
+    //         rank: rankClass[state.opponentRank.class],
+    //         percentile: state.opponentRank.mythicPercentile,
+    //         leaderboardPlace: state.opponentRank.mythicPlacement,
+    //       };
+    //       setOpponent(opponent);
 
-            const player = {
-              tier: state.playerRank.tier,
-              rank: rankClass[state.playerRank.class],
-              percentile: state.playerRank.mythicPercentile,
-              leaderboardPlace: state.playerRank.mythicPlacement,
-            };
-            setPlayer(player);
+    //       const player = {
+    //         tier: state.playerRank.tier,
+    //         rank: rankClass[state.playerRank.class],
+    //         percentile: state.playerRank.mythicPercentile,
+    //         leaderboardPlace: state.playerRank.mythicPlacement,
+    //       };
+    //       setPlayer(player);
 
-            if (isLimited) {
-              postChannelMessage({
-                type: "UPSERT_DB_RANK",
-                value: {
-                  limitedClass: rankClass[state.playerRank.class],
-                  limitedLevel: state.playerRank.tier,
-                },
-              });
-            } else {
-              postChannelMessage({
-                type: "UPSERT_DB_RANK",
-                value: {
-                  constructedClass: rankClass[state.playerRank.class],
-                  constructedLevel: state.playerRank.tier,
-                },
-              });
-            }
-          }
-        });
-    }
+    //       if (isLimited) {
+    //         postChannelMessage({
+    //           type: "UPSERT_DB_RANK",
+    //           value: {
+    //             limitedClass: rankClass[state.playerRank.class],
+    //             limitedLevel: state.playerRank.tier,
+    //           },
+    //         });
+    //       } else {
+    //         postChannelMessage({
+    //           type: "UPSERT_DB_RANK",
+    //           value: {
+    //             constructedClass: rankClass[state.playerRank.class],
+    //             constructedLevel: state.playerRank.tier,
+    //           },
+    //         });
+    //       }
+    //     }
+    //   });
+    // }
 
     setEventId(eventId);
 
