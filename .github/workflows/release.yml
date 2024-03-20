@@ -20,7 +20,7 @@ jobs:
       uses: "actions/checkout@v2"
 
     - name: "Install modules"
-      run: "npm run install:ci"
+      run: "npm set strict-ssl false && npm run install:ci"
 
     - name: "Test"
       run: "npm run jest:ci"
@@ -57,8 +57,6 @@ jobs:
         cd linux-installer
         chmod +x *.AppImage
         chmod +x *.sh
-        chmod +x mtga-tracker-daemon/*.sh
-        chmod +x mtga-tracker-daemon/bin/mtga-tracker-daemon
         tar czvf "../dist/mtgatool-desktop-linux-installer.tar.gz" *
         cd ..
 

@@ -1,5 +1,5 @@
-const ModuleReplacement = require("./module-resolver-file");
 const WebpackReactComponentNamePlugin = require("webpack-react-component-name");
+const ModuleReplacement = require("./module-resolver-file");
 
 process.env.PORT = 3006;
 
@@ -14,7 +14,7 @@ module.exports = {
     },
     plugins: [
       ...ModuleReplacement({ webIndex: true, electronIndex: false }),
-      new WebpackReactComponentNamePlugin()
+      new WebpackReactComponentNamePlugin(),
     ],
   },
   eslint: {
