@@ -8,8 +8,8 @@ export default function DaemonSettingsPanel(): JSX.Element {
   const [daemonStatus, setDaemonStatus] = useState("warn");
 
   useEffect(() => {
-    if (globalData.mtgaReader.status === "CONNECTED") setDaemonStatus("ok");
-    else if (globalData.mtgaReader.status === "DISCONNECTED")
+    if (globalData.mtgaReader.state === "CONNECTED") setDaemonStatus("ok");
+    else if (globalData.mtgaReader.state === "DISCONNECTED")
       setDaemonStatus("err");
     else setDaemonStatus("warn");
   }, []);
