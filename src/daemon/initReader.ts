@@ -7,12 +7,10 @@ const { MtgaReader } = __non_webpack_require__("mtga-reader");
 
 export default function initReader() {
   globalData.mtgaReader = new MtgaReader();
-  let interval: any = null;
 
   function tryReconnect() {
     if (globalData.mtgaReader.isConnected()) {
-      clearInterval(interval);
-      interval = null;
+      // skip
     } else {
       find("name", "MTGA", true).then((list: any) => {
         if (list.length === 0) return;
@@ -26,14 +24,5 @@ export default function initReader() {
     }
   }
 
-  globalData.mtgaReader.on("disconnect", () => {
-    interval = setInterval(tryReconnect, 2500);
-  });
-
-  globalData.mtgaReader.on("connect", () => {
-    clearInterval(interval);
-    interval = null;
-  });
-
-  tryReconnect();
+  setInterval(tryReconnect, 2500);
 }

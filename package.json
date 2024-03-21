@@ -45,7 +45,7 @@
     "electron-updater": "^6.1.4",
     "extract-zip": "^2.0.1",
     "find-process": "^1.4.7",
-    "mtga-reader": "https://mtgatool.com/libs/mtga-reader-1.0.1.tgz",
+    "mtga-reader": "https://mtgatool.com/libs/mtga-reader-1.0.2.tgz",
     "follow-redirects": "^1.14.3",
     "google-protobuf": "^3.15.6",
     "history": "^4.10.1",
