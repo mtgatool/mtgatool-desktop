@@ -2,10 +2,9 @@ import find from "find-process";
 
 import globalData from "../utils/globalData";
 
-// eslint-disable-next-line no-undef
-const { MtgaReader } = __non_webpack_require__("mtga-reader");
-
 export default function initReader() {
+  // eslint-disable-next-line no-undef
+  const { MtgaReader } = __non_webpack_require__("mtga-reader");
   globalData.mtgaReader = new MtgaReader();
 
   function tryReconnect() {

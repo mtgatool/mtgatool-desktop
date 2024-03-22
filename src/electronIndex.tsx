@@ -102,7 +102,9 @@ if (title == WINDOW_UPDATER) {
   }
 } else {
   defaultLocalSettings();
-  initReader();
+  if (process.platform !== "linux") {
+    initReader();
+  }
 
   const settings = JSON.parse(getLocalSetting("settings"));
   registerShortcuts(settings);
