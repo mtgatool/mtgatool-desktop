@@ -1,5 +1,7 @@
 import Automerge from "automerge";
 
+import MtgaTrackerDaemon from "../daemon/mtgaTrackerDaemon";
+
 const globalData = {
   backgroundProcess: null as any | null,
   broadcastChannel: null as BroadcastChannel | null,
@@ -13,7 +15,7 @@ const globalData = {
   hiddenDecks: [] as string[],
   liveFeed: Automerge.init<Record<string, number>>(),
   lastLogCheck: 0,
-  mtgaReader: null as any | null,
+  daemon: null as MtgaTrackerDaemon | null,
   latestDaemon: null as any | null,
 };
 

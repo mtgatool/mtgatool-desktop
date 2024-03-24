@@ -15,6 +15,7 @@ import upsertDbRank from "../toolDb/upsertDbRank";
 import { putData } from "../toolDb/worker-wrapper";
 import LogEntry from "../types/logDecoder";
 import bcConnect from "../utils/bcConnect";
+import electron from "../utils/electron/electronWrapper";
 import globalData from "../utils/globalData";
 import switchPlayerUUID from "../utils/switchPlayerUUID";
 import { ChannelMessage } from "./channelMessages";
@@ -25,6 +26,23 @@ export default function mainChannelListeners() {
   let last = Date.now();
 
   let logReadFinished = false;
+
+  if (electron) {
+    electron.ipcRenderer.on(
+      "mtgaTrackerDaemonVersion",
+      (event: any, d: any) => {
+        console.log("mtgaTrackerDaemonVersion", d);
+        globalData.latestDaemon = d;
+        if (globalData.daemon) {
+          globalData.daemon.downloadLatestDaemon().finally(() => {
+            if (globalData.daemon) {
+              globalData.daemon.startDaemon();
+            }
+          });
+        }
+      }
+    );
+  }
 
   channel.onmessage = (msg: MessageEvent<ChannelMessage>) => {
     // console.log(msg.data.type);
