@@ -1,15 +1,22 @@
+import { Cards } from "mtgatool-shared";
+
 import upsertDbCards from "../toolDb/upsertDbCards";
 import globalData from "../utils/globalData";
 import fetchPlayerId from "./fetchPlayerId";
 
 export default function fetchCards() {
-  fetchPlayerId();
-  const reader = globalData.mtgaReader;
+  fetchPlayerId().then(() => {
+    if (globalData.daemon) {
+      globalData.daemon.getCards().then((cards) => {
+        if (cards && cards.length > 0) {
+          const parsedCards: Cards = {};
+          cards.forEach((c) => {
+            parsedCards[c.grpId] = c.owned;
+          });
 
-  const { cards } = reader.read("mtgaInventory") as any;
-  console.debug("cards info", cards);
-
-  if (cards?.data) {
-    upsertDbCards(cards.data);
-  }
+          upsertDbCards(parsedCards);
+        }
+      });
+    }
+  });
 }
