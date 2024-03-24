@@ -17,11 +17,7 @@ export default function initReader() {
       find("name", "MTGA", true).then((list: any) => {
         if (list.length === 0) return;
         const firstPid = list[0].pid;
-        try {
-          globalData.mtgaReader.connect(firstPid);
-        } catch (e) {
-          console.debug(e);
-        }
+        globalData.mtgaReader.connect(firstPid);
       });
     }
   }
