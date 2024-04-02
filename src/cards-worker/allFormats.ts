@@ -11,13 +11,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -54,13 +49,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "3Sets",
@@ -71,13 +61,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "TCConstructed",
@@ -100,6 +85,7 @@ const formatsJson = {
         "LCI",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
       ],
       bannedTitleIds: [],
       suspendedTitleIds: [],
@@ -107,13 +93,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "Explorer",
@@ -345,13 +326,8 @@ const formatsJson = {
       ],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "TraditionalExplorer",
@@ -579,13 +555,8 @@ const formatsJson = {
       supressedTitleIds: [8595, 15162, 5088, 314, 400],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "TraditionalHistoric",
@@ -730,6 +701,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -751,13 +723,8 @@ const formatsJson = {
       ],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
       useRebalancedCards: true,
     },
     {
@@ -945,17 +912,9 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 59,
-        max: 59,
-      },
-      sideBoardQuota: {
-        max: 1,
-      },
-      commandZoneQuota: {
-        min: 1,
-        max: 1,
-      },
+      mainDeckQuota: { min: 59, max: 59 },
+      sideBoardQuota: { max: 1 },
+      commandZoneQuota: { min: 1, max: 1 },
       sideboardBehavior: "CompanionOnly",
     },
     {
@@ -967,13 +926,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "Singleton",
@@ -996,6 +950,7 @@ const formatsJson = {
         "LCI",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
       ],
       bannedTitleIds: [],
       suspendedTitleIds: [],
@@ -1004,13 +959,8 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -1022,13 +972,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "MKM",
@@ -1039,13 +984,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "KTK",
@@ -1056,13 +996,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "HistoricSingleton",
@@ -1207,6 +1142,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -1226,13 +1162,8 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -1256,6 +1187,7 @@ const formatsJson = {
         "LCI",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
       ],
       bannedTitleIds: [701908, 683716, 3142],
       suspendedTitleIds: [],
@@ -1263,13 +1195,8 @@ const formatsJson = {
       supressedTitleIds: [3142],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -1297,13 +1224,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "DominariaUnited",
@@ -1314,13 +1236,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "DirectGameLimitedRebalanced",
@@ -1465,6 +1382,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -1480,13 +1398,8 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "UnrestrictedCardCounts",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 40,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 250,
-      },
+      mainDeckQuota: { min: 40, max: 250 },
+      sideBoardQuota: { max: 250 },
       useRebalancedCards: true,
     },
     {
@@ -1632,6 +1545,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -1650,13 +1564,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -1668,13 +1577,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "100CardStandard",
@@ -1698,13 +1602,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 100,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 100, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "StreetsOfNewCapenna",
@@ -1715,13 +1614,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "HistoricShakeup3",
@@ -1866,6 +1760,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -1887,13 +1782,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -1905,13 +1795,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "Kaldheim",
@@ -1922,13 +1807,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "Brawl",
@@ -1953,17 +1833,9 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 59,
-        max: 59,
-      },
-      sideBoardQuota: {
-        max: 1,
-      },
-      commandZoneQuota: {
-        min: 1,
-        max: 1,
-      },
+      mainDeckQuota: { min: 59, max: 59 },
+      sideBoardQuota: { max: 1 },
+      commandZoneQuota: { min: 1, max: 1 },
       sideboardBehavior: "CompanionOnly",
     },
     {
@@ -1975,13 +1847,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "StandardArtisan",
@@ -2005,13 +1872,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -2024,13 +1886,8 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "UnrestrictedCardCounts",
       FormatType: "Draft",
-      mainDeckQuota: {
-        min: 40,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 250,
-      },
+      mainDeckQuota: { min: 40, max: 250 },
+      sideBoardQuota: { max: 250 },
     },
     {
       name: "CoreSetConstructed",
@@ -2041,13 +1898,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "HistoricAprilFoolLimited",
@@ -2192,6 +2044,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -2207,13 +2060,8 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "UnrestrictedCardCounts",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 40,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 40, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -2225,13 +2073,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "HistoricNBL",
@@ -2376,6 +2219,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -2390,13 +2234,8 @@ const formatsJson = {
       supressedTitleIds: [21415, 12194, 477509],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "StandardImmortalSun",
@@ -2426,13 +2265,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "GiantMonsters",
@@ -2455,6 +2289,7 @@ const formatsJson = {
         "LCI",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
       ],
       bannedTitleIds: [336370, 1679],
       suspendedTitleIds: [],
@@ -2462,13 +2297,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "TraditionalTimeless",
@@ -2612,6 +2442,7 @@ const formatsJson = {
         "LCC",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -2625,24 +2456,13 @@ const formatsJson = {
       allowedTitleIds: [],
       supressedTitleIds: [],
       individualCardQuotas: {
-        "21415": {
-          max: 1,
-        },
-        "12194": {
-          max: 1,
-        },
-        "477509": {
-          max: 1,
-        },
+        "21415": { max: 1 },
+        "12194": { max: 1 },
+        "477509": { max: 1 },
       },
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "InnistradConstructed",
@@ -2653,13 +2473,8 @@ const formatsJson = {
       supressedTitleIds: [530112],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "AllZeroes",
@@ -2815,6 +2630,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -2829,13 +2645,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "LTRBrawl",
@@ -3122,17 +2933,9 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 59,
-        max: 59,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
-      commandZoneQuota: {
-        min: 1,
-        max: 1,
-      },
+      mainDeckQuota: { min: 59, max: 59 },
+      sideBoardQuota: { max: 15 },
+      commandZoneQuota: { min: 1, max: 1 },
       useRebalancedCards: true,
     },
     {
@@ -3278,6 +3081,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -3298,13 +3102,8 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "FutureAlchemy",
@@ -3315,13 +3114,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -3347,13 +3141,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "Pauper",
@@ -3376,6 +3165,7 @@ const formatsJson = {
         "LCI",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
       ],
       bannedTitleIds: [],
       suspendedTitleIds: [],
@@ -3383,13 +3173,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "Standard",
@@ -3413,13 +3198,8 @@ const formatsJson = {
       supressedTitleIds: [3142],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "MOM",
@@ -3430,13 +3210,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "HistoricShakeup2",
@@ -3581,6 +3356,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -3600,13 +3376,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -3630,6 +3401,7 @@ const formatsJson = {
         "LCI",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
       ],
       bannedTitleIds: [478018, 477471, 437805, 437834],
       suspendedTitleIds: [],
@@ -3638,13 +3410,20 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
+    },
+    {
+      name: "RavnicaALL",
+      sets: ["GRN", "RNA", "WAR", "MKM"],
+      bannedTitleIds: [279773],
+      suspendedTitleIds: [],
+      allowedTitleIds: [],
+      supressedTitleIds: [],
+      individualCardQuotas: {},
+      FormatType: "Constructed",
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "ArtisanFuture",
@@ -3655,13 +3434,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "Alchemy",
@@ -3684,6 +3458,7 @@ const formatsJson = {
         "LCI",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
       ],
       bannedTitleIds: [3142, 3142, 3142, 3142],
       suspendedTitleIds: [],
@@ -3691,13 +3466,8 @@ const formatsJson = {
       supressedTitleIds: [3142],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -3709,13 +3479,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "TCSingleton",
@@ -3738,6 +3503,7 @@ const formatsJson = {
         "LCI",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
       ],
       bannedTitleIds: [],
       suspendedTitleIds: [],
@@ -3746,13 +3512,8 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "DirectGameBrawlRebalanced",
@@ -3897,6 +3658,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -3912,17 +3674,9 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 39,
-        max: 249,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
-      commandZoneQuota: {
-        min: 1,
-        max: 1,
-      },
+      mainDeckQuota: { min: 39, max: 249 },
+      sideBoardQuota: { max: 7 },
+      commandZoneQuota: { min: 1, max: 1 },
       sideboardBehavior: "CompanionOnly",
       useRebalancedCards: true,
     },
@@ -3935,13 +3689,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "LastCall",
@@ -3952,13 +3701,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -3970,13 +3714,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "PreHistoricTEST",
@@ -4121,6 +3860,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -4138,24 +3878,13 @@ const formatsJson = {
       allowedTitleIds: [],
       supressedTitleIds: [11983],
       individualCardQuotas: {
-        "1251": {
-          max: 1,
-        },
-        "4244": {
-          max: 2,
-        },
-        "760": {
-          max: 3,
-        },
+        "1251": { max: 1 },
+        "4244": { max: 2 },
+        "760": { max: 3 },
       },
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -4301,6 +4030,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -4319,17 +4049,9 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 99,
-        max: 99,
-      },
-      sideBoardQuota: {
-        max: 1,
-      },
-      commandZoneQuota: {
-        min: 1,
-        max: 1,
-      },
+      mainDeckQuota: { min: 99, max: 99 },
+      sideBoardQuota: { max: 1 },
+      commandZoneQuota: { min: 1, max: 1 },
       sideboardBehavior: "CompanionOnly",
       useRebalancedCards: true,
     },
@@ -4476,6 +4198,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -4494,13 +4217,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -4646,6 +4364,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -4660,13 +4379,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -4812,6 +4526,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -4827,13 +4542,8 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -4979,6 +4689,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -4999,13 +4710,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -5030,13 +4736,8 @@ const formatsJson = {
       supressedTitleIds: [3142],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "DirectGameAlchemy",
@@ -5181,6 +4882,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -5195,13 +4897,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
       useRebalancedCards: true,
     },
     {
@@ -5225,6 +4922,7 @@ const formatsJson = {
         "LCI",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
       ],
       bannedTitleIds: [181902, 173836, 1094, 229715, 173615],
       suspendedTitleIds: [],
@@ -5232,13 +4930,176 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
+    },
+    {
+      name: "ArtisanBrawl",
+      sets: [
+        "2XM",
+        "2X2",
+        "8ED",
+        "A25",
+        "AER",
+        "AFR",
+        "AKH",
+        "AKR",
+        "ALA",
+        "ANA",
+        "ANB",
+        "ARB",
+        "AVR",
+        "BFZ",
+        "BNG",
+        "C18",
+        "C20",
+        "C21",
+        "CC2",
+        "CHK",
+        "CM2",
+        "CMR",
+        "CONF",
+        "CSP",
+        "DAR",
+        "DGM",
+        "DKA",
+        "DMU",
+        "DST",
+        "DTK",
+        "ELD",
+        "EMN",
+        "FRF",
+        "G18",
+        "GRN",
+        "GTC",
+        "HBG",
+        "HOU",
+        "IKO",
+        "IMA",
+        "INV",
+        "ISD",
+        "J21",
+        "JMP",
+        "JOU",
+        "JUD",
+        "KHM",
+        "KLR",
+        "KTK",
+        "LGN",
+        "LRW",
+        "M10",
+        "M11",
+        "M12",
+        "M13",
+        "M14",
+        "M15",
+        "M19",
+        "M20",
+        "M21",
+        "MBS",
+        "MH1",
+        "MH2",
+        "MID",
+        "MMA",
+        "MMQ",
+        "MOR",
+        "MRD",
+        "NEC",
+        "NEO",
+        "NPH",
+        "ODY",
+        "OGW",
+        "ONS",
+        "ORI",
+        "PLC",
+        "RAV",
+        "RIX",
+        "RNA",
+        "ROE",
+        "RTR",
+        "SCG",
+        "SHM",
+        "SNC",
+        "SOI",
+        "SOK",
+        "SOM",
+        "STA",
+        "STX",
+        "THB",
+        "THS",
+        "TOR",
+        "TSP",
+        "USG",
+        "UMA",
+        "VOW",
+        "W17",
+        "WAR",
+        "WTH",
+        "WWK",
+        "XLN",
+        "Y22",
+        "Y23",
+        "ZEN",
+        "ZNR",
+        "BRO",
+        "BRR",
+        "ONE",
+        "SIR",
+        "SIS",
+        "MUL",
+        "MOM",
+        "MOC",
+        "MAT",
+        "LTR",
+        "WOE",
+        "WOT",
+        "LCI",
+        "AHA1",
+        "AHA2",
+        "AHA3",
+        "AHA4",
+        "AHA5",
+        "AHA6",
+        "AHA7",
+        "EA1",
+        "EA2",
+        "EA3",
+        "Y23_ONE",
+        "Y23_BRO",
+        "Y23_DMU",
+        "Y22_SNC",
+        "Y22_NEO",
+        "Y22_MID",
+        "Y24_WOE",
+        "Y24",
+        "LCC",
+        "Y24_LCI",
+        "MKM",
+        "OTJ",
+        "Y24_MKM",
+        "SPG",
+        "KLD",
+        "APC",
+        "CLB",
+        "C16",
+        "DIS",
+        "DDU",
+      ],
+      bannedTitleIds: [
+        487194, 351741, 413858, 24405, 21415, 12194, 427904, 352244, 279773,
+        76334, 428590, 8628, 24870, 1679, 414260, 279584, 19674, 5159, 31558,
+        174019, 26717, 46453, 352113, 279929, 428554,
+      ],
+      suspendedTitleIds: [],
+      allowedTitleIds: [],
+      supressedTitleIds: [],
+      individualCardQuotas: {},
+      cardCountRestriction: "Singleton",
+      FormatType: "Constructed",
+      mainDeckQuota: { min: 99, max: 99 },
+      sideBoardQuota: { max: 1 },
+      commandZoneQuota: { min: 1, max: 1 },
+      sideboardBehavior: "CompanionOnly",
     },
     {
       name: "Draft_Rebalanced",
@@ -5250,13 +5111,8 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "UnrestrictedCardCounts",
       FormatType: "Draft",
-      mainDeckQuota: {
-        min: 40,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 250,
-      },
+      mainDeckQuota: { min: 40, max: 250 },
+      sideBoardQuota: { max: 250 },
       useRebalancedCards: true,
     },
     {
@@ -5402,6 +5258,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -5419,13 +5276,8 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 100,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 100, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -5437,13 +5289,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "StandardGiantMonsters",
@@ -5467,13 +5314,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "AlchemyArtisan",
@@ -5496,6 +5338,7 @@ const formatsJson = {
         "LCI",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
       ],
       bannedTitleIds: [],
       suspendedTitleIds: [],
@@ -5503,13 +5346,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -5655,6 +5493,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -5670,17 +5509,9 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 39,
-        max: 249,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
-      commandZoneQuota: {
-        min: 1,
-        max: 1,
-      },
+      mainDeckQuota: { min: 39, max: 249 },
+      sideBoardQuota: { max: 7 },
+      commandZoneQuota: { min: 1, max: 1 },
       sideboardBehavior: "CompanionOnly",
     },
     {
@@ -5692,13 +5523,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "HarvestBash",
@@ -5721,6 +5547,7 @@ const formatsJson = {
         "LCI",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
       ],
       bannedTitleIds: [488856, 437805, 437834],
       suspendedTitleIds: [],
@@ -5729,13 +5556,8 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
       useRebalancedCards: true,
     },
     {
@@ -5747,13 +5569,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "Sealed_Rebalanced",
@@ -5765,13 +5582,8 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "UnrestrictedCardCounts",
       FormatType: "Sealed",
-      mainDeckQuota: {
-        min: 40,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 250,
-      },
+      mainDeckQuota: { min: 40, max: 250 },
+      sideBoardQuota: { max: 250 },
       useRebalancedCards: true,
     },
     {
@@ -5917,6 +5729,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -5925,17 +5738,14 @@ const formatsJson = {
         "DIS",
         "DDU",
       ],
-      bannedTitleIds: [352244, 24870, 1679, 414260, 336891],
+      bannedTitleIds: [12194, 352244, 604511, 24870, 414260],
       suspendedTitleIds: [],
       allowedTitleIds: [],
       supressedTitleIds: [],
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 100,
-        max: 250,
-      },
+      mainDeckQuota: { min: 100, max: 250 },
     },
     {
       name: "IdentityTest",
@@ -5958,6 +5768,7 @@ const formatsJson = {
         "LCI",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
       ],
       bannedTitleIds: [],
       suspendedTitleIds: [],
@@ -5965,13 +5776,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -5995,6 +5801,7 @@ const formatsJson = {
         "LCI",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
       ],
       bannedTitleIds: [557819, 3142, 3142, 3142, 3142],
       suspendedTitleIds: [],
@@ -6002,13 +5809,8 @@ const formatsJson = {
       supressedTitleIds: [3142],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
       useRebalancedCards: true,
     },
     {
@@ -6020,13 +5822,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 15,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 15 },
     },
     {
       name: "MidnightHunt",
@@ -6037,13 +5834,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "Standard_Recent",
@@ -6054,13 +5846,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "RetroHistoric",
@@ -6205,6 +5992,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -6281,13 +6069,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -6432,6 +6215,7 @@ const formatsJson = {
         "LCC",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -6445,24 +6229,13 @@ const formatsJson = {
       allowedTitleIds: [],
       supressedTitleIds: [21415, 12194, 477509],
       individualCardQuotas: {
-        "21415": {
-          max: 1,
-        },
-        "12194": {
-          max: 1,
-        },
-        "477509": {
-          max: 1,
-        },
+        "21415": { max: 1 },
+        "12194": { max: 1 },
+        "477509": { max: 1 },
       },
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "CascadeSingleton",
@@ -6485,6 +6258,7 @@ const formatsJson = {
         "LCI",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
       ],
       bannedTitleIds: [436934, 437805],
       suspendedTitleIds: [],
@@ -6493,13 +6267,8 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "Singleton",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "CrimsonVow",
@@ -6510,13 +6279,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
     {
       name: "DirectGameLimited",
@@ -6661,6 +6425,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -6676,13 +6441,8 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "UnrestrictedCardCounts",
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 40,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 250,
-      },
+      mainDeckQuota: { min: 40, max: 250 },
+      sideBoardQuota: { max: 250 },
     },
     {
       name: "Tripleton",
@@ -6705,6 +6465,7 @@ const formatsJson = {
         "LCI",
         "Y24_LCI",
         "MKM",
+        "Y24_MKM",
       ],
       bannedTitleIds: [498276, 437011, 437805, 545895, 437834],
       suspendedTitleIds: [],
@@ -6712,13 +6473,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -6864,6 +6620,7 @@ const formatsJson = {
         "Y24_LCI",
         "MKM",
         "OTJ",
+        "Y24_MKM",
         "SPG",
         "KLD",
         "APC",
@@ -6883,13 +6640,8 @@ const formatsJson = {
       supressedTitleIds: [25409, 24807, 11983, 24837, 36359, 24888, 3179],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
       useRebalancedCards: true,
     },
     {
@@ -6902,13 +6654,8 @@ const formatsJson = {
       individualCardQuotas: {},
       cardCountRestriction: "UnrestrictedCardCounts",
       FormatType: "Sealed",
-      mainDeckQuota: {
-        min: 40,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 250,
-      },
+      mainDeckQuota: { min: 40, max: 250 },
+      sideBoardQuota: { max: 250 },
     },
     {
       name: "Ikoria",
@@ -6919,13 +6666,8 @@ const formatsJson = {
       supressedTitleIds: [],
       individualCardQuotas: {},
       FormatType: "Constructed",
-      mainDeckQuota: {
-        min: 60,
-        max: 250,
-      },
-      sideBoardQuota: {
-        max: 7,
-      },
+      mainDeckQuota: { min: 60, max: 250 },
+      sideBoardQuota: { max: 7 },
     },
   ],
   FormatGroups: [
