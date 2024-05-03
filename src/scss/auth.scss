@@ -35,3 +35,11 @@
   color: var(--color-text-link);
 }
 
+.separator-title {
+  font-family: var(--main-font-name-it);
+  font-size: 20px;
+  border-bottom: solid var(--color-line-sep) 1px;
+  color: var(--color-text);
+  margin: 24px 0px 14px 0px;
+  padding-bottom: 3px;
+}

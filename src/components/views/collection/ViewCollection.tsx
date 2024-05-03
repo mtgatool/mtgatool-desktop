@@ -207,29 +207,37 @@ export default function ViewCollection(props: ViewCollectionProps) {
       <Section style={{ marginTop: "16px" }}>
         <div className="flex">
           <Toggle
-            style={{ maxWidth: "240px", marginRight: "48px" }}
+            style={{ maxWidth: "240px", margin: "0 24px 0 8px" }}
             text="Include unowned cards?"
             value={exportUnowned}
             callback={setExportUnowned}
           />
           <Toggle
-            style={{ maxWidth: "240px", marginRight: "48px" }}
+            style={{ maxWidth: "240px", margin: "0 24px 0 8px" }}
             text="Include digital sets?"
             value={exportDigital}
             callback={setExportDigital}
           />
           <i
-            style={{
-              lineHeight: "30px",
-              height: "30px",
-              margin: "auto auto auto 8px",
-              color: "var(--color-text-dark)",
-            }}
+            style={
+              {
+                lineHeight: "30px",
+                margin: "auto",
+                textWrap: "nowrap",
+                color: "var(--color-text-dark)",
+              } as any
+            }
           >
             Collection is saved in CSV format
           </i>
           <Button
-            style={{ margin: "16px" }}
+            style={
+              {
+                margin: "16px",
+                textWrap: "nowrap",
+                padding: "0 8px",
+              } as any
+            }
             className="button-simple"
             text="Download Collection"
             onClick={downloadTxtFile}
