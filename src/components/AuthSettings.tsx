@@ -13,7 +13,6 @@ import openExternal from "../utils/openExternal";
 import setLocalSetting from "../utils/setLocalSetting";
 import showOpenLogDialog from "../utils/showOpenLogDialog";
 import Toggle from "./ui/Toggle";
-import DaemonSettingsPanel from "./views/settings/DaemonSettingsPanel";
 import NetworkSettingsPanel from "./views/settings/NetworkSettingsPanel";
 
 function clickBetaChannel(value: boolean): void {
@@ -97,7 +96,6 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
         <div style={{ marginTop: "16px" }} />
         {isElectron() && (
           <>
-            <DaemonSettingsPanel />
             <Toggle
               text="Beta updates channel"
               value={getLocalSetting("betaChannel") == "true"}

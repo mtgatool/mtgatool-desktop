@@ -50,6 +50,7 @@
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.0",
     "mathjs": "^9.3.0",
+    "mtga-reader": "^0.1.2",
     "mtgatool-db": "^2.1.11",
     "mtgatool-shared": "^2.2.0",
     "qrcode": "^1.5.1",

@@ -57,8 +57,6 @@ jobs:
         cd linux-installer
         chmod +x *.AppImage
         chmod +x *.sh
-        chmod +x mtga-tracker-daemon/*.sh
-        chmod +x mtga-tracker-daemon/bin/mtga-tracker-daemon
         tar czvf "../dist/mtgatool-desktop-linux-installer.tar.gz" *
         cd ..
 

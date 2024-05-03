@@ -9,7 +9,6 @@ import globalData from "../../../utils/globalData";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import showOpenLogDialog from "../../../utils/showOpenLogDialog";
 import Button from "../../ui/Button";
-import DaemonSettingsPanel from "./DaemonSettingsPanel";
 
 function getLogExists(path: string) {
   // eslint-disable-next-line global-require
@@ -91,8 +90,6 @@ export default function LogsSettingsPanel(): JSX.Element {
         }}
         text={isReading ? "Stop reading log" : "Re-read log"}
       />
-
-      <DaemonSettingsPanel />
     </>
   );
 }

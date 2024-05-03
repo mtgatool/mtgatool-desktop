@@ -1,5 +1,5 @@
-const ModuleReplacement = require("./module-resolver-file");
 const WebpackReactComponentNamePlugin = require("webpack-react-component-name");
+const ModuleReplacement = require("./module-resolver-file");
 const eslintConfig = require("./.eslintrc");
 
 process.env.GENERATE_SOURCEMAP = true;
@@ -23,7 +23,7 @@ module.exports = {
     },
     plugins: [
       ...ModuleReplacement({ webIndex: false, electronIndex: true }),
-      new WebpackReactComponentNamePlugin()
+      new WebpackReactComponentNamePlugin(),
     ],
   },
   eslint: {

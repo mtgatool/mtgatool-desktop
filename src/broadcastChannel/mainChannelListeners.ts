@@ -3,8 +3,8 @@ import { InternalDraftv2 } from "mtgatool-shared";
 
 import { overlayTitleToId } from "../common/maps";
 import { LOGIN_OK } from "../constants";
-import fetchCards from "../daemon/fetchCards";
-import fetchPlayerId from "../daemon/fetchPlayerId";
+import readCards from "../reader/readCards";
+import readPlayerId from "../reader/readPlayerid";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import setDbMatch from "../toolDb/setDbMatch";
@@ -15,7 +15,6 @@ import upsertDbRank from "../toolDb/upsertDbRank";
 import { putData } from "../toolDb/worker-wrapper";
 import LogEntry from "../types/logDecoder";
 import bcConnect from "../utils/bcConnect";
-import electron from "../utils/electron/electronWrapper";
 import globalData from "../utils/globalData";
 import switchPlayerUUID from "../utils/switchPlayerUUID";
 import { ChannelMessage } from "./channelMessages";
@@ -26,23 +25,6 @@ export default function mainChannelListeners() {
   let last = Date.now();
 
   let logReadFinished = false;
-
-  if (electron) {
-    electron.ipcRenderer.on(
-      "mtgaTrackerDaemonVersion",
-      (event: any, d: any) => {
-        console.log("mtgaTrackerDaemonVersion", d);
-        globalData.latestDaemon = d;
-        if (globalData.daemon) {
-          globalData.daemon.downloadLatestDaemon().finally(() => {
-            if (globalData.daemon) {
-              globalData.daemon.startDaemon();
-            }
-          });
-        }
-      }
-    );
-  }
 
   channel.onmessage = (msg: MessageEvent<ChannelMessage>) => {
     // console.log(msg.data.type);
@@ -94,7 +76,7 @@ export default function mainChannelListeners() {
     }
 
     if (msg.data.type === "DAEMON_GET_PLAYER_ID") {
-      fetchPlayerId();
+      readPlayerId();
     }
 
     if (msg.data.type === "SET_DETAILED_LOGS") {
@@ -209,7 +191,7 @@ export default function mainChannelListeners() {
     if (msg.data.type === "PLAYER_INVENTORY") {
       const inventoryData = msg.data.value;
       upsertDbInventory(inventoryData);
-      fetchCards();
+      readCards();
     }
 
     if (msg.data.type === "UPDATE_ACTIVE_EVENTS") {

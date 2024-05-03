@@ -10,7 +10,7 @@ import { ReactComponent as PutKey } from "../assets/images/svg/put-key.svg";
 import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { LOGIN_AUTH, LOGIN_OK, LOGIN_WAITING } from "../constants";
-import fetchCards from "../daemon/fetchCards";
+import readCards from "../reader/readCards";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
 import checkPassphrase from "../toolDb/checkPassphrase";
@@ -128,7 +128,7 @@ export default function Auth(props: AuthProps) {
         setLocalSetting("savedPass", "");
       }
       history.push("/home");
-      fetchCards();
+      readCards();
     }
   }, [loginState, username, pass, rememberme, history]);
 
@@ -288,7 +288,7 @@ export default function Auth(props: AuthProps) {
                 type: "SET_LOADING",
                 arg: false,
               });
-              fetchCards();
+              readCards();
             }
           })
           .catch((err: Error) => {

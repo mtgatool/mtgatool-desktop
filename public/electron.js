@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-unresolved
-const { app, net, BrowserWindow, protocol, Menu, Tray } = require("electron");
+const { app, BrowserWindow, protocol, Menu, Tray } = require("electron");
 const path = require("path");
 const url = require("url");
 
@@ -38,29 +38,6 @@ if (!singleLock) {
 function sendInit() {
   console.log("Renderer Init signal");
   mainGlobals.backgroundWindow.webContents.send("rendererInit", true);
-
-  let body = "";
-  const request = net.request({
-    method: "GET",
-    protocol: "https:",
-    hostname: "api.github.com",
-    port: 443,
-    path: "repos/frcaton/mtga-tracker-daemon/releases/latest",
-  });
-  request.on("response", (response) => {
-    response.on("data", (chunk) => {
-      body += chunk.toString();
-    });
-
-    response.on("end", () => {
-      mainGlobals.mainWindow.webContents.send(
-        "mtgaTrackerDaemonVersion",
-        JSON.parse(body)
-      );
-    });
-  });
-  request.on("error", console.log);
-  request.end();
 
   /*
   // This was okay, but instead we use webrtc to find servers, and then

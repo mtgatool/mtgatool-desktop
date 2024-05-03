@@ -8,7 +8,9 @@ import {
 } from "mtgatool-shared";
 
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
-import MtgaTrackerDaemon from "../../daemon/mtgaTrackerDaemon";
+import readMatchManger from "../../reader/readMatchManger";
+import readMatchOpponentInfo from "../../reader/readMatchOpponentInfo";
+import readMatchPlayerInfo from "../../reader/readMatchPlayerInfo";
 import LogEntry from "../../types/logDecoder";
 import getLocalSetting from "../../utils/getLocalSetting";
 import isLimitedEventId from "../../utils/isLimitedEventId";
@@ -183,49 +185,57 @@ export default function onLabelMatchGameRoomStateChangedEvent(
     if ((window as any).daemon) {
       const isLimited = isLimitedEventId(gameRoom.gameRoomConfig.eventId);
 
-      ((window as any).daemon as MtgaTrackerDaemon)
-        .getMatchState()
-        .then((state) => {
-          if (
-            state &&
-            state.matchId === gameRoom.gameRoomConfig.matchId &&
-            state.playerRank.class > 0
-          ) {
-            const opponent = {
-              tier: state.opponentRank.tier,
-              rank: rankClass[state.opponentRank.class],
-              percentile: state.opponentRank.mythicPercentile,
-              leaderboardPlace: state.opponentRank.mythicPlacement,
-            };
-            setOpponent(opponent);
+      const matchState = readMatchManger();
 
-            const player = {
-              tier: state.playerRank.tier,
-              rank: rankClass[state.playerRank.class],
-              percentile: state.playerRank.mythicPercentile,
-              leaderboardPlace: state.playerRank.mythicPlacement,
-            };
-            setPlayer(player);
+      const oppInfo = readMatchOpponentInfo();
+      if (
+        oppInfo &&
+        matchState["<MatchID>k__BackingField"] ===
+          gameRoom.gameRoomConfig.matchId &&
+        oppInfo.RankingClass > 0
+      ) {
+        const opponent = {
+          tier: oppInfo.RankingTier,
+          rank: rankClass[oppInfo.RankingClass],
+          percentile: oppInfo.MythicPercentile,
+          leaderboardPlace: oppInfo.MythicPlacement,
+        };
+        setOpponent(opponent);
+      }
 
-            if (isLimited) {
-              postChannelMessage({
-                type: "UPSERT_DB_RANK",
-                value: {
-                  limitedClass: rankClass[state.playerRank.class],
-                  limitedLevel: state.playerRank.tier,
-                },
-              });
-            } else {
-              postChannelMessage({
-                type: "UPSERT_DB_RANK",
-                value: {
-                  constructedClass: rankClass[state.playerRank.class],
-                  constructedLevel: state.playerRank.tier,
-                },
-              });
-            }
-          }
-        });
+      const playerInfo = readMatchPlayerInfo();
+      if (
+        playerInfo &&
+        matchState["<MatchID>k__BackingField"] ===
+          gameRoom.gameRoomConfig.matchId &&
+        playerInfo.RankingClass > 0
+      ) {
+        const player = {
+          tier: playerInfo.RankingTier,
+          rank: rankClass[playerInfo.RankingClass],
+          percentile: playerInfo.MythicPercentile,
+          leaderboardPlace: playerInfo.MythicPlacement,
+        };
+        setPlayer(player);
+
+        if (isLimited) {
+          postChannelMessage({
+            type: "UPSERT_DB_RANK",
+            value: {
+              limitedClass: rankClass[playerInfo.RankingClass],
+              limitedLevel: playerInfo.RankingTier,
+            },
+          });
+        } else {
+          postChannelMessage({
+            type: "UPSERT_DB_RANK",
+            value: {
+              constructedClass: rankClass[playerInfo.RankingClass],
+              constructedLevel: playerInfo.RankingTier,
+            },
+          });
+        }
+      }
     }
 
     setEventId(eventId);

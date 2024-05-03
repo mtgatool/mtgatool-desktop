@@ -11,7 +11,6 @@ import { Router } from "react-router-dom";
 import backgroundChannelListeners from "./broadcastChannel/backgroundChannelListeners";
 import mainChannelListeners from "./broadcastChannel/mainChannelListeners";
 import App from "./components/App";
-import MtgaTrackerDaemon from "./daemon/mtgaTrackerDaemon";
 import Hover from "./hover";
 import Overlay from "./overlay";
 import reduxAction from "./redux/reduxAction";
@@ -28,7 +27,6 @@ import { loadDbFromCache } from "./utils/database-wrapper";
 import defaultLocalSettings from "./utils/defaultLocalSettings";
 import getWindowTitle from "./utils/electron/getWindowTitle";
 import getLocalSetting from "./utils/getLocalSetting";
-import globalData from "./utils/globalData";
 import initDirectories from "./utils/initDirectories";
 import registerShortcuts from "./utils/registerShortcuts";
 
@@ -48,8 +46,6 @@ if (title == WINDOW_UPDATER) {
     document.getElementById("root")
   );
 } else if (title == WINDOW_BACKGROUND) {
-  (window as any).daemon = new MtgaTrackerDaemon(false);
-
   initDirectories();
   if (module.hot && process.env.NODE_ENV === "development") {
     module.hot.accept();
@@ -108,8 +104,6 @@ if (title == WINDOW_UPDATER) {
 
   const settings = JSON.parse(getLocalSetting("settings"));
   registerShortcuts(settings);
-
-  globalData.daemon = new MtgaTrackerDaemon();
 
   mainChannelListeners();
   ReactDOM.render(

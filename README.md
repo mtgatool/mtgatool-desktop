@@ -8,29 +8,19 @@
 
 MTG Arena Tool is a collection browser, a deck tracker and a statistics manager. Explore which decks you played against and what other players are brewing. MTG Arena Tool is all about improving your Magic Arena experience.
 
-The MTGA tracker daemon can be found at https://github.com/frcaton/mtga-tracker-daemon.
-
 ### Install on Linux
 
-On Linux systems you can use the .AppImage as-is, but the recommended installer takes care of setting up the desktop integrations and daemon services; This is a one time setup; After that both the daemon and mtgatool appimage can update automatically.
+On Linux systems you can use the .AppImage as-is, but the recommended installer takes care of setting up the desktop integrations; This is a one time setup.
 
 Head to the downloads page and download the latest `mtgatool-desktop-linux-installer.tar.gz`
 
-Navigate in terminal to the directory where the tar.gz was downloaded, then extract and install; _(requires sudo to install the daemon service)_
+Navigate in terminal to the directory where the tar.gz was downloaded, then extract and install;
 ```
 mkdir mtgatool &&
 tar -xf mtgatool-desktop-linux-installer.tar.gz -C mtgatool &&
 cd mtgatool &&
 sudo ./install.sh
 ```
-
-You can check the mtga-tracker-daemon service status using systemctl;
-
-```systemctl status mtga-trackerd.service```
-
-Or simply [open a browser tab and try the api](http://localhost:6842/status)! You can find more information about it at [mtga-tracker-daemon](https://github.com/frcaton/mtga-tracker-daemon).
-
-
 
 ### Run from source
 
