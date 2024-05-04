@@ -156,87 +156,59 @@ export default function onLabelMatchGameRoomStateChangedEvent(
       }
     });
 
-    // Maybe deprecated?
-    /*
-    const metadata = (gameRoom.gameRoomConfig as any).clientMetadata;
+    const isLimited = isLimitedEventId(gameRoom.gameRoomConfig.eventId);
 
-    if (metadata) {
+    const matchState = readMatchManger();
+
+    const oppInfo = readMatchOpponentInfo();
+    if (
+      oppInfo &&
+      matchState &&
+      matchState["<MatchID>k__BackingField"] ===
+        gameRoom.gameRoomConfig.matchId &&
+      oppInfo.RankingClass > 0
+    ) {
       const opponent = {
-        tier: parseInt(metadata[`${oppId}_RankTier`]),
-        rank: metadata[`${oppId}_RankClass`],
-        percentile: parseInt(metadata[`${oppId}_LeaderboardPercentile`]),
-        leaderboardPlace: parseInt(metadata[`${oppId}_LeaderboardPlacement`]),
-        // commanderGrpIds: json.opponentCommanderGrpIds,
+        tier: oppInfo.RankingTier,
+        rank: rankClass[oppInfo.RankingClass],
+        percentile: oppInfo.MythicPercentile,
+        leaderboardPlace: oppInfo.MythicPlacement,
       };
       setOpponent(opponent);
+    }
 
+    const playerInfo = readMatchPlayerInfo();
+    if (
+      playerInfo &&
+      matchState &&
+      matchState["<MatchID>k__BackingField"] ===
+        gameRoom.gameRoomConfig.matchId &&
+      playerInfo.RankingClass > 0
+    ) {
       const player = {
-        tier: parseInt(metadata[`${playerId}_RankTier`]),
-        rank: metadata[`${playerId}_RankClass`],
-        percentile: parseInt(metadata[`${playerId}_LeaderboardPercentile`]),
-        leaderboardPlace: parseInt(
-          metadata[`${playerId}_LeaderboardPlacement`]
-        ),
+        tier: playerInfo.RankingTier,
+        rank: rankClass[playerInfo.RankingClass],
+        percentile: playerInfo.MythicPercentile,
+        leaderboardPlace: playerInfo.MythicPlacement,
       };
       setPlayer(player);
-    }
-    */
 
-    if ((window as any).daemon) {
-      const isLimited = isLimitedEventId(gameRoom.gameRoomConfig.eventId);
-
-      const matchState = readMatchManger();
-
-      const oppInfo = readMatchOpponentInfo();
-      if (
-        oppInfo &&
-        matchState &&
-        matchState["<MatchID>k__BackingField"] ===
-          gameRoom.gameRoomConfig.matchId &&
-        oppInfo.RankingClass > 0
-      ) {
-        const opponent = {
-          tier: oppInfo.RankingTier,
-          rank: rankClass[oppInfo.RankingClass],
-          percentile: oppInfo.MythicPercentile,
-          leaderboardPlace: oppInfo.MythicPlacement,
-        };
-        setOpponent(opponent);
-      }
-
-      const playerInfo = readMatchPlayerInfo();
-      if (
-        playerInfo &&
-        matchState &&
-        matchState["<MatchID>k__BackingField"] ===
-          gameRoom.gameRoomConfig.matchId &&
-        playerInfo.RankingClass > 0
-      ) {
-        const player = {
-          tier: playerInfo.RankingTier,
-          rank: rankClass[playerInfo.RankingClass],
-          percentile: playerInfo.MythicPercentile,
-          leaderboardPlace: playerInfo.MythicPlacement,
-        };
-        setPlayer(player);
-
-        if (isLimited) {
-          postChannelMessage({
-            type: "UPSERT_DB_RANK",
-            value: {
-              limitedClass: rankClass[playerInfo.RankingClass],
-              limitedLevel: playerInfo.RankingTier,
-            },
-          });
-        } else {
-          postChannelMessage({
-            type: "UPSERT_DB_RANK",
-            value: {
-              constructedClass: rankClass[playerInfo.RankingClass],
-              constructedLevel: playerInfo.RankingTier,
-            },
-          });
-        }
+      if (isLimited) {
+        postChannelMessage({
+          type: "UPSERT_DB_RANK",
+          value: {
+            limitedClass: rankClass[playerInfo.RankingClass],
+            limitedLevel: playerInfo.RankingTier,
+          },
+        });
+      } else {
+        postChannelMessage({
+          type: "UPSERT_DB_RANK",
+          value: {
+            constructedClass: rankClass[playerInfo.RankingClass],
+            constructedLevel: playerInfo.RankingTier,
+          },
+        });
       }
     }
 
