@@ -8,15 +8,15 @@ function findMTGA(): boolean {
 }
 
 export default function ReaderStatus() {
-  const [daemonStatus, setDaemonStatus] = useState("warn");
+  const [readerStatus, setReaderStatus] = useState("warn");
 
   useEffect(() => {
     const interval = setInterval(() => {
       const found = findMTGA();
       if (found) {
-        setDaemonStatus("ok");
+        setReaderStatus("ok");
       } else {
-        setDaemonStatus("err");
+        setReaderStatus("err");
       }
     }, 1000);
     return () => clearInterval(interval);
@@ -45,7 +45,7 @@ export default function ReaderStatus() {
             margin: "0 0 0 32px",
           }}
         />
-        <div className={`log-status-${daemonStatus}`} />
+        <div className={`log-status-${readerStatus}`} />
       </div>
     </>
   );
