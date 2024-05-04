@@ -202,5 +202,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/mtgatool/mtgatool-desktop.git"
+  },
+  "optionalDependencies": {
+    "dmg-license": "^1.0.11"
   }
 }
