@@ -1,4 +1,5 @@
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
+import readCards from "../../reader/readCards";
 import LogEntry, { ClientSceneChange } from "../../types/logDecoder";
 
 interface Entry extends LogEntry {
@@ -12,6 +13,10 @@ export default function onClientSceneChange(entry: Entry): void {
     postChannelMessage({
       type: "DRAFT_END",
     });
+  }
+
+  if (json.fromSceneName === "BoosterChamber") {
+    readCards();
   }
 
   postChannelMessage({
