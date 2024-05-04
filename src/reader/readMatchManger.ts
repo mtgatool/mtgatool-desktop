@@ -20,12 +20,10 @@ interface MatchManager {
   disposed: boolean;
 }
 
-export default function readMatchManger() {
-  const matchManager: MatchManager = readData("MTGA", [
-    "PAPA",
-    "_instance",
-    "_matchManager",
-  ]);
+export default function readMatchManger(): MatchManager | undefined {
+  const matchManager = readData("MTGA", ["PAPA", "_instance", "_matchManager"]);
+
+  if (matchManager.error) return undefined;
 
   return matchManager;
 }

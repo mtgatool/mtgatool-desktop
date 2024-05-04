@@ -22,21 +22,25 @@ interface AccountInformation {
 }
 
 export default function readPlayerId() {
-  const accountInformatiom: AccountInformation = readData("MTGA", [
+  const data = readData("MTGA", [
     "WrapperController",
     "<Instance>k__BackingField",
     "<AccountClient>k__BackingField",
     "<AccountInformation>k__BackingField",
   ]);
 
+  if (data.error) return;
+
+  const accountInformation: AccountInformation = data;
+
   if (
-    accountInformatiom &&
-    accountInformatiom.PersonaID &&
-    accountInformatiom.DisplayName
+    accountInformation &&
+    accountInformation.PersonaID &&
+    accountInformation.DisplayName
   ) {
     switchPlayerUUID(
-      accountInformatiom.PersonaID,
-      accountInformatiom.DisplayName
+      accountInformation.PersonaID,
+      accountInformation.DisplayName
     );
   }
 }

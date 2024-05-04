@@ -24,6 +24,8 @@ export default function readCards() {
     "_entries",
   ]);
 
+  if (cards.error) return;
+
   const parsedCards: Cards = {};
   cards.forEach((c: ReaderCard) => {
     parsedCards[c.key] = c.value;

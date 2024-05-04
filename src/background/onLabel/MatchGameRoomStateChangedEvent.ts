@@ -190,6 +190,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
       const oppInfo = readMatchOpponentInfo();
       if (
         oppInfo &&
+        matchState &&
         matchState["<MatchID>k__BackingField"] ===
           gameRoom.gameRoomConfig.matchId &&
         oppInfo.RankingClass > 0
@@ -206,6 +207,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
       const playerInfo = readMatchPlayerInfo();
       if (
         playerInfo &&
+        matchState &&
         matchState["<MatchID>k__BackingField"] ===
           gameRoom.gameRoomConfig.matchId &&
         playerInfo.RankingClass > 0

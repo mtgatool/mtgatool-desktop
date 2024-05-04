@@ -16,13 +16,15 @@ interface PlayerInfo {
   _screenName: string;
 }
 
-export default function readMatchPlayerInfo() {
-  const playerInfo: PlayerInfo = readData("MTGA", [
+export default function readMatchPlayerInfo(): PlayerInfo | undefined {
+  const playerInfo = readData("MTGA", [
     "PAPA",
     "_instance",
     "_matchManager",
     "<LocalPlayerInfo>k__BackingField",
   ]);
+
+  if (playerInfo.error) return undefined;
 
   return playerInfo;
 }
