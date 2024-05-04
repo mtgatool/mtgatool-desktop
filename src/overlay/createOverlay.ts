@@ -29,21 +29,23 @@ export default function createOverlay(
   const allSettings = JSON.parse(getLocalSetting("settings")) as Settings;
   const settings: OverlaySettings = allSettings.overlays[id];
 
+  console.warn("allSettings", id, allSettings);
+
   const newWindow = new remote.BrowserWindow({
     transparent: allSettings.overlaysTransparency,
-    // resizable: false,
-    // skipTaskbar: true,
+    // resizable: allSettings.overlayResizable,
+    // skipTaskbar: allSettings.overlaySkipTaskbar,
     focusable: !!allSettings.overlaysTransparency,
     backgroundColor: allSettings.overlaysTransparency ? undefined : "#0d0d0f",
     title: overlayIdToTitle[id],
     show: false,
-    frame: false,
+    frame: allSettings.overlayFrame,
     width: settings.bounds.width,
     height: settings.bounds.height,
     x: settings.bounds.x,
     y: settings.bounds.y,
     alwaysOnTop: true,
-    acceptFirstMouse: true,
+    acceptFirstMouse: allSettings.overlayAcceptFirstMouse,
     webPreferences: {
       webSecurity: false,
       nodeIntegration: true,

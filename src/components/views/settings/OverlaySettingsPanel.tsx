@@ -363,6 +363,34 @@ function setOverlaysTransparency(checked: boolean): void {
   });
 }
 
+// function setOverlaysResizable(checked: boolean): void {
+//   reduxAction(store.dispatch, {
+//     type: "SET_SETTINGS",
+//     arg: { overlayResizable: checked },
+//   });
+// }
+
+// function setOverlaysSkipTaskbar(checked: boolean): void {
+//   reduxAction(store.dispatch, {
+//     type: "SET_SETTINGS",
+//     arg: { overlaySkipTaskbar: checked },
+//   });
+// }
+
+function setOverlaysFrame(checked: boolean): void {
+  reduxAction(store.dispatch, {
+    type: "SET_SETTINGS",
+    arg: { overlayFrame: checked },
+  });
+}
+
+// function setOverlaysAcceptFirstMouse(checked: boolean): void {
+//   reduxAction(store.dispatch, {
+//     type: "SET_SETTINGS",
+//     arg: { overlayAcceptFirstMouse: checked },
+//   });
+// }
+
 export default function OverlaySettingsPanel() {
   const dispatch = useDispatch();
   const settings = useSelector((state: AppState) => state.settings);
@@ -481,6 +509,30 @@ export default function OverlaySettingsPanel() {
         value={settings.overlaysTransparency}
         callback={setOverlaysTransparency}
       />
+
+      {/* <Toggle
+        text="Resizable overlays"
+        value={settings.overlayResizable}
+        callback={setOverlaysResizable}
+      />
+
+      <Toggle
+        text="Skip overlays on taskbar"
+        value={settings.overlaySkipTaskbar}
+        callback={setOverlaysSkipTaskbar}
+      /> */}
+
+      <Toggle
+        text="Show frame on overlays"
+        value={settings.overlayFrame}
+        callback={setOverlaysFrame}
+      />
+
+      {/* <Toggle
+        text="Accept first mouse click on overlays"
+        value={settings.overlayAcceptFirstMouse}
+        callback={setOverlaysAcceptFirstMouse}
+      /> */}
 
       <div
         className="settings-note"

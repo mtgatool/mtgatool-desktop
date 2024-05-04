@@ -144,7 +144,13 @@ function App(props: AppProps) {
       <SettingsPersistor />
       <PopupComponent
         open={false}
-        className={isElectron() ? "settings-popup" : ""}
+        className={
+          isElectron()
+            ? os == "linux"
+              ? "settings-popup-linux"
+              : "settings-popup"
+            : ""
+        }
         width="100%"
         height="100%"
         openFnRef={openSettings}
