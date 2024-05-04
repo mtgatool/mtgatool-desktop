@@ -34,22 +34,22 @@ export default async function setDbMatch(match: InternalMatch) {
     // actionLog: match.actionLog,
   };
 
-  // Put this match
-  putData<DbMatch>(`matches-${match.id}`, newDbMatch, true);
-
   const remoteKey = getUserNamespacedKey(pubKey, `matches-${match.id}`);
-
-  if (!privateMode) {
-    // Send to explore and livefeed
-    window.toolDbWorker.postMessage({
-      type: "PUSH_DB_MATCH",
-      key: remoteKey,
-      match: newDbMatch,
-    });
-  }
 
   // Create CRDT document with the new match added to it
   if (!globalData.matchesIndex.includes(remoteKey)) {
+    // Put this match
+    putData<DbMatch>(`matches-${match.id}`, newDbMatch, true);
+
+    if (!privateMode) {
+      // Send to explore and livefeed
+      window.toolDbWorker.postMessage({
+        type: "PUSH_DB_MATCH",
+        key: remoteKey,
+        match: newDbMatch,
+      });
+    }
+
     globalData.matchesIndex.push(remoteKey);
   }
 
