@@ -18,9 +18,9 @@ export default function readCards() {
   const { readData } = reader;
 
   const cards = readData("MTGA", [
-    "WrapperController",
-    "<Instance>k__BackingField",
-    "<InventoryManager>k__BackingField",
+    "PAPA",
+    "_instance",
+    "_inventoryManager",
     "_inventoryServiceWrapper",
     "<Cards>k__BackingField",
     "_entries",
