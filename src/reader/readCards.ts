@@ -1,6 +1,7 @@
 import { Cards } from "mtgatool-shared";
 
 import upsertDbCards from "../toolDb/upsertDbCards";
+import isElectron from "../utils/electron/isElectron";
 
 interface ReaderCard {
   key: number;
@@ -10,6 +11,7 @@ interface ReaderCard {
 }
 
 export default function readCards() {
+  if (!isElectron()) return;
   // eslint-disable-next-line no-undef
   const reader = __non_webpack_require__("mtga-reader");
 
