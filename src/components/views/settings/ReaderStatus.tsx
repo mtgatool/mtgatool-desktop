@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 
-// eslint-disable-next-line no-undef
-const reader = __non_webpack_require__("mtga-reader");
-
 function findMTGA(): boolean {
+  // eslint-disable-next-line no-undef
+  const reader = __non_webpack_require__("mtga-reader");
   const { findPidByName } = reader;
   return findPidByName("MTGA");
 }

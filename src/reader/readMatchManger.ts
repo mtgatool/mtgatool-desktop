@@ -1,8 +1,3 @@
-// eslint-disable-next-line no-undef
-const reader = __non_webpack_require__("mtga-reader");
-
-const { readData } = reader;
-
 interface MatchManager {
   "<BattlefieldId>k__BackingField": string;
   "<CurrentGameNumber>k__BackingField": number;
@@ -21,6 +16,11 @@ interface MatchManager {
 }
 
 export default function readMatchManger(): MatchManager | undefined {
+  // eslint-disable-next-line no-undef
+  const reader = __non_webpack_require__("mtga-reader");
+
+  const { readData } = reader;
+
   const matchManager = readData("MTGA", ["PAPA", "_instance", "_matchManager"]);
 
   if (matchManager.error) return undefined;

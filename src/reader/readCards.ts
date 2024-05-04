@@ -2,11 +2,6 @@ import { Cards } from "mtgatool-shared";
 
 import upsertDbCards from "../toolDb/upsertDbCards";
 
-// eslint-disable-next-line no-undef
-const reader = __non_webpack_require__("mtga-reader");
-
-const { readData } = reader;
-
 interface ReaderCard {
   key: number;
   value: number;
@@ -15,6 +10,11 @@ interface ReaderCard {
 }
 
 export default function readCards() {
+  // eslint-disable-next-line no-undef
+  const reader = __non_webpack_require__("mtga-reader");
+
+  const { readData } = reader;
+
   const cards = readData("MTGA", [
     "WrapperController",
     "<Instance>k__BackingField",

@@ -1,8 +1,3 @@
-// eslint-disable-next-line no-undef
-const reader = __non_webpack_require__("mtga-reader");
-
-const { readData } = reader;
-
 interface PlayerInfo {
   AvatarSelection: string;
   CommanderGrpId: number;
@@ -17,6 +12,11 @@ interface PlayerInfo {
 }
 
 export default function readMatchOpponentInfo(): PlayerInfo | undefined {
+  // eslint-disable-next-line no-undef
+  const reader = __non_webpack_require__("mtga-reader");
+
+  const { readData } = reader;
+
   const opponentInfo = readData("MTGA", [
     "PAPA",
     "_instance",

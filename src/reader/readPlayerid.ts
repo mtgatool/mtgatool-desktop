@@ -1,10 +1,5 @@
 import switchPlayerUUID from "../utils/switchPlayerUUID";
 
-// eslint-disable-next-line no-undef
-const reader = __non_webpack_require__("mtga-reader");
-
-const { readData } = reader;
-
 interface AccountInformation {
   AccessToken: string;
   AccountID: string;
@@ -22,6 +17,11 @@ interface AccountInformation {
 }
 
 export default function readPlayerId() {
+  // eslint-disable-next-line no-undef
+  const reader = __non_webpack_require__("mtga-reader");
+
+  const { readData } = reader;
+
   const data = readData("MTGA", [
     "WrapperController",
     "<Instance>k__BackingField",
