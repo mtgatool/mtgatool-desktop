@@ -11,6 +11,7 @@ import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import readMatchManger from "../../reader/readMatchManger";
 import readMatchOpponentInfo from "../../reader/readMatchOpponentInfo";
 import readMatchPlayerInfo from "../../reader/readMatchPlayerInfo";
+import readRank from "../../reader/readRank";
 import LogEntry from "../../types/logDecoder";
 import isElectron from "../../utils/electron/isElectron";
 import getLocalSetting from "../../utils/getLocalSetting";
@@ -180,6 +181,25 @@ export default function onLabelMatchGameRoomStateChangedEvent(
       }
 
       const playerInfo = readMatchPlayerInfo();
+
+      // This doesnt work on this screen
+      const playerRank = readRank();
+
+      // eslint-disable-next-line no-nested-ternary
+      const rankData = playerRank
+        ? isLimited
+          ? {
+              step: playerRank.limitedStep,
+              percentile: playerRank.limitedPercentile,
+              leaderboardPlace: playerRank.limitedLeaderboardPlace,
+            }
+          : {
+              step: playerRank.constructedStep,
+              percentile: playerRank.constructedPercentile,
+              leaderboardPlace: playerRank.constructedLeaderboardPlace,
+            }
+        : undefined;
+
       if (
         playerInfo &&
         matchState &&
@@ -192,6 +212,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
           rank: rankClass[playerInfo.RankingClass],
           percentile: playerInfo.MythicPercentile,
           leaderboardPlace: playerInfo.MythicPlacement,
+          ...rankData,
         };
         setPlayer(player);
 

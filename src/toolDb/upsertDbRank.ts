@@ -23,6 +23,18 @@ export default async function upsertDbRank(arg: Partial<CombinedRankInfo>) {
   const pubKey = getLocalSetting("pubkey");
   console.warn("pubKey", { pubKey: pubKey });
 
+  // if (arg.constructedSeasonOrdinal && arg.constructedSeasonOrdinal > 0) {
+  //   putData(
+  //     `${uuid}-rank-${arg.constructedSeasonOrdinal}`,
+  //     {
+  //       ...rank,
+  //       pubKey: pubKey,
+  //       updated: new Date().getTime(),
+  //     },
+  //     true
+  //   );
+  // }
+
   getData(`${uuid}-rank`, true).then((uuidData) => {
     if (uuidData) {
       const newData: DbRankData = {

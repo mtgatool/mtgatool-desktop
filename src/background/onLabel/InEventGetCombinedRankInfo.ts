@@ -1,4 +1,5 @@
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
+import readRank from "../../reader/readRank";
 import LogEntry from "../../types/logDecoder";
 
 export interface CombinedRankInfo {
@@ -23,6 +24,17 @@ export interface CombinedRankInfo {
   limitedLeaderboardPlace: number;
 }
 
+const rankClass: Record<number, string> = {
+  "-1": "Unranked",
+  "0": "Beginner",
+  "1": "Bronze",
+  "2": "Silver",
+  "3": "Gold",
+  "4": "Platinum",
+  "5": "Diamond",
+  "6": "Mythic",
+};
+
 interface Entry extends LogEntry {
   json: CombinedRankInfo;
 }
@@ -30,8 +42,21 @@ interface Entry extends LogEntry {
 export default function InEventGetCombinedRankInfo(entry: Entry): void {
   const { json } = entry;
 
-  postChannelMessage({
-    type: "UPSERT_DB_RANK",
-    value: json,
-  });
+  const memoryRank = readRank();
+
+  if (memoryRank) {
+    postChannelMessage({
+      type: "UPSERT_DB_RANK",
+      value: {
+        ...memoryRank,
+        constructedClass: rankClass[memoryRank.constructedClass],
+        limitedClass: rankClass[memoryRank.limitedClass],
+      },
+    });
+  } else {
+    postChannelMessage({
+      type: "UPSERT_DB_RANK",
+      value: json,
+    });
+  }
 }
