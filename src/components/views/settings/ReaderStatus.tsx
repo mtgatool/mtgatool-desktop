@@ -7,16 +7,32 @@ function findMTGA(): boolean {
   return findPidByName("MTGA");
 }
 
+function checkAdmin(): boolean {
+  // eslint-disable-next-line no-undef
+  const reader = __non_webpack_require__("mtga-reader");
+  const { isAdmin } = reader;
+  return isAdmin();
+}
+
 export default function ReaderStatus() {
   const [readerStatus, setReaderStatus] = useState("warn");
 
+  const [errorText, setErrorText] = useState("");
+
   useEffect(() => {
     const interval = setInterval(() => {
+      const isAdmin = checkAdmin();
+      if (!isAdmin) {
+        setReaderStatus("err");
+        setErrorText("App is not running with admin/elevated privileges");
+        return;
+      }
       const found = findMTGA();
       if (found) {
         setReaderStatus("ok");
       } else {
         setReaderStatus("err");
+        setErrorText("MTGA process not found");
       }
     }, 1000);
     return () => clearInterval(interval);
@@ -32,19 +48,21 @@ export default function ReaderStatus() {
         </p>
       </div>
       <div
-        className="input-container"
         style={{
+          display: "flex",
           height: "40px",
         }}
       >
         <label className="label">MTGA Process:</label>
-        <div
+        <label
           style={{
-            display: "flex",
-            width: "120px",
-            margin: "0 0 0 32px",
+            fontFamily: "var(--main-font-name-it)",
+            color: "var(--color-r)",
+            margin: "auto 16px auto auto",
           }}
-        />
+        >
+          {errorText}
+        </label>
         <div className={`log-status-${readerStatus}`} />
       </div>
     </>
