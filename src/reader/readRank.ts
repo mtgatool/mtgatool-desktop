@@ -39,7 +39,7 @@ export default function readRank(): CombinedRankInfo | undefined {
 
   if (rank.error) return undefined;
 
-  if (Object.keys(rank.value).length === 0) return undefined;
+  if (Object.keys(rank).length === 0) return undefined;
 
   return rank;
 }
