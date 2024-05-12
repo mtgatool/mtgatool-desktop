@@ -24,7 +24,7 @@ export interface CombinedRankInfo {
   limitedLeaderboardPlace: number;
 }
 
-const rankClass: Record<number, string> = {
+export const rankClass: Record<number, string> = {
   "-1": "Unranked",
   "0": "Beginner",
   "1": "Bronze",
@@ -49,8 +49,8 @@ export default function InEventGetCombinedRankInfo(entry: Entry): void {
       type: "UPSERT_DB_RANK",
       value: {
         ...memoryRank,
-        constructedClass: rankClass[memoryRank.constructedClass],
-        limitedClass: rankClass[memoryRank.limitedClass],
+        constructedClass: memoryRank.constructedClass,
+        limitedClass: memoryRank.limitedClass,
       },
     });
   } else {

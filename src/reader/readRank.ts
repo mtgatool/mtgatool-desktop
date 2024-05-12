@@ -1,6 +1,11 @@
+import {
+  CombinedRankInfo,
+  rankClass,
+} from "../background/onLabel/InEventGetCombinedRankInfo";
+import globalStore from "../background/store";
 import isElectron from "../utils/electron/isElectron";
 
-interface CombinedRankInfo {
+interface _ReturnedRankInfo {
   constructedClass: number;
   constructedLeaderboardPlace: number;
   constructedLevel: number;
@@ -37,9 +42,17 @@ export default function readRank(): CombinedRankInfo | undefined {
     "_combinedRankInfo",
   ]);
 
-  if (rank.error) return undefined;
+  if (rank.error || Object.keys(rank).length === 0) {
+    if (globalStore.rank) return globalStore.rank;
 
-  if (Object.keys(rank).length === 0) return undefined;
+    return undefined;
+  }
 
-  return rank;
+  globalStore.rank = {
+    ...rank,
+    constructedClass: rankClass[rank.constructedClass],
+    limitedClass: rankClass[rank.limitedClass],
+  };
+
+  return globalStore.rank;
 }
