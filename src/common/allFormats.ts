@@ -2,7 +2,7 @@ import formatsJson from "../assets/resources/formats.json";
 
 export interface Format {
   name: string;
-  sets: string[];
+  legalSets: string[];
   bannedTitleIds: number[];
   suspendedTitleIds: number[];
   allowedTitleIds: number[];

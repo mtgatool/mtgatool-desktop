@@ -72,7 +72,7 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
   const historicSets: Set[] = [];
   const alchemySets: Set[] = [];
 
-  const standard = allFormats.Standard.sets;
+  const standard = allFormats.Standard.legalSets;
   // const _historic = allFormats.Historic.sets;
   // const _alchemy = allFormats.Alchemy.sets;
   // const _explorer = allFormats.Explorer.sets;

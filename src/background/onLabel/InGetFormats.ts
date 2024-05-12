@@ -2,11 +2,13 @@ import LogEntry from "../../types/logDecoder";
 
 export interface Format {
   name: string;
-  sets: string[];
+  legalSets: string[];
+  filterSets: string[];
   bannedTitleIds: number[];
   suspendedTitleIds: number[];
   allowedTitleIds: number[];
   cardCountRestriction?: string;
+  individualCardQuotas: Record<string, { max: number }>;
   // | "None"
   // | "Singleton"
   // | "Limited"
@@ -27,6 +29,7 @@ export interface Format {
     min: number;
     max: number;
   };
+  AllowedCommanderTitleIds: number[];
 }
 
 interface FormatsEvent {

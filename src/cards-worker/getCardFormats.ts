@@ -33,7 +33,7 @@ export default function getCardFormats(
     const format = allFormats[name];
     if (
       (format.allowedTitleIds.includes(card.TitleId) ||
-        format.sets.some(
+        format.legalSets.some(
           (set: any) => arenaSetCode.indexOf(set.toLowerCase()) >= 0
         )) &&
       !format.bannedTitleIds.includes(card.TitleId)
