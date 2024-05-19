@@ -29,6 +29,7 @@ export const initialRendererState = {
   loading: false,
   logCompletion: 0,
   detailedLogs: null as boolean | null,
+  adminPermissions: null as boolean | null,
   noLog: false,
   offline: true,
   loginState: LOGIN_AUTH,
@@ -103,6 +104,12 @@ const rendererSlice = createSlice({
       action: PayloadAction<boolean>
     ): void => {
       state.detailedLogs = action.payload;
+    },
+    setAdminPermissions: (
+      state: RendererState,
+      action: PayloadAction<boolean>
+    ): void => {
+      state.adminPermissions = action.payload;
     },
     setMatchesFetchState: (
       state: RendererState,
@@ -216,6 +223,7 @@ export const {
   setLoginState,
   setLogCompletion,
   setDetailedLogs,
+  setAdminPermissions,
   setMatchesFetchState,
   setBackgroundGrpid,
   setLoading,

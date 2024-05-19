@@ -26,6 +26,7 @@ import ErrorBoundary from "./ErrorBoundary";
 import LoadingBar from "./LoadingBar";
 import PopupComponent from "./PopupComponent";
 import Popups from "./Popups";
+import Admin from "./popups/Admin";
 import ArenaIdSelector from "./popups/ArenaIdSelector";
 import DetailedLogs from "./popups/DetailedLogs";
 import SettingsPersistor from "./SettingsPersistor";
@@ -46,6 +47,7 @@ function App(props: AppProps) {
 
   const {
     detailedLogs,
+    adminPermissions,
     loginState,
     loading,
     backgroundGrpid,
@@ -130,6 +132,9 @@ function App(props: AppProps) {
   const openDetailedLogs = useRef<() => void>(vodiFn);
   const closenDetailedLogs = useRef<() => void>(vodiFn);
 
+  const openAdmin = useRef<() => void>(vodiFn);
+  const closeAdmin = useRef<() => void>(vodiFn);
+
   useEffect(() => {
     if (detailedLogs === false) {
       openDetailedLogs.current();
@@ -138,6 +143,15 @@ function App(props: AppProps) {
       closenDetailedLogs.current();
     }
   }, [detailedLogs]);
+
+  useEffect(() => {
+    if (adminPermissions === false) {
+      openAdmin.current();
+    }
+    if (adminPermissions === true) {
+      closeAdmin.current();
+    }
+  }, [adminPermissions]);
 
   return (
     <>
@@ -180,6 +194,17 @@ function App(props: AppProps) {
         persistent={false}
       >
         <DetailedLogs onClose={closenDetailedLogs.current} />
+      </PopupComponent>
+      <PopupComponent
+        open={false}
+        className={getPopupClass(os)}
+        width="640px"
+        height="540px"
+        openFnRef={openAdmin}
+        closeFnRef={closeAdmin}
+        persistent={false}
+      >
+        <Admin onClose={closeAdmin.current} />
       </PopupComponent>
       {os !== "" && os !== "linux" && <TopBar forceOs={os} />}
       <div

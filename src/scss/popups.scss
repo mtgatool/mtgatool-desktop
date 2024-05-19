@@ -417,4 +417,31 @@
     overflow: hidden;
     margin: 16px auto;
   }
+
+  
+  .slide-img-admin-a {
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    background-image: url("../assets/images/help/win32-admin-a.png");
+    width: 239px;
+    height: 185px;
+    border-radius: 8px;
+    display: flex;
+    overflow: hidden;
+    margin: 16px auto;
+  }
+
+  .slide-img-admin-b {
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    background-image: url("../assets/images/help/win32-admin-b.png");
+    width: 336px;
+    height: 205px;
+    border-radius: 8px;
+    display: flex;
+    overflow: hidden;
+    margin: 16px auto;
+  }
 }
