@@ -192,11 +192,13 @@ export default function onLabelMatchGameRoomStateChangedEvent(
               step: playerRank.limitedStep,
               percentile: playerRank.limitedPercentile,
               leaderboardPlace: playerRank.limitedLeaderboardPlace,
+              classValue: (playerRank as any).limitedClassValue,
             }
           : {
               step: playerRank.constructedStep,
               percentile: playerRank.constructedPercentile,
               leaderboardPlace: playerRank.constructedLeaderboardPlace,
+              classValue: (playerRank as any).constructedClassValue,
             }
         : undefined;
 

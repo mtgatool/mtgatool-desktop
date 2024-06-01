@@ -36,6 +36,7 @@ export const actions = {
   SHOW_POST_SIGNUP: RendererSlice.showPostSignup,
   SET_LOGIN_STATE: RendererSlice.setLoginState,
   SET_DETAILED_LOGS: RendererSlice.setDetailedLogs,
+  SET_ADMIN_PERMISSIONS: RendererSlice.setAdminPermissions,
   SET_LOG_COMPLETION: RendererSlice.setLogCompletion,
   SET_MATCHES_FETCH_STATE: RendererSlice.setMatchesFetchState,
   SET_ARCHIVED: RendererSlice.setArchived,

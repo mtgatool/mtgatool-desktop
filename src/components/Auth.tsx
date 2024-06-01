@@ -11,6 +11,7 @@ import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { LOGIN_AUTH, LOGIN_OK, LOGIN_WAITING } from "../constants";
 import readCards from "../reader/readCards";
+import UICheckAdmin from "../reader/uiCheckAdmin";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
 import checkPassphrase from "../toolDb/checkPassphrase";
@@ -41,6 +42,8 @@ export default function Auth(props: AuthProps) {
   useEffect(() => {
     setTimeout(() => {
       setRefresh(2);
+
+      UICheckAdmin();
     }, 100);
   }, []);
 

@@ -5,6 +5,7 @@ import { overlayTitleToId } from "../common/maps";
 import { LOGIN_OK } from "../constants";
 import readCards from "../reader/readCards";
 import readPlayerId from "../reader/readPlayerid";
+import UICheckAdmin from "../reader/uiCheckAdmin";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import setDbMatch from "../toolDb/setDbMatch";
@@ -84,6 +85,7 @@ export default function mainChannelListeners() {
         type: "SET_DETAILED_LOGS",
         arg: msg.data.value === "ENABLED",
       });
+      UICheckAdmin();
     }
 
     if (msg.data.type === "SET_UUID") {

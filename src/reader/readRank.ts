@@ -52,6 +52,8 @@ export default function readRank(): CombinedRankInfo | undefined {
     ...rank,
     constructedClass: rankClass[rank.constructedClass],
     limitedClass: rankClass[rank.limitedClass],
+    constructedClassValue: rank.constructedClass,
+    limitedClassValue: rank.limitedClass,
   };
 
   return globalStore.rank;
