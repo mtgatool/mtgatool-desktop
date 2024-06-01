@@ -33,6 +33,7 @@ export const rankClass: Record<number, string> = {
   "4": "Platinum",
   "5": "Diamond",
   "6": "Mythic",
+  "7": "Mythic",
 };
 
 interface Entry extends LogEntry {
