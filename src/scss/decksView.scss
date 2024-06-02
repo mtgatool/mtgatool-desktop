@@ -25,6 +25,11 @@
   margin: 16px 0;
   -webkit-transition: all 0.2s ease-in-out;
 
+  &.small {
+    height: 64px;
+    margin: 0 0 16px 0;
+  }
+
   .top-inner {
     height: 32px;
     display: flex;

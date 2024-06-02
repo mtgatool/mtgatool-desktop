@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
 
 import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
+import { ReactComponent as CameraIcon } from "../../../assets/images/svg/camera-solid.svg";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { StatsDeck } from "../../../types/dbTypes";
@@ -48,12 +49,19 @@ const VIEW_REGULAR = 1;
 const VIEW_CHANGES = 2;
 const VIEW_WINRATES = 3;
 
-export default function DeckView(): JSX.Element {
+interface DeckViewProps {
+  openDeckView: (deck: Deck) => void;
+}
+
+export default function DeckView(props: DeckViewProps): JSX.Element {
+  const { openDeckView } = props;
+
   const dispatch = useDispatch();
   const history = useHistory();
   const params = useParams<{ page: string; id: string }>();
 
   const [dbDeck, setDbDeck] = useState<StatsDeck>();
+
   const fullStats = useSelector((state: AppState) => state.mainData.fullStats);
 
   useEffect(() => {
@@ -86,6 +94,9 @@ export default function DeckView(): JSX.Element {
     dbDeck?.mainDeck || [],
     dbDeck?.sideboard || []
   );
+
+  deck.setName(dbDeck?.name || "Deck");
+  deck.tile = dbDeck?.deckTileId || DEFAULT_TILE;
 
   const [deckView, setDeckView] = useState(VIEW_REGULAR);
   const [shuffle, setShuffle] = useState([true]);
@@ -216,6 +227,11 @@ export default function DeckView(): JSX.Element {
                 gridArea: "controls",
               }}
             >
+              <SvgButton
+                svg={CameraIcon}
+                style={{ height: "32px", width: "32px", margin: "auto 16px" }}
+                onClick={() => openDeckView(deck)}
+              />
               <Button
                 style={{ margin: "16px" }}
                 className="button-simple"

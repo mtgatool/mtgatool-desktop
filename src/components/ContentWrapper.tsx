@@ -1,4 +1,4 @@
-import { database } from "mtgatool-shared";
+import { database, Deck } from "mtgatool-shared";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -22,6 +22,7 @@ import getPopupClass from "../utils/getPopupClass";
 import doHistoryFilter from "../utils/tables/doHistoryFilter";
 import vodiFn from "../utils/voidfn";
 import PopupComponent from "./PopupComponent";
+import DeckViewPopup from "./popups/DeckViewPopup";
 import PostSignupPopup from "./PostSignupPopup";
 import AdvancedSearch from "./views/collection/advancedSearch";
 import ViewCollection from "./views/collection/ViewCollection";
@@ -196,6 +197,10 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   const openHistoryStatsPopup = useRef<() => void>(vodiFn);
   const closeHistoryStatsPopup = useRef<() => void>(vodiFn);
 
+  const openDeckView = useRef<() => void>(vodiFn);
+  const closenDeckView = useRef<() => void>(vodiFn);
+  const [deckView, setDeckView] = useState<Deck>(new Deck());
+
   useEffect(() => {
     if (showPostSignup) {
       openPostSignup.current();
@@ -252,6 +257,18 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
         <HistoryStats />
       </PopupComponent>
 
+      <PopupComponent
+        open={false}
+        className={getPopupClass(os)}
+        width="640px"
+        height="100%"
+        openFnRef={openDeckView}
+        closeFnRef={closenDeckView}
+        persistent={false}
+      >
+        <DeckViewPopup deck={deckView} onClose={closenDeckView.current} />
+      </PopupComponent>
+
       <div className="wrapper">
         <div className="wrapper-inner">
           <div className="overflow-ux">
@@ -273,6 +290,10 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
                         openAdvancedCollectionSearch.current
                       }
                       openHistoryStatsPopup={openHistoryStatsPopup.current}
+                      openDeckView={(deck: Deck) => {
+                        setDeckView(deck);
+                        openDeckView.current();
+                      }}
                       datePickerDoShow={datePickerDoShow}
                       matchesData={matchesData}
                     />
@@ -290,6 +311,10 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
                   openAdvancedCollectionSearch={
                     openAdvancedCollectionSearch.current
                   }
+                  openDeckView={(deck: Deck) => {
+                    setDeckView(deck);
+                    openDeckView.current();
+                  }}
                   openHistoryStatsPopup={openHistoryStatsPopup.current}
                   datePickerDoShow={datePickerDoShow}
                   matchesData={matchesData}
