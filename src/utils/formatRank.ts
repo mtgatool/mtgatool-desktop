@@ -2,7 +2,7 @@ import { InternalRankData } from "mtgatool-shared";
 
 // pass in playerData.constructed / limited / historic objects
 export default function formatRank(rank: InternalRankData): string {
-  if (rank.rank === "Mythic") {
+  if (rank.rank === "Mythic" || rank.percentile || rank.leaderboardPlace) {
     if (rank.leaderboardPlace) {
       return `Mythic #${rank.leaderboardPlace}`;
     }

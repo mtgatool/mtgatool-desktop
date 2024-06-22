@@ -9,14 +9,21 @@ export interface RankSmallProps {
 }
 
 export default function RankSmall(props: RankSmallProps): JSX.Element {
-  const { rank, rankTier, style } = props;
+  const { rank: rankData, rankTier, style } = props;
+
+  if (!rankData && !rankTier) return <></>;
+
+  let { rank } = rankData || {};
+
+  if (rankData?.percentile && rankData.percentile !== 0 && !rank)
+    rank = "Mythic";
 
   const getRankStyle = (): React.CSSProperties => {
     return {
       ...(style || {}),
       marginRight: "0px",
       backgroundPosition: `${
-        getRankIndex16(rank?.rank || rankTier || "Unranked") * -16
+        getRankIndex16(rank || rankTier || "Unranked") * -16
       }px 0px`,
     };
   };
@@ -24,7 +31,7 @@ export default function RankSmall(props: RankSmallProps): JSX.Element {
   return (
     <div
       style={getRankStyle()}
-      title={(rank ? formatRank(rank) : rankTier) || "Unranked"}
+      title={(rankData ? formatRank(rankData) : rankTier) || "Unranked"}
       className="ranks-16"
     />
   );

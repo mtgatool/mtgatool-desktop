@@ -31,11 +31,8 @@ export default function readPlayerTest() {
 
   const accountInformation: AccountInformation = data;
 
-  if (
-    accountInformation &&
-    accountInformation.DisplayName
-  ) {
-    return accountInformation.DisplayName
+  if (accountInformation && accountInformation.DisplayName) {
+    return accountInformation.DisplayName;
   }
 
   return null;
