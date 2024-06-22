@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import readPlayerTest from "../../../reader/readPlayerTest";
 
 function findMTGA(): boolean {
   // eslint-disable-next-line no-undef
@@ -21,14 +22,17 @@ export default function ReaderStatus() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const isAdmin = checkAdmin();
-      if (!isAdmin) {
-        setReaderStatus("err");
-        setErrorText("App is not running with admin/elevated privileges");
-        return;
-      }
       const found = findMTGA();
+      const isAdmin = checkAdmin();
+      const player = readPlayerTest();
+
       if (found) {
+        if (!player && !isAdmin) {
+          setReaderStatus("err");
+          setErrorText("App is not running with admin/elevated privileges");
+          return;
+        }
+
         setReaderStatus("ok");
       } else {
         setReaderStatus("err");
