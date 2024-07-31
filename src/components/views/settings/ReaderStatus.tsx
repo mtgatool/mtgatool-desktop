@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import readPlayerTest from "../../../reader/readPlayerTest";
 
 function findMTGA(): boolean {
