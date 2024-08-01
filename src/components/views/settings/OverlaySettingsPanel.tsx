@@ -54,12 +54,13 @@ interface OverlaysTopNavProps {
 }
 
 function OverlaysTopNav(props: OverlaysTopNavProps): JSX.Element {
+  const { current, setCurrent } = props;
   const overlays = [0, 1, 2, 3, 4];
 
-  function setCurrentOverlaySettings(current: number): void {
+  function setCurrentOverlaySettings(curr: number): void {
     reduxAction(store.dispatch, {
       type: "SET_SETTINGS",
-      arg: { settingsOverlaySection: current },
+      arg: { settingsOverlaySection: curr },
     });
   }
 
@@ -70,14 +71,14 @@ function OverlaysTopNav(props: OverlaysTopNavProps): JSX.Element {
           <div
             onClick={(): void => {
               setCurrentOverlaySettings(id);
-              props.setCurrent(id);
+              setCurrent(id);
             }}
             key={id}
             style={{
               borderBottomColor: `var(--color-${COLORS_ALL[id]})`,
             }}
             className={`overlay-settings-nav ${
-              props.current == id ? "item-selected" : ""
+              current == id ? "item-selected" : ""
             }`}
           >
             {`Overlay ${id + 1}`}

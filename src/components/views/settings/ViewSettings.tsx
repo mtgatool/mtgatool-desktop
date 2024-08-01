@@ -37,7 +37,7 @@ interface SettingsNavProps {
 function SettingsNav(props: SettingsNavProps): JSX.Element {
   const { id, title, currentTab, callback } = props;
   const click = (): void => {
-    callback(props.id);
+    callback(id);
   };
 
   return (

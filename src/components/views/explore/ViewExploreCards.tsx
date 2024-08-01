@@ -138,9 +138,11 @@ export default function ViewExploreCards(props: ViewExploreCardsProps) {
               const cardObj = database.card(grpId);
               if (cardObj) {
                 return (
-                  <Flex style={{ flexDirection: "column" }}>
+                  <Flex
+                    key={`${b.id}-bestcards-${ind}`}
+                    style={{ flexDirection: "column" }}
+                  >
                     <img
-                      key={`${b.id}-bestcards-${ind}`}
                       onMouseEnter={(): void => {
                         hoverCard(grpId, true);
                       }}
