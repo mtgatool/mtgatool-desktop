@@ -15,7 +15,7 @@ jobs:
     - name: "Setup node"
       uses: actions/setup-node@v1
       with:
-        node-version: '16'
+        node-version: '18'
     - name: "Checkout source code"
       uses: "actions/checkout@v2"
 
