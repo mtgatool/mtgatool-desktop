@@ -2,7 +2,7 @@ name: "Release"
 
 on:
   push:
-    tags: 'v*'
+    tags: "v*"
 
 jobs:
   build-job:
@@ -12,61 +12,70 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-2019, macos-latest]
     steps:
-    - name: "Setup node"
-      uses: actions/setup-node@v1
-      with:
-        node-version: '18'
-    - name: "Checkout source code"
-      uses: "actions/checkout@v2"
+      - name: "Setup node"
+        uses: actions/setup-node@v1
+        with:
+          node-version: "18"
+      - name: "Checkout source code"
+        uses: "actions/checkout@v2"
 
-    - name: "Install modules"
-      run: "npm run install:ci"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
 
-    - name: "Test"
-      run: "npm run jest:ci"
+      - name: Install Python setup tools
+        run: |
+          pip install setuptools
 
-    - name: "Generate build information json"
-      run: "node generateInfo.js"
+      - name: "Install modules"
+        run: "npm run install:ci"
 
-    - name: "Install distutils"
-      run: "pip install setuptools"
-    
-    - name: "Build release, create GitHub release and upload assets (electron-builder)"
-      run: "npm run release"
-      env:
-        GH_TOKEN: ${{ github.token }}
-        # create release if it doesn't exist
-        CI_BUILD_TAG: 1
+      - name: "Test"
+        run: "npm run jest:ci"
 
-    - name: Gets latest created release info
-      id: latest_release_info
-      uses: jossef/action-latest-release-info@v1.1.0
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-  
-    - name: "Package JSON"
-      run: |
-        echo "INFO_VERSION=$(jq -r .version ./src/info.json)" >> $GITHUB_ENV
-        echo "INFO_BRANCH=$(jq -r .branch ./src/info.json)" >> $GITHUB_ENV
-        echo "INFO_TIMESTAMP=$(jq -r .timestamp ./src/info.json)" >> $GITHUB_ENV
-  
-    - name: Create installer
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        cp dist/*.AppImage linux-installer
-        cd linux-installer
-        chmod +x *.AppImage
-        chmod +x *.sh
-        tar czvf "../dist/mtgatool-desktop-linux-installer.tar.gz" *
-        cd ..
+      - name: "Generate build information json"
+        run: "node generateInfo.js"
 
-    - name: Upload Release Asset
-      if: matrix.os == 'ubuntu-latest'
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.latest_release_info.outputs.upload_url }}
-        asset_path: ./dist/mtgatool-desktop-linux-installer.tar.gz
-        asset_name: mtgatool-desktop-linux-installer.tar.gz
-        asset_content_type: application/gzip
+      - name: "Install distutils"
+        run: "pip install setuptools"
+
+      - name: "Build release, create GitHub release and upload assets (electron-builder)"
+        run: "npm run release"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # create release if it doesn't exist
+          CI_BUILD_TAG: 1
+
+      - name: Gets latest created release info
+        id: latest_release_info
+        uses: jossef/action-latest-release-info@v1.1.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: "Package JSON"
+        run: |
+          echo "INFO_VERSION=$(jq -r .version ./src/info.json)" >> $GITHUB_ENV
+          echo "INFO_BRANCH=$(jq -r .branch ./src/info.json)" >> $GITHUB_ENV
+          echo "INFO_TIMESTAMP=$(jq -r .timestamp ./src/info.json)" >> $GITHUB_ENV
+
+      - name: Create installer
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          cp dist/*.AppImage linux-installer
+          cd linux-installer
+          chmod +x *.AppImage
+          chmod +x *.sh
+          tar czvf "../dist/mtgatool-desktop-linux-installer.tar.gz" *
+          cd ..
+
+      - name: Upload Release Asset
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.latest_release_info.outputs.upload_url }}
+          asset_path: ./dist/mtgatool-desktop-linux-installer.tar.gz
+          asset_name: mtgatool-desktop-linux-installer.tar.gz
+          asset_content_type: application/gzip
