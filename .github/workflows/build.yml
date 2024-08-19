@@ -17,6 +17,15 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: '18'
+      
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+
+    - name: Install Python setup tools
+      run: |
+            pip install setuptools
 
     - name: "Checkout source code"
       uses: "actions/checkout@v2"
