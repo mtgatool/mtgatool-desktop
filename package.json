@@ -206,5 +206,8 @@
   },
   "optionalDependencies": {
     "dmg-license": "^1.0.11"
+  },
+  "resolutions": {
+    "nan": "2.18.0"
   }
 }
