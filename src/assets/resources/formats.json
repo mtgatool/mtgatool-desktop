@@ -9721,30 +9721,20 @@
     {
       "name": "Standard_Recent",
       "legalSets": [
-        "WOE",
-        "MOM",
-        "MAT",
-        "DMU",
-        "ONE",
-        "BRO",
-        "LCI",
-        "MKM",
+        "BLB",
         "OTJ",
         "BIG",
-        "BLB"
+        "MKM",
+        "LCI",
+        "WOE"
       ],
       "filterSets": [
-        "WOE",
-        "MOM",
-        "MAT",
-        "DMU",
-        "ONE",
-        "BRO",
-        "LCI",
-        "MKM",
+        "BLB",
         "OTJ",
         "BIG",
-        "BLB"
+        "MKM",
+        "LCI",
+        "WOE"
       ],
       "bannedTitleIds": [
         557819,
