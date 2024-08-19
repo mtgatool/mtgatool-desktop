@@ -1,8 +1,8 @@
 name: "Build"
 
-on: 
+on:
   push:
-    branches: '**'
+    branches: "**"
 
 jobs:
   build-job:
@@ -11,34 +11,33 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-2019, macos-latest]
-    
+
     steps:
-    - name: "Setup node"
-      uses: actions/setup-node@v1
-      with:
-        node-version: '18'
-      
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-        cache: 'pip'
+      - name: "Setup node"
+        uses: actions/setup-node@v1
+        with:
+          node-version: "18"
 
-    - name: Install Python setup tools
-      run: |
-            pip install setuptools
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
 
-    - name: "Checkout source code"
-      uses: "actions/checkout@v2"
+      - name: Install Python setup tools
+        run: |
+          pip install setuptools
 
-    - name: "Install modules"
-      run: "npm run install:ci"
+      - name: "Checkout source code"
+        uses: "actions/checkout@v2"
 
-    - name: "Test"
-      run: "npm run jest:ci"
-    
-    - name: "Install distutils"
-      run: "pip install setuptools"
+      - name: "Install modules"
+        run: "npm run install:ci"
 
-    - name: "Build (npm)"
-      run: "npm run build"
+      - name: "Test"
+        run: "npm run jest:ci"
 
+      - name: "Install distutils"
+        run: "pip install setuptools"
+
+      - name: "Build (npm)"
+        run: "npm run build"
