@@ -6,6 +6,7 @@ import {
   COLORS_ALL,
   DEFAULT_TILE,
   FACE_ADVENTURE_MAIN,
+  FACE_ROOM_MAIN,
   FACE_SPLIT_FULL,
   LANDS_HACK,
 } from "../constants";
@@ -124,7 +125,9 @@ function CostSymbols(props: {
   const { card, dfcCard } = props;
   const costSymbols: JSX.Element[] = [];
   let prevc = true;
-  const hasSplitCost = card.LinkedFaceType === FACE_SPLIT_FULL;
+  const hasSplitCost =
+    card.LinkedFaceType === FACE_SPLIT_FULL ||
+    card.LinkedFaceType === FACE_ROOM_MAIN;
 
   const dfcSeparator = "//";
   if (card.ManaCost) {
@@ -299,7 +302,10 @@ export default function CardTile(props: CardTileProps): JSX.Element {
 
   const handleMouseClick = useCallback((): void => {
     let _card = card;
-    if (card?.LinkedFaceType === FACE_SPLIT_FULL) {
+    if (
+      card?.LinkedFaceType === FACE_SPLIT_FULL ||
+      card?.LinkedFaceType === FACE_ROOM_MAIN
+    ) {
       _card = dfcCard || card;
     }
     openScryfallCard(_card);

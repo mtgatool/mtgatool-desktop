@@ -636,6 +636,9 @@ export const FACE_ADVENTURE = 7;
 export const FACE_ADVENTURE_MAIN = 8;
 export const FACE_MODAL_BACK = 9;
 export const FACE_MODAL_FRONT = 10;
+export const FACE_SPECIALIZE_BACK = 11;
+export const FACE_ROOM_MAIN = 16;
+export const FACE_ROOM = 15;
 
 export const COLORS_ALL = ["w", "u", "b", "r", "g", "c", "m"] as const;
 export const COLORS_BRIEF = ["w", "u", "b", "r", "g"] as const;

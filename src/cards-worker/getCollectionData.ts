@@ -1,5 +1,4 @@
 import { CardsData } from "../types/collectionTypes";
-import allFormats from "./allFormats";
 import Colors from "./colors";
 import getCardBanned from "./getCardBanned";
 import getCardFormats from "./getCardFormats";
@@ -46,6 +45,7 @@ const FACE_ADVENTURE = 7;
 const FACE_MODAL_BACK = 9;
 const FACE_DFC_BACK = 1;
 const FACE_SPLIT = 5;
+const FACE_ROOM = 15;
 
 /**
  * Creates a representation of the database so its easier to filter and search trough it
@@ -70,6 +70,7 @@ export default function getCollectionData(
         card.LinkedFaceType !== 3 && // meld
         card.LinkedFaceType !== FACE_ADVENTURE &&
         card.LinkedFaceType !== FACE_SPLIT &&
+        card.LinkedFaceType !== FACE_ROOM &&
         card.LinkedFaceType !== FACE_MODAL_BACK &&
         card.LinkedFaceType !== FACE_SPECIALIZE_BACK
     )
