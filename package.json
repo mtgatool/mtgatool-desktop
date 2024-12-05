@@ -32,7 +32,7 @@
     "install:ci": "npm install && npm install @craco/craco",
     "proto:model": "node node_modules/protobufjs/bin/pbjs src/proto/messages.proto > src/proto/model.json",
     "proto:greTypes": "node src/proto/proto2typescript/index.js",
-    "proto:eslint": "eslint src/types/greTypes.ts --fix",
+    "proto:eslint": "eslint src/types/greTypes.ts --fix --no-ignore",
     "proto": "npm-run-all proto:model proto:greTypes proto:eslint"
   },
   "dependencies": {

@@ -220,7 +220,7 @@ export interface CLIPSConfiguration {
   logFileAppend?: boolean;
 }
 
-export interface CancelActionReq {}
+export interface CancelActionReq { }
 
 export interface CardConfig {
   count?: number;
@@ -625,7 +625,7 @@ export interface GRECancelScheduledMessage {
   timerId?: number;
 }
 
-export interface GRECheckpointRequest {}
+export interface GRECheckpointRequest { }
 
 export interface GREConfigRequest {
   greConfiguration?: GREConfiguration;
@@ -641,7 +641,7 @@ export interface GRECreateRequest {
   matchID?: string;
 }
 
-export interface GREDestroyRequest {}
+export interface GREDestroyRequest { }
 
 export interface GREElapseTimeRequest {
   timerId?: number;
@@ -678,7 +678,7 @@ export interface GREStartMatchRequest {
   matchConfig?: MatchConfig;
 }
 
-export interface GRETickMessage {}
+export interface GRETickMessage { }
 
 export interface GRETimeoutMessage {
   seatId?: number;
@@ -942,6 +942,12 @@ export interface KeyValuePair {
   key?: string;
   singleValue?: SingleValue;
   repeatedValue?: RepeatedValue;
+}
+
+export enum EnumValueOneofCase {
+  None = 0,
+  SingleValue = 2,
+  RepeatedValue = 3,
 }
 
 export interface KeyValuePairInfo {
@@ -1269,6 +1275,11 @@ export interface PromptParameter {
   numberValue?: number;
   promptId?: number;
 }
+export enum EnumValueOneofCase {
+  Reference = 3,
+  NumberValue = 5,
+  PromptId = 7,
+}
 
 export interface Reference {
   type?: ReferenceType;
@@ -1474,7 +1485,7 @@ export interface ServiceFabricServiceInfo {
   gatewayUrl?: string;
 }
 
-export interface ServiceInfoRequest {}
+export interface ServiceInfoRequest { }
 
 export interface SetSettingsReq {
   settings?: SettingsMessage;
@@ -1523,7 +1534,6 @@ export interface SingleValue {
   doubleValue?: number;
 }
 export enum EnumValueOneofCase {
-  None = 0,
   Uint32Value = 1,
   Int32Value = 2,
   Uint64Value = 3,
@@ -2173,7 +2183,8 @@ export enum EnumClientToMatchServiceMessageType {
   ClientToMatchServiceMessageType_EchoRequest = 8,
 }
 
-export type ClientToMatchServiceMessageType = keyof typeof EnumClientToMatchServiceMessageType;
+export type ClientToMatchServiceMessageType =
+  keyof typeof EnumClientToMatchServiceMessageType;
 
 export enum EnumClientType {
   ClientType_Invalid = 0,
@@ -2730,7 +2741,8 @@ export enum EnumManaPaymentConditionType {
   ManaPaymentConditionType_Uniformity = 4,
 }
 
-export type ManaPaymentConditionType = keyof typeof EnumManaPaymentConditionType;
+export type ManaPaymentConditionType =
+  keyof typeof EnumManaPaymentConditionType;
 
 export enum EnumManaPaymentStrategyType {
   ManaPaymentStrategyType_None = 0,
@@ -2779,7 +2791,8 @@ export enum EnumMatchCompletedReasonType {
   MatchCompletedReasonType_UnknownServerError = 40,
 }
 
-export type MatchCompletedReasonType = keyof typeof EnumMatchCompletedReasonType;
+export type MatchCompletedReasonType =
+  keyof typeof EnumMatchCompletedReasonType;
 
 export enum EnumMatchGameRoomStateType {
   MatchGameRoomStateType_Invalid = 0,
