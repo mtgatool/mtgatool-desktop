@@ -1,3 +1,4 @@
+
 const WebpackReactComponentNamePlugin = require("webpack-react-component-name");
 const ModuleReplacement = require("./module-resolver-file");
 const eslintConfig = require("./.eslintrc");
@@ -28,5 +29,10 @@ module.exports = {
   },
   eslint: {
     configure: eslintConfig,
+  },
+  jest: {
+    configure: {
+      setupFiles: ['./jest.setup.js']
+    },
   },
 };

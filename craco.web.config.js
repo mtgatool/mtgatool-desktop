@@ -24,4 +24,9 @@ module.exports = {
       },
     },
   },
+  jest: {
+    configure: {
+      setupFiles: ['./jest.setup.js']
+    },
+  },
 };

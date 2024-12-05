@@ -86,7 +86,7 @@ describe("utils", () => {
     expect(getEventPrettyName("Historic_Shakeup_20200606")).toBe(
       "Historic Shakeup (June 2020)"
     );
-    expect(getEventPrettyName("Play_Brawl")).toBe("Play Brawl");
+    expect(getEventPrettyName("Play_Brawl")).toBe("Brawl");
     expect(getEventPrettyName("Constructed_Event_2020")).toBe(
       "Standard Event 2020"
     );
