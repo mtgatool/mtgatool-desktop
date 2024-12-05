@@ -1,5 +1,4 @@
 import _ from "lodash";
-import { InternalDraftv2 } from "mtgatool-shared";
 
 import { overlayTitleToId } from "../common/maps";
 import { LOGIN_OK } from "../constants";
@@ -14,6 +13,7 @@ import upsertDbInventory from "../toolDb/upsertDbInventory";
 import upsertDbLiveMatch from "../toolDb/upsertDbLiveMatch";
 import upsertDbRank from "../toolDb/upsertDbRank";
 import { putData } from "../toolDb/worker-wrapper";
+import { InternalDraftv2 } from "../types";
 import LogEntry from "../types/logDecoder";
 import bcConnect from "../utils/bcConnect";
 import globalData from "../utils/globalData";

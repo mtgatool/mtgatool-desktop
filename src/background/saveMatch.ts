@@ -1,20 +1,13 @@
-import {
-  constants,
-  getJumpstartThemes,
-  InternalMatch,
-  JumpstartThemes,
-  themeCards,
-} from "mtgatool-shared";
-import { ResultSpec } from "mtgatool-shared/dist/types/greTypes";
-
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
+import { DEFAULT_TILE } from "../constants";
+import { InternalMatch, JumpstartThemes } from "../types";
+import { ResultSpec } from "../types/greTypes";
 import remote from "../utils/electron/remoteWrapper";
+import getJumpstartThemes, { themeCards } from "../utils/getJumpstartThemes";
 import getToolVersion from "../utils/getToolVersion";
 import getOpponentDeck from "./getOpponentDeck";
 import globalStore from "./store";
 import { setMatchStarted } from "./store/currentMatchStore";
-
-const { DEFAULT_TILE } = constants;
 
 function matchResults(results: ResultSpec[]): number[] {
   let playerWins = 0;

@@ -1,7 +1,8 @@
 /* eslint-disable react/no-array-index-key */
-import { constants, database, Deck } from "mtgatool-shared";
 
-const { MANA_COLORS } = constants;
+import { MANA_COLORS } from "../constants";
+import database from "../utils/mtga/database";
+import Deck from "../utils/mtga/deck";
 
 // Should proably be in constants
 const mana: Record<string, string> = {};

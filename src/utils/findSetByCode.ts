@@ -1,4 +1,4 @@
-import { database } from "mtgatool-shared";
+import database from "./mtga/database";
 
 export default function findSetByCode(code: string) {
   const name = database.setNames[code];

@@ -4,14 +4,15 @@ import {
   base64ToBinaryDocument,
   signData,
 } from "mtgatool-db";
-import { database, InternalDraftv2 } from "mtgatool-shared";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import { AppState } from "../../../redux/stores/rendererStore";
+import { InternalDraftv2 } from "../../../types";
 import { DbliveDraftV1 } from "../../../types/dbTypes";
+import database from "../../../utils/mtga/database";
 import CardTile from "../../CardTile";
 import CardLiveDraft from "./CardLiveDraft";
 

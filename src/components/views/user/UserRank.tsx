@@ -1,7 +1,7 @@
-import { getRankIndex, InternalRankData } from "mtgatool-shared";
-
 import { CombinedRankInfo } from "../../../background/onLabel/InEventGetCombinedRankInfo";
+import { InternalRankData } from "../../../types";
 import formatRank from "../../../utils/formatRank";
+import getRankIndex from "../../../utils/getRankIndex";
 
 interface TopRankProps {
   rank: CombinedRankInfo | null;

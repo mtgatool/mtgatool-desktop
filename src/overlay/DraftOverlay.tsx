@@ -1,17 +1,10 @@
-import {
-  Colors,
-  database,
-  DbCardDataV2,
-  InternalDraftv2,
-} from "mtgatool-shared";
-import {
-  DRAFT_RANKS,
-  DRAFT_RANKS_LOLA,
-} from "mtgatool-shared/dist/shared/constants";
-
 import CardTile, { QuantityRank } from "../components/CardTile";
+import { DRAFT_RANKS, DRAFT_RANKS_LOLA } from "../constants";
+import { DbCardDataV2, InternalDraftv2 } from "../types";
 import { DbDraftVote } from "../types/dbTypes";
 import getCardTypeSort from "../utils/getCardTypeSort";
+import Colors from "../utils/mtga/colors";
+import database from "../utils/mtga/database";
 
 interface DraftOverlayProps {
   state: InternalDraftv2;

@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Format, InternalDraftv2 } from "mtgatool-shared";
 
 import {
   LOGIN_AUTH,
@@ -8,6 +7,7 @@ import {
   LOGIN_OK,
   LOGIN_WAITING,
 } from "../../constants";
+import { Format, InternalDraftv2 } from "../../types";
 import setLocalSetting from "../../utils/setLocalSetting";
 
 export interface Peer {

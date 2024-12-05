@@ -1,8 +1,7 @@
-import { Deck } from "mtgatool-shared";
-import { DEFAULT_TILE } from "mtgatool-shared/dist/shared/constants";
-
 import { ReactComponent as Close } from "../../assets/images/svg/close.svg";
+import { DEFAULT_TILE } from "../../constants";
 import { getCardArtCrop } from "../../utils/getCardArtCrop";
+import Deck from "../../utils/mtga/deck";
 import DeckColorsBar from "../DeckColorsBar";
 import DeckList from "../DeckList";
 import ManaCost from "../ManaCost";

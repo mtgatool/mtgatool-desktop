@@ -1,7 +1,7 @@
-import { Chances, constants } from "mtgatool-shared";
 import { useCallback } from "react";
 
-const { CARD_TYPES } = constants;
+import { CARD_TYPES } from "../constants";
+import Chances from "../types/chances";
 
 interface SampleSizePanelProps {
   cardOdds: Chances;

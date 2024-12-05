@@ -1,11 +1,11 @@
 /* eslint-disable no-param-reassign */
 import Automerge from "automerge";
 import { base64ToBinaryDocument } from "mtgatool-db";
-import { InternalDraftv2 } from "mtgatool-shared";
 
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { LOGIN_OK } from "../constants";
 import store from "../redux/stores/rendererStore";
+import { InternalDraftv2 } from "../types";
 import { DbliveDraftV1 } from "../types/dbTypes";
 import getUserNamespacedKey from "./getUserNamespacedKey";
 

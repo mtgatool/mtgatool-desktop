@@ -1,19 +1,16 @@
 /* eslint-disable no-loop-func */
 /* eslint-disable react/no-array-index-key */
 import _ from "lodash";
-import {
-  CardObject,
-  cardType,
-  database,
-  DbCardDataV2,
-  Deck,
-} from "mtgatool-shared";
 import { Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
+import { CardObject, DbCardDataV2 } from "../../../types";
+import { cardType } from "../../../utils/cardTypes";
 import { getCardImage } from "../../../utils/getCardArtCrop";
+import database from "../../../utils/mtga/database";
+import Deck from "../../../utils/mtga/deck";
 import DeckTypesStats from "../../DeckTypesStats";
 import Button from "../../ui/Button";
 import Section from "../../ui/Section";

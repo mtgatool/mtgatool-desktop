@@ -1,5 +1,4 @@
-import { EventJoinPodmaking } from "mtgatool-shared";
-
+import { EventJoinPodmaking } from "../../types";
 import LogEntry from "../../types/logDecoder";
 
 interface Entry extends LogEntry {

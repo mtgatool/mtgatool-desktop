@@ -1,9 +1,7 @@
-import { Chances, constants, Deck } from "mtgatool-shared";
-
-import { typeIcons } from "../../../constants";
+import { CARD_TYPE_CODES, CARD_TYPES, typeIcons } from "../../../constants";
+import Chances from "../../../types/chances";
 import getDeckTypesAmount from "../../../utils/getDeckTypesAmount";
-
-const { CARD_TYPES, CARD_TYPE_CODES } = constants;
+import Deck from "../../../utils/mtga/deck";
 
 export default function LiveDeckTypesStats(props: {
   className?: string;

@@ -1,8 +1,8 @@
 /* eslint-disable react/no-array-index-key */
-import { constants } from "mtgatool-shared";
+
 import { Fragment } from "react";
 
-const { WHITE, BLUE, BLACK, RED, GREEN, COLORLESS } = constants;
+import { BLACK, BLUE, COLORLESS, GREEN, RED, WHITE } from "../constants";
 
 const manaClasses: string[] = [];
 manaClasses[WHITE] = "mana-w";

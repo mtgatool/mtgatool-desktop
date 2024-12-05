@@ -4,3 +4,5 @@ node_modules*
 *.svg
 *.png
 /src/info.json
+/src/background/greToClientInterpreter.ts
+/src/types/greTypes.ts

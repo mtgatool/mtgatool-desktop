@@ -1,7 +1,7 @@
-import { Colors, database } from "mtgatool-shared";
-
 import { makeDefaultUUIDData } from "../../../redux/slices/mainDataSlice";
 import store from "../../../redux/stores/rendererStore";
+import Colors from "../../../utils/mtga/colors";
+import database from "../../../utils/mtga/database";
 import SetStats from "./SetsStats";
 
 export const ALL_CARDS = "All cards";

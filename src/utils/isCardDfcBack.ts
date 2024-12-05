@@ -1,8 +1,5 @@
-import { constants } from "mtgatool-shared";
-
+import { FACE_DFC_BACK, FACE_MODAL_BACK } from "../constants";
 import database from "./database-wrapper";
-
-const { FACE_DFC_BACK, FACE_MODAL_BACK } = constants;
 
 export default function isCardDfcBack(grpId: number) {
   const cardObj = database.card(grpId);

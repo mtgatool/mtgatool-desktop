@@ -1,6 +1,5 @@
-import { DEFAULT_TILE } from "mtgatool-shared/dist/shared/constants";
-
 import notFound from "../assets/images/notfound.png";
+import { DEFAULT_TILE } from "../constants";
 import database from "./database-wrapper";
 import { getCardImage } from "./getCardArtCrop";
 

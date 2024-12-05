@@ -1,5 +1,7 @@
-import { Deck, getDeckColorsAmmount } from "mtgatool-shared";
 import { Fragment, useCallback } from "react";
+
+import getDeckColorsAmmount from "../utils/getDeckColorsAmmount";
+import Deck from "../utils/mtga/deck";
 
 interface DeckColorsBarProps {
   deck: Deck;

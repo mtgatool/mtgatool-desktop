@@ -1,6 +1,5 @@
 /* eslint-disable no-nested-ternary */
 import { BrowserWindow } from "electron";
-import { COLORS_ALL } from "mtgatool-shared/dist/shared/constants";
 import { CSSProperties, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -13,6 +12,7 @@ import { ReactComponent as WinMaximize } from "../assets/images/svg/win-maximize
 import { ReactComponent as WinMinimize } from "../assets/images/svg/win-minimize.svg";
 import { ReactComponent as WinRestore } from "../assets/images/svg/win-restore.svg";
 import { overlayTitleToId } from "../common/maps";
+import { COLORS_ALL } from "../constants";
 import store, { AppState } from "../redux/stores/rendererStore";
 import { ALL_OVERLAYS, WINDOW_MAIN } from "../types/app";
 import getWindowTitle from "../utils/electron/getWindowTitle";

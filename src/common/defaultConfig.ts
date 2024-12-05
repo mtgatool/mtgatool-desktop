@@ -1,17 +1,15 @@
-import { CardQuality, constants } from "mtgatool-shared";
-
-import electron from "../utils/electron/electronWrapper";
-import remote from "../utils/electron/remoteWrapper";
-
-const {
+import {
   COLLECTION_CARD_MODE,
   MATCHES_LIST_MODE,
-  OVERLAY_SEEN,
   OVERLAY_DRAFT,
   OVERLAY_FULL,
   OVERLAY_LOG,
   OVERLAY_MIXED,
-} = constants;
+  OVERLAY_SEEN,
+} from "../constants";
+import { CardQuality } from "../types";
+import electron from "../utils/electron/electronWrapper";
+import remote from "../utils/electron/remoteWrapper";
 
 let primaryX = 0;
 let primaryY = 0;

@@ -1,7 +1,7 @@
-import { database, Deck } from "mtgatool-shared";
-
 import store from "../redux/stores/rendererStore";
 import { defaultCardsData } from "../types/dbTypes";
+import database from "./mtga/database";
+import Deck from "./mtga/deck";
 
 export default function getWildcardsMissing(
   deck: Deck,

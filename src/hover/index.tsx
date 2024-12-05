@@ -1,5 +1,4 @@
 import { BrowserWindow } from "electron";
-import { Chances, constants } from "mtgatool-shared";
 import {
   CSSProperties,
   useCallback,
@@ -13,6 +12,7 @@ import NoCard from "../assets/images/nocard.png";
 import { ChannelMessage } from "../broadcastChannel/channelMessages";
 import { Settings } from "../common/defaultConfig";
 import { CARD_SIZE_RATIO } from "../common/static";
+import { LANDS_HACK } from "../constants";
 import useTransparentFix from "../hooks/useTransparentFix";
 import GroupedLandsDetails from "../overlay/GroupedLandsDetails";
 import {
@@ -24,6 +24,7 @@ import {
   WINDOW_OVERLAY_3,
   WINDOW_OVERLAY_4,
 } from "../types/app";
+import Chances from "../types/chances";
 import bcConnect from "../utils/bcConnect";
 import electron from "../utils/electron/electronWrapper";
 import remote from "../utils/electron/remoteWrapper";
@@ -33,8 +34,6 @@ import { getCardImage } from "../utils/getCardArtCrop";
 import getLocalSetting from "../utils/getLocalSetting";
 import isCardDfc from "../utils/isCardDfc";
 import vodiFn from "../utils/voidfn";
-
-const { LANDS_HACK } = constants;
 
 export default function Hover() {
   useTransparentFix();

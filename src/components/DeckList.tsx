@@ -1,13 +1,10 @@
 /* eslint-disable react/no-array-index-key */
 import _ from "lodash";
-import {
-  CardObject,
-  cardType,
-  database,
-  DbCardDataV2,
-  Deck,
-} from "mtgatool-shared";
 
+import { CardObject, DbCardDataV2 } from "../types";
+import { cardType } from "../utils/cardTypes";
+import database from "../utils/mtga/database";
+import Deck from "../utils/mtga/deck";
 import CardTile from "./CardTile";
 import Separator from "./Separator";
 

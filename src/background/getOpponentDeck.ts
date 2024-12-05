@@ -1,5 +1,5 @@
-import { Deck, InternalDeck } from "mtgatool-shared";
-
+import { InternalDeck } from "../types";
+import Deck from "../utils/mtga/deck";
 import globalStore from "./store";
 
 /*

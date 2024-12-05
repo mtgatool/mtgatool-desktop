@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-import { Deck } from "mtgatool-shared";
-import { ClientToGREMessage } from "mtgatool-shared/dist/types/greTypes";
-import LogEntry from "mtgatool-shared/dist/types/logDecoder";
-
+import { ClientToGREMessage } from "../../types/greTypes";
+import LogEntry from "../../types/logDecoder";
+import Deck from "../../utils/mtga/deck";
 import normaliseFields from "../../utils/normaliseFields";
 import globalStore from "../store";
 import { setOnThePlay } from "../store/currentMatchStore";

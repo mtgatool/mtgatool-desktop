@@ -1,6 +1,5 @@
-import { database } from "mtgatool-shared";
-
 import notFound from "../../../assets/images/notfound.png";
+import database from "../../../utils/mtga/database";
 import CompletionProgressBar from "./CompletionProgressBar";
 import SetStats from "./SetsStats";
 

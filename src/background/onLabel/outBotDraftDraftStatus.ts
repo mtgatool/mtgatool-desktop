@@ -1,8 +1,8 @@
 /* eslint-disable radix */
-import { getSetInEventId } from "mtgatool-shared";
 
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import LogEntry from "../../types/logDecoder";
+import getSetInEventId from "../../utils/getSetInEventId";
 import globalStore from "../store";
 import { resetCurrentDraft, setDraftData } from "../store/currentDraftStore";
 

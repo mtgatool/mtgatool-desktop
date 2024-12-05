@@ -1,11 +1,10 @@
 /* eslint-disable no-nested-ternary */
 import _ from "lodash";
-import { constants, MissingWildcards } from "mtgatool-shared";
 import { Fragment } from "react";
 
+import { CARD_RARITIES } from "../constants";
+import { MissingWildcards } from "../types";
 import getBoosterCountEstimate from "../utils/getBoosterCountEstimate";
-
-const { CARD_RARITIES } = constants;
 
 const wcIcon: Record<string, string> = {};
 wcIcon.common = "wc-common";

@@ -1,8 +1,9 @@
-import { cardHasType, DbCardDataV2 } from "mtgatool-shared";
 import { useSelector } from "react-redux";
 
 import { AppState } from "../redux/stores/rendererStore";
+import { DbCardDataV2 } from "../types";
 import { defaultCardsData } from "../types/dbTypes";
+import { cardHasType } from "../utils/cardTypes";
 
 interface OwnershipProps {
   owned: number;

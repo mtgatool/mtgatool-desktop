@@ -1,6 +1,5 @@
-import { Deck } from "mtgatool-shared";
-
 import getWildcardsMissing from "./getWildcardsMissing";
+import Deck from "./mtga/deck";
 
 export default function getCardsMissingCount(
   deck: Deck,

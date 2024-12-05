@@ -1,6 +1,7 @@
-import { InventoryUpdate, sha1 } from "mtgatool-shared";
+import { sha1 } from "mtgatool-db";
 
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
+import { InventoryUpdate } from "../../types";
 import LogEntry from "../../types/logDecoder";
 
 interface EntryJson {

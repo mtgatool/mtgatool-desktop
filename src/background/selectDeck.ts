@@ -1,5 +1,4 @@
-import { Deck } from "mtgatool-shared";
-
+import Deck from "../utils/mtga/deck";
 import globalStore from "./store";
 
 export default function selectDeck(selectedDeck: Deck): void {

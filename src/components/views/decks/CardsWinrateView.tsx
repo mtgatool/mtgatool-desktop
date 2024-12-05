@@ -1,20 +1,18 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable radix */
-import {
-  CardObject,
-  compareCards,
-  database,
-  DbCardDataV2,
-  Deck,
-} from "mtgatool-shared";
+
 import { useMemo, useState } from "react";
 import { useSortBy, useTable } from "react-table";
 
+import { CardObject, DbCardDataV2 } from "../../../types";
 import { CardWinrateData, StatsDeck } from "../../../types/dbTypes";
 import { AggregatedStats } from "../../../utils/aggregateStats";
+import compareCards from "../../../utils/compareCards";
 import getWinrateClass from "../../../utils/getWinrateClass";
 import getWinrateValue from "../../../utils/getWinrateValue";
+import database from "../../../utils/mtga/database";
+import Deck from "../../../utils/mtga/deck";
 import CardTile from "../../CardTile";
 import Button from "../../ui/Button";
 import Section from "../../ui/Section";
@@ -215,18 +213,18 @@ export default function CardsWinratesView(
     allVStats.id = v.id;
     allVStats.deckTileId = v.deckTileId;
     allVStats.name = v.name;
-    v.mainDeck.forEach((c) => {
+    v.mainDeck.forEach((c: CardObject) => {
       let found = false;
-      allVStats.mainDeck.forEach((cc) => {
+      allVStats.mainDeck.forEach((cc: CardObject) => {
         if (cc.id === c.id) found = true;
       });
 
       if (!found) allVStats.mainDeck.push(c);
     });
 
-    v.sideboard.forEach((c) => {
+    v.sideboard.forEach((c: CardObject) => {
       let found = false;
-      allVStats.sideboard.forEach((cc) => {
+      allVStats.sideboard.forEach((cc: CardObject) => {
         if (cc.id === c.id) found = true;
       });
 

@@ -1,20 +1,19 @@
 /* eslint-disable radix */
 /* eslint-disable no-bitwise */
 import _ from "lodash";
-import {
-  CardsList,
-  Colors,
-  constants,
-  database,
-  Deck,
-  formatPercent,
-} from "mtgatool-shared";
 
+import { DEFAULT_TILE } from "../../../constants";
+import { CardObject } from "../../../types";
 import { toMMSS } from "../../../utils/dateTo";
+import formatPercent from "../../../utils/formatPercent";
 import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
 // import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
 import getWildcardsMissing from "../../../utils/getWildcardsMissing";
 import getWinrateClass from "../../../utils/getWinrateClass";
+import CardsList from "../../../utils/mtga/cardsList";
+import Colors from "../../../utils/mtga/colors";
+import database from "../../../utils/mtga/database";
+import Deck from "../../../utils/mtga/deck";
 import {
   Column,
   FlexBottom,
@@ -34,8 +33,6 @@ import {
   RANK_SILVER,
 } from "../history/getRankFilterVal";
 import { ExploreDeckData } from "./doExploreAggregation";
-
-const { DEFAULT_TILE } = constants;
 
 function getRankBitsAsArray(bits: number) {
   const arr = [];
@@ -75,7 +72,7 @@ export default function ListItemExplore({
   const decklist = new Deck();
   decklist.setMainboard(new CardsList(data.deck));
   // const wildcards = getDeckRaritiesCount(decklist);
-  data.deck.forEach((c) => {
+  data.deck.forEach((c: CardObject) => {
     const card = database.card(c.grpId || c.id);
     if (card) {
       const missing = getWildcardsMissing(decklist, c.grpId || c.id, false);

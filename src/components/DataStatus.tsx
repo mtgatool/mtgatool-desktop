@@ -1,9 +1,9 @@
-import { database } from "mtgatool-shared";
 import { useRef } from "react";
 import { useSelector } from "react-redux";
 
 import { ReactComponent as DataIcon } from "../assets/images/svg/data.svg";
 import { AppState } from "../redux/stores/rendererStore";
+import database from "../utils/mtga/database";
 import vodiFn from "../utils/voidfn";
 import Alt from "./Alt";
 import SvgButton from "./SvgButton";
@@ -69,7 +69,7 @@ export default function DataStatus() {
           <StatusLine
             title={`Owned cards (${Object.values(
               uuidData[currentUUID]?.cards.cards || {}
-            ).reduce((p, c) => p + c, 0)})`}
+            ).reduce((p: number, c: unknown) => p + (c as number), 0)})`}
             status={uuidData[currentUUID]?.cards ? "OK" : "LOADING"}
           />
           <StatusLine

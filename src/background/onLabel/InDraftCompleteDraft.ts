@@ -1,6 +1,5 @@
-import { getSetInEventId } from "mtgatool-shared";
-
 import LogEntry from "../../types/logDecoder";
+import getSetInEventId from "../../utils/getSetInEventId";
 import { setDraftData } from "../store/currentDraftStore";
 
 interface Entry extends LogEntry {

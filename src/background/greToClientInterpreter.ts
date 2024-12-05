@@ -2,7 +2,7 @@
 /* eslint-disable radix */
 /* eslint-disable no-console */
 import { app } from "electron";
-import { countValues, objectClone, useSet } from "mtgatool-shared";
+
 import {
   AnnotationInfo,
   AnnotationType,
@@ -15,7 +15,7 @@ import {
   TurnInfo,
   ZoneInfo,
   ZoneType,
-} from "mtgatool-shared/dist/types/greTypes";
+} from "../types/greTypes";
 
 import {
   AggregatedDetailsType,
@@ -53,6 +53,9 @@ import {
   setTurnInfo,
 } from "./store/currentMatchStore";
 import updateDeck from "./updateDeck";
+import countValues from "../utils/countValues";
+import useSet from "../utils/useSet";
+import objectClone from "../utils/objectClone";
 
 function changePriority(previous: number, current: number, time: number): void {
   const priorityTimers = objectClone(globalStore.currentMatch.priorityTimers);
@@ -90,7 +93,7 @@ function _setHeat(seat: number, value: number): void {
 }
 
 function getGameObject(id: number): GameObjectInfo {
-  return globalStore.currentMatch.gameObjects[id];
+  return globalStore.currentMatch.gameObjects[id] as GameObjectInfo;
 }
 
 function getZone(id: number): ZoneInfo {

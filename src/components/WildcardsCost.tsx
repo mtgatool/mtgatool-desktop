@@ -1,11 +1,10 @@
 import _ from "lodash";
-import { constants, Deck } from "mtgatool-shared";
 import { Fragment } from "react";
 
+import { CARD_RARITIES } from "../constants";
 import getBoosterCountEstimate from "../utils/getBoosterCountEstimate";
 import getDeckMissing from "../utils/getDeckMissing";
-
-const { CARD_RARITIES } = constants;
+import Deck from "../utils/mtga/deck";
 
 const wcIcon: Record<string, string> = {};
 wcIcon.common = "wc-common";

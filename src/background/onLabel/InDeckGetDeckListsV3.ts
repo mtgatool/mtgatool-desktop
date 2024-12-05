@@ -1,6 +1,5 @@
-import { ArenaV3Deck } from "mtgatool-shared";
-
 // import postChannelMessage from "../../broadcastChannel/postChannelMessage";
+import { ArenaV3Deck } from "../../types";
 import LogEntry from "../../types/logDecoder";
 
 interface Entry extends LogEntry {

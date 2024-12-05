@@ -1,6 +1,6 @@
-import { database, DbCardDataV2 } from "mtgatool-shared";
-
+import { DbCardDataV2 } from "../types";
 import findSetByCode from "./findSetByCode";
+import database from "./mtga/database";
 import openExternal from "./openExternal";
 
 export default function openScryfallCard(card?: DbCardDataV2 | number): void {

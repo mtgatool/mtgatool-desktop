@@ -130,13 +130,12 @@
         display: flex;
 
         .rank-position {
+          margin: 0 8px;
+          color: var(--color-text-dark);
                   
           @media screen and (max-width: 600px) {
             font-size: 12px !important;
           }
-          
-          margin: 0 8px;
-          color: var(--color-text-dark);
         }
       }
 

@@ -1,16 +1,10 @@
 /* eslint-disable no-bitwise */
-import { Colors } from "mtgatool-shared";
-import {
-  BLACK,
-  BLUE,
-  COLORLESS,
-  GREEN,
-  RED,
-  WHITE,
-} from "mtgatool-shared/dist/shared/constants";
+
 import { useState } from "react";
 
 import manaClasses from "../common/manaClasses";
+import { BLACK, BLUE, COLORLESS, GREEN, RED, WHITE } from "../constants";
+import Colors from "../utils/mtga/colors";
 
 interface ManaFilterProps {
   initialState: number;

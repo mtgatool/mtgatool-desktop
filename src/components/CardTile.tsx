@@ -1,27 +1,22 @@
-import {
-  cardHasType,
-  constants,
-  DbCardDataV2,
-  Deck,
-  Rarity,
-} from "mtgatool-shared";
-import {
-  DEFAULT_TILE,
-  LANDS_HACK,
-} from "mtgatool-shared/dist/shared/constants";
 import { CSSProperties, useCallback, useEffect, useState } from "react";
 
 import typeLand from "../assets/images/type_land.png";
+import {
+  CARD_RARITIES,
+  COLORS_ALL,
+  DEFAULT_TILE,
+  FACE_ADVENTURE_MAIN,
+  FACE_SPLIT_FULL,
+  LANDS_HACK,
+} from "../constants";
 import useHoverCard from "../hooks/useHoverCard";
+import { DbCardDataV2, Rarity } from "../types";
+import { cardHasType } from "../utils/cardTypes";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
 import getRankColorClass from "../utils/getRankColorClass";
 import getWildcardsMissing from "../utils/getWildcardsMissing";
+import Deck from "../utils/mtga/deck";
 import openScryfallCard from "../utils/openScryfallCard";
-
-// import gray from "../assets/images/gray.png";
-
-const { CARD_RARITIES, COLORS_ALL, FACE_SPLIT_FULL, FACE_ADVENTURE_MAIN } =
-  constants;
 
 const mana: Record<string, string> = {};
 mana.w = "mana-w";
@@ -240,8 +235,8 @@ function MissingCardSprite(props: MissingCardsProps): JSX.Element {
   const { missing, cardRarity, listStyle, ww } = props;
 
   const xoff =
-    CARD_RARITIES.filter((r) => r !== "land" && r !== "token").indexOf(
-      cardRarity
+    CARD_RARITIES.filter((r: Rarity) => r !== "land" && r !== "token").indexOf(
+      cardRarity as Rarity & "land" & "token"
     ) * -24;
   const yoff = missing * -24;
 

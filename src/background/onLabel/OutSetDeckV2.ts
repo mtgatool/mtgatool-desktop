@@ -1,13 +1,10 @@
 // import postChannelMessage from "../../broadcastChannel/postChannelMessage";
-import {
-  CardsList,
-  convertV4ListToV2,
-  Deck,
-  InternalDeck,
-  v4cardsList,
-} from "mtgatool-shared";
 
+import { InternalDeck, v4cardsList } from "../../types";
 import LogEntry from "../../types/logDecoder";
+import convertV4ListToV2 from "../../utils/convertV4ListToV2";
+import CardsList from "../../utils/mtga/cardsList";
+import Deck from "../../utils/mtga/deck";
 import selectDeck from "../selectDeck";
 
 interface Entry extends LogEntry {

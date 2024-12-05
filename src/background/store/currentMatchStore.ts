@@ -1,12 +1,14 @@
 /* eslint-disable radix */
+
 import {
   CardCast,
-  Chances,
-  Deck,
   InternalPlayer,
   MatchGameStats,
+  MatchState,
   PriorityTimers,
-} from "mtgatool-shared";
+} from "../../types";
+import Chances from "../../types/chances";
+import { DetailsIdChange } from "../../types/greInterpreter";
 import {
   AnnotationInfo,
   GameInfo,
@@ -16,11 +18,9 @@ import {
   PlayerInfo,
   TurnInfo,
   ZoneInfo,
-} from "mtgatool-shared/dist/types/greTypes";
-
-import { DetailsIdChange, GameObject } from "../../types/greInterpreter";
+} from "../../types/greTypes";
+import Deck from "../../utils/mtga/deck";
 import globalStore from ".";
-import { MatchState } from "./types";
 
 interface Heat {
   seat: number;
@@ -81,7 +81,7 @@ export const matchStateObject = {
   zones: {} as Record<number, ZoneInfo>,
   annotations: {} as Record<number, AnnotationInfo>,
   processedAnnotations: [] as number[],
-  gameObjects: {} as Record<number, GameObject>,
+  gameObjects: {} as Record<number, GameObjectInfo>,
   initialLibraryInstanceIds: [] as number[],
   instanceToCardIdMap: {} as Record<number, number>,
   idChanges: {} as Record<number, number>,

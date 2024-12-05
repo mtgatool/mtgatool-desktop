@@ -1,15 +1,16 @@
 import _ from "lodash";
-import { Colors, constants } from "mtgatool-shared";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
+import { DEFAULT_TILE } from "../../../constants";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { toMMSS } from "../../../utils/dateTo";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import isLimitedEventId from "../../../utils/isLimitedEventId";
+import Colors from "../../../utils/mtga/colors";
 import timeAgo from "../../../utils/timeAgo";
 import {
   Column,
@@ -22,8 +23,6 @@ import ManaCost from "../../ManaCost";
 import RankIcon from "../../RankIcon";
 import ResultDetails from "../../ResultDetails";
 import { MatchData } from "../history/convertDbMatchData";
-
-const { DEFAULT_TILE } = constants;
 
 interface ListItemMatchProps {
   match: MatchData;
@@ -129,7 +128,9 @@ export default function LiveFeedMatch({
         </FlexBottom>
       </Column>
 
-      <Column className="list-item-center">{}</Column>
+      <Column className="list-item-center">
+        <></>
+      </Column>
 
       <Column className="list-item-right">
         <FlexBottom

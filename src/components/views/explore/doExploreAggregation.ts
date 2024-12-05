@@ -1,12 +1,19 @@
 /* eslint-disable no-bitwise */
 /* eslint-disable radix */
-import { Colors, database, DbCardDataV2, v2cardsList } from "mtgatool-shared";
-import { DEFAULT_TILE } from "mtgatool-shared/dist/shared/constants";
 
+import { DEFAULT_TILE } from "../../../constants";
 import store from "../../../redux/stores/rendererStore";
+import {
+  CardCast,
+  CardObject,
+  DbCardDataV2,
+  v2cardsList,
+} from "../../../types";
 import { DbMatch } from "../../../types/dbTypes";
 import { Winrate } from "../../../utils/aggregateStats";
 import getWinrateValue from "../../../utils/getWinrateValue";
+import Colors from "../../../utils/mtga/colors";
+import database from "../../../utils/mtga/database";
 import getRankFilterVal from "../history/getRankFilterVal";
 
 export interface ExploreDeckData {
@@ -210,7 +217,7 @@ export default function doExploreAggregation(allData: DbMatch[]) {
       if (playerDeck?.mainDeck) {
         data.name = playerDeck.name;
         data.tile = playerDeck.deckTileId;
-        data.deck = playerDeck.mainDeck.map((c) => {
+        data.deck = playerDeck.mainDeck.map((c: CardObject) => {
           // add to cards quantities
           const name = database.card(c.id)?.Name || "";
           if (!tempCards[name]) tempCards[name] = newCardWinrate(c.id);
@@ -222,7 +229,7 @@ export default function doExploreAggregation(allData: DbMatch[]) {
         });
       }
       if (playerDeck?.sideboard) {
-        data.side = playerDeck.sideboard.map((c) => {
+        data.side = playerDeck.sideboard.map((c: CardObject) => {
           // add to cards quantities
           const name = database.card(c.id)?.Name || "";
           if (!tempCards[name]) tempCards[name] = newCardWinrate(c.id);
@@ -246,14 +253,14 @@ export default function doExploreAggregation(allData: DbMatch[]) {
         data.colorWinrates[oColorBits].wins =
           (data.colorWinrates[oColorBits].wins || 0) + 1;
 
-        match.internalMatch.player.cardsUsed.forEach((c) => {
+        match.internalMatch.player.cardsUsed.forEach((c: number) => {
           const dbObj = database.card(c);
           if (dbObj && !dbObj.Types.toLowerCase().includes("land")) {
             data.bestCards[c] = (data.bestCards[c] ?? 0) + 1;
           }
         });
 
-        match.internalMatch.oppDeck.mainDeck.forEach((c) => {
+        match.internalMatch.oppDeck.mainDeck.forEach((c: CardObject) => {
           const dbObj = database.card(c.id);
           if (dbObj && !dbObj.Types.toLowerCase().includes("land")) {
             data.bestMatchCards[c.id] =
@@ -264,7 +271,7 @@ export default function doExploreAggregation(allData: DbMatch[]) {
         data.colorWinrates[oColorBits].losses =
           (data.colorWinrates[oColorBits].losses || 0) + 1;
 
-        match.internalMatch.oppDeck.mainDeck.forEach((c) => {
+        match.internalMatch.oppDeck.mainDeck.forEach((c: CardObject) => {
           const dbObj = database.card(c.id);
           if (dbObj && !dbObj.Types.toLowerCase().includes("land")) {
             data.worstMatchCards[c.id] =
@@ -291,7 +298,7 @@ export default function doExploreAggregation(allData: DbMatch[]) {
           const wins = game.winner === playerSeat ? 1 : 0;
           const losses = game.winner === playerSeat ? 0 : 1;
           // For each card cast
-          game.cardsCast?.forEach((cardCast) => {
+          game.cardsCast?.forEach((cardCast: CardCast) => {
             const { grpId, player, turn } = cardCast;
 
             const cardName = database.card(grpId)?.Name || "";
@@ -337,7 +344,7 @@ export default function doExploreAggregation(allData: DbMatch[]) {
             }
           });
 
-          game.handsDrawn?.forEach((hand, index) => {
+          game.handsDrawn?.forEach((hand: number[], index: number) => {
             // Initial hand
             if (hand) {
               if (index == game.handsDrawn.length - 1) {

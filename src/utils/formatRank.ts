@@ -1,4 +1,4 @@
-import { InternalRankData } from "mtgatool-shared";
+import { InternalRankData } from "../types";
 
 // pass in playerData.constructed / limited / historic objects
 export default function formatRank(rank: InternalRankData): string {

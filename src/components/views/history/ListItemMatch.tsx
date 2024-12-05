@@ -1,8 +1,8 @@
 import _ from "lodash";
-import { Colors, constants } from "mtgatool-shared";
 import { useSelector } from "react-redux";
 
 import { ReactComponent as IconUpload } from "../../../assets/images/svg/upload.svg";
+import { DEFAULT_TILE } from "../../../constants";
 import { AppState } from "../../../redux/stores/rendererStore";
 import setDbMatch from "../../../toolDb/setDbMatch";
 import copyToClipboard from "../../../utils/copyToClipboard";
@@ -10,6 +10,7 @@ import { toMMSS } from "../../../utils/dateTo";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
 import isLimitedEventId from "../../../utils/isLimitedEventId";
+import Colors from "../../../utils/mtga/colors";
 import timeAgo from "../../../utils/timeAgo";
 import {
   Column,
@@ -23,8 +24,6 @@ import RankIcon from "../../RankIcon";
 import RankSmall from "../../RankSmall";
 import ResultDetails from "../../ResultDetails";
 import { MatchData } from "./convertDbMatchData";
-
-const { DEFAULT_TILE } = constants;
 
 interface ListItemMatchProps {
   match: MatchData;

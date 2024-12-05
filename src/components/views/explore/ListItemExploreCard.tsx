@@ -1,6 +1,5 @@
-import { database } from "mtgatool-shared";
-
 import getWinrateClass from "../../../utils/getWinrateClass";
+import database from "../../../utils/mtga/database";
 import CardTile from "../../CardTile";
 import { ExploreCardData } from "./doExploreAggregation";
 

@@ -1,11 +1,12 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable radix */
-import { database } from "mtgatool-shared";
+
 import { useCallback, useMemo, useState } from "react";
 
 import usePagingControls from "../../../hooks/usePagingControls";
 import { Filters } from "../../../types/genericFilterTypes";
+import database from "../../../utils/mtga/database";
 import doExploreFilter from "../../../utils/tables/doExploreFilter";
 import setFilter from "../../../utils/tables/filters/setFilter";
 import Flex from "../../Flex";

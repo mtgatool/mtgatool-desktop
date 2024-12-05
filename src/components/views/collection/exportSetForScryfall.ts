@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
-import { database } from "mtgatool-shared";
 
 import { CardsData } from "../../../types/collectionTypes";
+import database from "../../../utils/mtga/database";
 
 interface JsonCardData {
   name: string;

@@ -1,6 +1,5 @@
-import { Cards } from "mtgatool-shared";
-
 import upsertDbCards from "../toolDb/upsertDbCards";
+import { Cards } from "../types";
 import isElectron from "../utils/electron/isElectron";
 
 interface ReaderCard {

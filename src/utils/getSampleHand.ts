@@ -1,4 +1,6 @@
-import { CardObject, database, DbCardDataV2, Deck } from "mtgatool-shared";
+import { CardObject, DbCardDataV2 } from "../types";
+import database from "./mtga/database";
+import Deck from "./mtga/deck";
 
 export default function getSampleHand(deck: Deck): DbCardDataV2[] {
   const cards: DbCardDataV2[] = [];

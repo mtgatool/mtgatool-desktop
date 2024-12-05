@@ -1,10 +1,10 @@
-import { database } from "mtgatool-shared";
 import { useSelector } from "react-redux";
 
 import notFound from "../../../assets/images/notfound.png";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { CardsData } from "../../../types/collectionTypes";
 import { Filters } from "../../../types/genericFilterTypes";
+import database from "../../../utils/mtga/database";
 import Flex from "../../Flex";
 import Section from "../../ui/Section";
 import { CollectionStats } from "./collectionStats";

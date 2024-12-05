@@ -1,6 +1,5 @@
-import { MatchServiceToClientMessage } from "mtgatool-shared/dist/types/greTypes";
-
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
+import { MatchServiceToClientMessage } from "../../types/greTypes";
 import LogEntry from "../../types/logDecoder";
 import setLocalSetting from "../../utils/setLocalSetting";
 

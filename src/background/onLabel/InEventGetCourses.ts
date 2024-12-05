@@ -1,5 +1,4 @@
-import { v4cardsList } from "mtgatool-shared";
-
+import { v4cardsList } from "../../types";
 import LogEntry from "../../types/logDecoder";
 import globalStore from "../store";
 

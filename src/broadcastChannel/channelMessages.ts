@@ -1,14 +1,13 @@
+import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
+import { OverlayUpdateMatchState } from "../background/store/types";
+import { OverlaySettings } from "../common/defaultConfig";
+import { ActionLogV2 } from "../components/action-log-v2/types";
 import {
   Cards,
   InternalDraftv2,
   InternalMatch,
   InventoryUpdate,
-} from "mtgatool-shared";
-
-import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
-import { OverlayUpdateMatchState } from "../background/store/types";
-import { OverlaySettings } from "../common/defaultConfig";
-import { ActionLogV2 } from "../components/action-log-v2/types";
+} from "../types";
 import { DbDraftVote, DbInventoryInfo } from "../types/dbTypes";
 import { ClientSceneChange } from "../types/logDecoder";
 

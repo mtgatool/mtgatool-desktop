@@ -1,11 +1,9 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/jsx-props-no-spreading */
-import { constants } from "mtgatool-shared";
 
+import { CARD_RARITIES, COLORS_LONG } from "../../../constants";
 import useHoverCard from "../../../hooks/useHoverCard";
 import { CardStats } from "./collectionStats";
-
-const { CARD_RARITIES, COLORS_LONG } = constants;
 
 type ColorData = { [key: string]: CardStats[] };
 type CardData = ColorData[];

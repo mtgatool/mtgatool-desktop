@@ -1,4 +1,6 @@
-import { CardObject, database, Deck } from "mtgatool-shared";
+import { CardObject } from "../types";
+import database from "./mtga/database";
+import Deck from "./mtga/deck";
 
 interface RaritiesCount {
   c: number;

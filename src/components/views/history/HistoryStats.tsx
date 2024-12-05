@@ -1,13 +1,15 @@
 /* eslint-disable radix */
-import { Colors, formatPercent } from "mtgatool-shared";
-import { COLORLESS } from "mtgatool-shared/dist/shared/constants";
+
 import { PieChart } from "react-minimal-pie-chart";
 import { useSelector } from "react-redux";
 
+import { COLORLESS } from "../../../constants";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { Winrate } from "../../../utils/aggregateStats";
 import { toDDHHMMSS } from "../../../utils/dateTo";
+import formatPercent from "../../../utils/formatPercent";
 import getWinrateClass from "../../../utils/getWinrateClass";
+import Colors from "../../../utils/mtga/colors";
 import Flex from "../../Flex";
 import ManaCost from "../../ManaCost";
 

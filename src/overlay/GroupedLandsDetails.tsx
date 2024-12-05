@@ -1,8 +1,6 @@
-import { Chances, constants } from "mtgatool-shared";
-
 import manaClasses from "../common/manaClasses";
-
-const { BLACK, BLUE, GREEN, RED, WHITE } = constants;
+import { BLACK, BLUE, GREEN, RED, WHITE } from "../constants";
+import Chances from "../types/chances";
 
 export default function GroupedLandsDetails(props: Chances): JSX.Element {
   const { landW, landU, landB, landR, landG } = props;

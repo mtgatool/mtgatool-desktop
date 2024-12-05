@@ -1,11 +1,7 @@
-import {
-  Deck,
-  getSetInEventId,
-  InternalDeck,
-  ModuleInstanceData,
-} from "mtgatool-shared";
-
+import { InternalDeck, ModuleInstanceData } from "../../types";
 import LogEntry from "../../types/logDecoder";
+import getSetInEventId from "../../utils/getSetInEventId";
+import Deck from "../../utils/mtga/deck";
 import selectDeck from "../selectDeck";
 import {
   resetCurrentDraft,

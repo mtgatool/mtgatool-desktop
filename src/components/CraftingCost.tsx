@@ -1,11 +1,10 @@
-import { constants, Deck } from "mtgatool-shared";
 import { useSelector } from "react-redux";
 
+import { CARD_RARITIES } from "../constants";
 import { AppState } from "../redux/stores/rendererStore";
 import getBoosterCountEstimate from "../utils/getBoosterCountEstimate";
 import getDeckMissing from "../utils/getDeckMissing";
-
-const { CARD_RARITIES } = constants;
+import Deck from "../utils/mtga/deck";
 
 const wcIcon: Record<string, string> = {};
 wcIcon.common = "wc-common";

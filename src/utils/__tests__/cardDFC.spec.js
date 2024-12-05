@@ -1,6 +1,5 @@
-import { loadDbFromCache } from "mtgatool-shared";
-
 import isCardDfc from "../isCardDfc";
+import loadDbFromCache from "../loadDbFromCache";
 
 loadDbFromCache();
 

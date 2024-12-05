@@ -1,5 +1,6 @@
-/* eslint-disable radix */
-import { CardObject, CardsList, Deck } from "mtgatool-shared";
+import { CardObject } from "../types";
+import CardsList from "./mtga/cardsList";
+import Deck from "./mtga/deck";
 
 export interface DeckDiff {
   added: CardsList;

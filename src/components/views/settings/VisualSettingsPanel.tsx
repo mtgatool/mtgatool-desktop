@@ -1,10 +1,10 @@
 import _ from "lodash";
-import { CardQuality } from "mtgatool-shared";
 import { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
+import { CardQuality } from "../../../types";
 import database from "../../../utils/database-wrapper";
 import { getCardImage } from "../../../utils/getCardArtCrop";
 import getLocalSetting from "../../../utils/getLocalSetting";

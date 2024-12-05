@@ -1,7 +1,6 @@
-import { MissingWildcards } from "mtgatool-shared";
-import { CARD_RARITIES } from "mtgatool-shared/dist/shared/constants";
-
+import { CARD_RARITIES } from "../constants";
 import store from "../redux/stores/rendererStore";
+import { MissingWildcards } from "../types";
 
 export default function getBoosterCountEstimate(
   neededWildcards: MissingWildcards

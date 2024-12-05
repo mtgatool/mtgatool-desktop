@@ -1,7 +1,8 @@
 /* eslint-disable no-bitwise */
-import { getRankIndex16 } from "mtgatool-shared";
+
 import { useState } from "react";
 
+import getRankIndex16 from "../utils/getRankIndex16";
 import {
   RANK_BRONZE,
   RANK_DIAMOND,

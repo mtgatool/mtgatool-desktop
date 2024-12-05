@@ -1,6 +1,4 @@
-import { constants } from "mtgatool-shared";
-
-const { BLACK, BLUE, COLORLESS, GREEN, RED, WHITE } = constants;
+import { BLACK, BLUE, COLORLESS, GREEN, RED, WHITE } from "../constants";
 
 const manaClasses: string[] = [];
 manaClasses[WHITE] = "mana-w";

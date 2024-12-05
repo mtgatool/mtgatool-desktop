@@ -2,30 +2,26 @@
 /* eslint-disable radix */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-nested-ternary */
-import {
-  compareCards,
-  database,
-  DbCardDataV2,
-  Deck,
-  getDeckColorsAmmount,
-  getDeckLandsAmmount,
-} from "mtgatool-shared";
-import {
-  DEFAULT_TILE,
-  MANA_COLORS,
-} from "mtgatool-shared/dist/shared/constants";
+
 import { useState } from "react";
 import { PieChart } from "react-minimal-pie-chart";
 import { useDispatch } from "react-redux";
 
 import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
+import { DEFAULT_TILE, MANA_COLORS } from "../../../constants";
 import reduxAction from "../../../redux/reduxAction";
+import { DbCardDataV2 } from "../../../types";
+import compareCards from "../../../utils/compareCards";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { toMMSS } from "../../../utils/dateTo";
 import { getCardArtCrop, getCardImage } from "../../../utils/getCardArtCrop";
+import getDeckColorsAmmount from "../../../utils/getDeckColorsAmmount";
+import getDeckLandsAmmount from "../../../utils/getDeckLandsAmmount";
 import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
 import getSampleHand from "../../../utils/getSampleHand";
 import getWinrateClass from "../../../utils/getWinrateClass";
+import database from "../../../utils/mtga/database";
+import Deck from "../../../utils/mtga/deck";
 import CardTile from "../../CardTile";
 import CraftingCost from "../../CraftingCost";
 import DeckColorsBar from "../../DeckColorsBar";

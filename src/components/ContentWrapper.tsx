@@ -1,4 +1,3 @@
-import { database, Deck } from "mtgatool-shared";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -19,6 +18,8 @@ import aggregateStats from "../utils/aggregateStats";
 import isElectron from "../utils/electron/isElectron";
 import getCssQuality from "../utils/getCssQuality";
 import getPopupClass from "../utils/getPopupClass";
+import database from "../utils/mtga/database";
+import Deck from "../utils/mtga/deck";
 import doHistoryFilter from "../utils/tables/doHistoryFilter";
 import vodiFn from "../utils/voidfn";
 import PopupComponent from "./PopupComponent";

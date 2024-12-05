@@ -1,4 +1,4 @@
-import { database } from "mtgatool-shared";
+import database from "../../utils/mtga/database";
 
 interface LogAbilityProps {
   abId: number;

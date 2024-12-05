@@ -1,6 +1,5 @@
-import { database } from "mtgatool-shared";
-
 import useHoverCard from "../../hooks/useHoverCard";
+import database from "../../utils/mtga/database";
 
 interface LogCardProps {
   grpId: number;

@@ -1,6 +1,5 @@
-import { InMakeHumanDraftPick } from "mtgatool-shared";
-
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
+import { InMakeHumanDraftPick } from "../../types";
 import LogEntry from "../../types/logDecoder";
 import globalStore from "../store";
 

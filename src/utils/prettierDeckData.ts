@@ -1,5 +1,4 @@
-import { InternalDeck } from "mtgatool-shared";
-
+import { InternalDeck } from "../types";
 import getPreconDeckName from "./getPreconDeckName";
 
 export default function prettierDeckData(data: InternalDeck): InternalDeck {

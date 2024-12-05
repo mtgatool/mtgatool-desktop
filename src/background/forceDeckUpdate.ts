@@ -1,5 +1,5 @@
-import { CardObject, Chances } from "mtgatool-shared";
-
+import { CardObject } from "../types";
+import Chances from "../types/chances";
 import { hypergeometricRange } from "../utils/statsFns";
 import globalStore from "./store";
 import { setCardsOdds } from "./store/currentMatchStore";

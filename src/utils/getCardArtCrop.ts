@@ -1,11 +1,12 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable radix */
-import { database, DbCardDataV2 } from "mtgatool-shared";
-import { DEFAULT_TILE } from "mtgatool-shared/dist/shared/constants";
 
 import notFound from "../assets/images/notfound.png";
 import notFoundArt from "../assets/images/notFoundArt.png";
+import { DEFAULT_TILE } from "../constants";
+import { DbCardDataV2 } from "../types";
 import isCardDfcBack from "./isCardDfcBack";
+import database from "./mtga/database";
 
 export function getCardImage(
   card: DbCardDataV2 | number,

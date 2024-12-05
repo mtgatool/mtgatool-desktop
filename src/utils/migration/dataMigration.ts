@@ -1,9 +1,10 @@
 /* eslint-disable no-param-reassign */
-import { Deck, InternalMatch } from "mtgatool-shared";
 
 // import getLocalDbValue from "../../toolDb/getLocalDbValue";
+import { InternalMatch } from "../../types";
 import { DbMatch } from "../../types/dbTypes";
 import getLocalSetting from "../getLocalSetting";
+import Deck from "../mtga/deck";
 
 function convertOldInternalToDbMatch(
   match: InternalMatch

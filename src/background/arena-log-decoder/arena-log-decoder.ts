@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-var-requires */
 import _ from "lodash";
-import { sha1 } from "mtgatool-shared";
+import { sha1 } from "mtgatool-db";
 
 import * as jsonText from "./jsonText";
 import nthLastIndexOf from "./nthLastIndexOf";

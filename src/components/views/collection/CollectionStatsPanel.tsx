@@ -1,8 +1,9 @@
 /* eslint-disable prefer-destructuring */
-import { constants } from "mtgatool-shared";
+
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import { CARD_RARITIES } from "../../../constants";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { CardsData } from "../../../types/collectionTypes";
@@ -24,8 +25,6 @@ import {
 } from "./collectionStats";
 import CompletionProgressBar from "./CompletionProgressBar";
 import SetCompletionBar from "./SetCompletionBar";
-
-const { CARD_RARITIES } = constants;
 
 const getRarityKey = (
   rarity: string

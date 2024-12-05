@@ -4,8 +4,8 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable complexity */
 import _ from "lodash";
-import { Colors, constants } from "mtgatool-shared";
 
+import { BLACK, BLUE, COLORLESS, GREEN, RED, WHITE } from "../../../constants";
 import {
   CardsData,
   ParsedToken,
@@ -29,9 +29,8 @@ import {
   RarityBitsFilterType,
   StringFilterType,
 } from "../../../types/genericFilterTypes";
+import Colors from "../../../utils/mtga/colors";
 import setFilter from "../../../utils/tables/filters/setFilter";
-
-const { WHITE, BLUE, RED, BLACK, GREEN, COLORLESS } = constants;
 
 /**
  * Matches a query string and returns an array to be used in the filters converter

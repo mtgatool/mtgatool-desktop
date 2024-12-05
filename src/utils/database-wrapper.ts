@@ -2,10 +2,11 @@
 /* eslint-disable no-console */
 import axios from "axios";
 import _ from "lodash";
-import { database, loadDbFromCache as loadDbFromShared } from "mtgatool-shared";
 
 import electron from "./electron/electronWrapper";
 import remote from "./electron/remoteWrapper";
+import loadDbFromShared from "./loadDbFromCache";
+import database from "./mtga/database";
 
 // import distributedDb from "../assets/resources/database.json";
 

@@ -1,4 +1,4 @@
-import { InternalMatch } from "mtgatool-shared";
+import { InternalMatch } from "../types";
 
 interface ResultDetailsProps {
   match: InternalMatch;

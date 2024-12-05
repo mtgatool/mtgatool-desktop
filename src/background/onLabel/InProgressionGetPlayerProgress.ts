@@ -1,5 +1,4 @@
-import { PlayerProgression } from "mtgatool-shared/dist/types/progression";
-
+import { PlayerProgression } from "../../types";
 import LogEntry from "../../types/logDecoder";
 
 interface Entry extends LogEntry {

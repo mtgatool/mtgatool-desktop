@@ -1,4 +1,4 @@
-import { getRankIndex } from "mtgatool-shared";
+import getRankIndex from "../utils/getRankIndex";
 
 export interface RankIconProps {
   style?: React.CSSProperties;

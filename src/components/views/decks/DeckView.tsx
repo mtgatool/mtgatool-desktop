@@ -1,17 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-nested-ternary */
-import {
-  Colors,
-  compareCards,
-  DbCardDataV2,
-  Deck,
-  getDeckColorsAmmount,
-  getDeckLandsAmmount,
-} from "mtgatool-shared";
-import {
-  DEFAULT_TILE,
-  MANA_COLORS,
-} from "mtgatool-shared/dist/shared/constants";
+
 import { useEffect, useState } from "react";
 import { PieChart } from "react-minimal-pie-chart";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,13 +8,20 @@ import { useHistory, useParams } from "react-router-dom";
 
 import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
 import { ReactComponent as CameraIcon } from "../../../assets/images/svg/camera-solid.svg";
+import { DEFAULT_TILE, MANA_COLORS } from "../../../constants";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
+import { CardObject, DbCardDataV2 } from "../../../types";
 import { StatsDeck } from "../../../types/dbTypes";
+import compareCards from "../../../utils/compareCards";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { getCardArtCrop } from "../../../utils/getCardArtCrop";
+import getDeckColorsAmmount from "../../../utils/getDeckColorsAmmount";
+import getDeckLandsAmmount from "../../../utils/getDeckLandsAmmount";
 import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
 import getSampleHand from "../../../utils/getSampleHand";
+import Colors from "../../../utils/mtga/colors";
+import Deck from "../../../utils/mtga/deck";
 import CardTile from "../../CardTile";
 import CraftingCost from "../../CraftingCost";
 import DeckColorsBar from "../../DeckColorsBar";
@@ -85,10 +81,10 @@ export default function DeckView(props: DeckViewProps): JSX.Element {
   const deck = new Deck(
     {
       commandZoneGRPIds: dbDeck?.commanders
-        ? dbDeck.commanders.map((c) => c.id)
+        ? dbDeck.commanders.map((c: CardObject) => c.id)
         : undefined,
       companionGRPId: dbDeck?.companions
-        ? dbDeck.companions.map((c) => c.id)[0]
+        ? dbDeck.companions.map((c: CardObject) => c.id)[0]
         : undefined,
     },
     dbDeck?.mainDeck || [],

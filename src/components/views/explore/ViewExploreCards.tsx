@@ -2,13 +2,14 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable radix */
-import { database } from "mtgatool-shared";
+
 import { useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import usePagingControls from "../../../hooks/usePagingControls";
 import reduxAction from "../../../redux/reduxAction";
 import { getCardImage } from "../../../utils/getCardArtCrop";
+import database from "../../../utils/mtga/database";
 import applySort from "../../../utils/tables/applySort";
 import Flex from "../../Flex";
 import PagingControls from "../../PagingControls";

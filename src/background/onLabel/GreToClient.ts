@@ -1,7 +1,7 @@
 /* eslint-disable radix */
-import { GREToClientMessage } from "mtgatool-shared/dist/types/greTypes";
 
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
+import { GREToClientMessage } from "../../types/greTypes";
 import LogEntry from "../../types/logDecoder";
 import GREMessage from "../greToClientInterpreter";
 import { setCurrentMatchMany } from "../store/currentMatchStore";

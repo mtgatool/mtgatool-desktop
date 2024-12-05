@@ -1,5 +1,4 @@
-import { PostMatchUpdate } from "mtgatool-shared";
-
+import { PostMatchUpdate } from "../../types";
 import LogEntry from "../../types/logDecoder";
 
 export interface Entry extends LogEntry {

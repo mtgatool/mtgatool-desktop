@@ -1,6 +1,5 @@
-import { Cards } from "mtgatool-shared";
-
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
+import { Cards } from "../../types";
 import LogEntry from "../../types/logDecoder";
 import getLocalSetting from "../../utils/getLocalSetting";
 

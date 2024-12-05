@@ -1,13 +1,18 @@
 /* eslint-disable react/no-array-index-key */
-import { CardsList, database, Deck, formatPercent } from "mtgatool-shared";
+
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
 import { AppState } from "../../../redux/stores/rendererStore";
+import { CardObject } from "../../../types";
 import { StatsDeck } from "../../../types/dbTypes";
+import formatPercent from "../../../utils/formatPercent";
 import getDeckDiff, { DeckDiff } from "../../../utils/getDeckDiff";
 import getWinrateClass from "../../../utils/getWinrateClass";
+import CardsList from "../../../utils/mtga/cardsList";
+import database from "../../../utils/mtga/database";
+import Deck from "../../../utils/mtga/deck";
 import CardTile from "../../CardTile";
 import DeckList from "../../DeckList";
 import Flex from "../../Flex";
@@ -94,7 +99,7 @@ export default function ChangesDeckView(
               <div className="card-tile-separator">
                 Added ({decksChanges[currentHash].added.count()})
               </div>
-              {decksChanges[currentHash].added.get().map((card) => {
+              {decksChanges[currentHash].added.get().map((card: CardObject) => {
                 const cardObj = database.card(card.id);
                 return cardObj ? (
                   <CardTile
@@ -116,25 +121,27 @@ export default function ChangesDeckView(
               <div className="card-tile-separator">
                 Removed ({decksChanges[currentHash].removed.count()})
               </div>
-              {decksChanges[currentHash].removed.get().map((card) => {
-                const cardObj = database.card(card.id);
-                return cardObj ? (
-                  <CardTile
-                    indent="a"
-                    isHighlighted={false}
-                    isSideboard={false}
-                    showWildcards={false}
-                    card={cardObj}
-                    key={`removed-card-${card.id}`}
-                    quantity={{
-                      type: "NUMBER",
-                      quantity: card.quantity,
-                    }}
-                  />
-                ) : (
-                  <></>
-                );
-              })}
+              {decksChanges[currentHash].removed
+                .get()
+                .map((card: CardObject) => {
+                  const cardObj = database.card(card.id);
+                  return cardObj ? (
+                    <CardTile
+                      indent="a"
+                      isHighlighted={false}
+                      isSideboard={false}
+                      showWildcards={false}
+                      card={cardObj}
+                      key={`removed-card-${card.id}`}
+                      quantity={{
+                        type: "NUMBER",
+                        quantity: card.quantity,
+                      }}
+                    />
+                  ) : (
+                    <></>
+                  );
+                })}
             </Flex>
           </>
         ) : (

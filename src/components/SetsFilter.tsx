@@ -1,8 +1,9 @@
 import { isEqual } from "lodash";
-import { CardSet, database } from "mtgatool-shared";
 import { CSSProperties } from "react";
 
 import allFormats from "../common/allFormats";
+import { CardSet } from "../types";
+import database from "../utils/mtga/database";
 
 interface SetsFilterProps {
   singleSelection?: boolean;
@@ -18,7 +19,8 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
   // const formats = useSelector((state: AppState) => state.renderer.formats);
   // All sets after Ixalan
   const filterable = Object.keys(database.sets).filter(
-    (set) => database.sets[set].collation > 0
+    (set) =>
+      database.sets[set].collation !== false && database.sets[set].collation > 0
   );
 
   filterable.push(

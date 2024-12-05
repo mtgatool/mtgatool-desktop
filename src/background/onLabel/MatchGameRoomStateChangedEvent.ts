@@ -1,21 +1,18 @@
 /* eslint-disable radix */
-import {
-  CardsList,
-  convertV4ListToV2,
-  Deck,
-  InternalDeck,
-  MatchGameRoomStateChange,
-} from "mtgatool-shared";
 
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import readMatchManger from "../../reader/readMatchManger";
 import readMatchOpponentInfo from "../../reader/readMatchOpponentInfo";
 import readMatchPlayerInfo from "../../reader/readMatchPlayerInfo";
 import readRank from "../../reader/readRank";
+import { InternalDeck, MatchGameRoomStateChange } from "../../types";
 import LogEntry from "../../types/logDecoder";
+import convertV4ListToV2 from "../../utils/convertV4ListToV2";
 import isElectron from "../../utils/electron/isElectron";
 import getLocalSetting from "../../utils/getLocalSetting";
 import isLimitedEventId from "../../utils/isLimitedEventId";
+import CardsList from "../../utils/mtga/cardsList";
+import Deck from "../../utils/mtga/deck";
 import actionLog from "../actionLog";
 import saveMatch from "../saveMatch";
 import selectDeck from "../selectDeck";

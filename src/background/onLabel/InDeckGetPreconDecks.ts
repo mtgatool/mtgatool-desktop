@@ -1,5 +1,4 @@
-import { ArenaV3Deck } from "mtgatool-shared";
-
+import { ArenaV3Deck } from "../../types";
 import LogEntry from "../../types/logDecoder";
 
 interface Entry extends LogEntry {

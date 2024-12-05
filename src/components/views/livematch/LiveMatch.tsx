@@ -1,4 +1,3 @@
-import { Deck } from "mtgatool-shared";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
@@ -18,6 +17,7 @@ import copyToClipboard from "../../../utils/copyToClipboard";
 import { getCardArtCrop } from "../../../utils/getCardArtCrop";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
+import Deck from "../../../utils/mtga/deck";
 import DeckColorsBar from "../../DeckColorsBar";
 import Flex from "../../Flex";
 import ManaCost from "../../ManaCost";

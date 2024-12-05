@@ -1,8 +1,6 @@
-import { constants, InternalDeck } from "mtgatool-shared";
-
+import { BLACK, BLUE, GREEN, RED, WHITE } from "../constants";
+import { InternalDeck } from "../types";
 import database from "./database-wrapper";
-
-const { WHITE, BLUE, BLACK, RED, GREEN } = constants;
 
 export default function getDeckColors(deck: InternalDeck): number[] {
   let colorIndices: number[] = [];

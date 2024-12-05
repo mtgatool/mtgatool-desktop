@@ -1,6 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import _ from "lodash";
-import { getRankIndex, InternalRankData } from "mtgatool-shared";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory, useLocation, useParams } from "react-router-dom";
@@ -9,9 +8,11 @@ import settingsIcon from "../assets/images/cog.png";
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import useWindowSize from "../hooks/useWindowSize";
 import { AppState } from "../redux/stores/rendererStore";
+import { InternalRankData } from "../types";
 import { defaultRankData } from "../types/dbTypes";
 import formatRank from "../utils/formatRank";
 import getLocalSetting from "../utils/getLocalSetting";
+import getRankIndex from "../utils/getRankIndex";
 import vodiFn from "../utils/voidfn";
 import Alt from "./Alt";
 import IconButton from "./ui/IconButton";

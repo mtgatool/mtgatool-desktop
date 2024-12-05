@@ -1,8 +1,7 @@
-// PROBABLY DEPRECATED
-import { convertDeckFromV3, PlayerCourse } from "mtgatool-shared";
-
 // import postChannelMessage from "../../broadcastChannel/postChannelMessage";
+import { PlayerCourse } from "../../types";
 import LogEntry from "../../types/logDecoder";
+import convertDeckFromV3 from "../../utils/convertDeckFromV3";
 import selectDeck from "../selectDeck";
 
 interface Entry extends LogEntry {

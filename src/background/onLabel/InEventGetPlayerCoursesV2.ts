@@ -1,5 +1,4 @@
-import { PlayerCourse } from "mtgatool-shared";
-
+import { PlayerCourse } from "../../types";
 import LogEntry from "../../types/logDecoder";
 
 interface Entry extends LogEntry {

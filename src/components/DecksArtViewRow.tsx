@@ -1,16 +1,19 @@
 /* eslint-disable no-nested-ternary */
-import { Colors, Deck, formatPercent } from "mtgatool-shared";
+
 import { useEffect, useState } from "react";
 
 import squirrels from "../assets/images/squirrels.png";
 import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
 import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
 import { StatsDeck } from "../types/dbTypes";
+import formatPercent from "../utils/formatPercent";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
 import getDeckMissing from "../utils/getDeckMissing";
 // import timeAgo from "../utils/timeAgo";
 import getPreconDeckName from "../utils/getPreconDeckName";
 import getWinrateClass from "../utils/getWinrateClass";
+import Colors from "../utils/mtga/colors";
+import Deck from "../utils/mtga/deck";
 import { normalApproximationInterval } from "../utils/statsFns";
 import DeckColorsBar from "./DeckColorsBar";
 import ManaCost from "./ManaCost";

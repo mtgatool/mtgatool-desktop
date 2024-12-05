@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { database } from "mtgatool-shared";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useRouteMatch } from "react-router-dom";
@@ -9,6 +9,7 @@ import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { CardsData } from "../../../types/collectionTypes";
 import { Filters } from "../../../types/genericFilterTypes";
+import database from "../../../utils/mtga/database";
 import doCollectionFilter from "../../../utils/tables/doCollectionFilter";
 import InputContainer from "../../InputContainer";
 import PagingControls from "../../PagingControls";

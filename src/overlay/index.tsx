@@ -1,11 +1,4 @@
 import { BrowserWindow } from "electron";
-import { Chances, compareCards, Deck, InternalDraftv2 } from "mtgatool-shared";
-import {
-  OVERLAY_DRAFT,
-  OVERLAY_FULL,
-  OVERLAY_LOG,
-  OVERLAY_SEEN,
-} from "mtgatool-shared/dist/shared/constants";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { OverlayUpdateMatchState } from "../background/store/types";
@@ -17,12 +10,22 @@ import ActionLog from "../components/action-log-v2";
 import { ActionLogV2 } from "../components/action-log-v2/types";
 import OverlayDeckList from "../components/OverlayDeckList";
 import TopBar from "../components/TopBar";
+import {
+  OVERLAY_DRAFT,
+  OVERLAY_FULL,
+  OVERLAY_LOG,
+  OVERLAY_SEEN,
+} from "../constants";
 import useDebounce from "../hooks/useDebounce";
+import { InternalDraftv2 } from "../types";
+import Chances from "../types/chances";
 import { DbDraftVote } from "../types/dbTypes";
 import bcConnect from "../utils/bcConnect";
+import compareCards from "../utils/compareCards";
 import remote from "../utils/electron/remoteWrapper";
 import getLocalSetting from "../utils/getLocalSetting";
 import getPlayerNameWithoutSuffix from "../utils/getPlayerNameWithoutSuffix";
+import Deck from "../utils/mtga/deck";
 import Clock from "./Clock";
 import DraftOverlay from "./DraftOverlay";
 

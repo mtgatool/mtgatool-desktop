@@ -1,5 +1,4 @@
-import { SeasonAndRankDetail } from "mtgatool-shared";
-
+import { SeasonAndRankDetail } from "../../types";
 import LogEntry from "../../types/logDecoder";
 
 interface Entry extends LogEntry {

@@ -1,12 +1,13 @@
 /* eslint-disable no-param-reassign */
 import _ from "lodash";
-import { Deck, InternalMatch } from "mtgatool-shared";
 
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
+import { InternalMatch } from "../types";
 import { DbMatch } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
 import globalData from "../utils/globalData";
+import Deck from "../utils/mtga/deck";
 import getUserNamespacedKey from "./getUserNamespacedKey";
 import { putData } from "./worker-wrapper";
 

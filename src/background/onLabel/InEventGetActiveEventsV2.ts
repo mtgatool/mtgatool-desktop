@@ -1,5 +1,4 @@
-import { ActiveEvent } from "mtgatool-shared";
-
+import { ActiveEvent } from "../../types";
 import LogEntry from "../../types/logDecoder";
 
 interface Entry extends LogEntry {

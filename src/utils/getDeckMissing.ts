@@ -1,6 +1,7 @@
-import { database, Deck, MissingWildcards } from "mtgatool-shared";
-
+import { MissingWildcards } from "../types";
 import getCardsMissingCount from "./getCardsMissinCount";
+import database from "./mtga/database";
+import Deck from "./mtga/deck";
 
 export default function getDeckMissing(deck: Deck): MissingWildcards {
   const missing = { rare: 0, common: 0, uncommon: 0, mythic: 0 };

@@ -2,13 +2,13 @@
 /* eslint-disable no-alert */
 /* eslint-disable no-restricted-globals */
 import { format, fromUnixTime } from "date-fns";
-import { database } from "mtgatool-shared";
 import { useCallback, useState } from "react";
 
 import { ReactComponent as Close } from "../assets/images/svg/close.svg";
 import info from "../info.json";
 import isElectron from "../utils/electron/isElectron";
 import getLocalSetting from "../utils/getLocalSetting";
+import database from "../utils/mtga/database";
 import openExternal from "../utils/openExternal";
 import setLocalSetting from "../utils/setLocalSetting";
 import showOpenLogDialog from "../utils/showOpenLogDialog";

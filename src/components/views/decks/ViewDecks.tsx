@@ -1,9 +1,9 @@
-import { Deck } from "mtgatool-shared";
 import { useSelector } from "react-redux";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
 
 import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import { AppState } from "../../../redux/stores/rendererStore";
+import Deck from "../../../utils/mtga/deck";
 import DecksList from "./DecksList";
 import DeckView from "./DeckView";
 

@@ -1,10 +1,10 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable radix */
 
-import { database } from "mtgatool-shared";
 import { Fragment } from "react";
 
 import useHoverCard from "../hooks/useHoverCard";
+import database from "../utils/mtga/database";
 
 interface LogTextProps {
   children: string;

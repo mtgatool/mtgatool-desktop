@@ -1,15 +1,11 @@
 // eslint-disable-next-line import/no-unresolved
 import { ToolDb } from "mtgatool-db";
-import {
-  Cards,
-  DatabaseClass,
-  InternalMatch,
-  v2cardsList,
-} from "mtgatool-shared";
 
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { InventoryInfo } from "../background/onLabel/InStartHook";
 import { OverlayHandler } from "../common/overlayHandler";
+import { DatabaseClass } from "../utils/mtga/database";
+import { Cards, InternalMatch, v2cardsList } from ".";
 
 declare global {
   interface Window {

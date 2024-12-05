@@ -1,28 +1,30 @@
 /* eslint-disable radix */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-nested-ternary */
-import {
-  CardObject,
-  Chances,
-  Colors,
-  compareCards,
-  constants,
-  database,
-  Deck,
-} from "mtgatool-shared";
+
 import QRCode from "qrcode";
 import { useCallback, useRef, useState } from "react";
 
 import { ReactComponent as QrCodeIcon } from "../assets/images/svg/qrcode.svg";
 import { OverlaySettings } from "../common/defaultConfig";
+import {
+  LANDS_HACK,
+  OVERLAY_FULL,
+  OVERLAY_LEFT,
+  OVERLAY_MIXED,
+  OVERLAY_ODDS,
+} from "../constants";
+import { CardObject } from "../types";
+import Chances from "../types/chances";
+import compareCards from "../utils/compareCards";
 import copyToClipboard from "../utils/copyToClipboard";
+import Colors from "../utils/mtga/colors";
+import database from "../utils/mtga/database";
+import Deck from "../utils/mtga/deck";
 import CardTile, { CardTileQuantity, LandsTile } from "./CardTile";
 import DeckManaCurve from "./DeckManaCurve";
 import DeckTypesStats from "./DeckTypesStats";
 import SampleSizePanel from "./SampleSizePanel";
-
-const { OVERLAY_FULL, OVERLAY_LEFT, OVERLAY_MIXED, OVERLAY_ODDS, LANDS_HACK } =
-  constants;
 
 function _compareQuantity(a: CardObject, b: CardObject): -1 | 0 | 1 {
   if (b.quantity - a.quantity < 0) return -1;

@@ -1,4 +1,4 @@
-import { TurnInfo } from "mtgatool-shared/dist/types/greTypes";
+import { TurnInfo } from "../../types/greTypes";
 
 export type ActionLogLineType =
   | "START"

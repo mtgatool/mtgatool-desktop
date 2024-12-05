@@ -2,13 +2,7 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable react/no-array-index-key */
-import {
-  CardsList,
-  compareCards,
-  database,
-  Deck,
-  MatchGameStats,
-} from "mtgatool-shared";
+
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
@@ -20,13 +14,18 @@ import { ReactComponent as IconEvent } from "../../../assets/images/svg/event.sv
 import { ReactComponent as IconTime } from "../../../assets/images/svg/time.svg";
 import reduxAction from "../../../redux/reduxAction";
 import { getData } from "../../../toolDb/worker-wrapper";
+import { MatchGameStats } from "../../../types";
 import { DbMatch } from "../../../types/dbTypes";
+import compareCards from "../../../utils/compareCards";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { toMMSS } from "../../../utils/dateTo";
 import { getCardArtCrop, getCardImage } from "../../../utils/getCardArtCrop";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
 import isLimitedEventId from "../../../utils/isLimitedEventId";
+import CardsList from "../../../utils/mtga/cardsList";
+import database from "../../../utils/mtga/database";
+import Deck from "../../../utils/mtga/deck";
 import ActionLogV2 from "../../action-log-v2";
 import ActionLog from "../../ActionLog";
 import CardList from "../../CardList";
@@ -305,7 +304,10 @@ export default function MatchView(): JSX.Element {
   }, [matchData]);
 
   const duration = arrayGameStats
-    ? arrayGameStats.reduce((acc, cur) => acc + cur.time, 0)
+    ? arrayGameStats.reduce(
+        (acc: number, cur: MatchGameStats) => acc + cur.time,
+        0
+      )
     : 0;
 
   const pw = matchData?.internalMatch.player.wins || 0;

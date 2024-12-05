@@ -1,7 +1,10 @@
 /* eslint-disable react/no-array-index-key */
-import { CardObject, CardsList, database } from "mtgatool-shared";
+
 import { Fragment } from "react";
 
+import { CardObject } from "../types";
+import CardsList from "../utils/mtga/cardsList";
+import database from "../utils/mtga/database";
 import CardTile from "./CardTile";
 
 interface CardListProps {

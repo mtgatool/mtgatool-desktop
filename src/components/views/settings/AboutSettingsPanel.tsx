@@ -1,9 +1,9 @@
 import { format, fromUnixTime } from "date-fns";
-import { database } from "mtgatool-shared";
 import { useSelector } from "react-redux";
 
 import info from "../../../info.json";
 import { AppState } from "../../../redux/stores/rendererStore";
+import database from "../../../utils/mtga/database";
 import openExternal from "../../../utils/openExternal";
 
 export default function AboutSettingsPanel(): JSX.Element {

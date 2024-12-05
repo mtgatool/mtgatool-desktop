@@ -1,12 +1,13 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable radix */
-import { Colors, constants } from "mtgatool-shared";
+
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import { ReactComponent as Close } from "../../../assets/images/svg/close.svg";
+import { BLACK, BLUE, COLORLESS, GREEN, RED, WHITE } from "../../../constants";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
 import {
@@ -25,6 +26,7 @@ import {
   MinMaxFilter,
   RarityBitsFilter,
 } from "../../../types/filterTypes";
+import Colors from "../../../utils/mtga/colors";
 import Flex from "../../Flex";
 import InputContainer from "../../InputContainer";
 import ManaFilter from "../../ManaFilter";
@@ -32,8 +34,6 @@ import SetsFilter from "../../SetsFilter";
 import Button from "../../ui/Button";
 import Select from "../../ui/Select";
 import getFiltersFromQuery from "./collectionQuery";
-
-const { WHITE, BLUE, BLACK, RED, GREEN, COLORLESS } = constants;
 
 const colorsToKey: Record<number, string> = {
   [WHITE]: "w",

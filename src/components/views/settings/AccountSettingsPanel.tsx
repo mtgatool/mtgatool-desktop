@@ -1,6 +1,5 @@
 import _ from "lodash";
 import { sha1 } from "mtgatool-db";
-import { LOGIN_AUTH } from "mtgatool-shared/dist/shared/constants";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
@@ -9,6 +8,7 @@ import { ReactComponent as ShowIcon } from "../../../assets/images/svg/archive.s
 import { ReactComponent as KeysIcon } from "../../../assets/images/svg/keys.svg";
 import { ReactComponent as HideIcon } from "../../../assets/images/svg/unarchive.svg";
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
+import { LOGIN_AUTH } from "../../../constants";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import reduxAction from "../../../redux/reduxAction";

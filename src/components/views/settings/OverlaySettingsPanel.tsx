@@ -1,17 +1,5 @@
 import _ from "lodash";
 import {
-  COLORS_ALL,
-  OVERLAY_DRAFT,
-  OVERLAY_DRAFT_BREW,
-  OVERLAY_DRAFT_MODES,
-  OVERLAY_FULL,
-  OVERLAY_LEFT,
-  OVERLAY_LOG,
-  OVERLAY_MIXED,
-  OVERLAY_ODDS,
-  OVERLAY_SEEN,
-} from "mtgatool-shared/dist/shared/constants";
-import {
   MutableRefObject,
   useCallback,
   useEffect,
@@ -22,6 +10,18 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import { defaultConfig, OverlaySettings } from "../../../common/defaultConfig";
+import {
+  COLORS_ALL,
+  OVERLAY_DRAFT,
+  OVERLAY_DRAFT_BREW,
+  OVERLAY_DRAFT_MODES,
+  OVERLAY_FULL,
+  OVERLAY_LEFT,
+  OVERLAY_LOG,
+  OVERLAY_MIXED,
+  OVERLAY_ODDS,
+  OVERLAY_SEEN,
+} from "../../../constants";
 import useColorPicker from "../../../hooks/useColorPicker";
 import reduxAction from "../../../redux/reduxAction";
 import store, { AppState } from "../../../redux/stores/rendererStore";

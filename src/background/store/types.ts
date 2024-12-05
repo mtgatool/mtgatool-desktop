@@ -1,13 +1,12 @@
 import {
   CardCast,
-  Chances,
-  Deck,
   Heat,
   InternalDeck,
   InternalPlayer,
   MatchGameStats,
   PriorityTimers,
-} from "mtgatool-shared";
+} from "../../types";
+import Chances from "../../types/chances";
 import {
   AnnotationInfo,
   GameInfo,
@@ -16,7 +15,8 @@ import {
   PlayerInfo,
   TurnInfo,
   ZoneInfo,
-} from "mtgatool-shared/dist/types/greTypes";
+} from "../../types/greTypes";
+import Deck from "../../utils/mtga/deck";
 
 export interface MatchState {
   matchStarted: boolean;

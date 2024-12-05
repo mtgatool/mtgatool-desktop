@@ -1,5 +1,7 @@
 /* eslint-disable radix */
-import { CardObject, Deck, DeckChanges, MatchGameStats } from "mtgatool-shared";
+
+import { CardObject, DeckChanges, MatchGameStats } from "../types";
+import Deck from "../utils/mtga/deck";
 
 export default function getDeckChanges(
   newDeck: Deck,

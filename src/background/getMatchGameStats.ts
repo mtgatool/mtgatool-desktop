@@ -1,6 +1,6 @@
 import _ from "lodash";
-import { MatchGameStats } from "mtgatool-shared";
 
+import { MatchGameStats } from "../types";
 import getDeckChanges from "./getDeckChanges";
 import globalStore from "./store";
 import { setMatchGameStats } from "./store/currentMatchStore";

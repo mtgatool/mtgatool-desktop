@@ -1,7 +1,7 @@
-import { ArenaV3Deck, convertDeckFromV3 } from "mtgatool-shared";
-
 // import postChannelMessage from "../../broadcastChannel/postChannelMessage";
+import { ArenaV3Deck } from "../../types";
 import LogEntry from "../../types/logDecoder";
+import convertDeckFromV3 from "../../utils/convertDeckFromV3";
 
 interface Entry extends LogEntry {
   json: ArenaV3Deck;
