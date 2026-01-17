@@ -5,10 +5,12 @@ const port = process.env.PORT ? process.env.PORT - 100 : 3001;
 
 process.env.ELECTRON_START_URL = `http://localhost:${port}`;
 
-const client = new net.Socket();
-
 let startedElectron = false;
+
 const tryConnection = () => {
+  // Create a new socket for each connection attempt to avoid listener accumulation
+  const client = new net.Socket();
+
   client.connect({ port }, () => {
     client.end();
     if (!startedElectron) {
@@ -29,14 +31,15 @@ const tryConnection = () => {
       });
 
       ls.on("exit", (code) => {
-        console.warning(`child process exited with code ${code.toString()}`);
+        console.warn(`child process exited with code ${code.toString()}`);
       });
     }
+  });
+
+  client.on("error", () => {
+    client.destroy();
+    setTimeout(tryConnection, 1000);
   });
 };
 
 tryConnection();
-
-client.on("error", () => {
-  setTimeout(tryConnection, 1000);
-});

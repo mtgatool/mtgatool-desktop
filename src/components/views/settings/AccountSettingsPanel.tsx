@@ -1,8 +1,8 @@
 import _ from "lodash";
-import { sha1 } from "mtgatool-db";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
+import { sha1 } from "tool-db";
 
 import { ReactComponent as ShowIcon } from "../../../assets/images/svg/archive.svg";
 import { ReactComponent as KeysIcon } from "../../../assets/images/svg/keys.svg";

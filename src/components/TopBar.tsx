@@ -14,7 +14,7 @@ import { ReactComponent as WinRestore } from "../assets/images/svg/win-restore.s
 import { overlayTitleToId } from "../common/maps";
 import { COLORS_ALL } from "../constants";
 import store, { AppState } from "../redux/stores/rendererStore";
-import { ALL_OVERLAYS, WINDOW_MAIN } from "../types/app";
+import { ALL_OVERLAYS, ConnectionData, WINDOW_MAIN } from "../types/app";
 import getWindowTitle from "../utils/electron/getWindowTitle";
 import hideWindow from "../utils/electron/hideWindow";
 import isFocused from "../utils/electron/isFocused";
@@ -69,6 +69,7 @@ interface TopBarProps {
 export default function TopBar(props: TopBarProps): JSX.Element {
   const { forceOs, closeCallback } = props;
   const [hoverControls, setHoverControls] = useState(false);
+  const [peerCount, setPeerCount] = useState(0);
 
   const offline = useSelector((state: AppState) => state.renderer.offline);
   const topArtist = useSelector((state: AppState) => state.renderer.topArtist);
@@ -78,6 +79,39 @@ export default function TopBar(props: TopBarProps): JSX.Element {
   const isOverlay = ALL_OVERLAYS.includes(getWindowTitle());
 
   const [_redraw, setRedraw] = useState(0);
+
+  // Fetch connection data periodically for peer count
+  useEffect(() => {
+    const listener = (e: MessageEvent) => {
+      const { type, value } = e.data;
+      if (type === "CONNECTION_DATA") {
+        const connectedPeers = (value as ConnectionData[]).filter(
+          (p) => p.isConnected
+        );
+        setPeerCount(connectedPeers.length);
+      }
+    };
+
+    const fetchConnectionData = () => {
+      if (window.toolDbWorker) {
+        window.toolDbWorker.postMessage({ type: "GET_CONNECTION_DATA" });
+      }
+    };
+
+    if (window.toolDbWorker) {
+      window.toolDbWorker.addEventListener("message", listener);
+      fetchConnectionData();
+    }
+
+    const interval = setInterval(fetchConnectionData, 2000);
+
+    return () => {
+      clearInterval(interval);
+      if (window.toolDbWorker) {
+        window.toolDbWorker.removeEventListener("message", listener);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (os !== "darwin") {
@@ -156,8 +190,13 @@ export default function TopBar(props: TopBarProps): JSX.Element {
     </div>
   );
 
-  const isOffline = (
-    <div className="unlink" title="You are not connected to any servers." />
+  const connectionStatus = offline ? (
+    <div className="unlink" title="Connecting to peers..." />
+  ) : (
+    <div
+      className="link"
+      title={`Connected to ${peerCount} peer${peerCount !== 1 ? "s" : ""}`}
+    />
   );
 
   return (
@@ -188,14 +227,14 @@ export default function TopBar(props: TopBarProps): JSX.Element {
         ) : (
           <></>
         )}
-        {offline && !isOverlay && isReverse && isOffline}
+        {!isOverlay && isReverse && connectionStatus}
       </div>
       <div
         onMouseEnter={(): void => setHoverControls(true)}
         onMouseLeave={(): void => setHoverControls(false)}
         className={topButtonsContainerClass}
       >
-        {offline && !isOverlay && !isReverse && isOffline}
+        {!isOverlay && !isReverse && connectionStatus}
         {os == "darwin"
           ? [close, minimize, maximize]
           : [minimize, maximize, close]}

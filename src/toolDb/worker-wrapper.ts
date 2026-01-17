@@ -1,5 +1,6 @@
-import { FunctionReturn, ParsedKeys } from "mtgatool-db";
+import { FunctionReturn } from "tool-db";
 
+import { ParsedKeys } from "../../tooldb-worker/keysLogin";
 import { MatchData } from "../components/views/history/convertDbMatchData";
 
 const login = (username: string, password: string) => {

@@ -1,10 +1,10 @@
 /* eslint-disable import/no-webpack-loader-syntax */
 /* eslint-disable no-nested-ternary */
 import _ from "lodash";
-import { sha1 } from "mtgatool-db";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Switch, useHistory } from "react-router-dom";
+import { sha1 } from "tool-db";
 
 import overlayHandler from "../common/overlayHandler";
 import { LOGIN_OK } from "../constants";

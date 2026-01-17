@@ -1,4 +1,4 @@
-import { sha1 } from "mtgatool-db";
+import { sha1 } from "tool-db";
 
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import { InventoryUpdate } from "../../types";

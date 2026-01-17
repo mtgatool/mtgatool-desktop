@@ -1,5 +1,3 @@
-import Automerge from "automerge";
-
 const globalData = {
   backgroundProcess: null as any | null,
   broadcastChannel: null as BroadcastChannel | null,
@@ -11,7 +9,7 @@ const globalData = {
   matchesIndex: [] as string[],
   draftsIndex: [] as string[],
   hiddenDecks: [] as string[],
-  liveFeed: Automerge.init<Record<string, number>>(),
+  liveFeed: {} as Record<string, number>,
   lastLogCheck: 0,
 };
 

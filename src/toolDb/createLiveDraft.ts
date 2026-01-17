@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
-import Automerge from "automerge";
-import { base64ToBinaryDocument } from "mtgatool-db";
+import { VerificationData } from "tool-db";
 
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { LOGIN_OK } from "../constants";
@@ -14,35 +13,30 @@ export default function createLiveDraft(draft: InternalDraftv2): null | string {
   if (loginState === LOGIN_OK) {
     const key = `live-draft-v1-${draft.id}`;
 
-    const origDoc = Automerge.init<DbliveDraftV1>();
+    // Create initial live draft data (no Automerge in new architecture)
+    const liveDraftData: DbliveDraftV1 = {
+      owner: pubKey || "",
+      ref: getUserNamespacedKey(pubKey, `draft-${draft.id}`),
+      votes: {},
+    };
 
-    const newDoc = Automerge.change(origDoc, (doc) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      doc.owner = pubKey || "";
-      doc.ref = getUserNamespacedKey(pubKey, `draft-${draft.id}`);
-      doc.votes = {};
-    });
+    // Put the initial data
+    window.toolDb.putData<DbliveDraftV1>(key, liveDraftData, false);
 
-    window.toolDb.putCrdt<DbliveDraftV1>(
+    // Set up a listener for updates
+    window.toolDb.addKeyListener<DbliveDraftV1>(
       key,
-      Automerge.getChanges(origDoc, newDoc),
-      false
-    );
+      (msg: VerificationData<DbliveDraftV1>) => {
+        if (msg.v) {
+          console.log("Received update", msg.v);
 
-    window.toolDb.addKeyListener<DbliveDraftV1>(key, (msg) => {
-      if (msg.type === "crdt") {
-        const doc = Automerge.load<DbliveDraftV1>(
-          base64ToBinaryDocument(msg.doc)
-        );
-        const _newDoc = Automerge.merge<DbliveDraftV1>(Automerge.init(), doc);
-        console.log("Recieved update", doc);
-
-        postChannelMessage({
-          type: "DRAFT_VOTES",
-          value: _newDoc.votes,
-        });
+          postChannelMessage({
+            type: "DRAFT_VOTES",
+            value: msg.v.votes,
+          });
+        }
       }
-    });
+    );
 
     window.toolDb.subscribeData(key);
 

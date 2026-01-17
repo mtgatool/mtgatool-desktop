@@ -1,4 +1,4 @@
-import { Peer, ServerPeerData } from "mtgatool-db";
+import { Peer } from "tool-db";
 
 export const WINDOW_BACKGROUND = "mtgatool-background";
 
@@ -26,10 +26,12 @@ export const ALL_OVERLAYS = [
   WINDOW_OVERLAY_4,
 ];
 
+// In the new P2P architecture, ServerPeerData is no longer used
+// Connection data is simplified
 export interface ConnectionData {
   peerId: string;
-  peerData: Peer;
-  serverPeerData: ServerPeerData;
+  peerData: Peer | null;
+  serverPeerData: null;
   host: string;
   isConnected: boolean;
 }

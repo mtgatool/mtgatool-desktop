@@ -1,5 +1,5 @@
-import { sha1, sha256 } from "mtgatool-db";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { sha1, sha256 } from "tool-db";
 
 import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
 import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";

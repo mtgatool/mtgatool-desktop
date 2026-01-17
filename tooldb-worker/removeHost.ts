@@ -1,30 +1,14 @@
-import { ToolDbNetwork } from "mtgatool-db";
-
-import { DEFAULT_PEERS, SAVED_PEERS_KEY } from "./constants";
-
 /* eslint-disable no-restricted-globals */
+
+// In the new P2P WebRTC architecture, hosts are managed automatically
+// This function is kept for backwards compatibility but doesn't do much
 export default function removeHost(host: string) {
-  const networkModule = self.toolDb.network as ToolDbNetwork;
-  networkModule.disconnect(host);
+  console.log(`removeHost called for ${host} - in P2P mode, connections are managed automatically`);
 
-  // Try to conenct to servers from cache
-  self.toolDb.store.get(SAVED_PEERS_KEY, (err, data) => {
-    let savedPeers: string[] = DEFAULT_PEERS;
-    if (err) {
-      console.error("Error getting saved peers from cache:", err);
-    } else if (data) {
-      try {
-        const newPeers = JSON.parse(data);
-        savedPeers = newPeers;
-      } catch (_e) {
-        console.error("Error parsing saved peers from cache:", _e);
-      }
-    }
-
-    savedPeers = savedPeers.filter((peer) => peer !== host);
-
-    self.toolDb.store.put(SAVED_PEERS_KEY, JSON.stringify(savedPeers), () => {
-      console.log("Saved peers to cache", savedPeers);
-    });
-  });
+  // The webrtc-network adapter handles peer connections internally
+  // Manual disconnect is not typically needed as peers are discovered via trackers
+  const networkModule = self.toolDb.network as any;
+  if (networkModule?.close) {
+    networkModule.close(host);
+  }
 }

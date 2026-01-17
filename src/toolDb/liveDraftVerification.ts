@@ -1,4 +1,4 @@
-import { VerificationData } from "mtgatool-db";
+import { VerificationData } from "tool-db";
 
 import { DbliveDraftV1 } from "../types/dbTypes";
 import { getData } from "./worker-wrapper";
@@ -10,7 +10,7 @@ export default function liveDraftVerification(
     getData<DbliveDraftV1>(msg.k)
       .then((originalDraft) => {
         if (originalDraft) {
-          if (originalDraft.owner === msg.p) {
+          if (originalDraft.owner === msg.a) {
             // Check if we own this
             // the owner has full control so we simply allow his writes
             resolve(true);

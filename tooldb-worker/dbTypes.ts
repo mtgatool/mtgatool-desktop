@@ -1,6 +1,4 @@
-// eslint-disable-next-line import/no-unresolved
-import Automerge from "automerge";
-import { ToolDb } from "mtgatool-db";
+import { ToolDb } from "tool-db";
 import {
   Cards,
   DatabaseClass,
@@ -75,7 +73,7 @@ interface GlobalData {
   matchesIndex: string[];
   draftsIndex: string[];
   hiddenDecks: string[];
-  liveFeed: Automerge.Doc<Record<string, number>>;
+  liveFeed: Record<string, number>;
   currentUUID: string;
 }
 
@@ -84,7 +82,6 @@ declare global {
     toolDb: ToolDb;
     toolDbInitialized: boolean;
     database: DatabaseClass;
-    overlayHandler: any | undefined; // OverlayHandler | undefined;
     globalStore: any;
     cards: Cards;
     cardsPrev: Cards;

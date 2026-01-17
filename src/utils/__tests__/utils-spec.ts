@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import { sha1 } from "mtgatool-db";
+import { sha1 } from "tool-db";
 
 import { cardHasType, cardType } from "../cardTypes";
 import countValues from "../countValues";

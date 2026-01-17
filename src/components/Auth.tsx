@@ -1,8 +1,8 @@
-import { sha1 } from "mtgatool-db";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { animated, useSpring } from "react-spring";
+import { sha1 } from "tool-db";
 
 import settingsIcon from "../assets/images/cog.png";
 import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";

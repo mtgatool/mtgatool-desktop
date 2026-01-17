@@ -1,12 +1,7 @@
-import Automerge, { FreezeObject } from "automerge";
-import {
-  arrayBufferToBase64,
-  base64ToBinaryDocument,
-  signData,
-} from "mtgatool-db";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { VerificationData } from "tool-db";
 
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import { AppState } from "../../../redux/stores/rendererStore";
@@ -29,71 +24,72 @@ export default function LiveDraftView() {
 
   const liveDraftKey = `live-draft-${params.id}`;
 
-  const liveDraftCrdt = useRef<FreezeObject<DbliveDraftV1>>();
-
-  useEffect(() => {
-    liveDraftCrdt.current = Automerge.init();
-  }, []);
+  // Store the current live draft data
+  const liveDraftData = useRef<DbliveDraftV1>({
+    owner: "",
+    ref: "",
+    votes: {},
+  });
 
   const _voteFor = useCallback(
-    (pack: number, pick: number, vote: number) => {
-      if (liveDraftCrdt.current && window.toolDb.user) {
-        if (window.toolDb.user) {
-          const voteKey = `${window.toolDb.user.pubKey}-${pack}-${pick}`;
-          signData(
-            voteKey,
-            window.toolDb.user?.keys.signKeys.privateKey as CryptoKey
-          ).then((signature) => {
-            const newDoc = Automerge.change(liveDraftCrdt.current, (doc) => {
-              // eslint-disable-next-line no-param-reassign
-              doc.votes[voteKey] = {
-                pubKey: window.toolDb.user?.pubKey || "",
-                signature: arrayBufferToBase64(signature),
-                pack,
-                pick,
-                vote,
-              };
-            });
+    async (pack: number, pick: number, vote: number) => {
+      const userAccount = window.toolDb.userAccount as any;
+      if (liveDraftData.current && userAccount) {
+        const pubKey = userAccount.getAddress?.();
+        if (pubKey) {
+          const voteKey = `${pubKey}-${pack}-${pick}`;
 
-            if (liveDraftCrdt.current && newDoc) {
-              window.toolDb.putCrdt(
-                liveDraftKey,
-                Automerge.getChanges(liveDraftCrdt.current, newDoc)
-              );
-              liveDraftCrdt.current = newDoc;
-            }
-          });
+          // Sign the vote
+          const signature = await userAccount.signData(voteKey);
+
+          // Update the live draft data
+          liveDraftData.current.votes[voteKey] = {
+            pubKey,
+            signature,
+            pack,
+            pick,
+            vote,
+          };
+
+          // Put the updated data
+          window.toolDb.putData(liveDraftKey, liveDraftData.current);
+          setLiveDraftState({ ...liveDraftData.current });
         }
       }
     },
-    [liveDraftCrdt, draftState]
+    [liveDraftKey]
   );
 
   useEffect(() => {
     let draftRef = "";
     let draftListener: null | number = null;
 
-    const keyLIstenerId = window.toolDb.addKeyListener<DbliveDraftV1>(
+    const keyListenerId = window.toolDb.addKeyListener<DbliveDraftV1>(
       liveDraftKey,
-      (msg) => {
-        if (msg.type === "crdt") {
-          const doc = Automerge.load<DbliveDraftV1>(
-            base64ToBinaryDocument(msg.doc)
-          );
-          liveDraftCrdt.current = Automerge.merge(Automerge.init(), doc);
+      (msg: VerificationData<DbliveDraftV1>) => {
+        if (msg.v) {
+          // Merge the votes from the received message
+          liveDraftData.current = {
+            ...liveDraftData.current,
+            ...msg.v,
+            votes: {
+              ...liveDraftData.current.votes,
+              ...msg.v.votes,
+            },
+          };
 
-          setLiveDraftState(liveDraftCrdt.current);
+          setLiveDraftState({ ...liveDraftData.current });
 
           // Do only once!
-          if (draftRef === "") {
-            draftRef = liveDraftCrdt.current.ref;
+          if (draftRef === "" && liveDraftData.current.ref) {
+            draftRef = liveDraftData.current.ref;
             window.toolDb.subscribeData(draftRef);
             window.toolDb.getData(draftRef);
 
             draftListener = window.toolDb.addKeyListener<InternalDraftv2>(
               draftRef,
-              (draftMsg) => {
-                if (draftMsg.type === "put") {
+              (draftMsg: VerificationData<InternalDraftv2>) => {
+                if (draftMsg.v) {
                   setDraftState(draftMsg.v);
                 }
               }
@@ -110,9 +106,9 @@ export default function LiveDraftView() {
       if (draftListener) {
         window.toolDb.removeKeyListener(draftListener);
       }
-      window.toolDb.removeKeyListener(keyLIstenerId);
+      window.toolDb.removeKeyListener(keyListenerId);
     };
-  }, []);
+  }, [liveDraftKey]);
 
   useEffect(() => {
     const pubKeys: string[] = [];
@@ -130,13 +126,13 @@ export default function LiveDraftView() {
   }, [fetchAvatar, avatars, liveDraftState]);
 
   const currentVotes: Record<number, string[]> = {};
-  if (liveDraftCrdt.current) {
-    Object.keys(liveDraftCrdt.current.votes || {})
+  if (liveDraftData.current) {
+    Object.keys(liveDraftData.current.votes || {})
       .filter((key) =>
         key.endsWith(`-${draftState?.currentPack}-${draftState?.currentPick}`)
       )
       .forEach((key) => {
-        const keyData = liveDraftCrdt.current?.votes[key];
+        const keyData = liveDraftData.current?.votes[key];
         if (keyData) {
           const grpId = keyData.vote || 0;
           if (!currentVotes[grpId]) currentVotes[grpId] = [];

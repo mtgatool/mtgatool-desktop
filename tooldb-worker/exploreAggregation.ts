@@ -1,8 +1,7 @@
 /* eslint-disable no-restricted-globals */
 /* eslint-disable no-bitwise */
 /* eslint-disable radix */
-import Automerge from "automerge";
-import { base64ToBinaryDocument, ToolDbMessage } from "mtgatool-db";
+import { ToolDbMessage, VerificationData } from "tool-db";
 import { DbCardDataV2, v2cardsList } from "mtgatool-shared";
 
 import { DbMatch } from "./dbTypes";
@@ -102,7 +101,9 @@ export function limitRecord(
 }
 
 export function beginDataQuery(_day: number, _eventId: string) {
-  let crdt: Automerge.FreezeObject<Record<string, number>> = Automerge.init({});
+  // In the new tool-db, CRDTs are handled differently
+  // We'll use regular data aggregation instead of Automerge
+  let aggregatedData: Record<string, number> = {};
 
   const data: Record<string, DbMatch> = {};
 
@@ -112,29 +113,29 @@ export function beginDataQuery(_day: number, _eventId: string) {
     self.postMessage({
       type: `EXPLORE_DATA_QUERY_STATE`,
       value: {
-        foundKeys: Object.keys(crdt).length,
+        foundKeys: Object.keys(aggregatedData).length,
         queriedKeys: queriedIds.length,
         savedKeys: Object.keys(data).length,
         loadingPercent: Math.floor(
-          (queriedIds.length / Object.keys(crdt).length) * 100
+          (queriedIds.length / Object.keys(aggregatedData).length) * 100
         ),
       },
     });
 
-    if (Object.keys(crdt).length === queriedIds.length) {
+    if (Object.keys(aggregatedData).length === queriedIds.length) {
       self.postMessage({
         type: `EXPLORE_DATA_QUERY`,
         value: data,
       });
     }
 
-    if (Object.keys(crdt).length === 0) {
+    if (Object.keys(aggregatedData).length === 0) {
       setTimeout(() => {
         continnuousCheck();
       }, 500);
     }
 
-    Object.keys(crdt)
+    Object.keys(aggregatedData)
       .filter((k) => !queriedIds.includes(k))
       .splice(0, 1)
       .forEach((id) => {
@@ -146,17 +147,13 @@ export function beginDataQuery(_day: number, _eventId: string) {
       });
   }
 
-  const handleExploreData = (msg: ToolDbMessage) => {
-    if (msg && msg.type === "crdt") {
-      const doc = Automerge.load<Record<string, number>>(
-        base64ToBinaryDocument(msg.doc)
-      );
-
-      try {
-        crdt = Automerge.merge(crdt, doc);
-      } catch (e) {
-        console.warn(e);
-      }
+  // Handle explore data - in new tool-db, CRDT messages have different structure
+  const handleExploreData = (msg: VerificationData<Record<string, number>>) => {
+    if (msg && msg.v) {
+      // Merge the data
+      Object.keys(msg.v).forEach((key) => {
+        aggregatedData[key] = msg.v[key];
+      });
     }
   };
 

@@ -1,4 +1,4 @@
-import { sha1 } from "mtgatool-db";
+import { sha1 } from "tool-db";
 
 /* eslint-disable import/prefer-default-export */
 export const DEFAULT_PEERS: string[] = [

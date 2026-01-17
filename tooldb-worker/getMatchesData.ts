@@ -42,22 +42,20 @@ export function convertDbMatchToData(match: DbMatch): MatchData {
 }
 
 function getLocalData<T>(key: string): Promise<T | undefined> {
-  return new Promise((resolve) => {
-    self.toolDb.store.get(key, (err, data) => {
-      if (err) {
-        resolve(undefined);
-      } else if (data) {
+  return self.toolDb.store
+    .get(key)
+    .then((data) => {
+      if (data) {
         try {
           const json = JSON.parse(data);
-          resolve(json.v);
+          return json.v as T;
         } catch (_e) {
-          resolve(undefined);
+          return undefined;
         }
-      } else {
-        resolve(undefined);
       }
-    });
-  });
+      return undefined;
+    })
+    .catch(() => undefined);
 }
 
 export function getMatchesDataLocal(
@@ -116,17 +114,25 @@ export function getMatchesData(
 
   // Fetch any match we dont have locally
   matchesIndex.forEach((id: string) => {
-    self.toolDb.store.get(id, (err) => {
-      if (!err) {
-        saved += 1;
-        debounceUpdateState();
-      } else {
+    self.toolDb.store
+      .get(id)
+      .then((data) => {
+        if (data) {
+          saved += 1;
+          debounceUpdateState();
+        } else {
+          self.toolDb.getData(id, false, 2000).finally(() => {
+            saved += 1;
+            debounceUpdateState();
+          });
+        }
+      })
+      .catch(() => {
         self.toolDb.getData(id, false, 2000).finally(() => {
           saved += 1;
           debounceUpdateState();
         });
-      }
-    });
+      });
   });
 
   updateState();

@@ -1,4 +1,4 @@
-import { ParsedKeys } from "mtgatool-db";
+import { ParsedKeys } from "../../tooldb-worker/keysLogin";
 
 function getKeysJson(): Promise<{ keys: ParsedKeys; userName: string }> {
   return new Promise((resolve, reject) => {

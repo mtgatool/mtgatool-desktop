@@ -1,28 +1,25 @@
-import { ToolDbNetwork } from "mtgatool-db";
-
 /* eslint-disable no-restricted-globals */
+
+// In the new P2P WebRTC architecture, connection data is managed differently
+// The webrtc-network adapter handles peer connections automatically
 export default function getConnectionData() {
-  const networkModule = self.toolDb.network as ToolDbNetwork;
+  const networkModule = self.toolDb.network as any;
 
-  const connectionData = Object.keys(networkModule.clientToSend).map(
-    (peerId: string) => {
-      const serverPeerData = networkModule.serverPeerData[peerId];
-      const peerData = self.toolDb.peers[peerId];
+  // Get connected peers from the webrtc adapter
+  const connectedPeers = Object.keys(networkModule?.clientToSend || {});
 
-      const host = peerData?.host;
-      const peerHost = !host || host === "127.0.0.1" ? peerId.slice(-20) : host;
+  const connectionData = connectedPeers.map((peerId: string) => {
+    const isConnected = networkModule?.isClientConnected?.[peerId]?.() ?? false;
 
-      const socket = networkModule.clientSocket[peerId];
-      return {
-        peerId,
-        peerData,
-        serverPeerData: serverPeerData,
-        host: serverPeerData?.name || peerHost,
-        readyState: socket?.readyState,
-        isConnected: socket?.readyState === socket.OPEN,
-      };
-    }
-  );
+    return {
+      peerId,
+      peerData: null,
+      serverPeerData: null,
+      host: peerId.slice(-20), // Use last 20 chars of peerId as display name
+      readyState: isConnected ? 1 : 0, // WebSocket.OPEN = 1
+      isConnected,
+    };
+  });
 
   self.postMessage({ type: `CONNECTION_DATA`, value: connectionData });
 }

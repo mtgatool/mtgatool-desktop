@@ -1,10 +1,11 @@
 /* eslint-disable no-restricted-globals */
 
-import { ServerPeerData, ToolDb, ToolDbNetwork } from "mtgatool-db";
+import ToolDbEcdsaUser from "@tool-db/ecdsa-user";
+import ToolDbIndexedb from "@tool-db/indexeddb-store";
+import ToolDbWebrtc from "@tool-db/webrtc-network";
+import { ToolDb } from "tool-db";
 
-import addHost from "./addHost";
 import addKeyListener from "./addKeyListener";
-import { DEFAULT_PEERS, SAVED_PEERS_KEY, SERVERS_KEY } from "./constants";
 import doFunction from "./doFunction";
 import { beginDataQuery } from "./exploreAggregation";
 import getConnectionData from "./getConnectionData";
@@ -20,70 +21,30 @@ import pushToExplore from "./pushToExplore";
 import pushToLiveFeed from "./pushToLivefeed";
 import queryKeys from "./queryKeys";
 import reduxAction from "./reduxAction";
-import removeHost from "./removeHost";
 import setPassword from "./setPassword";
 import signup from "./signup";
 
+// Initialize ToolDb with the new plugin-based architecture
 const toolDb = new ToolDb({
   topic: "mtgatool-db-swarm-v4",
   // debug: true,
-  server: false,
-  maxRetries: 999,
+  peers: [],
+  debug: true,
+  userAdapter: ToolDbEcdsaUser,
+  networkAdapter: ToolDbWebrtc as any,
+  storageAdapter: ToolDbIndexedb as any,
 });
 
 toolDb.on("init", (key) => console.warn("ToolDb initialized!", key));
 
-// Try to conenct to servers from cache
-toolDb.store.get(SAVED_PEERS_KEY, (err, savedData) => {
-  let savedPeers: string[] = DEFAULT_PEERS;
-  if (err) {
-    toolDb.store.put(SAVED_PEERS_KEY, JSON.stringify(DEFAULT_PEERS), () => {
-      console.log("Saved default peers to cache");
-    });
-  } else if (savedData) {
-    try {
-      const newPeers = JSON.parse(savedData);
-      savedPeers = newPeers;
-    } catch (_e) {
-      console.error("Error parsing saved peers from cache:", _e);
-    }
-  }
-
-  toolDb.store.get(SERVERS_KEY, (serr, data) => {
-    let serversData: Record<string, ServerPeerData> = {};
-    if (serr) {
-      console.error("Error getting servers from cache:", serr);
-    } else if (data) {
-      try {
-        serversData = JSON.parse(data);
-      } catch (_e) {
-        console.error("Error parsing servers from cache:", _e);
-      }
-    }
-
-    console.log("Got servers from cache:", serversData);
-
-    savedPeers.forEach((peer) => {
-      const networkModule = toolDb.network as ToolDbNetwork;
-      if (serversData[peer]) {
-        networkModule.connectTo(serversData[peer]);
-      } else {
-        networkModule.findServer(peer);
-      }
-    });
-  });
+// Wait for database to be ready
+toolDb.ready.catch((err) => {
+  console.error("Failed to initialize ToolDb:", err);
 });
 
 toolDb.onConnect = () => {
-  const networkModule = toolDb.network as ToolDbNetwork;
   reduxAction("SET_OFFLINE", false);
-
   self.postMessage({ type: "CONNECTED" });
-  toolDb.store.put(
-    SERVERS_KEY,
-    JSON.stringify(networkModule.serverPeerData),
-    () => console.log("Saved servers to cache", networkModule.serverPeerData)
-  );
 };
 
 toolDb.onDisconnect = () => {
@@ -132,7 +93,13 @@ self.onmessage = (e: any) => {
       break;
 
     case "GET_CRDT":
-      getCrdt(e.data.id, e.data.key, e.data.userNamespaced, e.data.timeoutMs);
+      getCrdt(
+        e.data.id,
+        e.data.key,
+        e.data.crdt,
+        e.data.userNamespaced,
+        e.data.timeoutMs
+      );
       break;
 
     case "GET_LOCAL_DATA":
@@ -163,22 +130,16 @@ self.onmessage = (e: any) => {
       getConnectionData();
       break;
 
+    // Network operations are no longer manually controlled in the new P2P architecture
+    // The webrtc-network adapter handles peer discovery automatically via WebRTC trackers
     case "CONNECT":
-      addHost(e.data.peer.pubKey);
-      (self.toolDb.network as ToolDbNetwork).connectTo(e.data.peer);
-      break;
-
     case "DISCONNECT":
-      (self.toolDb.network as ToolDbNetwork).disconnect(e.data.host);
-      break;
-
     case "REMOVE_HOST":
-      removeHost(e.data.host);
-      break;
-
     case "FIND_SERVER":
-      addHost(e.data.host);
-      (self.toolDb.network as ToolDbNetwork).findServer(e.data.host);
+      // These operations are no longer needed with P2P WebRTC
+      console.log(
+        `Network operation ${type} is handled automatically by webrtc-network`
+      );
       break;
 
     case "GET_SAVE_KEYS_JSON":
@@ -201,9 +162,13 @@ self.onmessage = (e: any) => {
       break;
 
     case "REFRESH_MATCHES":
-      if (self.toolDb.user) {
+      if (self.toolDb.userAccount?.getAddress()) {
         self.toolDb
-          .queryKeys(`:${self.toolDb.user.pubKey}.matches-`, false, 5000, true)
+          .queryKeys(
+            `:${self.toolDb.userAccount.getAddress()}.matches-`,
+            false,
+            5000
+          )
           .then(handleMatchesIndex);
       }
       break;

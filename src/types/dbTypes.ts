@@ -1,5 +1,4 @@
-// eslint-disable-next-line import/no-unresolved
-import { ToolDb } from "mtgatool-db";
+import { ToolDb } from "tool-db";
 
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { InventoryInfo } from "../background/onLabel/InStartHook";

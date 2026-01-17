@@ -3,6 +3,10 @@ const { app, BrowserWindow, protocol, Menu, Tray } = require("electron");
 const path = require("path");
 const url = require("url");
 
+// Increase max listeners to prevent warning from WebRTC network adapter
+// which creates multiple WebSocket connections to trackers and relays
+require("events").EventEmitter.defaultMaxListeners = 50;
+
 const { autoUpdater } = require("electron-updater");
 
 // const DC = require("discovery-channel");

@@ -1,27 +1,21 @@
 /* eslint-disable no-restricted-globals */
 /* eslint-disable no-param-reassign */
-import Automerge from "automerge";
 
 import { DbMatch } from "./dbTypes";
 
 export default async function pushToLiveFeed(key: string, match: DbMatch) {
   if (!self.globalData.liveFeed[key]) {
-    // Create CRDT document with the new match added to it
+    // In the new tool-db, we don't use Automerge CRDTs
+    // Instead, we use regular put operations with merge logic
     try {
-      const origDoc = Automerge.init<Record<string, number>>();
-      const newLiveFeed = Automerge.change(origDoc, (doc) => {
-        doc[key] = new Date(match.internalMatch.date).getTime();
-      });
-
       const currentDay = Math.floor(new Date().getTime() / (86400 * 1000));
-      self.toolDb
-        .putCrdt(
-          `matches-livefeed-${currentDay}`,
-          Automerge.getChanges(origDoc, newLiveFeed),
-          false
-        )
-        .catch(console.error);
-      // self.globalData.liveFeed = newLiveFeed;
+      const liveFeedKey = `matches-livefeed-${currentDay}`;
+
+      // Add the match to the live feed
+      self.globalData.liveFeed[key] = new Date(match.internalMatch.date).getTime();
+
+      // Put the updated live feed data
+      self.toolDb.putData(liveFeedKey, self.globalData.liveFeed, false);
     } catch (e) {
       console.warn(e);
     }
