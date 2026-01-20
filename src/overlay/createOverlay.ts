@@ -1,107 +1,69 @@
-import path from "path";
-import url from "url";
-
 import { OverlaySettings, Settings } from "../common/defaultConfig";
-import {
-  WINDOW_OVERLAY_0,
-  WINDOW_OVERLAY_1,
-  WINDOW_OVERLAY_2,
-  WINDOW_OVERLAY_3,
-  WINDOW_OVERLAY_4,
-} from "../types/app";
-import remote from "../utils/electron/remoteWrapper";
+import { ALL_TAURI_OVERLAY_LABELS } from "../types/app";
 import getLocalSetting from "../utils/getLocalSetting";
+import isTauri from "../utils/tauri/isTauri";
 
-const overlayIdToTitle = [
-  WINDOW_OVERLAY_0,
-  WINDOW_OVERLAY_1,
-  WINDOW_OVERLAY_2,
-  WINDOW_OVERLAY_3,
-  WINDOW_OVERLAY_4,
-];
-
-export default function createOverlay(
+export default async function createOverlay(
   id: number,
   callback?: () => void
 ): Promise<void> {
-  if (!remote) return new Promise((a, r) => r());
+  if (!isTauri()) return;
 
   const allSettings = JSON.parse(getLocalSetting("settings")) as Settings;
   const settings: OverlaySettings = allSettings.overlays[id];
+  const label = ALL_TAURI_OVERLAY_LABELS[id];
 
-  console.warn("allSettings", id, allSettings);
+  console.warn("createOverlay", id, allSettings);
 
-  const newWindow = new remote.BrowserWindow({
-    transparent: allSettings.overlaysTransparency,
-    // resizable: allSettings.overlayResizable,
-    // skipTaskbar: allSettings.overlaySkipTaskbar,
-    focusable: !!allSettings.overlaysTransparency,
-    backgroundColor: allSettings.overlaysTransparency ? undefined : "#0d0d0f",
-    title: overlayIdToTitle[id],
-    show: false,
-    frame: allSettings.overlayFrame,
-    width: settings.bounds.width,
-    height: settings.bounds.height,
-    x: settings.bounds.x,
-    y: settings.bounds.y,
-    alwaysOnTop: true,
-    acceptFirstMouse: allSettings.overlayAcceptFirstMouse,
-    webPreferences: {
-      webSecurity: false,
-      nodeIntegration: true,
-      contextIsolation: false,
-    },
-  });
+  try {
+    const { WebviewWindow } = await import("@tauri-apps/api/window");
 
-  newWindow.removeMenu();
-  newWindow.setVisibleOnAllWorkspaces(true);
+    // Check if window already exists
+    const existingWindow = WebviewWindow.getByLabel(label);
+    if (existingWindow) {
+      await existingWindow.show();
+      return;
+    }
 
-  const proc: any = process;
-  newWindow.loadURL(
-    remote.app.isPackaged
-      ? url.format({
-          pathname: path.join(
-            proc.resourcesPath,
-            "app.asar",
-            "build",
-            "index.html"
-          ),
-          protocol: "file:",
-          slashes: true,
-        })
-      : "http://localhost:3001"
-  );
+    // Create new overlay window
+    const newWindow = new WebviewWindow(label, {
+      url: "/", // Tauri serves from the build folder
+      transparent: allSettings.overlaysTransparency,
+      decorations: allSettings.overlayFrame,
+      alwaysOnTop: true,
+      skipTaskbar: true,
+      width: settings.bounds.width,
+      height: settings.bounds.height,
+      x: settings.bounds.x,
+      y: settings.bounds.y,
+      visible: false,
+      resizable: true,
+      focus: false,
+    });
 
-  remote.require("@electron/remote/main").enable(newWindow.webContents);
-
-  return new Promise<void>((resolve) => {
-    newWindow.webContents.once("dom-ready", () => {
-      // eslint-disable-next-line func-names
-      if (remote && process.env.NODE_ENV === "development") {
-        const overlayDevtools = new remote.BrowserWindow({
-          title: "MTG Arena Tool - overlay debug",
-          icon: path.join(__dirname, "logo512.png"),
-        });
-        overlayDevtools.removeMenu();
-        newWindow.webContents.setDevToolsWebContents(
-          overlayDevtools.webContents
-        );
-        newWindow.webContents.openDevTools({ mode: "detach" });
-      }
-
-      setTimeout(() => {
-        newWindow.show();
+    // Listen for window creation
+    await newWindow.once("tauri://created", async () => {
+      // Show window after a short delay
+      setTimeout(async () => {
+        try {
+          await newWindow.show();
+          await newWindow.setAlwaysOnTop(true);
+        } catch (e) {
+          console.error("Failed to show overlay:", e);
+        }
       }, 250);
-
-      setTimeout(() => {
-        newWindow.setFocusable(false);
-        newWindow.setAlwaysOnTop(true, "pop-up-menu", 1);
-      }, 500);
     });
 
-    newWindow.on("close", () => {
+    // Listen for window close
+    await newWindow.once("tauri://close-requested", () => {
       if (callback) callback();
-      resolve();
     });
-  });
+
+    // Handle creation error
+    await newWindow.once("tauri://error", (e) => {
+      console.error("Failed to create overlay window:", e);
+    });
+  } catch (e) {
+    console.error("Failed to create overlay:", e);
+  }
 }

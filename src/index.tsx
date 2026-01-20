@@ -4,5 +4,5 @@
  *
  * See module-resolver-file.js
  */
-import "./electronIndex";
 import "./webIndex";
+import "./tauriIndex";

@@ -2,7 +2,6 @@ import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { DEFAULT_TILE } from "../constants";
 import { InternalMatch, JumpstartThemes } from "../types";
 import { ResultSpec } from "../types/greTypes";
-import remote from "../utils/electron/remoteWrapper";
 import getJumpstartThemes, { themeCards } from "../utils/getJumpstartThemes";
 import getToolVersion from "../utils/getToolVersion";
 import getOpponentDeck from "./getOpponentDeck";
@@ -75,7 +74,7 @@ function generateInternalMatch(): InternalMatch {
     duration,
     gameStats: currentMatch.matchGameStats,
     toolVersion: getToolVersion(),
-    toolRunFromSource: !remote?.app.isPackaged,
+    toolRunFromSource: false, // In Tauri, we assume packaged builds
     arenaId: currentMatch.player.name,
     playerDeckHash: globalStore.currentMatch.originalDeck.getHash(),
     actionLog: globalStore.currentActionLog as any,

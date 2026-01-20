@@ -8,15 +8,11 @@ import {
   OVERLAY_SEEN,
 } from "../constants";
 import { CardQuality } from "../types";
-import electron from "../utils/electron/electronWrapper";
-import remote from "../utils/electron/remoteWrapper";
+import isTauri from "../utils/tauri/isTauri";
 
-let primaryX = 0;
-let primaryY = 0;
-if (remote) {
-  primaryX = remote.screen.getPrimaryDisplay().bounds.x;
-  primaryY = remote.screen.getPrimaryDisplay().bounds.y;
-}
+// Default primary display position (will be updated async in Tauri)
+const primaryX = 0;
+const primaryY = 0;
 
 const overlayCfg = {
   alpha: 1,
@@ -42,11 +38,20 @@ const overlayCfg = {
 
 export type OverlaySettings = typeof overlayCfg;
 
+// Check platform for transparency support
+// Linux doesn't support transparent windows well
+function supportsTransparency(): boolean {
+  if (!isTauri()) return false;
+  // On Tauri, we default to true and check platform later
+  // Linux mode fallback is handled elsewhere
+  return true;
+}
+
 export const defaultConfig = {
   overlayBackColor: "#000000ff",
   overlayOverview: true,
   overlayHover: true,
-  overlaysTransparency: !!(electron && process.platform !== "linux"),
+  overlaysTransparency: supportsTransparency(),
   overlayResizable: false,
   overlaySkipTaskbar: false,
   overlayFrame: false,

@@ -3,8 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
-import remote from "../../../utils/electron/remoteWrapper";
-import registerShortcuts from "../../../utils/registerShortcuts";
+import registerShortcuts, { unregisterAllShortcuts } from "../../../utils/registerShortcuts";
 import EditKey from "../../popups/EditKey";
 import Button from "../../ui/Button";
 import Toggle from "../../ui/Toggle";
@@ -31,9 +30,7 @@ function ShortcutsRow({
   const ld = index % 2 ? "line-dark" : "line-light";
 
   function openKeyCombinationDialog(): void {
-    if (remote) {
-      remote.globalShortcut.unregisterAll();
-    }
+    unregisterAllShortcuts();
     setOpenDialog(true);
   }
 

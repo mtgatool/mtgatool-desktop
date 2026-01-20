@@ -8,8 +8,8 @@ import readRank from "../../reader/readRank";
 import { InternalDeck, MatchGameRoomStateChange } from "../../types";
 import LogEntry from "../../types/logDecoder";
 import convertV4ListToV2 from "../../utils/convertV4ListToV2";
-import isElectron from "../../utils/electron/isElectron";
 import getLocalSetting from "../../utils/getLocalSetting";
+import isTauri from "../../utils/tauri/isTauri";
 import isLimitedEventId from "../../utils/isLimitedEventId";
 import CardsList from "../../utils/mtga/cardsList";
 import Deck from "../../utils/mtga/deck";
@@ -157,7 +157,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
 
     const isLimited = isLimitedEventId(gameRoom.gameRoomConfig.eventId);
 
-    if (isElectron()) {
+    if (isTauri()) {
       const matchState = readMatchManger();
 
       const oppInfo = readMatchOpponentInfo();

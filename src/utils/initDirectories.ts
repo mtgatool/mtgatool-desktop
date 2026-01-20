@@ -1,18 +1,18 @@
-import path from "path";
+import isTauri from "./tauri/isTauri";
 
-import electron from "./electron/electronWrapper";
-import remote from "./electron/remoteWrapper";
+export default async function initDirectories(): Promise<void> {
+  if (!isTauri()) return;
 
-export default function initDirectories() {
-  if (electron) {
-    // eslint-disable-next-line global-require
-    const fs = require("fs");
-    const actionLogDir = path.join(
-      (remote && remote.app).getPath("userData"),
-      "actionlogs"
-    );
-    if (!fs.existsSync(actionLogDir)) {
-      fs.mkdirSync(actionLogDir);
-    }
+  try {
+    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { appDataDir, join } = await import("@tauri-apps/api/path");
+
+    const appData = await appDataDir();
+    const actionLogDir = await join(appData, "actionlogs");
+
+    // Create directory using Tauri command
+    await invoke("create_dir", { path: actionLogDir });
+  } catch (e) {
+    console.error("Failed to initialize directories:", e);
   }
 }

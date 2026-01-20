@@ -1,20 +1,34 @@
-import electron from "./electron/electronWrapper";
-import remote from "./electron/remoteWrapper";
+import isTauri from "./tauri/isTauri";
 
-export default function showOpenLogDialog(log: string): Promise<any> {
-  if (electron && remote) {
-    const { dialog } = remote;
-    return dialog.showOpenDialog(remote.getCurrentWindow(), {
+export default async function showOpenLogDialog(
+  defaultPath: string
+): Promise<{ filePaths: string[] } | null> {
+  if (!isTauri()) {
+    return null;
+  }
+
+  try {
+    const { open } = await import("@tauri-apps/api/dialog");
+
+    const selected = await open({
       title: "Arena Log Location",
-      defaultPath: log,
-      buttonLabel: "Select",
+      defaultPath,
       filters: [
         { name: "Log Files", extensions: ["log"] },
         { name: "Text", extensions: ["txt", "text"] },
         { name: "All Files", extensions: ["*"] },
       ],
-      properties: ["openFile"],
+      multiple: false,
+      directory: false,
     });
+
+    if (selected && typeof selected === "string") {
+      return { filePaths: [selected] };
+    }
+
+    return null;
+  } catch (e) {
+    console.error("Failed to show open dialog:", e);
+    return null;
   }
-  return new Promise((_resolve, reject) => reject());
 }

@@ -1,7 +1,8 @@
 import "./index.scss";
 
-import { ipcRenderer as ipc } from "electron";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import isTauri from "../utils/tauri/isTauri";
 
 function toMb(bytes: number): number {
   return Math.round((bytes / 1024 / 1024) * 100) / 100;
@@ -21,10 +22,56 @@ function Updater(): JSX.Element {
     total: 0,
     transferred: 0,
   });
+  const [status, setStatus] = useState<string>("Checking for updates..");
 
-  ipc.on("update_progress", (_event, s: any) => {
-    setState(s);
-  });
+  useEffect(() => {
+    if (!isTauri()) return;
+
+    const checkForUpdates = async () => {
+      try {
+        const { checkUpdate, installUpdate } = await import(
+          "@tauri-apps/api/updater"
+        );
+        const { listen } = await import("@tauri-apps/api/event");
+
+        // Listen for update progress
+        const unlisten = await listen<{
+          chunkLength: number;
+          contentLength: number;
+        }>("tauri://update-download-progress", (event) => {
+          const { chunkLength, contentLength } = event.payload;
+          const percent = contentLength
+            ? (chunkLength / contentLength) * 100
+            : 0;
+          setState((prev) => ({
+            ...prev,
+            percent,
+            total: contentLength || 0,
+            transferred: chunkLength || 0,
+          }));
+        });
+
+        // Check for updates
+        const update = await checkUpdate();
+        if (update.shouldUpdate) {
+          setStatus("Downloading update...");
+          await installUpdate();
+          setStatus("Update installed! Restarting...");
+        } else {
+          setStatus("No updates available");
+        }
+
+        return () => {
+          unlisten();
+        };
+      } catch (e) {
+        console.error("Update check failed:", e);
+        setStatus("Update check failed");
+      }
+    };
+
+    checkForUpdates();
+  }, []);
 
   const progress = state.percent;
   const speed = Math.round(state.bytesPerSecond / 1024);
@@ -42,8 +89,8 @@ function Updater(): JSX.Element {
         />
         <div className="progress-text">
           {state.percent
-            ? ` ${transferredMb}mb / ${totalMb}mb (${speed}kb/s)`
-            : "Checking for updates.."}
+            ? ` ${transferredMb}mb / ${totalMb}mb ${speed ? `(${speed}kb/s)` : ""}`
+            : status}
         </div>
       </div>
     </div>

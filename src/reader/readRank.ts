@@ -3,7 +3,7 @@ import {
   rankClass,
 } from "../background/onLabel/InEventGetCombinedRankInfo";
 import globalStore from "../background/store";
-import isElectron from "../utils/electron/isElectron";
+import isTauri from "../utils/tauri/isTauri";
 
 interface _ReturnedRankInfo {
   constructedClass: number;
@@ -28,7 +28,7 @@ interface _ReturnedRankInfo {
 }
 
 export default function readRank(): CombinedRankInfo | undefined {
-  if (!isElectron()) return undefined;
+  if (!isTauri()) return undefined;
 
   // eslint-disable-next-line no-undef
   const reader = __non_webpack_require__("mtga-reader");

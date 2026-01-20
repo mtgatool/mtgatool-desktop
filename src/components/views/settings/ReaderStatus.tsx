@@ -1,19 +1,44 @@
 import { useEffect, useState } from "react";
 
 import readPlayerTest from "../../../reader/readPlayerTest";
+import isTauri from "../../../utils/tauri/isTauri";
 
 function findMTGA(): boolean {
-  // eslint-disable-next-line no-undef
-  const reader = __non_webpack_require__("mtga-reader");
-  const { findPidByName } = reader;
-  return findPidByName("MTGA");
+  // In Tauri, native modules aren't available in the browser context
+  // This functionality would need to be implemented via Tauri commands
+  if (isTauri()) {
+    // TODO: Implement via Tauri command
+    return false;
+  }
+
+  try {
+    // eslint-disable-next-line no-undef
+    const reader = __non_webpack_require__("mtga-reader");
+    const { findPidByName } = reader;
+    return findPidByName("MTGA");
+  } catch (error) {
+    console.error("Failed to access mtga-reader:", error);
+    return false;
+  }
 }
 
 function checkAdmin(): boolean {
-  // eslint-disable-next-line no-undef
-  const reader = __non_webpack_require__("mtga-reader");
-  const { isAdmin } = reader;
-  return isAdmin();
+  // In Tauri, native modules aren't available in the browser context
+  // This functionality would need to be implemented via Tauri commands
+  if (isTauri()) {
+    // TODO: Implement via Tauri command
+    return false;
+  }
+
+  try {
+    // eslint-disable-next-line no-undef
+    const reader = __non_webpack_require__("mtga-reader");
+    const { isAdmin } = reader;
+    return isAdmin();
+  } catch (error) {
+    console.error("Failed to access mtga-reader:", error);
+    return false;
+  }
 }
 
 export default function ReaderStatus() {
@@ -22,6 +47,15 @@ export default function ReaderStatus() {
   const [errorText, setErrorText] = useState("");
 
   useEffect(() => {
+    // In Tauri, the reader functionality isn't available yet
+    if (isTauri()) {
+      setReaderStatus("warn");
+      setErrorText(
+        "Reader functionality not available in Tauri (requires native module implementation)"
+      );
+      return undefined;
+    }
+
     const interval = setInterval(() => {
       const found = findMTGA();
       const isAdmin = checkAdmin();

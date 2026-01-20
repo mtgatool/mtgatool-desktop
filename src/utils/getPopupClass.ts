@@ -1,8 +1,8 @@
 /* eslint-disable no-nested-ternary */
-import isElectron from "./electron/isElectron";
+import isTauri from "./tauri/isTauri";
 
 export default function getPopupClass(os: string) {
-  return isElectron()
+  return isTauri()
     ? os === "linux"
       ? "electron-popup-notop"
       : "electron-popup"

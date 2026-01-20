@@ -1,0 +1,80 @@
+#![cfg_attr(
+    all(not(debug_assertions), target_os = "windows"),
+    windows_subsystem = "windows"
+)]
+
+mod commands;
+mod arena_log;
+mod tray;
+mod state;
+
+use std::sync::Mutex;
+use tauri::{Manager, WindowBuilder, WindowUrl};
+
+fn main() {
+    tauri::Builder::default()
+        .manage(state::AppState {
+            log_watcher: Mutex::new(arena_log::watcher::ArenaLogWatcher::new()),
+        })
+        .system_tray(tray::create_tray())
+        .on_system_tray_event(tray::handle_tray_event)
+        .invoke_handler(tauri::generate_handler![
+            // File system commands
+            commands::file_system::read_file,
+            commands::file_system::read_file_chunk,
+            commands::file_system::write_file,
+            commands::file_system::file_exists,
+            commands::file_system::get_file_size,
+            commands::file_system::create_dir,
+            commands::file_system::delete_file,
+            commands::file_system::get_app_data_path,
+            commands::file_system::get_home_path,
+            // Window commands
+            commands::window::create_overlay_window,
+            commands::window::set_ignore_cursor_events,
+            commands::window::get_window_bounds,
+            commands::window::set_window_bounds,
+            // Shortcuts commands
+            commands::shortcuts::register_shortcut,
+            commands::shortcuts::unregister_shortcut,
+            commands::shortcuts::unregister_all_shortcuts,
+            // Dialog commands
+            commands::dialog::show_open_dialog,
+            // App commands
+            commands::app::get_default_log_path,
+            commands::app::restart_app,
+            commands::app::quit_app,
+            commands::app::get_platform,
+            // Arena log watcher
+            arena_log::watcher::start_log_watcher,
+            arena_log::watcher::stop_log_watcher,
+        ])
+        .setup(|app| {
+            // Create background window (hidden)
+            let background_url = if cfg!(debug_assertions) {
+                WindowUrl::External("http://localhost:3001".parse().unwrap())
+            } else {
+                WindowUrl::App("index.html".into())
+            };
+
+            WindowBuilder::new(app, "background", background_url.clone())
+                .title("mtgatool-background")
+                .visible(false)
+                .build()?;
+
+            // Create hover window (transparent, hidden initially)
+            WindowBuilder::new(app, "hover", background_url)
+                .title("mtgatool-hover")
+                .visible(false)
+                .transparent(true)
+                .decorations(false)
+                .always_on_top(true)
+                .skip_taskbar(true)
+                .inner_size(400.0, 600.0)
+                .build()?;
+
+            Ok(())
+        })
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}

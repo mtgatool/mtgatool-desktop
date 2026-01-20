@@ -1,6 +1,6 @@
 import upsertDbCards from "../toolDb/upsertDbCards";
 import { Cards } from "../types";
-import isElectron from "../utils/electron/isElectron";
+import isTauri from "../utils/tauri/isTauri";
 
 interface ReaderCard {
   key: number;
@@ -10,7 +10,7 @@ interface ReaderCard {
 }
 
 export default function readCards() {
-  if (!isElectron()) return;
+  if (!isTauri()) return;
   // eslint-disable-next-line no-undef
   const reader = __non_webpack_require__("mtga-reader");
 

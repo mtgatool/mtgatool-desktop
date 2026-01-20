@@ -12,11 +12,10 @@ import info from "../info.json";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
 import { login } from "../toolDb/worker-wrapper";
-import electron from "../utils/electron/electronWrapper";
-import isElectron from "../utils/electron/isElectron";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
 import getLocalSetting from "../utils/getLocalSetting";
 import getPopupClass from "../utils/getPopupClass";
+import isTauri from "../utils/tauri/isTauri";
 import vodiFn from "../utils/voidfn";
 import Auth from "./Auth";
 import CardHover from "./CardHover";
@@ -54,7 +53,16 @@ function App(props: AppProps) {
     matchInProgress,
   } = useSelector((state: AppState) => state.renderer);
 
-  const os = forceOs || (isElectron() ? process.platform : "");
+  const [os, setOs] = useState<string>(forceOs || "");
+
+  // Get platform from Tauri
+  useEffect(() => {
+    if (!forceOs && isTauri()) {
+      import("@tauri-apps/api/os").then(({ platform }) => {
+        platform().then((p) => setOs(p));
+      });
+    }
+  }, [forceOs]);
 
   useEffect(() => {
     window.toolDbWorker.addEventListener("message", (e) => {
@@ -85,30 +93,32 @@ function App(props: AppProps) {
     const welcome = getLocalSetting("welcome");
     if (!welcome || welcome === "false") {
       history.push("/welcome");
-    } else if (!electron && canLogin) {
+    } else if (canLogin) {
       const pwd = getLocalSetting("savedPass");
       const user = getLocalSetting("username");
 
-      login(user, sha1(pwd))
-        .then(() => {
-          reduxAction(dispatch, {
-            type: "SET_LOGIN_STATE",
-            arg: LOGIN_OK,
-          });
+      if (pwd && user) {
+        login(user, sha1(pwd))
+          .then(() => {
+            reduxAction(dispatch, {
+              type: "SET_LOGIN_STATE",
+              arg: LOGIN_OK,
+            });
 
-          if (
-            history.location.pathname === "" ||
-            history.location.pathname === "/"
-          ) {
+            if (
+              history.location.pathname === "" ||
+              history.location.pathname === "/"
+            ) {
+              history.push("/auth");
+            }
+          })
+          .catch((e: Error) => {
+            console.error(e);
             history.push("/auth");
-          }
-        })
-        .catch((e: Error) => {
-          console.error(e);
-          history.push("/auth");
-        });
-    } else if (canLogin) {
-      history.push("/auth");
+          });
+      } else {
+        history.push("/auth");
+      }
     }
   }, [canLogin, history, dispatch]);
 
@@ -159,7 +169,7 @@ function App(props: AppProps) {
       <PopupComponent
         open={false}
         className={
-          isElectron()
+          isTauri()
             ? os == "linux"
               ? "settings-popup-linux"
               : "settings-popup"

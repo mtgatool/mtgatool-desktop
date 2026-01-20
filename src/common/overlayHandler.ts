@@ -1,5 +1,3 @@
-import { BrowserWindow } from "electron";
-
 import {
   OVERLAY_DRAFT,
   OVERLAY_DRAFT_BREW,
@@ -13,29 +11,37 @@ import {
 import closeOverlay from "../overlay/closeOverlay";
 import createOverlay from "../overlay/createOverlay";
 import store from "../redux/stores/rendererStore";
-import { ALL_OVERLAYS } from "../types/app";
-import remote from "../utils/electron/remoteWrapper";
-import { overlayTitleToId } from "./maps";
+import { ALL_TAURI_OVERLAY_LABELS } from "../types/app";
+import isTauri from "../utils/tauri/isTauri";
 
 export class OverlayHandler {
   private _openState = [false, false, false, false, false];
 
-  private _checkOverlaysState = () => {
+  private _checkOverlaysState = async (): Promise<boolean[]> => {
     const currentStates = [false, false, false, false, false];
-    if (remote) {
-      remote.BrowserWindow.getAllWindows().forEach((w: BrowserWindow) => {
-        if (ALL_OVERLAYS.includes(w.getTitle())) {
-          const id = overlayTitleToId[w.getTitle()];
-          currentStates[id] = true;
+
+    if (!isTauri()) return currentStates;
+
+    try {
+      const { WebviewWindow } = await import("@tauri-apps/api/window");
+
+      for (let i = 0; i < ALL_TAURI_OVERLAY_LABELS.length; i += 1) {
+        const label = ALL_TAURI_OVERLAY_LABELS[i];
+        const window = WebviewWindow.getByLabel(label);
+        if (window) {
+          currentStates[i] = true;
         }
-      });
+      }
+    } catch (e) {
+      console.error("Failed to check overlay states:", e);
     }
+
     return currentStates;
   };
 
-  private _updateOverlays = () => {
+  private _updateOverlays = async () => {
     // currentStates is not the state we want, but the state we have
-    const currentStates = this._checkOverlaysState();
+    const currentStates = await this._checkOverlaysState();
     currentStates.forEach((state, index) => {
       if (state === true && this._openState[index] === false) {
         closeOverlay(index);

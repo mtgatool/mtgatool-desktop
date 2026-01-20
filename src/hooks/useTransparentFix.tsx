@@ -1,42 +1,36 @@
-import { BrowserWindow } from "electron";
 import { useCallback, useLayoutEffect, useRef } from "react";
 
-import remote from "../utils/electron/remoteWrapper";
 import globalData from "../utils/globalData";
 
+/**
+ * This hook was used in Electron to handle click-through behavior for transparent windows.
+ * In Tauri, click-through is handled at the window configuration level.
+ * This hook now just tracks mouse position for global data.
+ */
 export default function useTransparentFix(debug?: boolean) {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const doMouseFix = useCallback((event) => {
-    // eslint-disable-next-line global-require
-    if (remote) {
-      const { setIgnoreMouseEvents } =
-        remote.getCurrentWindow() as BrowserWindow;
-
-      const target = event.target as HTMLElement;
-      if (debug) console.log(target.classList, event);
+  const doMouseFix = useCallback(
+    (event: MouseEvent) => {
+      if (debug) {
+        const target = event.target as HTMLElement;
+        console.log(target.classList, event);
+      }
       globalData.mouseX = event.clientX;
       globalData.mouseY = event.clientY;
-      if (
-        target?.classList?.contains("click-through") ||
-        target?.id == "root"
-      ) {
-        setIgnoreMouseEvents(true, { forward: true });
 
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        // timeoutRef.current = setTimeout(() => {
-        //  setIgnoreMouseEvents(false);
-        // }, 500);
-      } else {
-        setIgnoreMouseEvents(false);
+      // Clear any pending timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
-    }
-  }, []);
+    },
+    [debug]
+  );
 
-  // Unmount this! very importante
+  // Track mouse position
   useLayoutEffect(() => {
-    console.warn("useLayoutEffect");
     window.addEventListener("mousemove", doMouseFix);
     return () => window.removeEventListener("mousemove", doMouseFix);
-  }, []);
+  }, [doMouseFix]);
 }

@@ -1,22 +1,41 @@
-import electron from "./electron/electronWrapper";
-import remote from "./electron/remoteWrapper";
+import isTauri from "./tauri/isTauri";
+
+// Cache for the log path
+let cachedLogPath: string | null = null;
 
 export default function defaultLogUri(): string {
-  if (!electron) return "";
-
-  if (process.platform == "darwin") {
-    return `${remote.app.getPath(
-      "home"
-    )}/Library/Logs/Wizards Of The Coast/MTGA/Player.log`;
-  }
-  if (process.platform == "linux") {
-    return `${process.env.HOME}/.wine/drive_c/user/${process.env.USER}/AppData/LocalLow/Wizards of the Coast/MTGA/Player.log`;
+  // Return cached value if available
+  if (cachedLogPath !== null) {
+    return cachedLogPath;
   }
 
-  const windowsMtgaLogFolder =
-    "LocalLow\\Wizards Of The Coast\\MTGA\\Player.log";
+  // For non-Tauri environments, return empty
+  if (!isTauri()) {
+    return "";
+  }
 
-  return remote?.app
-    .getPath("appData")
-    .replace("Roaming", windowsMtgaLogFolder);
+  // The actual path will be fetched async, return a placeholder for now
+  // The caller should use getDefaultLogPathAsync for proper async handling
+  return "";
+}
+
+// Async version that properly fetches from Tauri backend
+export async function getDefaultLogPathAsync(): Promise<string> {
+  if (cachedLogPath !== null) {
+    return cachedLogPath;
+  }
+
+  if (!isTauri()) {
+    return "";
+  }
+
+  try {
+    const { invoke } = await import("@tauri-apps/api/tauri");
+    const path = await invoke<string>("get_default_log_path");
+    cachedLogPath = path;
+    return path;
+  } catch (e) {
+    console.error("Failed to get default log path:", e);
+    return "";
+  }
 }

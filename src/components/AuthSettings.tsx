@@ -2,16 +2,16 @@
 /* eslint-disable no-alert */
 /* eslint-disable no-restricted-globals */
 import { format, fromUnixTime } from "date-fns";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { ReactComponent as Close } from "../assets/images/svg/close.svg";
 import info from "../info.json";
-import isElectron from "../utils/electron/isElectron";
 import getLocalSetting from "../utils/getLocalSetting";
 import database from "../utils/mtga/database";
 import openExternal from "../utils/openExternal";
 import setLocalSetting from "../utils/setLocalSetting";
 import showOpenLogDialog from "../utils/showOpenLogDialog";
+import isTauri from "../utils/tauri/isTauri";
 import Toggle from "./ui/Toggle";
 import NetworkSettingsPanel from "./views/settings/NetworkSettingsPanel";
 import ReaderStatus from "./views/settings/ReaderStatus";
@@ -20,10 +20,15 @@ function clickBetaChannel(value: boolean): void {
   setLocalSetting("betaChannel", value ? "true" : "false");
 }
 
-function getLogExists(path: string) {
-  // eslint-disable-next-line global-require
-  const fs = require("fs");
-  return fs.existsSync(path);
+// Note: This is now async but we use state to track the result
+async function checkLogExists(path: string): Promise<boolean> {
+  if (!isTauri()) return false;
+  try {
+    const { exists } = await import("@tauri-apps/api/fs");
+    return await exists(path);
+  } catch {
+    return false;
+  }
 }
 
 interface AuthSettingsProps {
@@ -33,6 +38,12 @@ interface AuthSettingsProps {
 export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
   const { onClose } = props;
   const [path, setPath] = useState(getLocalSetting("logPath"));
+  const [logFileExists, setLogFileExists] = useState(false);
+
+  // Check if log file exists
+  useEffect(() => {
+    checkLogExists(path).then(setLogFileExists);
+  }, [path]);
 
   // Arena log controls
   const arenaLogCallback = useCallback((value: string): void => {
@@ -62,8 +73,6 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
     });
   }, [arenaLogCallback]);
 
-  const logFileExists = isElectron() ? getLogExists(path) : false;
-
   return (
     <>
       <div className="close-button" onClick={onClose}>
@@ -71,7 +80,7 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
       </div>
       <div className="popup-inner" style={{ color: "var(--color-back)" }}>
         <div className="title">Settings</div>
-        {isElectron() && (
+        {isTauri() && (
           <div className="input-container" style={{ height: "40px" }}>
             <label className="label">Arena Log:</label>
             <div
@@ -96,7 +105,7 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
         )}
         <div style={{ marginTop: "16px" }} />
 
-        {isElectron() && (
+        {isTauri() && (
           <>
             <ReaderStatus />
             <Toggle
@@ -117,9 +126,9 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
           <p
             style={{ margin: "4px", textDecoration: "underline" }}
             className="link"
-            onClick={(): void =>
-              openExternal("https://mtgatool.com/release-notes/")
-            }
+            onClick={(): void => {
+              openExternal("https://mtgatool.com/release-notes/");
+            }}
           >
             {`Version ${info.version} - ${info.branch}, ${new Date(
               info.timestamp

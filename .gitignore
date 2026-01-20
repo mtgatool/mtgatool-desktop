@@ -31,3 +31,5 @@ src/info.json
 dist-worker
 dist-cards-worker
 dist-tooldb-worker
+
+src-tauri/target

@@ -1,11 +1,9 @@
-import { BrowserWindow } from "electron";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { OverlayUpdateMatchState } from "../background/store/types";
 import { ChannelMessage } from "../broadcastChannel/channelMessages";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { OverlaySettings, Settings } from "../common/defaultConfig";
-import { overlayTitleToId } from "../common/maps";
 import ActionLog from "../components/action-log-v2";
 import { ActionLogV2 } from "../components/action-log-v2/types";
 import OverlayDeckList from "../components/OverlayDeckList";
@@ -18,20 +16,74 @@ import {
 } from "../constants";
 import useDebounce from "../hooks/useDebounce";
 import { InternalDraftv2 } from "../types";
+import { getOverlayIndexFromLabel } from "../types/app";
 import Chances from "../types/chances";
 import { DbDraftVote } from "../types/dbTypes";
 import bcConnect from "../utils/bcConnect";
 import compareCards from "../utils/compareCards";
-import remote from "../utils/electron/remoteWrapper";
 import getLocalSetting from "../utils/getLocalSetting";
 import getPlayerNameWithoutSuffix from "../utils/getPlayerNameWithoutSuffix";
 import Deck from "../utils/mtga/deck";
+import isTauri from "../utils/tauri/isTauri";
 import Clock from "./Clock";
 import DraftOverlay from "./DraftOverlay";
 
+// Get current overlay ID from Tauri window label
 function getCurrentOverlayId(): number {
-  const title = remote.getCurrentWindow().getTitle() || "";
-  return overlayTitleToId[title] || 0;
+  if (isTauri()) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const label = (window as any).__TAURI__?.window?.appWindow?.label || "";
+    return getOverlayIndexFromLabel(label);
+  }
+  return 0;
+}
+
+// Get current window bounds in Tauri
+async function getCurrentWindowBounds(): Promise<{
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+} | null> {
+  if (!isTauri()) return null;
+  try {
+    const { appWindow } = await import("@tauri-apps/api/window");
+    const position = await appWindow.outerPosition();
+    const size = await appWindow.outerSize();
+    return {
+      x: position.x,
+      y: position.y,
+      width: size.width,
+      height: size.height,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// Get current window label in Tauri
+function getCurrentWindowLabel(): string {
+  if (isTauri()) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (window as any).__TAURI__?.window?.appWindow?.label || "";
+  }
+  return "";
+}
+
+// Set window height in Tauri
+async function setWindowHeight(height: number): Promise<void> {
+  if (!isTauri()) return;
+  try {
+    const { appWindow } = await import("@tauri-apps/api/window");
+    const size = await appWindow.outerSize();
+    await appWindow.setSize({
+      type: "Physical",
+      width: size.width,
+      height: Math.ceil(height),
+    });
+  } catch (e) {
+    console.error("Failed to set window height:", e);
+  }
 }
 
 export default function Overlay() {
@@ -46,12 +98,13 @@ export default function Overlay() {
 
   const allSettings = JSON.parse(getLocalSetting("settings")) as Settings;
 
-  const updateNewBounds = useCallback(() => {
-    if (remote) {
-      const window = remote.getCurrentWindow() as BrowserWindow;
+  const updateNewBounds = useCallback(async () => {
+    const bounds = await getCurrentWindowBounds();
+    const label = getCurrentWindowLabel();
+    if (bounds && label) {
       postChannelMessage({
         type: "OVERLAY_UPDATE_BOUNDS",
-        value: { bounds: window.getBounds(), window: window.getTitle() },
+        value: { bounds, window: label },
       });
     }
   }, []);
@@ -59,11 +112,11 @@ export default function Overlay() {
   const deboucer = useDebounce(500);
 
   const closeOverlay = useCallback(() => {
-    if (remote) {
-      const window = remote.getCurrentWindow() as BrowserWindow;
+    const label = getCurrentWindowLabel();
+    if (label) {
       postChannelMessage({
         type: "OVERLAY_SET_SETTINGS",
-        value: { settings: { show: false }, window: window.getTitle() },
+        value: { settings: { show: false }, window: label },
       });
     }
   }, []);
@@ -106,20 +159,33 @@ export default function Overlay() {
   );
 
   useEffect(() => {
-    // if (electron) {
-    //   const { setIgnoreMouseEvents } = remote.getCurrentWindow();
-    //   setIgnoreMouseEvents(false);
-    // }
-
-    const channel = bcConnect() as any;
+    const channel = bcConnect() as BroadcastChannel;
     channel.onmessage = channelMessageHandler;
 
-    if (remote) {
-      remote.getCurrentWindow().removeAllListeners();
-      remote.getCurrentWindow().on("move", () => deboucer(updateNewBounds));
-      remote.getCurrentWindow().on("resize", () => deboucer(updateNewBounds));
+    // Set up Tauri window event listeners
+    let unlistenMove: (() => void) | undefined;
+    let unlistenResize: (() => void) | undefined;
+
+    if (isTauri()) {
+      import("@tauri-apps/api/window").then(({ appWindow }) => {
+        appWindow
+          .onMoved(() => deboucer(updateNewBounds))
+          .then((unlisten) => {
+            unlistenMove = unlisten;
+          });
+        appWindow
+          .onResized(() => deboucer(updateNewBounds))
+          .then((unlisten) => {
+            unlistenResize = unlisten;
+          });
+      });
     }
-  }, [deboucer]);
+
+    return () => {
+      unlistenMove?.();
+      unlistenResize?.();
+    };
+  }, [deboucer, channelMessageHandler, updateNewBounds]);
 
   useEffect(() => {
     if (matchState && settings) {
@@ -147,16 +213,18 @@ export default function Overlay() {
     }
   }, [settings, matchState]);
 
-  if (remote && settings?.autosize && heightDivAdjustRef.current) {
-    remote.getCurrentWindow().setBounds({
+  // Handle autosize for Tauri
+  useEffect(() => {
+    if (settings?.autosize && heightDivAdjustRef.current) {
       // 24px topbar
       // 12px margin
-      height:
+      const height =
         Math.ceil(heightDivAdjustRef.current.offsetHeight) +
         24 +
-        (allSettings.overlaysTransparency ? 12 : 0),
-    });
-  }
+        (allSettings.overlaysTransparency ? 12 : 0);
+      setWindowHeight(height);
+    }
+  }, [settings?.autosize, allSettings.overlaysTransparency]);
 
   let subTitle = deck?.getName() || "Deck";
   if (settings?.mode == OVERLAY_LOG) {

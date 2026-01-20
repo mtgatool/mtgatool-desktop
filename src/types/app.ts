@@ -1,5 +1,6 @@
 import { Peer } from "tool-db";
 
+// Electron window titles (for backwards compatibility)
 export const WINDOW_BACKGROUND = "mtgatool-background";
 
 export const WINDOW_HOVER = "mtgatool-hover";
@@ -25,6 +26,33 @@ export const ALL_OVERLAYS = [
   WINDOW_OVERLAY_3,
   WINDOW_OVERLAY_4,
 ];
+
+// Tauri window labels
+export const TAURI_LABEL_MAIN = "main";
+export const TAURI_LABEL_BACKGROUND = "background";
+export const TAURI_LABEL_HOVER = "hover";
+export const TAURI_LABEL_OVERLAY_PREFIX = "overlay-";
+
+export const ALL_TAURI_OVERLAY_LABELS = [
+  `${TAURI_LABEL_OVERLAY_PREFIX}0`,
+  `${TAURI_LABEL_OVERLAY_PREFIX}1`,
+  `${TAURI_LABEL_OVERLAY_PREFIX}2`,
+  `${TAURI_LABEL_OVERLAY_PREFIX}3`,
+  `${TAURI_LABEL_OVERLAY_PREFIX}4`,
+];
+
+// Helper to convert Tauri label to overlay index
+export function getOverlayIndexFromLabel(label: string): number {
+  if (label.startsWith(TAURI_LABEL_OVERLAY_PREFIX)) {
+    return parseInt(label.replace(TAURI_LABEL_OVERLAY_PREFIX, ""), 10);
+  }
+  // Electron format
+  const match = label.match(/mtgatool-overlay-(\d+)/);
+  if (match) {
+    return parseInt(match[1], 10);
+  }
+  return -1;
+}
 
 // In the new P2P architecture, ServerPeerData is no longer used
 // Connection data is simplified

@@ -2,7 +2,7 @@
 import { Fragment, useState } from "react";
 
 import { ReactComponent as Close } from "../../../assets/images/svg/close.svg";
-import isElectron from "../../../utils/electron/isElectron";
+import isTauri from "../../../utils/tauri/isTauri";
 import AboutSettingsPanel from "./AboutSettingsPanel";
 import AccountSettingsPanel from "./AccountSettingsPanel";
 import DataSettingsPanel from "./DataSettingsPanel";
@@ -127,11 +127,11 @@ export default function ViewSettings(props: ViewSettingsProps) {
             style={{ marginTop: "16px", marginLeft: "auto", maxWidth: "200px" }}
           >
             <SettingsNav {...tabs[SETTINGS_ACCOUNT]} />
-            {isElectron() && <SettingsNav {...tabs[SETTINGS_LOGS]} />}
+            {isTauri() && <SettingsNav {...tabs[SETTINGS_LOGS]} />}
             <SettingsNav {...tabs[SETTINGS_DATA]} />
-            {isElectron() && <SettingsNav {...tabs[SETTINGS_OVERLAY]} />}
+            {isTauri() && <SettingsNav {...tabs[SETTINGS_OVERLAY]} />}
             <SettingsNav {...tabs[SETTINGS_VISUAL]} />
-            {isElectron() && <SettingsNav {...tabs[SETTINGS_SHORTCUTS]} />}
+            {isTauri() && <SettingsNav {...tabs[SETTINGS_SHORTCUTS]} />}
             <SettingsNav {...tabs[SETTINGS_NETWORK]} />
             <SettingsNav {...tabs[SETTINGS_ABOUT]} />
           </div>

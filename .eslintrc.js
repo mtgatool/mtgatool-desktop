@@ -83,9 +83,17 @@ module.exports = {
     "@typescript-eslint/interface-name-prefix": "off",
     "react/react-in-jsx-scope": "off",
     "react-hooks/rules-of-hooks": "error",
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        devDependencies: true,
+        optionalDependencies: false,
+        peerDependencies: false,
+      },
+    ],
   },
   settings: {
-    "import/core-modules": ["electron"],
+    "import/core-modules": ["@tauri-apps/api"],
     "import/resolver": {
       node: {
         extensions: [".js", ".jsx", ".ts", ".tsx"],

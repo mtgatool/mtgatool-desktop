@@ -15,8 +15,8 @@ import { getMatchesData } from "../toolDb/worker-wrapper";
 import { CardsData } from "../types/collectionTypes";
 import { defaultCardsData } from "../types/dbTypes";
 import aggregateStats from "../utils/aggregateStats";
-import isElectron from "../utils/electron/isElectron";
 import getCssQuality from "../utils/getCssQuality";
+import isTauri from "../utils/tauri/isTauri";
 import getPopupClass from "../utils/getPopupClass";
 import database from "../utils/mtga/database";
 import Deck from "../utils/mtga/deck";
@@ -81,7 +81,16 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
     workerRef.current = new Worker("cards-worker/index.js", { type: "module" });
   }, []);
 
-  const os = forceOs || (isElectron() ? process.platform : "");
+  const [os, setOs] = useState<string>(forceOs || "");
+
+  // Get platform from Tauri
+  useEffect(() => {
+    if (!forceOs && isTauri()) {
+      import("@tauri-apps/api/os").then(({ platform }) => {
+        platform().then((p) => setOs(p));
+      });
+    }
+  }, [forceOs]);
 
   const currentUUID = useSelector(
     (state: AppState) => state.mainData.currentUUID

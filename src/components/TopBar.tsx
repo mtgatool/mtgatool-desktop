@@ -1,5 +1,4 @@
 /* eslint-disable no-nested-ternary */
-import { BrowserWindow } from "electron";
 import { CSSProperties, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -11,54 +10,126 @@ import { ReactComponent as WinClose } from "../assets/images/svg/win-close.svg";
 import { ReactComponent as WinMaximize } from "../assets/images/svg/win-maximize.svg";
 import { ReactComponent as WinMinimize } from "../assets/images/svg/win-minimize.svg";
 import { ReactComponent as WinRestore } from "../assets/images/svg/win-restore.svg";
-import { overlayTitleToId } from "../common/maps";
 import { COLORS_ALL } from "../constants";
 import store, { AppState } from "../redux/stores/rendererStore";
-import { ALL_OVERLAYS, ConnectionData, WINDOW_MAIN } from "../types/app";
-import getWindowTitle from "../utils/electron/getWindowTitle";
-import hideWindow from "../utils/electron/hideWindow";
-import isFocused from "../utils/electron/isFocused";
-import isMaximized from "../utils/electron/isMaximized";
-import minimizeWindow from "../utils/electron/minimizeWindow";
-import remote from "../utils/electron/remoteWrapper";
-import setMaximize from "../utils/electron/setMaximize";
+import {
+  ALL_TAURI_OVERLAY_LABELS,
+  ConnectionData,
+  getOverlayIndexFromLabel,
+  WINDOW_MAIN,
+} from "../types/app";
+import isTauri from "../utils/tauri/isTauri";
+
+// Get current window label in Tauri
+function getWindowLabel(): string {
+  if (isTauri()) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (window as any).__TAURI__?.window?.appWindow?.label || "main";
+  }
+  return "main";
+}
+
+// Check if current window is an overlay
+function isOverlayWindow(): boolean {
+  const label = getWindowLabel();
+  return ALL_TAURI_OVERLAY_LABELS.includes(label);
+}
+
+// Get overlay index from current window
+function getCurrentOverlayIndex(): number {
+  return getOverlayIndexFromLabel(getWindowLabel());
+}
+
+// Tauri window control functions
+async function minimizeWindow(): Promise<void> {
+  if (!isTauri()) return;
+  try {
+    const { appWindow } = await import("@tauri-apps/api/window");
+    await appWindow.minimize();
+  } catch (e) {
+    console.error("Failed to minimize window:", e);
+  }
+}
+
+async function toggleMaximize(): Promise<void> {
+  if (!isTauri()) return;
+  try {
+    const { appWindow } = await import("@tauri-apps/api/window");
+    await appWindow.toggleMaximize();
+  } catch (e) {
+    console.error("Failed to toggle maximize:", e);
+  }
+}
+
+async function hideWindow(): Promise<void> {
+  if (!isTauri()) return;
+  try {
+    const { appWindow } = await import("@tauri-apps/api/window");
+    await appWindow.hide();
+  } catch (e) {
+    console.error("Failed to hide window:", e);
+  }
+}
+
+async function closeOverlayWindow(): Promise<void> {
+  if (!isTauri()) return;
+  try {
+    const { appWindow } = await import("@tauri-apps/api/window");
+    await appWindow.close();
+  } catch (e) {
+    console.error("Failed to close window:", e);
+  }
+}
+
+async function checkIsMaximized(): Promise<boolean> {
+  if (!isTauri()) return false;
+  try {
+    const { appWindow } = await import("@tauri-apps/api/window");
+    return await appWindow.isMaximized();
+  } catch {
+    return false;
+  }
+}
+
+async function checkIsFocused(): Promise<boolean> {
+  if (!isTauri()) return true;
+  try {
+    const { appWindow } = await import("@tauri-apps/api/window");
+    return await appWindow.isFocused();
+  } catch {
+    return true;
+  }
+}
+
+async function getPlatform(): Promise<string> {
+  if (!isTauri()) return "win32";
+  try {
+    const { platform } = await import("@tauri-apps/api/os");
+    return await platform();
+  } catch {
+    return "win32";
+  }
+}
 
 function clickMinimize(): void {
   minimizeWindow();
 }
 
 function clickMaximize(): void {
-  setMaximize();
+  toggleMaximize();
 }
 
 function clickClose(): void {
   if (store.getState().settings.closeToTray) {
     hideWindow();
   } else {
-    // ipcSend("quit", 1);
+    // For now, just hide - quit handled elsewhere
+    hideWindow();
   }
 }
 
 function clickCloseOverlay(): void {
-  if (remote) {
-    const thisWindowTitle = remote.getCurrentWindow().getTitle();
-    // const overlayId = overlayTitleToId[thisWindowTitle];
-    // reduxAction(store.dispatch, {
-    //   type: "SET_OVERLAY_SETTINGS",
-    //   arg: {
-    //     id: overlayId,
-    //     settings: {
-    //       show: false,
-    //     },
-    //   },
-    // });
-    remote.BrowserWindow.getAllWindows().forEach((w: BrowserWindow) => {
-      if (w.getTitle() == thisWindowTitle) {
-        w.close();
-        w.destroy();
-      }
-    });
-  }
+  closeOverlayWindow();
 }
 
 interface TopBarProps {
@@ -70,15 +141,24 @@ export default function TopBar(props: TopBarProps): JSX.Element {
   const { forceOs, closeCallback } = props;
   const [hoverControls, setHoverControls] = useState(false);
   const [peerCount, setPeerCount] = useState(0);
+  const [os, setOs] = useState<string>(forceOs || "win32");
+  const [maximized, setMaximized] = useState(false);
+  const [focused, setFocused] = useState(true);
 
   const offline = useSelector((state: AppState) => state.renderer.offline);
   const topArtist = useSelector((state: AppState) => state.renderer.topArtist);
 
-  const os = forceOs || process.platform;
-
-  const isOverlay = ALL_OVERLAYS.includes(getWindowTitle());
+  const isOverlay = isOverlayWindow();
+  const windowLabel = getWindowLabel();
 
   const [_redraw, setRedraw] = useState(0);
+
+  // Get platform on mount
+  useEffect(() => {
+    if (!forceOs) {
+      getPlatform().then(setOs);
+    }
+  }, [forceOs]);
 
   // Fetch connection data periodically for peer count
   useEffect(() => {
@@ -113,6 +193,7 @@ export default function TopBar(props: TopBarProps): JSX.Element {
     };
   }, []);
 
+  // Update maximized/focused state periodically for macOS style
   useEffect(() => {
     if (os !== "darwin") {
       return () => {
@@ -120,18 +201,48 @@ export default function TopBar(props: TopBarProps): JSX.Element {
       };
     }
 
-    const interval = setInterval(() => {
+    const updateState = async () => {
+      const [max, foc] = await Promise.all([
+        checkIsMaximized(),
+        checkIsFocused(),
+      ]);
+      setMaximized(max);
+      setFocused(foc);
       setRedraw(new Date().getTime());
-    }, 50);
+    };
+
+    const interval = setInterval(updateState, 50);
+    updateState();
 
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [os]);
+
+  // Update maximized state for Windows
+  useEffect(() => {
+    if (os === "darwin") {
+      return () => {
+        //
+      };
+    }
+
+    const updateMaximized = async () => {
+      const max = await checkIsMaximized();
+      setMaximized(max);
+    };
+
+    const interval = setInterval(updateMaximized, 200);
+    updateMaximized();
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [os]);
 
   const topButtonClass =
     os == "darwin"
-      ? isFocused()
+      ? focused
         ? "top-button-mac"
         : "top-button-mac-unfocus"
       : "top-button";
@@ -172,7 +283,7 @@ export default function TopBar(props: TopBarProps): JSX.Element {
       key="top-maximize"
       className={`maximize ${topButtonClass}`}
     >
-      {isMaximized() ? (
+      {maximized ? (
         <RestoreSVG style={iconStyle} />
       ) : (
         <MaximizeSVG style={iconStyle} />
@@ -209,7 +320,7 @@ export default function TopBar(props: TopBarProps): JSX.Element {
           className="overlay-icon"
           style={{
             backgroundColor: `var(--color-${
-              COLORS_ALL[overlayTitleToId[getWindowTitle()]]
+              COLORS_ALL[getCurrentOverlayIndex()]
             })`,
           }}
         />
@@ -222,7 +333,7 @@ export default function TopBar(props: TopBarProps): JSX.Element {
         }}
       >
         <Logo fill="#FFF" style={{ margin: "2px 8px", opacity: 0.6 }} />
-        {getWindowTitle() == WINDOW_MAIN ? (
+        {windowLabel === WINDOW_MAIN ? (
           <div className="top-artist">{topArtist}</div>
         ) : (
           <></>

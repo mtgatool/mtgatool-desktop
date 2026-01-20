@@ -1,8 +1,6 @@
 /* eslint-disable camelcase */
 /* eslint-disable radix */
 /* eslint-disable no-console */
-import { app } from "electron";
-
 import {
   AnnotationInfo,
   AnnotationType,
@@ -152,7 +150,8 @@ class NoInstanceException {
   constructor(orig: number, instanceID: number, instance: GameObjectInfo) {
     this.instanceID = instanceID;
     this.instance = instance;
-    if (!app.isPackaged) {
+    // Only log in development mode
+    if (process.env.NODE_ENV === "development") {
       console.info(`No instance with ID ${orig} found. (${this.instanceID})`);
     }
   }

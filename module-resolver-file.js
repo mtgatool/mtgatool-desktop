@@ -1,7 +1,7 @@
 /* eslint-disable */
 const webpack = require("webpack");
 
-module.exports = function (modules = { webIndex: true, electronIndex: true }) {
+module.exports = function (modules = { webIndex: true, tauriIndex: true }) {
   // The modules which can be toggled.
   // Eg. This config can be exported from db. For now its static.
   const replacements = [];

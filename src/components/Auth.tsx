@@ -16,9 +16,9 @@ import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
 import checkPassphrase from "../toolDb/checkPassphrase";
 import { keysLogin, login, signup } from "../toolDb/worker-wrapper";
-import electron from "../utils/electron/electronWrapper";
 import getLocalSetting from "../utils/getLocalSetting";
 import setLocalSetting from "../utils/setLocalSetting";
+import isTauri from "../utils/tauri/isTauri";
 import voidFn from "../utils/voidfn";
 import AuthSettings from "./AuthSettings";
 import PopupComponent from "./PopupComponent";
@@ -148,7 +148,7 @@ export default function Auth(props: AuthProps) {
         });
         login(username, sha1(pass))
           .then(() => {
-            if (electron) {
+            if (isTauri()) {
               postChannelMessage({
                 type: "START_LOG_READING",
               });
@@ -195,7 +195,7 @@ export default function Auth(props: AuthProps) {
         });
         keysLogin(keys)
           .then(() => {
-            if (electron) {
+            if (isTauri()) {
               postChannelMessage({
                 type: "START_LOG_READING",
               });
@@ -269,7 +269,7 @@ export default function Auth(props: AuthProps) {
               type: "SHOW_POST_SIGNUP",
               arg: signupPass,
             });
-            if (electron) {
+            if (isTauri()) {
               postChannelMessage({
                 type: "START_LOG_READING",
               });
@@ -573,7 +573,7 @@ export default function Auth(props: AuthProps) {
           </div>
         </div>
       </form>
-      {electron && (
+      {isTauri() && (
         <div className="app-settings" onClick={openPopup.current}>
           <IconButton
             style={{ margin: "auto" }}

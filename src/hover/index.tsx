@@ -1,4 +1,3 @@
-import { BrowserWindow } from "electron";
 import {
   CSSProperties,
   useCallback,
@@ -15,32 +14,128 @@ import { CARD_SIZE_RATIO } from "../common/static";
 import { LANDS_HACK } from "../constants";
 import useTransparentFix from "../hooks/useTransparentFix";
 import GroupedLandsDetails from "../overlay/GroupedLandsDetails";
-import {
-  ALL_OVERLAYS,
-  WINDOW_MAIN,
-  WINDOW_OVERLAY_0,
-  WINDOW_OVERLAY_1,
-  WINDOW_OVERLAY_2,
-  WINDOW_OVERLAY_3,
-  WINDOW_OVERLAY_4,
-} from "../types/app";
 import Chances from "../types/chances";
 import bcConnect from "../utils/bcConnect";
-import electron from "../utils/electron/electronWrapper";
-import remote from "../utils/electron/remoteWrapper";
-import setTopMost from "../utils/electron/setTopMost";
 import getBackUrl from "../utils/getBackUrl";
 import { getCardImage } from "../utils/getCardArtCrop";
 import getLocalSetting from "../utils/getLocalSetting";
 import isCardDfc from "../utils/isCardDfc";
+import isTauri from "../utils/tauri/isTauri";
 import vodiFn from "../utils/voidfn";
+
+// Initialize window settings for Tauri
+async function initTauriWindow() {
+  if (!isTauri()) return;
+  const { appWindow } = await import("@tauri-apps/api/window");
+  await appWindow.setAlwaysOnTop(true);
+}
+
+// Calculate position for Tauri
+async function calculatePositionTauri(
+  settings: Settings,
+  currentWidth: number,
+  currentHeight: number
+) {
+  if (!isTauri()) return;
+
+  const { appWindow, primaryMonitor } = await import("@tauri-apps/api/window");
+
+  const monitor = await primaryMonitor();
+  if (!monitor) return;
+
+  const display = monitor;
+  const bounds = { width: currentWidth, height: currentHeight };
+
+  const left = display.position.x;
+  const center =
+    display.position.x + Math.round(display.size.width / 2 - bounds.width / 2);
+  const right = display.position.x + display.size.width - bounds.width;
+
+  const top = display.position.y;
+  const middle =
+    display.position.y +
+    Math.round(display.size.height / 2) -
+    bounds.height / 2;
+  const bottom =
+    display.position.y + Math.round(display.size.height - bounds.height - 32);
+
+  const pos = settings.hoverPosition;
+
+  let xPos = center;
+  let yPos = bottom;
+  switch (pos) {
+    case 0:
+      xPos = left;
+      yPos = top;
+      break;
+    case 1:
+      xPos = center;
+      yPos = top;
+      break;
+    case 2:
+      xPos = right;
+      yPos = top;
+      break;
+    case 3:
+      xPos = left;
+      yPos = middle;
+      break;
+    case 4:
+      xPos = center;
+      yPos = middle;
+      break;
+    case 5:
+      xPos = right;
+      yPos = middle;
+      break;
+    case 6:
+      xPos = left;
+      yPos = bottom;
+      break;
+    case 7:
+      xPos = center;
+      yPos = bottom;
+      break;
+    case 8:
+      xPos = right;
+      yPos = bottom;
+      break;
+    default:
+      break;
+  }
+
+  await appWindow.setPosition({ type: "Physical", x: xPos, y: yPos });
+}
+
+// Show window
+async function showWindow() {
+  if (!isTauri()) return;
+  const { appWindow } = await import("@tauri-apps/api/window");
+  await appWindow.show();
+}
+
+// Hide window
+async function hideWindow() {
+  if (!isTauri()) return;
+  const { appWindow } = await import("@tauri-apps/api/window");
+  await appWindow.hide();
+}
+
+// Set window size
+async function setWindowSize(width: number, height: number) {
+  if (!isTauri()) return;
+  const { appWindow } = await import("@tauri-apps/api/window");
+  await appWindow.setSize({ type: "Physical", width, height });
+}
 
 export default function Hover() {
   useTransparentFix();
-  if (remote) {
-    remote.getCurrentWindow().setFocusable(false);
-    setTopMost(true);
-  }
+
+  // Initialize Tauri window
+  useEffect(() => {
+    initTauriWindow();
+  }, []);
+
   const [hovering, setHovering] = useState(false);
   const [cardOdds, setCardOdds] = useState<Chances>();
   const [grpId, setGrpId] = useState<number>();
@@ -61,102 +156,11 @@ export default function Hover() {
   const [frontUrl, setFrontUrl] = useState("");
   const [backUrl, setBackUrl] = useState("");
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [windowSize, setWindowSizeState] = useState({ width: 0, height: 0 });
 
   const calculatePosition = useCallback(() => {
-    if (remote && electron) {
-      const allWindowNames = remote.BrowserWindow.getAllWindows().map(
-        (w: BrowserWindow) => w.getTitle()
-      );
-
-      const hasOverlay =
-        allWindowNames.includes(WINDOW_OVERLAY_0) ||
-        allWindowNames.includes(WINDOW_OVERLAY_1) ||
-        allWindowNames.includes(WINDOW_OVERLAY_2) ||
-        allWindowNames.includes(WINDOW_OVERLAY_3) ||
-        allWindowNames.includes(WINDOW_OVERLAY_4);
-
-      let display = remote.screen.getPrimaryDisplay();
-      remote.BrowserWindow.getAllWindows().forEach((w: BrowserWindow) => {
-        if (hasOverlay) {
-          if (ALL_OVERLAYS.includes(w.getTitle())) {
-            const bounds = w.getBounds();
-            display = remote.screen.getDisplayMatching(bounds);
-          }
-        } else if (w.getTitle() === WINDOW_MAIN) {
-          const bounds = w.getBounds();
-          display = remote.screen.getDisplayMatching(bounds);
-        }
-      });
-      const bounds = remote.getCurrentWindow().getBounds();
-
-      const left = display.bounds.x;
-      const center =
-        display.bounds.x +
-        Math.round(display.bounds.width / 2 - bounds.width / 2);
-      const right = display.bounds.x + display.bounds.width - bounds.width;
-
-      const top = display.bounds.y;
-
-      const middle =
-        display.bounds.y +
-        Math.round(display.bounds.height / 2) -
-        bounds.height / 2;
-
-      const bottom =
-        display.bounds.y +
-        Math.round(display.bounds.height - bounds.height - 32);
-
-      const pos = settings.hoverPosition;
-
-      let xPos = center;
-      let yPos = bottom;
-      switch (pos) {
-        case 0:
-          xPos = left;
-          yPos = top;
-          break;
-        case 1:
-          xPos = center;
-          yPos = top;
-          break;
-        case 2:
-          xPos = right;
-          yPos = top;
-          break;
-        case 3:
-          xPos = left;
-          yPos = middle;
-          break;
-        case 4:
-          xPos = center;
-          yPos = middle;
-          break;
-        case 5:
-          xPos = right;
-          yPos = middle;
-          break;
-        case 6:
-          xPos = left;
-          yPos = bottom;
-          break;
-        case 7:
-          xPos = center;
-          yPos = bottom;
-          break;
-        case 8:
-          xPos = right;
-          yPos = bottom;
-          break;
-        default:
-          break;
-      }
-
-      remote.getCurrentWindow().setBounds({
-        x: xPos,
-        y: yPos,
-      });
-    }
-  }, [settings]);
+    calculatePositionTauri(settings, windowSize.width, windowSize.height);
+  }, [settings, windowSize]);
 
   useEffect(() => {
     const size = 100 + hoverSize * 15;
@@ -166,9 +170,8 @@ export default function Hover() {
     const width = Math.round(cardWidth * 2 + 64);
     const height = Math.round(cardHeight + 48);
 
-    if (remote) {
-      remote.getCurrentWindow().setBounds({ width, height });
-    }
+    setWindowSizeState({ width, height });
+    setWindowSize(width, height);
   }, [hoverSize]);
 
   const channelMessageHandler = useCallback(
@@ -178,7 +181,7 @@ export default function Hover() {
         setSettings(newSettings);
       }
 
-      if (msg.data.type == "HOVER_IN") {
+      if (msg.data.type === "HOVER_IN") {
         setGrpId(msg.data.value);
         setHovering(true);
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -187,7 +190,7 @@ export default function Hover() {
         }, 5000);
       }
 
-      if (msg.data.type == "HOVER_OUT") {
+      if (msg.data.type === "HOVER_OUT") {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
         setHovering(false);
       }
@@ -200,9 +203,9 @@ export default function Hover() {
   );
 
   useEffect(() => {
-    const channel = bcConnect() as any;
+    const channel = bcConnect() as BroadcastChannel;
     channel.onmessage = channelMessageHandler;
-  }, []);
+  }, [channelMessageHandler]);
 
   const styleFront = useMemo((): CSSProperties => {
     const size = 100 + hoverSize * 15;
@@ -210,7 +213,7 @@ export default function Hover() {
     return {
       width: `${size}px`,
       height: `${size / CARD_SIZE_RATIO}px`,
-      backgroundImage: `url(${frontLoaded == grpId ? frontUrl : NoCard})`,
+      backgroundImage: `url(${frontLoaded === grpId ? frontUrl : NoCard})`,
     };
   }, [frontUrl, grpId, frontLoaded, hoverSize]);
 
@@ -224,23 +227,23 @@ export default function Hover() {
     return {
       width: `${size}px`,
       height: `${size / CARD_SIZE_RATIO}px`,
-      backgroundImage: `url(${backLoaded == grpId ? backUrl : NoCard})`,
+      backgroundImage: `url(${backLoaded === grpId ? backUrl : NoCard})`,
       display: op,
     };
   }, [backUrl, grpId, backLoaded, hoverSize]);
 
   useEffect(() => {
-    if (!electron) return vodiFn;
+    if (!isTauri()) return vodiFn;
 
     if (hideRef.current) {
       clearTimeout(hideRef.current);
     }
     if (hovering && settings?.overlayHover) {
       calculatePosition();
-      remote.getCurrentWindow().show();
+      showWindow();
     } else {
       hideRef.current = setTimeout(() => {
-        if (remote) remote.getCurrentWindow().hide();
+        hideWindow();
       }, 250);
     }
     if (grpId) {
@@ -272,7 +275,7 @@ export default function Hover() {
   return (
     <div className="click-through hover-root">
       <div ref={wrapperRef} className="hover-cards-wrapper">
-        {grpId == LANDS_HACK && cardOdds ? (
+        {grpId === LANDS_HACK && cardOdds ? (
           // eslint-disable-next-line react/jsx-props-no-spreading
           <GroupedLandsDetails {...cardOdds} />
         ) : (

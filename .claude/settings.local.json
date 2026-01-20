@@ -14,7 +14,11 @@
       "Bash(npm start)",
       "Bash(tasklist:*)",
       "Bash(netstat:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(npm install:*)",
+      "Bash(rustc:*)",
+      "Bash(cargo check:*)",
+      "Bash(rustup update:*)"
     ]
   }
 }

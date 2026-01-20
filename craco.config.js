@@ -5,25 +5,18 @@ const eslintConfig = require("./.eslintrc");
 
 process.env.GENERATE_SOURCEMAP = true;
 
+// Tauri build configuration (now the default)
 // https://www.npmjs.com/package/@craco/craco
 module.exports = {
   webpack: {
     configure: {
-      target: "electron-renderer",
-      module: {
-        rules: [
-          {
-            test: /\.node$/,
-            use: "native-addon-loader",
-          },
-        ],
-      },
+      target: "web",
       node: {
         fs: "empty",
       },
     },
     plugins: [
-      ...ModuleReplacement({ webIndex: false, electronIndex: true }),
+      ...ModuleReplacement({ webIndex: false, tauriIndex: true }),
       new WebpackReactComponentNamePlugin(),
     ],
   },

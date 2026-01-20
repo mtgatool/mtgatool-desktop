@@ -1,79 +1,94 @@
 /* eslint-disable radix */
 /* eslint-disable no-console */
 import axios from "axios";
-import _ from "lodash";
 
-import electron from "./electron/electronWrapper";
-import remote from "./electron/remoteWrapper";
 import loadDbFromShared from "./loadDbFromCache";
 import database from "./mtga/database";
+import isTauri from "./tauri/isTauri";
 
-// import distributedDb from "../assets/resources/database.json";
-
+// Cache path will be set asynchronously
 let cachePath: string | null = null;
-if (electron) {
-  // eslint-disable-next-line no-undef
-  const path = __non_webpack_require__("path");
-  cachePath = remote
-    ? path.join(remote.app.getPath("userData"), "database.json")
-    : null;
-}
 
-/*
- This is cool for debugging the metadata files, so we can
- test and view the output files without copypasta.
-*/
-/*
-const cachePath =
-  app || (remote && remote.app)
-    ? path.join(
-        "C:\\Users\\user\\Documents\\GitHub\\MTG-Arena-Tool-Metadata\\dist",
-        "v67-en-database.json"
-      )
-    : null;
+// Initialize cache path for Tauri
+async function initCachePath(): Promise<void> {
+  if (!isTauri()) return;
 
-const scryfallDataPath = path.join(
-  "C:\\Users\\user\\Documents\\GitHub\\MTG-Arena-Tool-Metadata\\external",
-  "scryfall-cards.json"
-);
-*/
-
-export function updateCache(data: string): void {
-  if (electron) {
-    try {
-      // eslint-disable-next-line no-undef
-      const fs = __non_webpack_require__("fs");
-      if (cachePath) {
-        console.log(`Saved metadata to ${cachePath}`);
-        fs.writeFileSync(cachePath, data);
-      }
-    } catch (e) {
-      console.log(`Error updating cache: ${e}`, "error");
-    }
-  } else {
-    // requests are cached so we are cool?
+  try {
+    const { appDataDir, join } = await import("@tauri-apps/api/path");
+    const appData = await appDataDir();
+    cachePath = await join(appData, "database.json");
+  } catch (e) {
+    console.error("Failed to get cache path:", e);
   }
 }
 
-export function loadDbFromCache(
+// Initialize on module load
+initCachePath();
+
+export async function updateCache(data: string): Promise<void> {
+  if (!isTauri()) return;
+
+  // Ensure cache path is initialized
+  if (!cachePath) {
+    await initCachePath();
+  }
+
+  if (!cachePath) return;
+
+  try {
+    const { invoke } = await import("@tauri-apps/api/tauri");
+    await invoke("write_file", { path: cachePath, contents: data });
+    console.log(`Saved metadata to ${cachePath}`);
+  } catch (e) {
+    console.log(`Error updating cache: ${e}`, "error");
+  }
+}
+
+async function fileExists(path: string): Promise<boolean> {
+  if (!isTauri()) return false;
+
+  try {
+    const { invoke } = await import("@tauri-apps/api/tauri");
+    return await invoke<boolean>("file_exists", { path });
+  } catch {
+    return false;
+  }
+}
+
+async function readFile(path: string): Promise<string | null> {
+  if (!isTauri()) return null;
+
+  try {
+    const { invoke } = await import("@tauri-apps/api/tauri");
+    return await invoke<string>("read_file", { path });
+  } catch {
+    return null;
+  }
+}
+
+export async function loadDbFromCache(
   lang?: string,
   forceReload = false
 ): Promise<void> {
   loadDbFromShared();
-  if (electron) {
-    // eslint-disable-next-line no-undef
-    const fs = __non_webpack_require__("fs");
-    if (cachePath && fs.existsSync(cachePath)) {
-      const dbString = fs.readFileSync(cachePath, "utf8");
-      database.setDatabase(dbString);
-      console.log(`Loaded metadata from cache (${cachePath})`);
+
+  // Ensure cache path is initialized
+  if (!cachePath) {
+    await initCachePath();
+  }
+
+  if (isTauri() && cachePath) {
+    const exists = await fileExists(cachePath);
+    if (exists) {
+      const dbString = await readFile(cachePath);
+      if (dbString) {
+        database.setDatabase(dbString);
+        console.log(`Loaded metadata from cache (${cachePath})`);
+      }
     } else {
       console.log(`Cache not found (${cachePath}), try to generate it.`);
-      // database.setDatabaseUnsafely(distributedDb as Metadata);
-      updateCache(JSON.stringify(database.metadata));
+      await updateCache(JSON.stringify(database.metadata));
     }
-  } else {
-    // requests are cached so we are cool?
   }
 
   return axios

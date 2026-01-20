@@ -1,20 +1,25 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 import reduxAction from "../../../redux/reduxAction";
-import isElectron from "../../../utils/electron/isElectron";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import globalData from "../../../utils/globalData";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import showOpenLogDialog from "../../../utils/showOpenLogDialog";
+import isTauri from "../../../utils/tauri/isTauri";
 import Button from "../../ui/Button";
 import ReaderStatus from "./ReaderStatus";
 
-function getLogExists(path: string) {
-  // eslint-disable-next-line global-require
-  const fs = require("fs");
-  return fs.existsSync(path);
+// Note: This is async but we use state to track the result
+async function checkLogExists(path: string): Promise<boolean> {
+  if (!isTauri()) return false;
+  try {
+    const { exists } = await import("@tauri-apps/api/fs");
+    return await exists(path);
+  } catch {
+    return false;
+  }
 }
 
 export default function LogsSettingsPanel(): JSX.Element {
@@ -22,8 +27,14 @@ export default function LogsSettingsPanel(): JSX.Element {
   const lastLogUpdate = globalData.lastLogCheck;
   const [path, setPath] = useState(getLocalSetting("logPath"));
   const [_rerender, setRerender] = useState(0);
+  const [logFileExists, setLogFileExists] = useState(false);
 
   setTimeout(() => setRerender(new Date().getTime()), 500);
+
+  // Check if log file exists
+  useEffect(() => {
+    checkLogExists(path).then(setLogFileExists);
+  }, [path]);
 
   // Arena log controls
   const arenaLogCallback = useCallback((value: string): void => {
@@ -43,8 +54,6 @@ export default function LogsSettingsPanel(): JSX.Element {
   }, [arenaLogCallback]);
 
   const isReading = new Date().getTime() - lastLogUpdate < 1000;
-
-  const logFileExists = isElectron() ? getLogExists(path) : false;
 
   return (
     <>
