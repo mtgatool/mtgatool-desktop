@@ -40,10 +40,10 @@ interface Entry extends LogEntry {
   json: CombinedRankInfo;
 }
 
-export default function InEventGetCombinedRankInfo(entry: Entry): void {
+export default async function InEventGetCombinedRankInfo(entry: Entry): Promise<void> {
   const { json } = entry;
 
-  const memoryRank = readRank();
+  const memoryRank = await readRank();
 
   if (memoryRank) {
     postChannelMessage({

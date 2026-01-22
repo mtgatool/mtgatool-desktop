@@ -3,7 +3,7 @@ import {
   rankClass,
 } from "../background/onLabel/InEventGetCombinedRankInfo";
 import globalStore from "../background/store";
-import isTauri from "../utils/tauri/isTauri";
+import { isMemoryReadingAvailable, readData } from "../utils/mtgaReader";
 
 interface _ReturnedRankInfo {
   constructedClass: number;
@@ -27,22 +27,22 @@ interface _ReturnedRankInfo {
   playerId: string;
 }
 
-export default function readRank(): CombinedRankInfo | undefined {
-  if (!isTauri()) return undefined;
+export default async function readRank(): Promise<
+  CombinedRankInfo | undefined
+> {
+  // Skip if memory reading is not available (web mode)
+  if (!isMemoryReadingAvailable()) {
+    return globalStore.rank || undefined;
+  }
 
-  // eslint-disable-next-line no-undef
-  const reader = __non_webpack_require__("mtga-reader");
-
-  const { readData } = reader;
-
-  const rank = readData("MTGA", [
+  const rank = await readData("MTGA", [
     "WrapperController",
     "<Instance>k__BackingField",
     "<PlayerRankServiceWrapper>k__BackingField",
     "_combinedRankInfo",
   ]);
 
-  if (rank.error || Object.keys(rank).length === 0) {
+  if (!rank || rank.error || Object.keys(rank).length === 0) {
     if (globalStore.rank) return globalStore.rank;
 
     return undefined;

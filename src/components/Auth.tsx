@@ -40,10 +40,13 @@ export default function Auth(props: AuthProps) {
   const [_refresh, setRefresh] = useState(1);
 
   useEffect(() => {
+    console.log("Auth component mounted");
     setTimeout(() => {
       setRefresh(2);
 
-      UICheckAdmin();
+      UICheckAdmin().catch((err) => {
+        console.error("UICheckAdmin error:", err);
+      });
     }, 100);
   }, []);
 
@@ -131,7 +134,9 @@ export default function Auth(props: AuthProps) {
         setLocalSetting("savedPass", "");
       }
       history.push("/home");
-      readCards();
+      readCards().catch(() => {
+        // Ignore errors from background operation
+      });
     }
   }, [loginState, username, pass, rememberme, history]);
 
@@ -291,7 +296,9 @@ export default function Auth(props: AuthProps) {
                 type: "SET_LOADING",
                 arg: false,
               });
-              readCards();
+              readCards().catch(() => {
+                // Ignore errors from background operation
+              });
             }
           })
           .catch((err: Error) => {

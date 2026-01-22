@@ -1,6 +1,6 @@
 import upsertDbCards from "../toolDb/upsertDbCards";
 import { Cards } from "../types";
-import isTauri from "../utils/tauri/isTauri";
+import { isMemoryReadingAvailable, readData } from "../utils/mtgaReader";
 
 interface ReaderCard {
   key: number;
@@ -9,14 +9,11 @@ interface ReaderCard {
   next: number;
 }
 
-export default function readCards() {
-  if (!isTauri()) return;
-  // eslint-disable-next-line no-undef
-  const reader = __non_webpack_require__("mtga-reader");
+export default async function readCards() {
+  // Skip if memory reading is not available (web mode)
+  if (!isMemoryReadingAvailable()) return;
 
-  const { readData } = reader;
-
-  const cards = readData("MTGA", [
+  const cards = await readData("MTGA", [
     "PAPA",
     "_instance",
     "_inventoryManager",
@@ -25,7 +22,7 @@ export default function readCards() {
     "_entries",
   ]);
 
-  if (cards.error) return;
+  if (!cards || cards.error) return;
 
   const parsedCards: Cards = {};
   cards.forEach((c: ReaderCard) => {

@@ -16,7 +16,9 @@ export default function onClientSceneChange(entry: Entry): void {
   }
 
   if (json.fromSceneName === "BoosterChamber") {
-    readCards();
+    readCards().catch(() => {
+      // Ignore errors from background operation
+    });
   }
 
   postChannelMessage({

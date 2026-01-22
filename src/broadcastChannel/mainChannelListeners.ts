@@ -77,7 +77,9 @@ export default function mainChannelListeners() {
     }
 
     if (msg.data.type === "DAEMON_GET_PLAYER_ID") {
-      readPlayerId();
+      readPlayerId().catch(() => {
+        // Ignore errors from background operation
+      });
     }
 
     if (msg.data.type === "SET_DETAILED_LOGS") {
@@ -85,7 +87,9 @@ export default function mainChannelListeners() {
         type: "SET_DETAILED_LOGS",
         arg: msg.data.value === "ENABLED",
       });
-      UICheckAdmin();
+      UICheckAdmin().catch(() => {
+        // Ignore errors from background operation
+      });
     }
 
     if (msg.data.type === "SET_UUID") {
@@ -193,7 +197,9 @@ export default function mainChannelListeners() {
     if (msg.data.type === "PLAYER_INVENTORY") {
       const inventoryData = msg.data.value;
       upsertDbInventory(inventoryData);
-      readCards();
+      readCards().catch(() => {
+        // Ignore errors from background operation
+      });
     }
 
     if (msg.data.type === "UPDATE_ACTIVE_EVENTS") {

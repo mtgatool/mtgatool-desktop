@@ -29,6 +29,7 @@ serde_json = "1.0"
 notify = "5.2"
 tokio = { version = "1", features = ["full"] }
 dirs = "5.0"
+mtga-reader = { path = "../../mtga-reader", default-features = false }
 
 [features]
 default = ["custom-protocol"]

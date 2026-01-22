@@ -1,44 +1,15 @@
 import { useEffect, useState } from "react";
 
 import readPlayerTest from "../../../reader/readPlayerTest";
-import isTauri from "../../../utils/tauri/isTauri";
+import { findProcess, isAdmin } from "../../../utils/mtgaReader";
 
-function findMTGA(): boolean {
-  // In Tauri, native modules aren't available in the browser context
-  // This functionality would need to be implemented via Tauri commands
-  if (isTauri()) {
-    // TODO: Implement via Tauri command
-    return false;
-  }
-
-  try {
-    // eslint-disable-next-line no-undef
-    const reader = __non_webpack_require__("mtga-reader");
-    const { findPidByName } = reader;
-    return findPidByName("MTGA");
-  } catch (error) {
-    console.error("Failed to access mtga-reader:", error);
-    return false;
-  }
+async function findMTGA(): Promise<boolean> {
+  const pid = await findProcess("MTGA");
+  return pid !== null;
 }
 
-function checkAdmin(): boolean {
-  // In Tauri, native modules aren't available in the browser context
-  // This functionality would need to be implemented via Tauri commands
-  if (isTauri()) {
-    // TODO: Implement via Tauri command
-    return false;
-  }
-
-  try {
-    // eslint-disable-next-line no-undef
-    const reader = __non_webpack_require__("mtga-reader");
-    const { isAdmin } = reader;
-    return isAdmin();
-  } catch (error) {
-    console.error("Failed to access mtga-reader:", error);
-    return false;
-  }
+async function checkAdmin(): Promise<boolean> {
+  return isAdmin();
 }
 
 export default function ReaderStatus() {
@@ -47,22 +18,13 @@ export default function ReaderStatus() {
   const [errorText, setErrorText] = useState("");
 
   useEffect(() => {
-    // In Tauri, the reader functionality isn't available yet
-    if (isTauri()) {
-      setReaderStatus("warn");
-      setErrorText(
-        "Reader functionality not available in Tauri (requires native module implementation)"
-      );
-      return undefined;
-    }
-
-    const interval = setInterval(() => {
-      const found = findMTGA();
-      const isAdmin = checkAdmin();
-      const player = readPlayerTest();
+    const interval = setInterval(async () => {
+      const found = await findMTGA();
+      const admin = await checkAdmin();
+      const player = await readPlayerTest();
 
       if (found) {
-        if (!player && !isAdmin) {
+        if (!player && !admin) {
           setReaderStatus("err");
           setErrorText("App is not running with admin/elevated privileges");
           return;

@@ -1,3 +1,5 @@
+import { isMemoryReadingAvailable, readData } from "../utils/mtgaReader";
+
 interface PlayerInfo {
   AvatarSelection: string;
   CommanderGrpId: number;
@@ -11,20 +13,20 @@ interface PlayerInfo {
   _screenName: string;
 }
 
-export default function readMatchOpponentInfo(): PlayerInfo | undefined {
-  // eslint-disable-next-line no-undef
-  const reader = __non_webpack_require__("mtga-reader");
+export default async function readMatchOpponentInfo(): Promise<
+  PlayerInfo | undefined
+> {
+  // Skip if memory reading is not available (web mode)
+  if (!isMemoryReadingAvailable()) return undefined;
 
-  const { readData } = reader;
-
-  const opponentInfo = readData("MTGA", [
+  const opponentInfo = await readData("MTGA", [
     "PAPA",
     "_instance",
     "_matchManager",
     "<OpponentInfo>k__BackingField",
   ]);
 
-  if (opponentInfo.error) return undefined;
+  if (!opponentInfo || opponentInfo.error) return undefined;
 
   return opponentInfo;
 }

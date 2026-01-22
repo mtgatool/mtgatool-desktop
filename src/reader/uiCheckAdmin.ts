@@ -1,35 +1,17 @@
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
-import isTauri from "../utils/tauri/isTauri";
+import { isAdmin, isMemoryReadingAvailable } from "../utils/mtgaReader";
 
-function checkAdmin(): boolean {
-  // In Tauri, native modules aren't available in the browser context
-  if (isTauri()) {
-    // TODO: Implement via Tauri command
-    return false;
-  }
-
-  try {
-    // eslint-disable-next-line no-undef
-    const reader = __non_webpack_require__("mtga-reader");
-    const { isAdmin } = reader;
-    return isAdmin();
-  } catch (error) {
-    console.error("Failed to access mtga-reader:", error);
-    return false;
-  }
-}
-
-export default function UICheckAdmin() {
-  // Skip in Tauri - native module access not available
-  if (isTauri()) {
+export default async function UICheckAdmin() {
+  // Skip if memory reading is not available (web mode)
+  if (!isMemoryReadingAvailable()) {
     return;
   }
 
   // if we are on windows
-  if (process.platform === "win32") {
-    const isAdmin = checkAdmin();
-    if (!isAdmin) {
+  if (typeof process !== "undefined" && process.platform === "win32") {
+    const admin = await isAdmin();
+    if (!admin) {
       console.log("Admin detected, sending to overlay");
       reduxAction(store.dispatch, {
         type: "SET_ADMIN_PERMISSIONS",

@@ -62,7 +62,9 @@ export default function Welcome() {
                   }}
                   className="button-simple-dark"
                   onClick={() => {
+                    console.log("Skip clicked");
                     setLocalSetting("welcome", "true");
+                    console.log("Welcome setting saved, navigating to /auth");
                     history.push("/auth");
                   }}
                 >
@@ -159,7 +161,9 @@ export default function Welcome() {
                   }}
                   className="button-simple"
                   onClick={() => {
+                    console.log("Get Started clicked");
                     setLocalSetting("welcome", "true");
+                    console.log("Welcome setting saved, navigating to /auth");
                     history.push("/auth");
                   }}
                 >

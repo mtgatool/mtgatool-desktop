@@ -1,4 +1,4 @@
-import isTauri from "../utils/tauri/isTauri";
+import { isMemoryReadingAvailable, readData } from "../utils/mtgaReader";
 
 interface AccountInformation {
   AccessToken: string;
@@ -16,27 +16,19 @@ interface AccountInformation {
   Roles: null;
 }
 
-export default function readPlayerTest() {
-  // In Tauri, native modules aren't available in the browser context
-  if (isTauri()) {
-    // TODO: Implement via Tauri command
-    return null;
-  }
+export default async function readPlayerTest(): Promise<string | null> {
+  // Skip if memory reading is not available (web mode)
+  if (!isMemoryReadingAvailable()) return null;
 
   try {
-    // eslint-disable-next-line no-undef
-    const reader = __non_webpack_require__("mtga-reader");
-
-    const { readData } = reader;
-
-    const data = readData("MTGA", [
+    const data = await readData("MTGA", [
       "WrapperController",
       "<Instance>k__BackingField",
       "<AccountClient>k__BackingField",
       "<AccountInformation>k__BackingField",
     ]);
 
-    if (data.error) return null;
+    if (!data || data.error) return null;
 
     const accountInformation: AccountInformation = data;
 
@@ -46,7 +38,7 @@ export default function readPlayerTest() {
 
     return null;
   } catch (error) {
-    console.error("Failed to access mtga-reader:", error);
+    console.error("Failed to read player test:", error);
     return null;
   }
 }

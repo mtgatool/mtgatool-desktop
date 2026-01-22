@@ -41,9 +41,9 @@ const rankClass: Record<number, string> = {
   "6": "Mythic",
 };
 
-export default function onLabelMatchGameRoomStateChangedEvent(
+export default async function onLabelMatchGameRoomStateChangedEvent(
   entry: Entry
-): void {
+): Promise<void> {
   const { json } = entry;
 
   const gameRoom = json.matchGameRoomStateChangedEvent.gameRoomInfo;
@@ -158,9 +158,9 @@ export default function onLabelMatchGameRoomStateChangedEvent(
     const isLimited = isLimitedEventId(gameRoom.gameRoomConfig.eventId);
 
     if (isTauri()) {
-      const matchState = readMatchManger();
+      const matchState = await readMatchManger();
 
-      const oppInfo = readMatchOpponentInfo();
+      const oppInfo = await readMatchOpponentInfo();
       if (
         oppInfo &&
         matchState &&
@@ -177,10 +177,10 @@ export default function onLabelMatchGameRoomStateChangedEvent(
         setOpponent(opponent);
       }
 
-      const playerInfo = readMatchPlayerInfo();
+      const playerInfo = await readMatchPlayerInfo();
 
       // This doesnt work on this screen
-      const playerRank = readRank();
+      const playerRank = await readRank();
 
       // eslint-disable-next-line no-nested-ternary
       const rankData = playerRank

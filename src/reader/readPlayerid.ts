@@ -1,3 +1,4 @@
+import { isMemoryReadingAvailable, readData } from "../utils/mtgaReader";
 import switchPlayerUUID from "../utils/switchPlayerUUID";
 
 interface AccountInformation {
@@ -16,31 +17,33 @@ interface AccountInformation {
   Roles: null;
 }
 
-export default function readPlayerId() {
-  // eslint-disable-next-line no-undef
-  const reader = __non_webpack_require__("mtga-reader");
+export default async function readPlayerId() {
+  // Skip if memory reading is not available (web mode)
+  if (!isMemoryReadingAvailable()) return;
 
-  const { readData } = reader;
+  try {
+    const data = await readData("MTGA", [
+      "WrapperController",
+      "<Instance>k__BackingField",
+      "<AccountClient>k__BackingField",
+      "<AccountInformation>k__BackingField",
+    ]);
 
-  const data = readData("MTGA", [
-    "WrapperController",
-    "<Instance>k__BackingField",
-    "<AccountClient>k__BackingField",
-    "<AccountInformation>k__BackingField",
-  ]);
+    if (!data || data.error) return;
 
-  if (data.error) return;
+    const accountInformation: AccountInformation = data;
 
-  const accountInformation: AccountInformation = data;
-
-  if (
-    accountInformation &&
-    accountInformation.PersonaID &&
-    accountInformation.DisplayName
-  ) {
-    switchPlayerUUID(
-      accountInformation.PersonaID,
+    if (
+      accountInformation &&
+      accountInformation.PersonaID &&
       accountInformation.DisplayName
-    );
+    ) {
+      switchPlayerUUID(
+        accountInformation.PersonaID,
+        accountInformation.DisplayName
+      );
+    }
+  } catch (error) {
+    console.error("Failed to read player ID:", error);
   }
 }

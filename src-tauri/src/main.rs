@@ -9,7 +9,7 @@ mod tray;
 mod state;
 
 use std::sync::Mutex;
-use tauri::{Manager, WindowBuilder, WindowUrl};
+use tauri::{WindowBuilder, WindowUrl};
 
 fn main() {
     tauri::Builder::default()
@@ -48,6 +48,12 @@ fn main() {
             // Arena log watcher
             arena_log::watcher::start_log_watcher,
             arena_log::watcher::stop_log_watcher,
+            // Memory reader commands
+            commands::reader::is_admin,
+            commands::reader::find_process,
+            commands::reader::read_data,
+            commands::reader::read_class,
+            commands::reader::read_generic_instance,
         ])
         .setup(|app| {
             // Create background window (hidden)
@@ -62,11 +68,11 @@ fn main() {
                 .visible(false)
                 .build()?;
 
-            // Create hover window (transparent, hidden initially)
+            // Create hover window (hidden initially)
+            // Note: Transparency is configured in tauri.conf.json, not in WindowBuilder for Tauri 1.x
             WindowBuilder::new(app, "hover", background_url)
                 .title("mtgatool-hover")
                 .visible(false)
-                .transparent(true)
                 .decorations(false)
                 .always_on_top(true)
                 .skip_taskbar(true)

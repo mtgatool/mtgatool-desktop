@@ -34600,23 +34600,19 @@ exports.default = generateKeysComb;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function getCrypto() {
-    var _a, _b;
-    // Check for browser or web worker environment
-    if (typeof ((_a = globalThis.crypto) === null || _a === void 0 ? void 0 : _a.subtle) !== "undefined") {
-        return globalThis.crypto;
-    }
-    // Check window.crypto for older browser compatibility
-    if (typeof window !== "undefined" && ((_b = window.crypto) === null || _b === void 0 ? void 0 : _b.subtle)) {
-        return window.crypto;
-    }
-    // Node.js environment
-    if (typeof window === "undefined" && typeof self === "undefined") {
+    var _a;
+    if (typeof window === "undefined") {
+        // Node.js environment
         // eslint-disable-next-line global-require
         return require("crypto").webcrypto;
     }
-    throw new Error("Web Crypto API (crypto.subtle) is not available. " +
-        "This usually means the page is not served over HTTPS. " +
-        "Please use HTTPS or localhost for secure crypto operations.");
+    // Check if crypto.subtle is available (requires HTTPS or localhost)
+    if (!((_a = window.crypto) === null || _a === void 0 ? void 0 : _a.subtle)) {
+        throw new Error("Web Crypto API (crypto.subtle) is not available. " +
+            "This usually means the page is not served over HTTPS. " +
+            "Please use HTTPS or localhost for secure crypto operations.");
+    }
+    return window.crypto;
 }
 exports.default = getCrypto;
 
@@ -35140,7 +35136,10 @@ var ToolDbEcdsaUser = /** @class */ (function (_super) {
         var _this = _super.call(this, db) || this;
         // eslint-disable-next-line global-require
         global.Buffer = global.Buffer || require("buffer").Buffer;
-        // Note: crypto is handled by getCrypto() which supports browser, web worker, and Node.js
+        if (typeof window === "undefined") {
+            // eslint-disable-next-line global-require
+            global.crypto = require("crypto").webcrypto;
+        }
         // Initialize with temporary keys for peerAccount to function
         // These will be replaced when anonUser() or setUser() is called explicitly
         _this.anonUser();
@@ -35325,7 +35324,7 @@ var generateKeyFromPassword_1 = require("./crypto/generateKeyFromPassword");
 Object.defineProperty(exports, "generateKeyFromPassword", { enumerable: true, get: function () { return __importDefault(generateKeyFromPassword_1).default; } });
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./crypto/base64ToPubkey":255,"./crypto/cryptoKeyPairToHexed":256,"./crypto/decryptWithKey":257,"./crypto/decryptWithPass":258,"./crypto/deriveSharedKey":259,"./crypto/encryptWithKey":260,"./crypto/encryptWithPass":261,"./crypto/exportKey":262,"./crypto/generateECDHKeyPair":263,"./crypto/generateIv":264,"./crypto/generateKeyFromPassword":265,"./crypto/generateKeyPair":266,"./crypto/generateKeysComb":267,"./crypto/getCrypto":268,"./crypto/importAESKey":269,"./crypto/importECDHPrivateKey":270,"./crypto/importECDHPublicKey":271,"./crypto/importKey":272,"./crypto/pubkeyToBase64":273,"./crypto/signData":274,"./crypto/unwrapGroupKey":275,"./crypto/verifyData":276,"./crypto/wrapGroupKey":277,"buffer":86,"tool-db":287}],279:[function(require,module,exports){
+},{"./crypto/base64ToPubkey":255,"./crypto/cryptoKeyPairToHexed":256,"./crypto/decryptWithKey":257,"./crypto/decryptWithPass":258,"./crypto/deriveSharedKey":259,"./crypto/encryptWithKey":260,"./crypto/encryptWithPass":261,"./crypto/exportKey":262,"./crypto/generateECDHKeyPair":263,"./crypto/generateIv":264,"./crypto/generateKeyFromPassword":265,"./crypto/generateKeyPair":266,"./crypto/generateKeysComb":267,"./crypto/getCrypto":268,"./crypto/importAESKey":269,"./crypto/importECDHPrivateKey":270,"./crypto/importECDHPublicKey":271,"./crypto/importKey":272,"./crypto/pubkeyToBase64":273,"./crypto/signData":274,"./crypto/unwrapGroupKey":275,"./crypto/verifyData":276,"./crypto/wrapGroupKey":277,"buffer":86,"crypto":110,"tool-db":287}],279:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {

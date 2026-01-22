@@ -4,34 +4,23 @@
   "private": true,
   "homepage": "./",
   "scripts": {
-    "start": "npm run build:workers && nf start -p 3001",
-    "cm": "git-cz",
+    "dev": "npx tauri dev",
+    "dev:web": "npm run build:workers && craco --openssl-legacy-provider start --config craco.web.config.js",
+    "build": "npx tauri build",
+    "build:web": "npm run build:workers && craco --openssl-legacy-provider build --config craco.web.config.js",
+    "build:workers": "npm run build:tooldb-worker && npm run build:cards-worker",
     "build:tooldb-worker": "tsc --p tooldb-worker-tsconfig.json && browserify ./dist-tooldb-worker/toolDbWorker.js --standalone tooldbworker > ./public/tooldb-worker/index.js",
     "build:cards-worker": "tsc --p cards-worker-tsconfig.json && browserify ./dist-cards-worker/cards-worker/collectionDataWorker.js --standalone cardsworker > ./dist-cards-worker/index.js && uglifyjs ./dist-cards-worker/index.js -c > ./public/cards-worker/index.js",
-    "build:workers": "npm run build:tooldb-worker && npm run build:cards-worker",
-    "react-start": "node generateInfo.js && craco --openssl-legacy-provider start",
-    "react-build": "craco --openssl-legacy-provider build",
     "react-start:tauri": "node generateInfo.js && craco --openssl-legacy-provider start --config craco.tauri.config.js",
     "react-build:tauri": "craco --openssl-legacy-provider build --config craco.tauri.config.js",
-    "tauri:dev": "npm run build:workers && tauri dev",
-    "tauri:build": "npm run build:workers && npm run react-build:tauri && tauri build",
-    "start:web": "npm run build:workers && craco --openssl-legacy-provider start --config craco.web.config.js",
-    "build:web": "npm run build:workers && craco --openssl-legacy-provider build --config craco.web.config.js",
-    "build:fleek": "npm run build:workers && craco build --config craco.web.config.js",
-    "jest-server": "http-server ./build -p 3000",
-    "jest:watch": "craco test --env=jsdom",
-    "jest:ci": "craco test --env=jsdom --watchAll=false --testPathIgnorePatterns \"src/__tests__/\"",
-    "jest:ci:watch": "craco test --env=jsdom --testPathIgnorePatterns \"src/__tests__/\"",
-    "test:eslint": "eslint src/**",
-    "test:all": "npm run test:eslint && npm run jest:ci",
-    "eject": "react-scripts eject",
-    "semantic-release": "semantic-release",
-    "build": "npm run tauri:build",
-    "install:ci": "npm install && npm install @craco/craco",
+    "test": "npm run test:lint && npm run test:unit",
+    "test:lint": "eslint src/**",
+    "test:unit": "craco test --env=jsdom --watchAll=false",
+    "test:watch": "craco test --env=jsdom",
+    "proto": "npm-run-all proto:model proto:greTypes proto:eslint",
     "proto:model": "node node_modules/protobufjs/bin/pbjs src/proto/messages.proto > src/proto/model.json",
     "proto:greTypes": "node src/proto/proto2typescript/index.js",
-    "proto:eslint": "eslint src/types/greTypes.ts --fix --no-ignore",
-    "proto": "npm-run-all proto:model proto:greTypes proto:eslint"
+    "proto:eslint": "eslint src/types/greTypes.ts --fix --no-ignore"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.6.0",
@@ -121,58 +110,6 @@
     "text-encoding": "^0.7.0",
     "uglify-js": "^3.15.4",
     "webpack-react-component-name": "^4.0.2"
-  },
-  "build": {
-    "appId": "com.mtgatool.desktop",
-    "files": [
-      "build/**/*",
-      "node_modules/**/*",
-      "!**/__tests__/**",
-      "!**/__mocks__/**"
-    ],
-    "win": {
-      "target": "NSIS",
-      "icon": "public/icons/icon.ico",
-      "artifactName": "${productName}-${version}.${ext}"
-    },
-    "mac": {
-      "icon": "public/icons/icon.icns",
-      "artifactName": "${productName}-${version}.${ext}",
-      "extendInfo": {
-        "LSUIElement": 1
-      }
-    },
-    "linux": {
-      "target": "AppImage",
-      "category": "Utility;",
-      "icon": "public/icons/icon-512.png",
-      "artifactName": "${productName}-${version}.${ext}"
-    },
-    "publish": [
-      {
-        "provider": "github",
-        "releaseType": "release"
-      }
-    ],
-    "extraResources": [
-      {
-        "from": "./public/extra/",
-        "to": "extra",
-        "filter": [
-          "**/*"
-        ]
-      },
-      {
-        "from": "./public/icons/",
-        "to": "icons",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ],
-    "directories": {
-      "buildResources": "public"
-    }
   },
   "eslintConfig": {
     "extends": [

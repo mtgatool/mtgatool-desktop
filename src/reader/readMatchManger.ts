@@ -1,3 +1,5 @@
+import { isMemoryReadingAvailable, readData } from "../utils/mtgaReader";
+
 interface MatchManager {
   "<BattlefieldId>k__BackingField": string;
   "<CurrentGameNumber>k__BackingField": number;
@@ -15,15 +17,19 @@ interface MatchManager {
   disposed: boolean;
 }
 
-export default function readMatchManger(): MatchManager | undefined {
-  // eslint-disable-next-line no-undef
-  const reader = __non_webpack_require__("mtga-reader");
+export default async function readMatchManger(): Promise<
+  MatchManager | undefined
+> {
+  // Skip if memory reading is not available (web mode)
+  if (!isMemoryReadingAvailable()) return undefined;
 
-  const { readData } = reader;
+  const matchManager = await readData("MTGA", [
+    "PAPA",
+    "_instance",
+    "_matchManager",
+  ]);
 
-  const matchManager = readData("MTGA", ["PAPA", "_instance", "_matchManager"]);
-
-  if (matchManager.error) return undefined;
+  if (!matchManager || matchManager.error) return undefined;
 
   return matchManager;
 }

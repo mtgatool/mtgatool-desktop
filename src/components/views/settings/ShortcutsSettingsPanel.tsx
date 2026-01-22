@@ -3,7 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
-import registerShortcuts, { unregisterAllShortcuts } from "../../../utils/registerShortcuts";
+import registerShortcuts, {
+  unregisterAllShortcuts,
+} from "../../../utils/registerShortcuts";
 import EditKey from "../../popups/EditKey";
 import Button from "../../ui/Button";
 import Toggle from "../../ui/Toggle";

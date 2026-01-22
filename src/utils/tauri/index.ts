@@ -59,3 +59,12 @@ export {
   setWindowBounds,
   OverlayBounds,
 } from "./overlayWindow";
+
+// Memory reader
+export {
+  isAdmin,
+  findProcess,
+  readData,
+  readClass,
+  readGenericInstance,
+} from "./reader";

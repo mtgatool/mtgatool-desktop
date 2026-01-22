@@ -30,11 +30,12 @@ pub fn create_overlay_window(
         WindowUrl::App("index.html".into())
     };
 
+    let _ = transparent; // Transparency is configured in tauri.conf.json, not WindowBuilder in Tauri 1.x
+
     WindowBuilder::new(&app, &label, url)
         .title(&label)
         .position(x as f64, y as f64)
         .inner_size(width as f64, height as f64)
-        .transparent(transparent)
         .decorations(false)
         .always_on_top(true)
         .skip_taskbar(true)
@@ -42,7 +43,7 @@ pub fn create_overlay_window(
         .resizable(true)
         .visible(true)
         .build()
-        .map_err(|e| e.to_string())?;
+        .map_err(|e: tauri::Error| e.to_string())?;
 
     Ok(())
 }
