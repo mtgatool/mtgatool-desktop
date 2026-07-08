@@ -30,18 +30,19 @@ module.exports = {
         require.resolve("@babel/plugin-proposal-nullish-coalescing-operator"),
         require.resolve("@babel/plugin-proposal-logical-assignment-operators"),
       ];
+      // Append to every babel-loader that has presets (both the app-src and
+      // the node_modules "dependencies" loaders). The app-src loader is scoped
+      // to src/ so this only affects @tauri-apps via the dependencies loader,
+      // but appending to both is harmless and robust across CRA start/build.
       webpackConfig.module.rules.forEach((rule) => {
         if (!Array.isArray(rule.oneOf)) return;
         rule.oneOf.forEach((one) => {
-          const isDepsBabel =
+          if (
             one.loader &&
             one.loader.includes("babel-loader") &&
             one.options &&
-            Array.isArray(one.options.presets) &&
-            JSON.stringify(one.options.presets).includes(
-              "preset-react-app/dependencies"
-            );
-          if (isDepsBabel) {
+            Array.isArray(one.options.presets)
+          ) {
             one.options.plugins = [
               ...(one.options.plugins || []),
               ...forceModernSyntaxPlugins,
