@@ -3,13 +3,13 @@
     windows_subsystem = "windows"
 )]
 
-mod commands;
 mod arena_log;
-mod tray;
+mod commands;
 mod state;
+mod tray;
 
 use std::sync::Mutex;
-use tauri::{WindowBuilder, WindowUrl};
+use tauri::{WebviewUrl, WebviewWindowBuilder};
 
 fn main() {
     // WebView2 paints an opaque (white) backdrop by default, which shows through
@@ -19,11 +19,17 @@ fn main() {
     std::env::set_var("WEBVIEW2_DEFAULT_BACKGROUND_COLOR", "00000000");
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_shell::init())
         .manage(state::AppState {
             log_watcher: Mutex::new(arena_log::watcher::ArenaLogWatcher::new()),
         })
-        .system_tray(tray::create_tray())
-        .on_system_tray_event(tray::handle_tray_event)
         .invoke_handler(tauri::generate_handler![
             // File system commands
             commands::file_system::read_file,
@@ -71,20 +77,23 @@ fn main() {
             commands::reader::read_inventory,
         ])
         .setup(|app| {
+            // System tray (Tauri v2 builds it in code; menu items need a handle)
+            tray::create_tray(app.handle())?;
+
             // Create background window (hidden)
             let background_url = if cfg!(debug_assertions) {
-                WindowUrl::External("http://localhost:3001".parse().unwrap())
+                WebviewUrl::External("http://localhost:3001".parse().unwrap())
             } else {
-                WindowUrl::App("index.html".into())
+                WebviewUrl::App("index.html".into())
             };
 
-            WindowBuilder::new(app, "background", background_url.clone())
+            WebviewWindowBuilder::new(app, "background", background_url.clone())
                 .title("mtgatool-background")
                 .visible(false)
                 .build()?;
 
             // Create hover window (hidden initially) — borderless + transparent
-            WindowBuilder::new(app, "hover", background_url)
+            WebviewWindowBuilder::new(app, "hover", background_url)
                 .title("mtgatool-hover")
                 .visible(false)
                 .decorations(false)

@@ -1,31 +1,24 @@
 use tauri::{
-    AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu,
-    SystemTrayMenuItem,
+    menu::{Menu, MenuItem, PredefinedMenuItem},
+    tray::{TrayIconBuilder, TrayIconEvent},
+    AppHandle, Manager,
 };
 
-pub fn create_tray() -> SystemTray {
-    let show = CustomMenuItem::new("show".to_string(), "Show");
-    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
+/// Build the system tray icon, menu, and event handlers (Tauri v2 API).
+/// Called from the app `setup` hook because menu items require an app handle.
+pub fn create_tray(app: &AppHandle) -> tauri::Result<()> {
+    let show = MenuItem::with_id(app, "show", "Show", true, None::<&str>)?;
+    let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+    let separator = PredefinedMenuItem::separator(app)?;
+    let menu = Menu::with_items(app, &[&show, &separator, &quit])?;
 
-    let tray_menu = SystemTrayMenu::new()
-        .add_item(show)
-        .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(quit);
-
-    SystemTray::new().with_menu(tray_menu)
-}
-
-pub fn handle_tray_event(app: &AppHandle, event: SystemTrayEvent) {
-    match event {
-        SystemTrayEvent::DoubleClick { .. } => {
-            if let Some(window) = app.get_window("main") {
-                let _ = window.show();
-                let _ = window.set_focus();
-            }
-        }
-        SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+    TrayIconBuilder::new()
+        .icon(app.default_window_icon().unwrap().clone())
+        .menu(&menu)
+        .show_menu_on_left_click(false)
+        .on_menu_event(|app, event| match event.id.as_ref() {
             "show" => {
-                if let Some(window) = app.get_window("main") {
+                if let Some(window) = app.get_webview_window("main") {
                     let _ = window.show();
                     let _ = window.set_focus();
                 }
@@ -34,7 +27,17 @@ pub fn handle_tray_event(app: &AppHandle, event: SystemTrayEvent) {
                 std::process::exit(0);
             }
             _ => {}
-        },
-        _ => {}
-    }
+        })
+        .on_tray_icon_event(|tray, event| {
+            if let TrayIconEvent::DoubleClick { .. } = event {
+                let app = tray.app_handle();
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.show();
+                    let _ = window.set_focus();
+                }
+            }
+        })
+        .build(app)?;
+
+    Ok(())
 }

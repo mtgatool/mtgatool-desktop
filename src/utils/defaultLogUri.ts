@@ -30,7 +30,7 @@ export async function getDefaultLogPathAsync(): Promise<string> {
   }
 
   try {
-    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { invoke } = await import("@tauri-apps/api/core");
     const path = await invoke<string>("get_default_log_path");
     cachedLogPath = path;
     return path;

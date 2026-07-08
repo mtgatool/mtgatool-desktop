@@ -1,6 +1,6 @@
 use std::fs;
 use std::io::{Read, Seek, SeekFrom};
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 #[tauri::command]
 pub fn read_file(path: String) -> Result<String, String> {
@@ -10,7 +10,8 @@ pub fn read_file(path: String) -> Result<String, String> {
 #[tauri::command]
 pub fn read_file_chunk(path: String, offset: u64, length: usize) -> Result<String, String> {
     let mut file = fs::File::open(&path).map_err(|e| e.to_string())?;
-    file.seek(SeekFrom::Start(offset)).map_err(|e| e.to_string())?;
+    file.seek(SeekFrom::Start(offset))
+        .map_err(|e| e.to_string())?;
 
     let mut buffer = vec![0u8; length];
     let bytes_read = file.read(&mut buffer).map_err(|e| e.to_string())?;
@@ -52,10 +53,10 @@ pub fn delete_file(path: String) -> Result<(), String> {
 
 #[tauri::command]
 pub fn get_app_data_path(app: AppHandle) -> Result<String, String> {
-    app.path_resolver()
+    app.path()
         .app_data_dir()
         .map(|p| p.to_string_lossy().to_string())
-        .ok_or_else(|| "Failed to get app data path".to_string())
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]

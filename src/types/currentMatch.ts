@@ -1,4 +1,3 @@
-
 import Deck from "../utils/mtga/deck";
 import Chances from "./chances";
 import { InternalDeck } from "./deck";

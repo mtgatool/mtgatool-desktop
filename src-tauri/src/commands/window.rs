@@ -1,5 +1,5 @@
-use tauri::{Manager, Window, WindowBuilder, WindowUrl};
 use serde::{Deserialize, Serialize};
+use tauri::{Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
 #[derive(Serialize, Deserialize)]
 pub struct WindowBounds {
@@ -20,17 +20,17 @@ pub fn create_overlay_window(
     transparent: bool,
 ) -> Result<(), String> {
     // Check if window already exists
-    if app.get_window(&label).is_some() {
+    if app.get_webview_window(&label).is_some() {
         return Ok(());
     }
 
     let url = if cfg!(debug_assertions) {
-        WindowUrl::External("http://localhost:3001".parse().unwrap())
+        WebviewUrl::External("http://localhost:3001".parse().unwrap())
     } else {
-        WindowUrl::App("index.html".into())
+        WebviewUrl::App("index.html".into())
     };
 
-    WindowBuilder::new(&app, &label, url)
+    WebviewWindowBuilder::new(&app, &label, url)
         .title(&label)
         .position(x as f64, y as f64)
         .inner_size(width as f64, height as f64)
@@ -48,14 +48,14 @@ pub fn create_overlay_window(
 }
 
 #[tauri::command]
-pub fn set_ignore_cursor_events(window: Window, ignore: bool) -> Result<(), String> {
+pub fn set_ignore_cursor_events(window: WebviewWindow, ignore: bool) -> Result<(), String> {
     window
         .set_ignore_cursor_events(ignore)
         .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-pub fn get_window_bounds(window: Window) -> Result<WindowBounds, String> {
+pub fn get_window_bounds(window: WebviewWindow) -> Result<WindowBounds, String> {
     let pos = window.outer_position().map_err(|e| e.to_string())?;
     let size = window.outer_size().map_err(|e| e.to_string())?;
     Ok(WindowBounds {
@@ -68,16 +68,20 @@ pub fn get_window_bounds(window: Window) -> Result<WindowBounds, String> {
 
 #[tauri::command]
 pub fn set_window_bounds(
-    window: Window,
+    window: WebviewWindow,
     x: i32,
     y: i32,
     width: u32,
     height: u32,
 ) -> Result<(), String> {
     window
-        .set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(x, y)))
+        .set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(
+            x, y,
+        )))
         .map_err(|e| e.to_string())?;
     window
-        .set_size(tauri::Size::Physical(tauri::PhysicalSize::new(width, height)))
+        .set_size(tauri::Size::Physical(tauri::PhysicalSize::new(
+            width, height,
+        )))
         .map_err(|e| e.to_string())
 }

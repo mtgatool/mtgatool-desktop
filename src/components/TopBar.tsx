@@ -46,7 +46,9 @@ function getCurrentOverlayIndex(): number {
 async function minimizeWindow(): Promise<void> {
   if (!isTauri()) return;
   try {
-    const { appWindow } = await import("@tauri-apps/api/window");
+    const appWindow = (
+      await import("@tauri-apps/api/window")
+    ).getCurrentWindow();
     await appWindow.minimize();
   } catch (e) {
     console.error("Failed to minimize window:", e);
@@ -56,7 +58,9 @@ async function minimizeWindow(): Promise<void> {
 async function toggleMaximize(): Promise<void> {
   if (!isTauri()) return;
   try {
-    const { appWindow } = await import("@tauri-apps/api/window");
+    const appWindow = (
+      await import("@tauri-apps/api/window")
+    ).getCurrentWindow();
     await appWindow.toggleMaximize();
   } catch (e) {
     console.error("Failed to toggle maximize:", e);
@@ -66,7 +70,9 @@ async function toggleMaximize(): Promise<void> {
 async function hideWindow(): Promise<void> {
   if (!isTauri()) return;
   try {
-    const { appWindow } = await import("@tauri-apps/api/window");
+    const appWindow = (
+      await import("@tauri-apps/api/window")
+    ).getCurrentWindow();
     await appWindow.hide();
   } catch (e) {
     console.error("Failed to hide window:", e);
@@ -76,7 +82,9 @@ async function hideWindow(): Promise<void> {
 async function closeOverlayWindow(): Promise<void> {
   if (!isTauri()) return;
   try {
-    const { appWindow } = await import("@tauri-apps/api/window");
+    const appWindow = (
+      await import("@tauri-apps/api/window")
+    ).getCurrentWindow();
     await appWindow.close();
   } catch (e) {
     console.error("Failed to close window:", e);
@@ -86,7 +94,9 @@ async function closeOverlayWindow(): Promise<void> {
 async function checkIsMaximized(): Promise<boolean> {
   if (!isTauri()) return false;
   try {
-    const { appWindow } = await import("@tauri-apps/api/window");
+    const appWindow = (
+      await import("@tauri-apps/api/window")
+    ).getCurrentWindow();
     return await appWindow.isMaximized();
   } catch {
     return false;
@@ -96,7 +106,9 @@ async function checkIsMaximized(): Promise<boolean> {
 async function checkIsFocused(): Promise<boolean> {
   if (!isTauri()) return true;
   try {
-    const { appWindow } = await import("@tauri-apps/api/window");
+    const appWindow = (
+      await import("@tauri-apps/api/window")
+    ).getCurrentWindow();
     return await appWindow.isFocused();
   } catch {
     return true;
@@ -106,7 +118,7 @@ async function checkIsFocused(): Promise<boolean> {
 async function getPlatform(): Promise<string> {
   if (!isTauri()) return "win32";
   try {
-    const { platform } = await import("@tauri-apps/api/os");
+    const { platform } = await import("@tauri-apps/plugin-os");
     return await platform();
   } catch {
     return "win32";

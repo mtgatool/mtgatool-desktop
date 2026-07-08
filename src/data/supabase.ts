@@ -14,13 +14,17 @@ const SUPABASE_URL = "https://decenyvqkbvydrrolwpk.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_9CgHq0DZWlYYxjH7ZDLeOw_zk4EKYKu";
 
-const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    // Sessions persist in localStorage so the desktop app can auto-login
-    // (and keep working offline) without storing the password.
-    persistSession: true,
-    autoRefreshToken: true,
-  },
-});
+const supabase = createClient<Database>(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
+  {
+    auth: {
+      // Sessions persist in localStorage so the desktop app can auto-login
+      // (and keep working offline) without storing the password.
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+  }
+);
 
 export default supabase;

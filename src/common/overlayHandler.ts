@@ -23,11 +23,12 @@ export class OverlayHandler {
     if (!isTauri()) return currentStates;
 
     try {
-      const { WebviewWindow } = await import("@tauri-apps/api/window");
+      const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
 
       for (let i = 0; i < ALL_TAURI_OVERLAY_LABELS.length; i += 1) {
         const label = ALL_TAURI_OVERLAY_LABELS[i];
-        const window = WebviewWindow.getByLabel(label);
+        // eslint-disable-next-line no-await-in-loop
+        const window = await WebviewWindow.getByLabel(label);
         if (window) {
           currentStates[i] = true;
         }

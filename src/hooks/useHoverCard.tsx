@@ -11,8 +11,9 @@ type HoverCardHook = (() => void)[];
 // Get current window label/title
 function getWindowLabel(): string {
   if (isTauri()) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (window as any).__TAURI__?.window?.appWindow?.label || "main";
+    // eslint-disable-next-line global-require, @typescript-eslint/no-var-requires
+    const { getCurrentWindow } = require("@tauri-apps/api/window");
+    return getCurrentWindow().label || "main";
   }
   return WINDOW_MAIN;
 }

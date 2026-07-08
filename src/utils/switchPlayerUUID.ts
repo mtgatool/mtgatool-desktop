@@ -1,9 +1,9 @@
 ﻿import _ from "lodash";
 
-import reduxAction from "../redux/reduxAction";
-import store from "../redux/stores/rendererStore";
 import upsertDbDisplayName from "../data/upsertDbDisplayName";
 import upsertDbUserdata from "../data/upsertDbUserdata";
+import reduxAction from "../redux/reduxAction";
+import store from "../redux/stores/rendererStore";
 import setLocalSetting from "./setLocalSetting";
 
 export default async function switchPlayerUUID(

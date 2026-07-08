@@ -9,27 +9,22 @@ edition = "2021"
 rust-version = "1.70"
 
 [build-dependencies]
-tauri-build = { version = "1.5", features = [] }
+tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "1.5", features = [ "os-all",
-    "clipboard-all",
-    "dialog-all",
-    "fs-all",
-    "global-shortcut-all",
-    "notification-all",
-    "path-all",
-    "shell-open",
-    "system-tray",
-    "updater",
-    "window-all"
-] }
+tauri = { version = "2", features = ["tray-icon"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 notify = "5.2"
 tokio = { version = "1", features = ["full"] }
 dirs = "5.0"
 mtga-reader = { path = "../../mtga-reader", default-features = false }
+tauri-plugin-shell = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-os = "2"
+tauri-plugin-clipboard-manager = "2"
 
 [features]
 default = ["custom-protocol"]
@@ -41,3 +36,7 @@ codegen-units = 1
 lto = true
 opt-level = "s"
 strip = true
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-updater = "2"

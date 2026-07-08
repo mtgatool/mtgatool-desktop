@@ -16,10 +16,10 @@ export default async function createOverlay(
   console.warn("createOverlay", id, allSettings);
 
   try {
-    const { WebviewWindow } = await import("@tauri-apps/api/window");
+    const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
 
     // Check if window already exists
-    const existingWindow = WebviewWindow.getByLabel(label);
+    const existingWindow = await WebviewWindow.getByLabel(label);
     if (existingWindow) {
       await existingWindow.show();
       return;

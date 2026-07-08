@@ -4,7 +4,7 @@ export default async function initDirectories(): Promise<void> {
   if (!isTauri()) return;
 
   try {
-    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { invoke } = await import("@tauri-apps/api/core");
     const { appDataDir, join } = await import("@tauri-apps/api/path");
 
     const appData = await appDataDir();

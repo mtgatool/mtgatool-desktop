@@ -13,7 +13,7 @@ export async function createOverlayWindow(
   transparent: boolean
 ): Promise<void> {
   if (isTauri()) {
-    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { invoke } = await import("@tauri-apps/api/core");
     await invoke("create_overlay_window", {
       label,
       x: bounds.x,
@@ -27,8 +27,8 @@ export async function createOverlayWindow(
 
 export async function closeOverlayWindow(label: string): Promise<void> {
   if (isTauri()) {
-    const { WebviewWindow } = await import("@tauri-apps/api/window");
-    const window = WebviewWindow.getByLabel(label);
+    const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
+    const window = await WebviewWindow.getByLabel(label);
     if (window) {
       await window.close();
     }
@@ -37,8 +37,8 @@ export async function closeOverlayWindow(label: string): Promise<void> {
 
 export async function getAllOverlayWindows(): Promise<string[]> {
   if (isTauri()) {
-    const { getAll } = await import("@tauri-apps/api/window");
-    const windows = await getAll();
+    const { getAllWindows } = await import("@tauri-apps/api/window");
+    const windows = await getAllWindows();
     return windows
       .filter((w) => w.label.startsWith("overlay-"))
       .map((w) => w.label);
@@ -50,7 +50,7 @@ export async function getWindowBounds(
   label?: string
 ): Promise<OverlayBounds | null> {
   if (isTauri()) {
-    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { invoke } = await import("@tauri-apps/api/core");
     try {
       return await invoke<OverlayBounds>("get_window_bounds", { label });
     } catch {
@@ -65,7 +65,7 @@ export async function setWindowBounds(
   label?: string
 ): Promise<void> {
   if (isTauri()) {
-    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { invoke } = await import("@tauri-apps/api/core");
     await invoke("set_window_bounds", {
       label,
       x: bounds.x,

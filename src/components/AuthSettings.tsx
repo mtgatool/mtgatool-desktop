@@ -23,7 +23,7 @@ function clickBetaChannel(value: boolean): void {
 async function checkLogExists(path: string): Promise<boolean> {
   if (!isTauri()) return false;
   try {
-    const { exists } = await import("@tauri-apps/api/fs");
+    const { exists } = await import("@tauri-apps/plugin-fs");
     return await exists(path);
   } catch {
     return false;

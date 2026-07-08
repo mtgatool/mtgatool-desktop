@@ -1,3 +1,4 @@
+import { PhysicalPosition, PhysicalSize } from "@tauri-apps/api/dpi";
 import {
   CSSProperties,
   useCallback,
@@ -26,7 +27,7 @@ import vodiFn from "../utils/voidfn";
 // Initialize window settings for Tauri
 async function initTauriWindow() {
   if (!isTauri()) return;
-  const { appWindow } = await import("@tauri-apps/api/window");
+  const appWindow = (await import("@tauri-apps/api/window")).getCurrentWindow();
   await appWindow.setAlwaysOnTop(true);
 }
 
@@ -38,7 +39,10 @@ async function calculatePositionTauri(
 ) {
   if (!isTauri()) return;
 
-  const { appWindow, primaryMonitor } = await import("@tauri-apps/api/window");
+  const { getCurrentWindow, primaryMonitor } = await import(
+    "@tauri-apps/api/window"
+  );
+  const appWindow = getCurrentWindow();
 
   const monitor = await primaryMonitor();
   if (!monitor) return;
@@ -104,28 +108,28 @@ async function calculatePositionTauri(
       break;
   }
 
-  await appWindow.setPosition({ type: "Physical", x: xPos, y: yPos });
+  await appWindow.setPosition(new PhysicalPosition(xPos, yPos));
 }
 
 // Show window
 async function showWindow() {
   if (!isTauri()) return;
-  const { appWindow } = await import("@tauri-apps/api/window");
+  const appWindow = (await import("@tauri-apps/api/window")).getCurrentWindow();
   await appWindow.show();
 }
 
 // Hide window
 async function hideWindow() {
   if (!isTauri()) return;
-  const { appWindow } = await import("@tauri-apps/api/window");
+  const appWindow = (await import("@tauri-apps/api/window")).getCurrentWindow();
   await appWindow.hide();
 }
 
 // Set window size
 async function setWindowSize(width: number, height: number) {
   if (!isTauri()) return;
-  const { appWindow } = await import("@tauri-apps/api/window");
-  await appWindow.setSize({ type: "Physical", width, height });
+  const appWindow = (await import("@tauri-apps/api/window")).getCurrentWindow();
+  await appWindow.setSize(new PhysicalSize(width, height));
 }
 
 export default function Hover() {

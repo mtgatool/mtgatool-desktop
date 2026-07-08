@@ -1,9 +1,9 @@
 ﻿import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import { getData } from "../data/store";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
-import { getData } from "../data/store";
 import cleanUsername from "../utils/cleanUsername";
 
 export default function useFetchUsername() {

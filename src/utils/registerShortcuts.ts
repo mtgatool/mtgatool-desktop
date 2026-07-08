@@ -9,7 +9,9 @@ export async function unregisterAllShortcuts(): Promise<void> {
   if (!isTauri()) return;
 
   try {
-    const { unregisterAll } = await import("@tauri-apps/api/globalShortcut");
+    const { unregisterAll } = await import(
+      "@tauri-apps/plugin-global-shortcut"
+    );
     await unregisterAll();
     registeredShortcuts = [];
   } catch (e) {
@@ -25,7 +27,7 @@ async function registerShortcut(
 
   try {
     const { register, isRegistered } = await import(
-      "@tauri-apps/api/globalShortcut"
+      "@tauri-apps/plugin-global-shortcut"
     );
 
     // Check if already registered

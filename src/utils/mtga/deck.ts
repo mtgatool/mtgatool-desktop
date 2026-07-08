@@ -1,7 +1,5 @@
 ﻿/* eslint-disable no-param-reassign */
 /* eslint-disable func-names */
-import sha1 from "../sha1";
-
 import { DEFAULT_TILE } from "../../constants";
 import {
   anyCardsList,
@@ -11,6 +9,7 @@ import {
 } from "../../types";
 import compareCards from "../compareCards";
 import objectClone from "../objectClone";
+import sha1 from "../sha1";
 import CardsList from "./cardsList";
 import Colors from "./colors";
 import database from "./database";

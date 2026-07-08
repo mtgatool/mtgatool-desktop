@@ -36,7 +36,7 @@ export async function updateCache(data: string): Promise<void> {
   if (!cachePath) return;
 
   try {
-    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { invoke } = await import("@tauri-apps/api/core");
     await invoke("write_file", { path: cachePath, contents: data });
     console.log(`Saved metadata to ${cachePath}`);
   } catch (e) {
@@ -48,7 +48,7 @@ async function fileExists(path: string): Promise<boolean> {
   if (!isTauri()) return false;
 
   try {
-    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { invoke } = await import("@tauri-apps/api/core");
     return await invoke<boolean>("file_exists", { path });
   } catch {
     return false;
@@ -59,7 +59,7 @@ async function readFile(path: string): Promise<string | null> {
   if (!isTauri()) return null;
 
   try {
-    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { invoke } = await import("@tauri-apps/api/core");
     return await invoke<string>("read_file", { path });
   } catch {
     return null;

@@ -85,8 +85,8 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   // Get platform from Tauri
   useEffect(() => {
     if (!forceOs && isTauri()) {
-      import("@tauri-apps/api/os").then(({ platform }) => {
-        platform().then((p) => setOs(p));
+      import("@tauri-apps/plugin-os").then(({ platform }) => {
+        setOs(platform());
       });
     }
   }, [forceOs]);

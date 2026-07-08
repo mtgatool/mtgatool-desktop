@@ -16,7 +16,7 @@ export async function showOpenDialog(
   filters?: DialogFilter[]
 ): Promise<OpenDialogResult> {
   if (isTauri()) {
-    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { invoke } = await import("@tauri-apps/api/core");
     return invoke<OpenDialogResult>("show_open_dialog", {
       title,
       defaultPath,

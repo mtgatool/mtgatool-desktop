@@ -1,4 +1,5 @@
-use tauri::{AppHandle, GlobalShortcutManager, Manager};
+use tauri::{AppHandle, Emitter};
+use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
 #[tauri::command]
 pub fn register_shortcut(
@@ -6,29 +7,31 @@ pub fn register_shortcut(
     shortcut: String,
     event_name: String,
 ) -> Result<(), String> {
-    let app_clone = app.clone();
-    let event_name_clone = event_name.clone();
+    let gs = app.global_shortcut();
 
     // First unregister if already registered
-    let _ = app.global_shortcut_manager().unregister(&shortcut);
+    let _ = gs.unregister(shortcut.as_str());
 
-    app.global_shortcut_manager()
-        .register(&shortcut, move || {
-            let _ = app_clone.emit_all(&event_name_clone, ());
-        })
-        .map_err(|e| e.to_string())
+    let app_clone = app.clone();
+    gs.on_shortcut(shortcut.as_str(), move |_app, _shortcut, event| {
+        // Fire on key press only (not on release).
+        if event.state() == ShortcutState::Pressed {
+            let _ = app_clone.emit(&event_name, ());
+        }
+    })
+    .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 pub fn unregister_shortcut(app: AppHandle, shortcut: String) -> Result<(), String> {
-    app.global_shortcut_manager()
-        .unregister(&shortcut)
+    app.global_shortcut()
+        .unregister(shortcut.as_str())
         .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 pub fn unregister_all_shortcuts(app: AppHandle) -> Result<(), String> {
-    app.global_shortcut_manager()
+    app.global_shortcut()
         .unregister_all()
         .map_err(|e| e.to_string())
 }

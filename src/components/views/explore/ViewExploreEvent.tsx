@@ -6,10 +6,10 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
 
+import { getData } from "../../../data/store";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
 import { AppState } from "../../../redux/stores/rendererStore";
-import { getData } from "../../../data/store";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import Flex from "../../Flex";
 import Button from "../../ui/Button";

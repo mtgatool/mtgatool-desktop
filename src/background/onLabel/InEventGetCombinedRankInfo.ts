@@ -40,7 +40,9 @@ interface Entry extends LogEntry {
   json: CombinedRankInfo;
 }
 
-export default async function InEventGetCombinedRankInfo(entry: Entry): Promise<void> {
+export default async function InEventGetCombinedRankInfo(
+  entry: Entry
+): Promise<void> {
   const { json } = entry;
 
   const memoryRank = await readRank();

@@ -8,7 +8,7 @@ use std::sync::mpsc;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Emitter, Manager};
 
 use crate::state::AppState;
 
@@ -203,7 +203,11 @@ mod tests {
 
     fn tmp(name: &str) -> String {
         std::env::temp_dir()
-            .join(format!("mtgatool_watchtest_{}_{}.log", std::process::id(), name))
+            .join(format!(
+                "mtgatool_watchtest_{}_{}.log",
+                std::process::id(),
+                name
+            ))
             .to_string_lossy()
             .to_string()
     }

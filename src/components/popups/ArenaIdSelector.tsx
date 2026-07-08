@@ -2,9 +2,9 @@
 
 import { ReactComponent as Close } from "../../assets/images/svg/close.svg";
 import { ReactComponent as DeleteIcon } from "../../assets/images/svg/trash.svg";
+import upsertDbUserdata from "../../data/upsertDbUserdata";
 import reduxAction from "../../redux/reduxAction";
 import { AppState } from "../../redux/stores/rendererStore";
-import upsertDbUserdata from "../../data/upsertDbUserdata";
 import removePlayerUUID from "../../utils/removePlayerUUID";
 import SvgButton from "../SvgButton";
 import Radio from "../ui/Radio";

@@ -3,7 +3,9 @@ import isTauri from "./isTauri";
 
 export default async function getWindowLabel(): Promise<string> {
   if (isTauri()) {
-    const { appWindow } = await import("@tauri-apps/api/window");
+    const appWindow = (
+      await import("@tauri-apps/api/window")
+    ).getCurrentWindow();
     return appWindow.label;
   }
   return WINDOW_MAIN;

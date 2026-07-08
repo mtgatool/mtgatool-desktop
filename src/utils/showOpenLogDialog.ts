@@ -8,7 +8,7 @@ export default async function showOpenLogDialog(
   }
 
   try {
-    const { open } = await import("@tauri-apps/api/dialog");
+    const { open } = await import("@tauri-apps/plugin-dialog");
 
     const selected = await open({
       title: "Arena Log Location",

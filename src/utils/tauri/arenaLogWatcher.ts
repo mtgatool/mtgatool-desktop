@@ -15,7 +15,7 @@ export async function startLogWatcher(
   onFinished?: () => void
 ): Promise<void> {
   if (isTauri()) {
-    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { invoke } = await import("@tauri-apps/api/core");
     const { listen } = await import("@tauri-apps/api/event");
 
     // Set up event listeners first
@@ -35,7 +35,7 @@ export async function startLogWatcher(
 
 export async function stopLogWatcher(): Promise<void> {
   if (isTauri()) {
-    const { invoke } = await import("@tauri-apps/api/tauri");
+    const { invoke } = await import("@tauri-apps/api/core");
     await invoke("stop_log_watcher");
   }
 

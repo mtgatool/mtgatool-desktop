@@ -1,3 +1,4 @@
+import { PhysicalSize } from "@tauri-apps/api/dpi";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { OverlayUpdateMatchState } from "../background/store/types";
@@ -53,7 +54,9 @@ async function getCurrentWindowBounds(): Promise<{
 } | null> {
   if (!isTauri()) return null;
   try {
-    const { appWindow } = await import("@tauri-apps/api/window");
+    const appWindow = (
+      await import("@tauri-apps/api/window")
+    ).getCurrentWindow();
     const position = await appWindow.outerPosition();
     const size = await appWindow.outerSize();
     return {
@@ -79,13 +82,11 @@ function getCurrentWindowLabel(): string {
 async function setWindowHeight(height: number): Promise<void> {
   if (!isTauri()) return;
   try {
-    const { appWindow } = await import("@tauri-apps/api/window");
+    const appWindow = (
+      await import("@tauri-apps/api/window")
+    ).getCurrentWindow();
     const size = await appWindow.outerSize();
-    await appWindow.setSize({
-      type: "Physical",
-      width: size.width,
-      height: Math.ceil(height),
-    });
+    await appWindow.setSize(new PhysicalSize(size.width, Math.ceil(height)));
   } catch (e) {
     console.error("Failed to set window height:", e);
   }
@@ -174,7 +175,8 @@ export default function Overlay() {
     let unlistenResize: (() => void) | undefined;
 
     if (isTauri()) {
-      import("@tauri-apps/api/window").then(({ appWindow }) => {
+      import("@tauri-apps/api/window").then(({ getCurrentWindow }) => {
+        const appWindow = getCurrentWindow();
         appWindow
           .onMoved(() => deboucer(updateNewBounds))
           .then((unlisten) => {

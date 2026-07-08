@@ -2,107 +2,61 @@
   "build": {
     "beforeBuildCommand": "npm run build:workers && npm run react-build:tauri",
     "beforeDevCommand": "npm run build:workers && npm run react-start:tauri",
-    "devPath": "http://localhost:3001",
-    "distDir": "../build"
+    "frontendDist": "../build",
+    "devUrl": "http://localhost:3001"
   },
-  "package": {
-    "productName": "MTG Arena Tool",
-    "version": "6.7.5"
-  },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "fs": {
-        "all": true,
-        "scope": ["$APPDATA/**", "$LOCALAPPDATA/**", "$HOME/**", "$RESOURCE/**"]
-      },
-      "path": {
-        "all": true
-      },
-      "dialog": {
-        "all": true,
-        "open": true,
-        "save": false
-      },
-      "window": {
-        "all": true,
-        "create": true,
-        "close": true,
-        "hide": true,
-        "show": true,
-        "minimize": true,
-        "maximize": true,
-        "unmaximize": true,
-        "setAlwaysOnTop": true,
-        "setSize": true,
-        "setPosition": true,
-        "setResizable": true,
-        "setFocus": true,
-        "setIgnoreCursorEvents": true
-      },
-      "globalShortcut": {
-        "all": true
-      },
-      "os": {
-        "all": true
-      },
-      "shell": {
-        "open": true
-      },
-      "clipboard": {
-        "all": true,
-        "writeText": true,
-        "readText": false
-      },
-      "notification": {
-        "all": true
-      }
+  "bundle": {
+    "active": true,
+    "category": "Utility",
+    "copyright": "MTG Arena Tool",
+    "targets": "all",
+    "externalBin": [],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "",
+      "wix": null
     },
-    "bundle": {
-      "active": true,
-      "category": "Utility",
-      "copyright": "MTG Arena Tool",
+    "longDescription": "MTG Arena Tool - A companion app for Magic: The Gathering Arena",
+    "macOS": {
+      "entitlements": null,
+      "exceptionDomain": "",
+      "frameworks": [],
+      "providerShortName": null,
+      "signingIdentity": null
+    },
+    "resources": [
+      "../public/icons/*"
+    ],
+    "shortDescription": "MTG Arena Tool",
+    "linux": {
       "deb": {
         "depends": []
-      },
-      "externalBin": [],
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "identifier": "com.mtgatool.desktop",
-      "longDescription": "MTG Arena Tool - A companion app for Magic: The Gathering Arena",
-      "macOS": {
-        "entitlements": null,
-        "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": null,
-        "signingIdentity": null
-      },
-      "resources": ["../public/icons/*"],
-      "shortDescription": "MTG Arena Tool",
-      "targets": "all",
-      "windows": {
-        "certificateThumbprint": null,
-        "digestAlgorithm": "sha256",
-        "timestampUrl": "",
-        "wix": null
       }
     },
-    "security": {
-      "csp": null
-    },
+    "createUpdaterArtifacts": "v1Compatible"
+  },
+  "productName": "MTG Arena Tool",
+  "mainBinaryName": "MTG Arena Tool",
+  "version": "6.7.5",
+  "identifier": "com.mtgatool.desktop",
+  "plugins": {
     "updater": {
-      "active": true,
+      "pubkey": "",
       "endpoints": [
         "https://github.com/mtgatool/mtgatool-desktop/releases/latest/download/latest.json"
-      ],
-      "dialog": false,
-      "pubkey": ""
-    },
+      ]
+    }
+  },
+  "app": {
+    "withGlobalTauri": true,
     "windows": [
       {
         "label": "main",
@@ -115,13 +69,12 @@
         "fullscreen": false,
         "decorations": false,
         "transparent": false,
-        "center": true
+        "center": true,
+        "useHttpsScheme": true
       }
     ],
-    "systemTray": {
-      "iconPath": "icons/icon.png",
-      "iconAsTemplate": true,
-      "menuOnLeftClick": false
+    "security": {
+      "csp": null
     }
   }
 }

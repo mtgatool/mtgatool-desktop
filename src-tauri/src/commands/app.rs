@@ -1,5 +1,4 @@
 use std::env;
-use tauri::Manager;
 
 #[tauri::command]
 pub fn get_platform() -> String {
@@ -65,7 +64,7 @@ pub fn get_default_log_path() -> Result<String, String> {
 
 #[tauri::command]
 pub fn restart_app(app: tauri::AppHandle) {
-    tauri::api::process::restart(&app.env());
+    app.restart();
 }
 
 #[tauri::command]

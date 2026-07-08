@@ -1,6 +1,7 @@
 import "./index.scss";
 
-import { appWindow, PhysicalSize } from "@tauri-apps/api/window";
+import { PhysicalSize } from "@tauri-apps/api/dpi";
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { createBrowserHistory } from "history";
 // eslint-disable-next-line no-use-before-define
 import React from "react";
@@ -23,6 +24,8 @@ import getLocalSetting from "./utils/getLocalSetting";
 import initDirectoriesTauri from "./utils/initDirectoriesTauri";
 import registerShortcutsTauri from "./utils/registerShortcutsTauri";
 import isTauri from "./utils/tauri/isTauri";
+
+const appWindow = getCurrentWebviewWindow();
 
 // Make an overlay/hover window frameless + transparent from its OWN context.
 // This is more reliable than the WebviewWindow creation options:
@@ -50,7 +53,9 @@ async function makeWindowFramelessTransparent(): Promise<void> {
           .setSize(new PhysicalSize(size.width + 1, size.height))
           .then(() => appWindow.setSize(size))
       )
-      .catch((e) => console.error("[Tauri] transparency repaint nudge failed:", e));
+      .catch((e) =>
+        console.error("[Tauri] transparency repaint nudge failed:", e)
+      );
   }, 500);
 }
 

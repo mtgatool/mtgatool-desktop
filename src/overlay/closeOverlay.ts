@@ -5,9 +5,9 @@ export default async function closeOverlay(id: number): Promise<void> {
   if (!isTauri()) return;
 
   try {
-    const { WebviewWindow } = await import("@tauri-apps/api/window");
+    const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
     const label = ALL_TAURI_OVERLAY_LABELS[id];
-    const window = WebviewWindow.getByLabel(label);
+    const window = await WebviewWindow.getByLabel(label);
 
     if (window) {
       await window.close();
