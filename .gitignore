@@ -33,5 +33,7 @@ dist-cards-worker
 dist-tooldb-worker
 
 src-tauri/target
+# machine-local cargo config (redirects target-dir out of OneDrive)
+src-tauri/.cargo/
 # local log fixtures for testing (not committed)
 test-data/

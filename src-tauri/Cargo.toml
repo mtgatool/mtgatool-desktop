@@ -37,6 +37,15 @@ lto = true
 opt-level = "s"
 strip = true
 
+# Dev builds: light debug info for our crate, none for dependencies.
+# Debuginfo/PDBs dominate target/ size; trimming them keeps the disk footprint
+# small (important on a near-full drive) and sidesteps PDB write issues.
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false
+
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-global-shortcut = "2"
 tauri-plugin-updater = "2"
