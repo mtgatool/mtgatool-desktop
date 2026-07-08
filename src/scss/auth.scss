@@ -1,19 +1,7 @@
-.auth-pages-container-main {
-  overflow: hidden;
+.auth-page-single {
   width: 100%;
-  position: relative;
-}
-
-.auth-pages-container {
-  width: 300%;
-  display: flex;
-}
-
-.auth-page {
-  overflow: hidden;
-  position: relative;
-  width: calc(50% - 4em);
   padding: 1em 2em;
+  box-sizing: border-box;
 }
 
 .signup-link, .privacy-link, .launch-login-link {

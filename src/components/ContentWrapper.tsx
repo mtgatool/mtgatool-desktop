@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { animated, useTransition } from "react-spring";
 
+import { getMatchesData } from "../data/store";
 import useDatePicker from "../hooks/useDatePicker";
 import reduxAction from "../redux/reduxAction";
 import {
@@ -11,7 +12,6 @@ import {
   setDateOption,
 } from "../redux/slices/FilterSlice";
 import { AppState } from "../redux/stores/rendererStore";
-import { getMatchesData } from "../toolDb/worker-wrapper";
 import { CardsData } from "../types/collectionTypes";
 import { defaultCardsData } from "../types/dbTypes";
 import aggregateStats from "../utils/aggregateStats";
@@ -24,7 +24,6 @@ import isTauri from "../utils/tauri/isTauri";
 import vodiFn from "../utils/voidfn";
 import PopupComponent from "./PopupComponent";
 import DeckViewPopup from "./popups/DeckViewPopup";
-import PostSignupPopup from "./PostSignupPopup";
 import AdvancedSearch from "./views/collection/advancedSearch";
 import ViewCollection from "./views/collection/ViewCollection";
 import ViewDecks from "./views/decks/ViewDecks";
@@ -98,9 +97,6 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
 
   const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
 
-  const showPostSignup = useSelector(
-    (state: AppState) => state.renderer.showPostSignup
-  );
   const forceCollection = useSelector(
     (state: AppState) => state.mainData.forceCollection
   );
@@ -116,24 +112,6 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
         setMatchesData(d);
       }
     });
-
-    // hacky hack to listen for the after login matches data message
-    const listener = (e: any) => {
-      const { type, value } = e.data;
-      if (type === `MATCHES_DATA_OK`) {
-        setMatchesData(value);
-      }
-    };
-
-    if (window.toolDbWorker) {
-      window.toolDbWorker.addEventListener("message", listener);
-    }
-
-    return () => {
-      if (window.toolDbWorker) {
-        window.toolDbWorker.removeEventListener("message", listener);
-      }
-    };
   }, [matchesIndex, currentUUID]);
 
   useEffect(() => {
@@ -198,9 +176,6 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
     paths.current.push(params.page);
   }, [params]);
 
-  const openPostSignup = useRef<() => void>(vodiFn);
-  const closePostSignup = useRef<() => void>(vodiFn);
-
   const openAdvancedCollectionSearch = useRef<() => void>(vodiFn);
   const closeAdvancedCollectionSearch = useRef<() => void>(vodiFn);
 
@@ -210,12 +185,6 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   const openDeckView = useRef<() => void>(vodiFn);
   const closenDeckView = useRef<() => void>(vodiFn);
   const [deckView, setDeckView] = useState<Deck>(new Deck());
-
-  useEffect(() => {
-    if (showPostSignup) {
-      openPostSignup.current();
-    }
-  }, [showPostSignup]);
 
   const CurrentPage = Object.values(views)[viewIndex];
 
@@ -234,17 +203,6 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   return (
     <>
       {datePickerElement}
-      <PopupComponent
-        open={false}
-        className={getPopupClass(os)}
-        width="900px"
-        height="440px"
-        openFnRef={openPostSignup}
-        closeFnRef={closePostSignup}
-      >
-        <PostSignupPopup />
-      </PopupComponent>
-
       <PopupComponent
         open={false}
         className={getPopupClass(os)}

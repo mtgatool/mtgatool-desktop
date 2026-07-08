@@ -1,11 +1,11 @@
-/* eslint-disable guard-for-in */
+﻿/* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable consistent-return */
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-var-requires */
 import _ from "lodash";
-import { sha1 } from "tool-db";
+import sha1 from "../../utils/sha1";
 
 import * as jsonText from "./jsonText";
 import nthLastIndexOf from "./nthLastIndexOf";

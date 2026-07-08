@@ -1,4 +1,4 @@
-/* eslint-disable no-param-reassign */
+﻿/* eslint-disable no-param-reassign */
 /* eslint-disable radix */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/jsx-props-no-spreading */
@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 
-import { queryKeys } from "../../../toolDb/worker-wrapper";
+import { queryKeys } from "../../../data/store";
 import getEventExplorerSection from "../../../utils/getEventExplorerSection";
 import Flex from "../../Flex";
 import Section from "../../ui/Section";

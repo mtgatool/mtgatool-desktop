@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { ReactComponent as SyncIcon } from "../../assets/images/svg/cloud-sync.svg";
 import { ReactComponent as StatsIcon } from "../../assets/images/svg/stats.svg";
+import localLogin from "../../data/localLogin";
 import {
   DateOption,
   dateOptions,
@@ -94,11 +95,7 @@ export default function FilterSection(props: FilterSectionProps) {
   ];
 
   const refreshMatches = useCallback(() => {
-    if (window.toolDbWorker) {
-      window.toolDbWorker.postMessage({
-        type: "REFRESH_MATCHES",
-      });
-    }
+    localLogin().catch(console.warn);
   }, []);
 
   return (

@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 
-import { putData, queryKeys } from "../../../toolDb/worker-wrapper";
+import { putData, queryKeys } from "../../../data/store";
 import { DbMatch } from "../../../types/dbTypes";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import Flex from "../../Flex";
@@ -26,9 +26,9 @@ export default function ViewExploreAggregator() {
 
   const [eventsList, setEventsList] = useState<string[]>([]);
 
-  const [data, setData] = useState<Record<string, DbMatch>>({});
+  const [data] = useState<Record<string, DbMatch>>({});
 
-  const [queryDataState, setQueryDataState] = useState<{
+  const [queryDataState] = useState<{
     foundKeys: number;
     queriedKeys: number;
     savedKeys: number;
@@ -40,15 +40,10 @@ export default function ViewExploreAggregator() {
     loadingPercent: 0,
   });
 
-  const beginDataQuery = useCallback((days: number, event: string) => {
+  const beginDataQuery = useCallback((_days: number, _event: string) => {
+    // Explore aggregation queried the p2p swarm; disabled until the Supabase
+    // backend provides community data (docs/LEGACY_TOOLDB_DATA_MODEL.md).
     setIsOk(false);
-    if (window.toolDbWorker) {
-      window.toolDbWorker.postMessage({
-        type: "EXPLORE_DATA_QUERY",
-        days,
-        event,
-      });
-    }
   }, []);
 
   const doAggregation = useCallback(() => {
@@ -95,25 +90,6 @@ export default function ViewExploreAggregator() {
     }
 
     doQueryLoop();
-
-    const listener = (e: any) => {
-      const { type, value } = e.data;
-      if (type === `EXPLORE_DATA_QUERY_STATE`) {
-        setQueryDataState(value);
-      }
-      if (type === `EXPLORE_DATA_QUERY`) {
-        setData(value);
-      }
-    };
-    if (window.toolDbWorker) {
-      window.toolDbWorker.addEventListener("message", listener);
-    }
-
-    return () => {
-      if (window.toolDbWorker) {
-        window.toolDbWorker.removeEventListener("message", listener);
-      }
-    };
   }, []);
 
   // Get default events list to filter

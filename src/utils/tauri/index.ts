@@ -1,70 +1,78 @@
 // Main exports for Tauri utilities
+export {
+  default as getWindowLabel,
+  getWindowLabelSync,
+} from "./getWindowLabel";
 export { default as isTauri } from "./isTauri";
-export { default as getWindowLabel, getWindowLabelSync } from "./getWindowLabel";
 
 // Window controls
 export {
   closeWindow,
-  minimizeWindow,
   hideWindow,
+  isFocused,
+  isMaximized,
+  minimizeWindow,
+  setAlwaysOnTop,
+  setFocusable,
+  setIgnoreCursorEvents,
+  setMaximize,
+  setResizable,
   showWindow,
   toggleMaximize,
-  setMaximize,
-  isMaximized,
-  isFocused,
-  setAlwaysOnTop,
-  setResizable,
-  setIgnoreCursorEvents,
-  setFocusable,
 } from "./windowControls";
 
 // File system
 export {
-  readFile,
-  writeFile,
-  fileExists,
-  getFileSize,
   createDir,
   deleteFile,
+  fileExists,
   getAppDataPath,
+  getFileSize,
   getHomePath,
+  readFile,
+  writeFile,
 } from "./fileSystem";
 
 // Shortcuts
 export {
   registerShortcut,
-  unregisterShortcut,
   unregisterAllShortcuts,
+  unregisterShortcut,
 } from "./shortcuts";
 
 // Dialog
 export { showOpenDialog } from "./dialog";
 
 // App
-export { getPlatform, getDefaultLogPath, restartApp, quitApp } from "./app";
+export { getDefaultLogPath, getPlatform, quitApp, restartApp } from "./app";
 
 // Arena log watcher
-export {
-  startLogWatcher,
-  stopLogWatcher,
-  LogChunkPayload,
-} from "./arenaLogWatcher";
+export type { LogChunkPayload } from "./arenaLogWatcher";
+export { startLogWatcher, stopLogWatcher } from "./arenaLogWatcher";
 
 // Overlay windows
+export type { OverlayBounds } from "./overlayWindow";
 export {
-  createOverlayWindow,
   closeOverlayWindow,
+  createOverlayWindow,
   getAllOverlayWindows,
   getWindowBounds,
   setWindowBounds,
-  OverlayBounds,
 } from "./overlayWindow";
 
 // Memory reader
 export {
-  isAdmin,
   findProcess,
-  readData,
+  isAdmin,
+  readAccount,
   readClass,
+  readCollection,
+  readData,
+  readDecks,
+  readerClose,
+  readerInit,
+  readerIsInitialized,
   readGenericInstance,
+  readInventory,
+  readRanks,
 } from "./reader";

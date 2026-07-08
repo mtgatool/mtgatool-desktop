@@ -35,6 +35,83 @@ export interface DictionaryData {
   entries: Array<{ key: any; value: any }>;
 }
 
+// Shapes returned by the high-level typed readers (mtga-reader >= 0.1.6)
+export interface ReaderCardCount {
+  grpId: number;
+  qty: number;
+}
+
+export interface ReaderDeckPile {
+  pile: number;
+  pileName: "Main" | "Sideboard" | "CommandZone" | "Companions" | string;
+  total: number;
+  cards: ReaderCardCount[];
+}
+
+export interface ReaderDeck {
+  name: string;
+  deckId: string;
+  description?: string;
+  tileId?: number;
+  attributes: Record<string, string>;
+  piles: ReaderDeckPile[];
+}
+
+export interface ReaderDecks {
+  count: number;
+  decks: ReaderDeck[];
+}
+
+export interface ReaderRank {
+  seasonOrdinal?: number;
+  class: string;
+  classValue: number;
+  level?: number;
+  step?: number;
+  wins?: number;
+  losses?: number;
+  draws?: number;
+  percentile?: string;
+  leaderboardPlace?: number;
+}
+
+export interface ReaderRanks {
+  playerId?: string;
+  constructed: ReaderRank;
+  limited: ReaderRank;
+}
+
+export interface ReaderAccount {
+  displayName?: string;
+  accountId?: string;
+  personaId?: string;
+  gameId?: string;
+  email?: string;
+  externalId?: string;
+  countryCode?: string;
+  accessToken?: string;
+}
+
+export interface ReaderCollection {
+  count: number;
+  cards: ReaderCardCount[];
+}
+
+export interface ReaderInventory {
+  gems?: number;
+  gold?: number;
+  wildcards: {
+    common?: number;
+    uncommon?: number;
+    rare?: number;
+    mythic?: number;
+  };
+  wcTrackPosition?: number;
+  vaultProgress?: number;
+  basicLandSet?: string;
+  latestBasicLandSet?: string;
+}
+
 /**
  * Check if running with admin/elevated privileges
  */
@@ -101,9 +178,10 @@ export async function findProcess(processName: string): Promise<number | null> {
  */
 export async function init(processName: string): Promise<boolean> {
   if (isTauri()) {
-    // Tauri doesn't have explicit init, just use findProcess
+    // Starts a cached reader session so subsequent typed reads skip the
+    // expensive assembly scan (~4s -> ~10-20ms).
     try {
-      return await TauriReader.findProcess(processName);
+      return await TauriReader.readerInit(processName);
     } catch (error) {
       console.error("Failed to init via Tauri:", error);
       return false;
@@ -132,7 +210,11 @@ export async function init(processName: string): Promise<boolean> {
  */
 export async function close(): Promise<void> {
   if (isTauri()) {
-    // Tauri manages its own lifecycle
+    try {
+      await TauriReader.readerClose();
+    } catch (error) {
+      console.error("Failed to close via Tauri:", error);
+    }
     return;
   }
 
@@ -154,8 +236,12 @@ export async function close(): Promise<void> {
  */
 export async function isInitialized(): Promise<boolean> {
   if (isTauri()) {
-    // Tauri is always "initialized" if available
-    return true;
+    try {
+      return await TauriReader.readerIsInitialized();
+    } catch (error) {
+      console.error("Failed to check initialization via Tauri:", error);
+      return false;
+    }
   }
 
   // Node.js/Electron environment
@@ -476,6 +562,144 @@ export async function getDictionary(
 
   // Web environment - not supported
   return null;
+}
+
+let sessionInitPromise: Promise<boolean> | null = null;
+
+/**
+ * Lazily start the cached reader session so typed reads skip the expensive
+ * assembly scan. Failures are swallowed; typed reads then fall back to a
+ * fresh scan on the Rust side.
+ */
+async function ensureSession(processName: string): Promise<void> {
+  try {
+    if (await TauriReader.readerIsInitialized()) return;
+    if (!sessionInitPromise) {
+      sessionInitPromise = TauriReader.readerInit(processName).finally(() => {
+        sessionInitPromise = null;
+      });
+    }
+    await sessionInitPromise;
+  } catch (error) {
+    // Process not running or not elevated; typed reads still work (slower).
+  }
+}
+
+/**
+ * Run one of the high-level typed readers (mtga-reader >= 0.1.6). These
+ * return ready-to-use JSON and transparently use the cached session started
+ * by init(), falling back to a fresh scan when the session is stale.
+ */
+async function typedRead<T>(
+  name:
+    | "readDecks"
+    | "readRanks"
+    | "readAccount"
+    | "readCollection"
+    | "readInventory",
+  tauriFn: (process: string) => Promise<any>,
+  processName: string
+): Promise<T | null> {
+  if (isTauri()) {
+    try {
+      await ensureSession(processName);
+      const result = await tauriFn(processName);
+      if (result && result.error) {
+        console.error(`${name} failed:`, result.error);
+        return null;
+      }
+      return result as T;
+    } catch (error) {
+      console.error(`Failed to ${name} via Tauri:`, error);
+      return null;
+    }
+  }
+
+  // Node.js/Electron environment
+  // eslint-disable-next-line camelcase
+  if (typeof __non_webpack_require__ !== "undefined") {
+    try {
+      // eslint-disable-next-line no-undef, camelcase
+      const reader = __non_webpack_require__("mtga-reader");
+      const result = reader[name](processName);
+      if (result && result.error) {
+        console.error(`${name} failed:`, result.error);
+        return null;
+      }
+      return result as T;
+    } catch (error) {
+      console.error(`Failed to ${name} via mtga-reader:`, error);
+      return null;
+    }
+  }
+
+  // Web environment - not supported
+  return null;
+}
+
+/**
+ * Read all saved decks (name, deckId, attributes, per-pile card lists)
+ */
+export async function readDecks(
+  processName: string
+): Promise<ReaderDecks | null> {
+  return typedRead<ReaderDecks>(
+    "readDecks",
+    TauriReader.readDecks,
+    processName
+  );
+}
+
+/**
+ * Read constructed/limited rank info for the logged-in player
+ */
+export async function readRanks(
+  processName: string
+): Promise<ReaderRanks | null> {
+  return typedRead<ReaderRanks>(
+    "readRanks",
+    TauriReader.readRanks,
+    processName
+  );
+}
+
+/**
+ * Read account identity (displayName, personaId, ...)
+ */
+export async function readAccount(
+  processName: string
+): Promise<ReaderAccount | null> {
+  return typedRead<ReaderAccount>(
+    "readAccount",
+    TauriReader.readAccount,
+    processName
+  );
+}
+
+/**
+ * Read the card collection as {count, cards: [{grpId, qty}]}
+ */
+export async function readCollection(
+  processName: string
+): Promise<ReaderCollection | null> {
+  return typedRead<ReaderCollection>(
+    "readCollection",
+    TauriReader.readCollection,
+    processName
+  );
+}
+
+/**
+ * Read inventory (gems, gold, wildcards, vault progress, ...)
+ */
+export async function readInventory(
+  processName: string
+): Promise<ReaderInventory | null> {
+  return typedRead<ReaderInventory>(
+    "readInventory",
+    TauriReader.readInventory,
+    processName
+  );
 }
 
 /**

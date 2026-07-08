@@ -1,5 +1,3 @@
-import { Peer } from "tool-db";
-
 // Electron window titles (for backwards compatibility)
 export const WINDOW_BACKGROUND = "mtgatool-background";
 
@@ -52,14 +50,4 @@ export function getOverlayIndexFromLabel(label: string): number {
     return parseInt(match[1], 10);
   }
   return -1;
-}
-
-// In the new P2P architecture, ServerPeerData is no longer used
-// Connection data is simplified
-export interface ConnectionData {
-  peerId: string;
-  peerData: Peer | null;
-  serverPeerData: null;
-  host: string;
-  isConnected: boolean;
 }

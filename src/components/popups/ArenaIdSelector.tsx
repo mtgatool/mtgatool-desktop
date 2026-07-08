@@ -1,10 +1,10 @@
-import { useDispatch, useSelector } from "react-redux";
+﻿import { useDispatch, useSelector } from "react-redux";
 
 import { ReactComponent as Close } from "../../assets/images/svg/close.svg";
 import { ReactComponent as DeleteIcon } from "../../assets/images/svg/trash.svg";
 import reduxAction from "../../redux/reduxAction";
 import { AppState } from "../../redux/stores/rendererStore";
-import upsertDbUserdata from "../../toolDb/upsertDbuserdata";
+import upsertDbUserdata from "../../data/upsertDbUserdata";
 import removePlayerUUID from "../../utils/removePlayerUUID";
 import SvgButton from "../SvgButton";
 import Radio from "../ui/Radio";

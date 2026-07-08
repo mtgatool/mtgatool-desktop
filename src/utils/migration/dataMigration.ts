@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 
-// import getLocalDbValue from "../../toolDb/getLocalDbValue";
 import { InternalMatch } from "../../types";
 import { DbMatch } from "../../types/dbTypes";
 import getLocalSetting from "../getLocalSetting";

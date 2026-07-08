@@ -1,4 +1,4 @@
-import { format, fromUnixTime } from "date-fns";
+﻿import { format, fromUnixTime } from "date-fns";
 import { useSelector } from "react-redux";
 
 import info from "../../../info.json";
@@ -14,10 +14,10 @@ export default function AboutSettingsPanel(): JSX.Element {
     <div className="about">
       <div
         className="top-logo-about"
-        onClick={(): void => openExternal("https://mtgatool.com")}
+        onClick={() => openExternal("https://mtgatool.com")}
       />
       <div className="message-sub15">
-        By Manuel Etchegaray &quot;Manwë&quot;, {new Date().getFullYear()}
+        By Manuel Etchegaray &quot;ManwÃ«&quot;, {new Date().getFullYear()}
       </div>
       <div
         className="message-sub15 release-notes-link"
@@ -45,15 +45,15 @@ export default function AboutSettingsPanel(): JSX.Element {
       <div style={{ margin: "16px auto 0px auto" }} className="flex-item">
         <div
           className="discord-link"
-          onClick={(): void => openExternal("https://discord.gg/K9bPkJy")}
+          onClick={() => openExternal("https://discord.gg/K9bPkJy")}
         />
         <div
           className="twitter-link"
-          onClick={(): void => openExternal("https://twitter.com/mtgatool")}
+          onClick={() => openExternal("https://twitter.com/mtgatool")}
         />
         <div
           className="git-link"
-          onClick={(): void =>
+          onClick={() =>
             openExternal("https://github.com/mtgatool/mtgatool-desktop#readme")
           }
         />
@@ -65,14 +65,14 @@ export default function AboutSettingsPanel(): JSX.Element {
         <div
           className="donate-link"
           title="PayPal"
-          onClick={(): void =>
+          onClick={() =>
             openExternal("https://www.paypal.me/ManuelEtchegaray/10")
           }
         />
         <div
           className="patreon-link"
           title="Patreon"
-          onClick={(): void => openExternal("https://www.patreon.com/mtgatool")}
+          onClick={() => openExternal("https://www.patreon.com/mtgatool")}
         />
       </div>
     </div>

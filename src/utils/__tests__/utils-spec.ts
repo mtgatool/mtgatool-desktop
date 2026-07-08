@@ -1,6 +1,6 @@
-/* eslint-env jest */
+﻿/* eslint-env jest */
 
-import { sha1 } from "tool-db";
+import sha1 from "../sha1";
 
 import { cardHasType, cardType } from "../cardTypes";
 import countValues from "../countValues";

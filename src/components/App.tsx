@@ -4,14 +4,14 @@ import _ from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Switch, useHistory } from "react-router-dom";
-import { sha1 } from "tool-db";
 
 import overlayHandler from "../common/overlayHandler";
 import { LOGIN_OK } from "../constants";
+import { getCloudSession } from "../data/cloudAuth";
+import localLogin from "../data/localLogin";
 import info from "../info.json";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
-import { login } from "../toolDb/worker-wrapper";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
 import getLocalSetting from "../utils/getLocalSetting";
 import getPopupClass from "../utils/getPopupClass";
@@ -65,24 +65,6 @@ function App(props: AppProps) {
   }, [forceOs]);
 
   useEffect(() => {
-    window.toolDbWorker.addEventListener("message", (e) => {
-      // console.warn("Worker REDUX_ACTION", action.type, action.arg);
-      if (e.data.type === "REDUX_ACTION") {
-        const action = e.data.arg;
-        // console.warn("Worker REDUX_ACTION", action.type, action.arg);
-        reduxAction(dispatch, {
-          type: action.type,
-          arg: action.arg,
-        });
-      }
-      // lets experiment removing this
-      // if (e.data.type === "CONNECTED") {
-      //   setCanLogin(true);
-      // }
-    });
-  }, []);
-
-  useEffect(() => {
     if (overlayHandler) {
       overlayHandler.settingsUpdated();
     }
@@ -94,12 +76,24 @@ function App(props: AppProps) {
     if (!welcome || welcome === "false") {
       history.push("/welcome");
     } else if (canLogin) {
-      const pwd = getLocalSetting("savedPass");
-      const user = getLocalSetting("username");
+      const autoLogin = getLocalSetting("autoLogin");
 
-      if (pwd && user) {
-        login(user, sha1(pwd))
-          .then(() => {
+      // "local" = offline mode (no account); "true" = cloud account, valid
+      // only while a Supabase session is persisted.
+      const checkSession =
+        autoLogin === "local"
+          ? Promise.resolve(true)
+          : autoLogin === "true"
+          ? getCloudSession().then((session) => !!session)
+          : Promise.resolve(false);
+
+      checkSession
+        .then((ok) => {
+          if (!ok) {
+            history.push("/auth");
+            return undefined;
+          }
+          return localLogin().then(() => {
             reduxAction(dispatch, {
               type: "SET_LOGIN_STATE",
               arg: LOGIN_OK,
@@ -111,14 +105,12 @@ function App(props: AppProps) {
             ) {
               history.push("/auth");
             }
-          })
-          .catch((e: Error) => {
-            console.error(e);
-            history.push("/auth");
           });
-      } else {
-        history.push("/auth");
-      }
+        })
+        .catch((e: Error) => {
+          console.error(e);
+          history.push("/auth");
+        });
     }
   }, [canLogin, history, dispatch]);
 

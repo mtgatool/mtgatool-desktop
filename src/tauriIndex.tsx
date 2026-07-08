@@ -9,6 +9,7 @@ import { Router } from "react-router-dom";
 
 import backgroundChannelListenersTauri from "./broadcastChannel/backgroundChannelListenersTauri";
 import mainChannelListeners from "./broadcastChannel/mainChannelListeners";
+import { defaultConfig } from "./common/defaultConfig";
 import App from "./components/App";
 import Hover from "./hover";
 import Overlay from "./overlay";
@@ -27,17 +28,6 @@ if (isTauri()) {
   console.log("[Tauri] Initializing Tauri app...");
 
   try {
-    // Web worker for tooldb
-    try {
-      window.toolDbWorker = new Worker("tooldb-worker/index.js", {
-        type: "module",
-      });
-      console.log("[Tauri] Worker initialized successfully");
-    } catch (error) {
-      console.error("[Tauri] Failed to initialize worker:", error);
-      throw error;
-    }
-
     const history = createBrowserHistory();
 
     // Get window label from Tauri - use synchronous access
@@ -124,7 +114,7 @@ if (isTauri()) {
         );
         // Use default settings if parsing fails
         try {
-          registerShortcutsTauri({});
+          registerShortcutsTauri(defaultConfig);
         } catch (shortcutError) {
           console.error("[Tauri] Failed to register shortcuts:", shortcutError);
         }

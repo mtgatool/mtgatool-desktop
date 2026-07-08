@@ -1,18 +1,17 @@
-import _ from "lodash";
+﻿import _ from "lodash";
 
 import { overlayTitleToId } from "../common/maps";
 import { LOGIN_OK } from "../constants";
+import setDbMatch from "../data/setDbMatch";
+import { putData } from "../data/store";
+import upsertDbCards from "../data/upsertDbCards";
+import upsertDbInventory from "../data/upsertDbInventory";
+import upsertDbRank from "../data/upsertDbRank";
 import readCards from "../reader/readCards";
 import readPlayerId from "../reader/readPlayerid";
 import UICheckAdmin from "../reader/uiCheckAdmin";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
-import setDbMatch from "../toolDb/setDbMatch";
-import upsertDbCards from "../toolDb/upsertDbCards";
-import upsertDbInventory from "../toolDb/upsertDbInventory";
-import upsertDbLiveMatch from "../toolDb/upsertDbLiveMatch";
-import upsertDbRank from "../toolDb/upsertDbRank";
-import { putData } from "../toolDb/worker-wrapper";
 import { InternalDraftv2 } from "../types";
 import LogEntry from "../types/logDecoder";
 import bcConnect from "../utils/bcConnect";
@@ -25,13 +24,8 @@ export default function mainChannelListeners() {
 
   let last = Date.now();
 
-  let logReadFinished = false;
-
   channel.onmessage = (msg: MessageEvent<ChannelMessage>) => {
     // console.log(msg.data.type);
-    if (logReadFinished && msg.data.type === "OVERLAY_UPDATE") {
-      upsertDbLiveMatch(msg.data.value);
-    }
 
     if (msg.data.type === "POPUP") {
       reduxAction(store.dispatch, {
@@ -59,7 +53,6 @@ export default function mainChannelListeners() {
     }
 
     if (msg.data.type == "LOG_READ_FINISHED") {
-      logReadFinished = true;
       if (store.getState().renderer.loading === true) {
         reduxAction(store.dispatch, {
           type: "SET_LOGIN_STATE",

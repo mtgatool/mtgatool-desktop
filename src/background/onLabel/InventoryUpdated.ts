@@ -1,4 +1,4 @@
-import { sha1 } from "tool-db";
+﻿import sha1 from "../../utils/sha1";
 
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import { InventoryUpdate } from "../../types";

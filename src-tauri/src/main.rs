@@ -54,6 +54,14 @@ fn main() {
             commands::reader::read_data,
             commands::reader::read_class,
             commands::reader::read_generic_instance,
+            commands::reader::reader_init,
+            commands::reader::reader_close,
+            commands::reader::reader_is_initialized,
+            commands::reader::read_decks,
+            commands::reader::read_ranks,
+            commands::reader::read_account,
+            commands::reader::read_collection,
+            commands::reader::read_inventory,
         ])
         .setup(|app| {
             // Create background window (hidden)

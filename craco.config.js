@@ -1,6 +1,7 @@
 
 const WebpackReactComponentNamePlugin = require("webpack-react-component-name");
 const ModuleReplacement = require("./module-resolver-file");
+const supabaseCjsAlias = require("./supabaseCjsAlias");
 const eslintConfig = require("./.eslintrc");
 
 process.env.GENERATE_SOURCEMAP = true;
@@ -9,11 +10,15 @@ process.env.GENERATE_SOURCEMAP = true;
 // https://www.npmjs.com/package/@craco/craco
 module.exports = {
   webpack: {
-    configure: {
-      target: "web",
-      node: {
-        fs: "empty",
-      },
+    configure: (webpackConfig) => {
+      webpackConfig.target = "web";
+      webpackConfig.node = { ...webpackConfig.node, fs: "empty" };
+      // See craco.tauri.config.js / supabaseCjsAlias.js.
+      webpackConfig.resolve.alias = {
+        ...webpackConfig.resolve.alias,
+        ...supabaseCjsAlias(),
+      };
+      return webpackConfig;
     },
     plugins: [
       ...ModuleReplacement({ webIndex: false, tauriIndex: true }),

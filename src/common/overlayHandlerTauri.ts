@@ -9,13 +9,13 @@ import {
   OVERLAY_SEEN,
 } from "../constants";
 import store from "../redux/stores/rendererStore";
-import { Settings } from "../redux/slices/settingsSlice";
 import getLocalSetting from "../utils/getLocalSetting";
 import {
-  createOverlayWindow,
   closeOverlayWindow,
+  createOverlayWindow,
   getAllOverlayWindows,
 } from "../utils/tauri/overlayWindow";
+import { Settings } from "./defaultConfig";
 
 export class OverlayHandlerTauri {
   private _openState = [false, false, false, false, false];
@@ -43,41 +43,41 @@ export class OverlayHandlerTauri {
     // currentStates is not the state we want, but the state we have
     const currentStates = await this._checkOverlaysState();
 
-    for (let index = 0; index < currentStates.length; index++) {
-      const state = currentStates[index];
-
-      if (state === true && this._openState[index] === false) {
-        // Close overlay that should be closed
-        try {
-          await closeOverlayWindow(`overlay-${index}`);
-        } catch (e) {
-          console.error(`Failed to close overlay ${index}:`, e);
+    await Promise.all(
+      currentStates.map(async (state, index) => {
+        if (state === true && this._openState[index] === false) {
+          // Close overlay that should be closed
+          try {
+            await closeOverlayWindow(`overlay-${index}`);
+          } catch (e) {
+            console.error(`Failed to close overlay ${index}:`, e);
+          }
         }
-      }
 
-      if (state === false && this._openState[index] === true) {
-        // Create overlay that should be open
-        try {
-          const allSettings = JSON.parse(
-            getLocalSetting("settings")
-          ) as Settings;
-          const settings = allSettings.overlays[index];
+        if (state === false && this._openState[index] === true) {
+          // Create overlay that should be open
+          try {
+            const allSettings = JSON.parse(
+              getLocalSetting("settings")
+            ) as Settings;
+            const settings = allSettings.overlays[index];
 
-          await createOverlayWindow(
-            `overlay-${index}`,
-            {
-              x: settings.bounds.x,
-              y: settings.bounds.y,
-              width: settings.bounds.width,
-              height: settings.bounds.height,
-            },
-            allSettings.overlaysTransparency
-          );
-        } catch (e) {
-          console.error(`Failed to create overlay ${index}:`, e);
+            await createOverlayWindow(
+              `overlay-${index}`,
+              {
+                x: settings.bounds.x,
+                y: settings.bounds.y,
+                width: settings.bounds.width,
+                height: settings.bounds.height,
+              },
+              allSettings.overlaysTransparency
+            );
+          } catch (e) {
+            console.error(`Failed to create overlay ${index}:`, e);
+          }
         }
-      }
-    }
+      })
+    );
   };
 
   public settingsUpdated = () => {
@@ -94,7 +94,8 @@ export class OverlayHandlerTauri {
           overlay.mode === OVERLAY_ODDS) &&
           overlay.show &&
           matchInProgress) ||
-        ((overlay.mode === OVERLAY_DRAFT || overlay.mode === OVERLAY_DRAFT_BREW) &&
+        ((overlay.mode === OVERLAY_DRAFT ||
+          overlay.mode === OVERLAY_DRAFT_BREW) &&
           overlay.show &&
           draftInProgress);
     });

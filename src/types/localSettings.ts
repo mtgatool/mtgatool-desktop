@@ -1,8 +1,6 @@
-import { sha1 } from "tool-db";
-
-import { defaultConfig } from "../common/defaultConfig";
-import { DEFAULT_PEERS } from "../constants";
+﻿import { defaultConfig } from "../common/defaultConfig";
 import defaultLogUri from "../utils/defaultLogUri";
+import sha1 from "../utils/sha1";
 import isTauri from "../utils/tauri/isTauri";
 import textRandom from "../utils/textRandom";
 
@@ -17,7 +15,6 @@ export const settingKeys = [
   "settings",
   "welcome",
   "lang",
-  "saved-peer-keys",
   "css",
   "clientId",
   "showHiddenDecks",
@@ -40,7 +37,6 @@ export const defaultSettings: Record<SettingKey, string> = {
   settings: JSON.stringify(defaultConfig),
   welcome: "false",
   lang: "en",
-  "saved-peer-keys": JSON.stringify(DEFAULT_PEERS),
   css: isTauri() ? "high" : "web",
   clientId: sha1(`${textRandom(100)}-${new Date().getTime()}`),
   showHiddenDecks: "false",

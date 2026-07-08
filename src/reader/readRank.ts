@@ -1,31 +1,10 @@
-import {
-  CombinedRankInfo,
-  rankClass,
-} from "../background/onLabel/InEventGetCombinedRankInfo";
+import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import globalStore from "../background/store";
-import { isMemoryReadingAvailable, readData } from "../utils/mtgaReader";
-
-interface _ReturnedRankInfo {
-  constructedClass: number;
-  constructedLeaderboardPlace: number;
-  constructedLevel: number;
-  constructedMatchesDrawn: number;
-  constructedMatchesLost: number;
-  constructedMatchesWon: number;
-  constructedPercentile: number;
-  constructedSeasonOrdinal: number;
-  constructedStep: number;
-  limitedClass: number;
-  limitedLeaderboardPlace: number;
-  limitedLevel: number;
-  limitedMatchesDrawn: number;
-  limitedMatchesLost: number;
-  limitedMatchesWon: number;
-  limitedPercentile: number;
-  limitedSeasonOrdinal: number;
-  limitedStep: number;
-  playerId: string;
-}
+import {
+  isMemoryReadingAvailable,
+  ReaderRank,
+  readRanks,
+} from "../utils/mtgaReader";
 
 export default async function readRank(): Promise<
   CombinedRankInfo | undefined
@@ -35,26 +14,33 @@ export default async function readRank(): Promise<
     return globalStore.rank || undefined;
   }
 
-  const rank = await readData("MTGA", [
-    "WrapperController",
-    "<Instance>k__BackingField",
-    "<PlayerRankServiceWrapper>k__BackingField",
-    "_combinedRankInfo",
-  ]);
+  const ranks = await readRanks("MTGA");
 
-  if (!rank || rank.error || Object.keys(rank).length === 0) {
+  if (!ranks || !ranks.constructed || !ranks.limited) {
     if (globalStore.rank) return globalStore.rank;
 
     return undefined;
   }
 
+  const flatten = (prefix: "constructed" | "limited", rank: ReaderRank) => ({
+    [`${prefix}SeasonOrdinal`]: rank.seasonOrdinal ?? 0,
+    // The app's rank icons/filters use "Unranked" where the game uses "None"
+    [`${prefix}Class`]: rank.class === "None" ? "Unranked" : rank.class,
+    [`${prefix}ClassValue`]: rank.classValue,
+    [`${prefix}Level`]: rank.level ?? 0,
+    [`${prefix}Step`]: rank.step ?? 0,
+    [`${prefix}MatchesWon`]: rank.wins ?? 0,
+    [`${prefix}MatchesLost`]: rank.losses ?? 0,
+    [`${prefix}MatchesDrawn`]: rank.draws ?? 0,
+    [`${prefix}Percentile`]: parseFloat(rank.percentile || "0") || 0,
+    [`${prefix}LeaderboardPlace`]: rank.leaderboardPlace ?? 0,
+  });
+
   globalStore.rank = {
-    ...rank,
-    constructedClass: rankClass[rank.constructedClass],
-    limitedClass: rankClass[rank.limitedClass],
-    constructedClassValue: rank.constructedClass,
-    limitedClassValue: rank.limitedClass,
-  };
+    playerId: ranks.playerId || "",
+    ...flatten("constructed", ranks.constructed),
+    ...flatten("limited", ranks.limited),
+  } as unknown as CombinedRankInfo;
 
   return globalStore.rank;
 }

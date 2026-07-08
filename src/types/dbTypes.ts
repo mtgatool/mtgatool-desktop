@@ -1,5 +1,3 @@
-import { ToolDb } from "tool-db";
-
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { InventoryInfo } from "../background/onLabel/InStartHook";
 import { OverlayHandler } from "../common/overlayHandler";
@@ -8,9 +6,6 @@ import { Cards, InternalMatch, v2cardsList } from ".";
 
 declare global {
   interface Window {
-    toolDb: ToolDb;
-    toolDbWorker: Worker;
-    toolDbInitialized: boolean;
     database: DatabaseClass;
     overlayHandler: OverlayHandler | undefined;
     globalStore: any;

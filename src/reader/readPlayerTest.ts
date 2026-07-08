@@ -1,39 +1,14 @@
-import { isMemoryReadingAvailable, readData } from "../utils/mtgaReader";
-
-interface AccountInformation {
-  AccessToken: string;
-  AccountID: string;
-  Credentials: null;
-  CredentialsState: number;
-  DisplayName: string;
-  Email: string;
-  Expiration: number;
-  ExternalID: string;
-  GameID: string;
-  LinkedAccounts: null;
-  Password: string;
-  PersonaID: string;
-  Roles: null;
-}
+import { isMemoryReadingAvailable, readAccount } from "../utils/mtgaReader";
 
 export default async function readPlayerTest(): Promise<string | null> {
   // Skip if memory reading is not available (web mode)
   if (!isMemoryReadingAvailable()) return null;
 
   try {
-    const data = await readData("MTGA", [
-      "WrapperController",
-      "<Instance>k__BackingField",
-      "<AccountClient>k__BackingField",
-      "<AccountInformation>k__BackingField",
-    ]);
+    const account = await readAccount("MTGA");
 
-    if (!data || data.error) return null;
-
-    const accountInformation: AccountInformation = data;
-
-    if (accountInformation && accountInformation.DisplayName) {
-      return accountInformation.DisplayName;
+    if (account && account.displayName) {
+      return account.displayName;
     }
 
     return null;

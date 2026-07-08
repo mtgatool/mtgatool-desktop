@@ -1,32 +1,18 @@
-import upsertDbCards from "../toolDb/upsertDbCards";
+﻿import upsertDbCards from "../data/upsertDbCards";
 import { Cards } from "../types";
-import { isMemoryReadingAvailable, readData } from "../utils/mtgaReader";
-
-interface ReaderCard {
-  key: number;
-  value: number;
-  hashCode: number;
-  next: number;
-}
+import { isMemoryReadingAvailable, readCollection } from "../utils/mtgaReader";
 
 export default async function readCards() {
   // Skip if memory reading is not available (web mode)
   if (!isMemoryReadingAvailable()) return;
 
-  const cards = await readData("MTGA", [
-    "PAPA",
-    "_instance",
-    "_inventoryManager",
-    "_inventoryServiceWrapper",
-    "<Cards>k__BackingField",
-    "_entries",
-  ]);
+  const collection = await readCollection("MTGA");
 
-  if (!cards || cards.error) return;
+  if (!collection || !collection.cards || collection.cards.length === 0) return;
 
   const parsedCards: Cards = {};
-  cards.forEach((c: ReaderCard) => {
-    parsedCards[c.key] = c.value;
+  collection.cards.forEach((c) => {
+    parsedCards[c.grpId] = c.qty;
   });
 
   upsertDbCards(parsedCards);

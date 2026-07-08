@@ -1,4 +1,4 @@
-/* eslint-disable no-nested-ternary */
+﻿/* eslint-disable no-nested-ternary */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable react/no-array-index-key */
@@ -13,7 +13,7 @@ import { ReactComponent as IconCrown } from "../../../assets/images/svg/crown.sv
 import { ReactComponent as IconEvent } from "../../../assets/images/svg/event.svg";
 import { ReactComponent as IconTime } from "../../../assets/images/svg/time.svg";
 import reduxAction from "../../../redux/reduxAction";
-import { getData } from "../../../toolDb/worker-wrapper";
+import { getData } from "../../../data/store";
 import { MatchGameStats } from "../../../types";
 import { DbMatch } from "../../../types/dbTypes";
 import compareCards from "../../../utils/compareCards";

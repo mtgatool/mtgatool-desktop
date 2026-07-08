@@ -24,30 +24,28 @@ sudo ./install.sh
 
 ### Run from source
 
-**Make sure you are using node 15+ and npm 7+**
+The desktop app is built with [Tauri](https://tauri.app), so you will need:
 
-If swtching node versions is an issue you can use [nvm](https://github.com/nvm-sh/nvm) (there's a [Windows versiion](https://github.com/coreybutler/nvm-windows) too!)
+- Node 18+ and npm 9+
+- A [Rust toolchain](https://rustup.rs) (stable)
+- The [mtga-reader](https://github.com/mtgatool/mtga-reader) repository cloned as a sibling directory (`../mtga-reader`), used by the Tauri backend for memory reading
+- The [tool-db](https://github.com/Manwe-777/tool-db) repository cloned as a sibling directory (`../tool-db`), with its packages built
 
-
-Before running you will need to install some packages globally;
-
-```npm install -g foreman @craco/craco```
-
-Once installed you can proceed installing the app's packages;
+Install the app's packages;
 
 ```npm install```
 
-
 To run the desktop app in development mode (with hot module reloading enabled)
 
-```npm start```
+```npm run dev```
 
 To do the same, but for the web use:
 
-```npm start:web```
+```npm run dev:web```
 
-You can use the app in localhost:3006 (we use this port to avoid conflicts with the electron version at port 3000)
-
+Note: MTG Arena runs elevated, so memory reading (ranks, collection, account)
+only works when the app also runs with administrator permissions. The app
+still works without it (log reading only).
 
 Build is rather straightforward for both web and desktop;
 

@@ -1,4 +1,4 @@
-/* eslint-disable no-nested-ternary */
+﻿/* eslint-disable no-nested-ternary */
 import { CSSProperties, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -14,7 +14,6 @@ import { COLORS_ALL } from "../constants";
 import store, { AppState } from "../redux/stores/rendererStore";
 import {
   ALL_TAURI_OVERLAY_LABELS,
-  ConnectionData,
   getOverlayIndexFromLabel,
   WINDOW_MAIN,
 } from "../types/app";
@@ -140,12 +139,10 @@ interface TopBarProps {
 export default function TopBar(props: TopBarProps): JSX.Element {
   const { forceOs, closeCallback } = props;
   const [hoverControls, setHoverControls] = useState(false);
-  const [peerCount, setPeerCount] = useState(0);
   const [os, setOs] = useState<string>(forceOs || "win32");
   const [maximized, setMaximized] = useState(false);
   const [focused, setFocused] = useState(true);
 
-  const offline = useSelector((state: AppState) => state.renderer.offline);
   const topArtist = useSelector((state: AppState) => state.renderer.topArtist);
 
   const isOverlay = isOverlayWindow();
@@ -159,39 +156,6 @@ export default function TopBar(props: TopBarProps): JSX.Element {
       getPlatform().then(setOs);
     }
   }, [forceOs]);
-
-  // Fetch connection data periodically for peer count
-  useEffect(() => {
-    const listener = (e: MessageEvent) => {
-      const { type, value } = e.data;
-      if (type === "CONNECTION_DATA") {
-        const connectedPeers = (value as ConnectionData[]).filter(
-          (p) => p.isConnected
-        );
-        setPeerCount(connectedPeers.length);
-      }
-    };
-
-    const fetchConnectionData = () => {
-      if (window.toolDbWorker) {
-        window.toolDbWorker.postMessage({ type: "GET_CONNECTION_DATA" });
-      }
-    };
-
-    if (window.toolDbWorker) {
-      window.toolDbWorker.addEventListener("message", listener);
-      fetchConnectionData();
-    }
-
-    const interval = setInterval(fetchConnectionData, 2000);
-
-    return () => {
-      clearInterval(interval);
-      if (window.toolDbWorker) {
-        window.toolDbWorker.removeEventListener("message", listener);
-      }
-    };
-  }, []);
 
   // Update maximized/focused state periodically for macOS style
   useEffect(() => {
@@ -301,15 +265,6 @@ export default function TopBar(props: TopBarProps): JSX.Element {
     </div>
   );
 
-  const connectionStatus = offline ? (
-    <div className="unlink" title="Connecting to peers..." />
-  ) : (
-    <div
-      className="link"
-      title={`Connected to ${peerCount} peer${peerCount !== 1 ? "s" : ""}`}
-    />
-  );
-
   return (
     <div
       className="top click-on"
@@ -338,14 +293,12 @@ export default function TopBar(props: TopBarProps): JSX.Element {
         ) : (
           <></>
         )}
-        {!isOverlay && isReverse && connectionStatus}
       </div>
       <div
         onMouseEnter={(): void => setHoverControls(true)}
         onMouseLeave={(): void => setHoverControls(false)}
         className={topButtonsContainerClass}
       >
-        {!isOverlay && !isReverse && connectionStatus}
         {os == "darwin"
           ? [close, minimize, maximize]
           : [minimize, maximize, close]}

@@ -32,7 +32,6 @@ export default function backgroundChannelListenersTauri() {
     // Notify about log check
     postChannelMessage({
       type: "LOG_CHECK",
-      value: position,
     });
   };
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
 
@@ -7,12 +7,12 @@ import { ReactComponent as CopyButton } from "../../../assets/images/svg/copy.sv
 // import { ReactComponent as IconCrown } from "../../../assets/images/svg/crown.svg";
 import { ReactComponent as IconEvent } from "../../../assets/images/svg/event.svg";
 import { OverlayUpdateMatchState } from "../../../background/store/types";
-import reduxAction from "../../../redux/reduxAction";
 import {
   addKeyListener,
   removeKeyListener,
   subscribeData,
-} from "../../../toolDb/worker-wrapper";
+} from "../../../data/store";
+import reduxAction from "../../../redux/reduxAction";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { getCardArtCrop } from "../../../utils/getCardArtCrop";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
@@ -30,40 +30,23 @@ export default function LiveMatch() {
   const dispatch = useDispatch();
   const params = useParams<{ id: string }>();
 
-  const [matchState, setMatchState] = useState<null | OverlayUpdateMatchState>(
-    null
-  );
+  const [matchState] = useState<null | OverlayUpdateMatchState>(null);
 
   const liveMatchKey = `livematch-${params.id}`;
 
   useEffect(() => {
+    // Live match spectating relied on the p2p network and is disabled until
+    // the Supabase realtime backend lands (docs/LEGACY_TOOLDB_DATA_MODEL.md).
     let listenerId: number | null = null;
     addKeyListener(liveMatchKey).then((id) => {
       listenerId = id;
     });
-
-    const listener = (e: any) => {
-      const { type, value } = e.data;
-      console.log("LIVE MATCH LISTENER", type, value);
-      if (type === `LISTENER_${liveMatchKey}`) {
-        if (value && value.type === "put") {
-          setMatchState(value.v);
-        }
-      }
-    };
-
-    if (window.toolDbWorker) {
-      window.toolDbWorker.addEventListener("message", listener);
-    }
 
     subscribeData(liveMatchKey);
 
     return () => {
       if (listenerId) {
         removeKeyListener(listenerId);
-      }
-      if (window.toolDbWorker) {
-        window.toolDbWorker.removeEventListener("message", listener);
       }
     };
   }, []);
