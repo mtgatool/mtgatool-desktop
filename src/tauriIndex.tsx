@@ -1,5 +1,6 @@
 import "./index.scss";
 
+import { appWindow, PhysicalSize } from "@tauri-apps/api/window";
 import { createBrowserHistory } from "history";
 // eslint-disable-next-line no-use-before-define
 import React from "react";
@@ -23,6 +24,36 @@ import initDirectoriesTauri from "./utils/initDirectoriesTauri";
 import registerShortcutsTauri from "./utils/registerShortcutsTauri";
 import isTauri from "./utils/tauri/isTauri";
 
+// Make an overlay/hover window frameless + transparent from its OWN context.
+// This is more reliable than the WebviewWindow creation options:
+//  - setDecorations(false) at runtime reliably removes the title bar even when
+//    the creation-time `decorations` flag is ignored on Windows.
+//  - The transparent-window-shows-white bug (tauri#4881, upstream in wry/tao)
+//    only clears after a resize forces a repaint, so we nudge the size by 1px
+//    and back once the window is on screen. This mimics the manual
+//    shrink/enlarge that currently fixes it.
+async function makeWindowFramelessTransparent(): Promise<void> {
+  document.documentElement.style.background = "transparent";
+  document.body.style.background = "transparent";
+  try {
+    await appWindow.setDecorations(false);
+  } catch (e) {
+    console.error("[Tauri] setDecorations(false) failed:", e);
+  }
+  // Delay the repaint nudge until after the window is shown (createOverlay
+  // shows it ~250ms after creation) so the resize actually forces a redraw.
+  setTimeout(() => {
+    appWindow
+      .innerSize()
+      .then((size) =>
+        appWindow
+          .setSize(new PhysicalSize(size.width + 1, size.height))
+          .then(() => appWindow.setSize(size))
+      )
+      .catch((e) => console.error("[Tauri] transparency repaint nudge failed:", e));
+  }, 500);
+}
+
 // Only run in Tauri environment
 if (isTauri()) {
   console.log("[Tauri] Initializing Tauri app...");
@@ -30,9 +61,11 @@ if (isTauri()) {
   try {
     const history = createBrowserHistory();
 
-    // Get window label from Tauri - use synchronous access
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const label = (window as any).__TAURI__?.window?.appWindow?.label || "main";
+    // Window label from the Tauri API (reliable per-window). The old
+    // window.__TAURI__?.window?.appWindow?.label path was undefined in this
+    // build and fell back to "main" for EVERY window — so the background
+    // window rendered the app instead of starting the log watcher.
+    const { label } = appWindow;
     console.log("[Tauri] Window label:", label);
 
     // Route based on window label
@@ -46,8 +79,9 @@ if (isTauri()) {
         module.hot.accept();
       }
     } else if (label === "hover") {
-      // Hover window - card preview
+      // Hover window - card preview (borderless + transparent)
       console.log("[Tauri] Initializing hover window...");
+      makeWindowFramelessTransparent();
       defaultLocalSettings();
       ReactDOM.render(
         <React.StrictMode>
@@ -72,8 +106,9 @@ if (isTauri()) {
         );
       }
     } else if (label.startsWith("overlay-")) {
-      // Overlay windows
+      // Overlay windows (borderless + transparent)
       console.log("[Tauri] Initializing overlay window...");
+      makeWindowFramelessTransparent();
       defaultLocalSettings();
       ReactDOM.render(
         <React.StrictMode>

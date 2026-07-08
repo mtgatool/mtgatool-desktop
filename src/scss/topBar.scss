@@ -8,7 +8,8 @@
 }
 
 .top {
-  -webkit-app-region: drag;
+  /* Window dragging is handled by data-tauri-drag-region in TopBar.tsx;
+     Electron's -webkit-app-region is ignored by Tauri and can interfere. */
   margin-top: 4px;
   position: relative;
   height: 20px;

@@ -9,7 +9,6 @@ import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { LOGIN_AUTH, LOGIN_OK, LOGIN_WAITING } from "../constants";
 import { cloudLogin, cloudSignup } from "../data/cloudAuth";
 import localLogin from "../data/localLogin";
-import readCards from "../reader/readCards";
 import UICheckAdmin from "../reader/uiCheckAdmin";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
@@ -95,9 +94,9 @@ export default function Auth(props: AuthProps) {
   useEffect(() => {
     if (loginState === LOGIN_OK) {
       history.push("/home");
-      readCards().catch(() => {
-        // Ignore errors from background operation
-      });
+      // Data is synced by syncAll() on LOG_READ_FINISHED (account-first), so
+      // no direct readCards() here — that raced ahead of the account and
+      // stored the collection under "default".
     }
   }, [loginState, history]);
 

@@ -28,12 +28,18 @@ import isTauri from "../utils/tauri/isTauri";
 import Clock from "./Clock";
 import DraftOverlay from "./DraftOverlay";
 
+// Reliable per-window label from Tauri's injected metadata (the old
+// window.__TAURI__.window.appWindow path returned "main" for every window).
+function currentLabel(): string {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const meta = (window as any).__TAURI_METADATA__;
+  return meta?.__currentWindow?.label || "";
+}
+
 // Get current overlay ID from Tauri window label
 function getCurrentOverlayId(): number {
   if (isTauri()) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const label = (window as any).__TAURI__?.window?.appWindow?.label || "";
-    return getOverlayIndexFromLabel(label);
+    return getOverlayIndexFromLabel(currentLabel());
   }
   return 0;
 }
@@ -64,8 +70,7 @@ async function getCurrentWindowBounds(): Promise<{
 // Get current window label in Tauri
 function getCurrentWindowLabel(): string {
   if (isTauri()) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (window as any).__TAURI__?.window?.appWindow?.label || "";
+    return currentLabel();
   }
   return "";
 }
@@ -128,15 +133,17 @@ export default function Overlay() {
       }
 
       if (msg.data.type === "OVERLAY_UPDATE_SETTINGS") {
-        const newSettings: OverlaySettings = (
+        const newSettings: OverlaySettings | undefined = (
           JSON.parse(getLocalSetting("settings")) as Settings
         ).overlays[getCurrentOverlayId()];
 
-        setSettings({
-          ...settings,
-          ...newSettings,
-          bounds: settings?.bounds || newSettings.bounds,
-        });
+        if (newSettings) {
+          setSettings({
+            ...settings,
+            ...newSettings,
+            bounds: settings?.bounds || newSettings.bounds,
+          });
+        }
       }
 
       if (msg.data.type === "OVERLAY_UPDATE") {

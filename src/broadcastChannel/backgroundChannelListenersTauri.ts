@@ -1,5 +1,7 @@
 import ArenaLogDecoder from "../background/arena-log-decoder/arena-log-decoder";
+import logEntrySwitch from "../background/logEntrySwitch";
 import bcConnect from "../utils/bcConnect";
+import { pushDebug } from "../utils/debugLog";
 import getLocalSetting from "../utils/getLocalSetting";
 import setLocalSetting from "../utils/setLocalSetting";
 import { getDefaultLogPath } from "../utils/tauri/app";
@@ -21,13 +23,27 @@ export default function backgroundChannelListenersTauri() {
   const handleLogChunk = (payload: LogChunkPayload) => {
     const { text, position, size } = payload;
 
+    let entryCount = 0;
     decoder.append(text, (entry: any) => {
-      // Post each log entry to the broadcast channel
+      entryCount += 1;
+      // Route the entry to the label handlers (scene change, player id,
+      // matches, rank, ...). This is what drives everything downstream; it
+      // was missing from the Tauri log path.
+      try {
+        logEntrySwitch(entry);
+      } catch (e) {
+        console.error("logEntrySwitch error:", e);
+      }
+
+      // Progress notification only (json stripped to keep the message light).
       postChannelMessage({
         type: "LOG_MESSAGE_RECV",
         value: { ...entry, position, size, json: {} },
       });
     });
+    pushDebug(
+      `[bg] log chunk ${text.length}b @${position}/${size} → ${entryCount} entries`
+    );
 
     // Notify about log check
     postChannelMessage({
@@ -38,7 +54,7 @@ export default function backgroundChannelListenersTauri() {
   // Handle channel messages
   channel.onmessage = async (msg: MessageEvent<ChannelMessage>) => {
     if (msg.data.type === "START_LOG_READING" && !isWatching) {
-      console.log("START LOG READING (Tauri)");
+      pushDebug("[bg] START_LOG_READING received, starting watcher");
 
       // Reset decoder
       decoder = ArenaLogDecoder();
@@ -55,11 +71,18 @@ export default function backgroundChannelListenersTauri() {
         }
       }
 
+      pushDebug(`[bg] starting watcher on ${logPath}`);
       try {
-        await startLogWatcher(logPath, handleLogChunk);
+        await startLogWatcher(logPath, handleLogChunk, () => {
+          // Initial (historical) read caught up — tells the app it can
+          // complete login and start live scene-driven memory reads.
+          pushDebug("[bg] log_finished → posting LOG_READ_FINISHED");
+          postChannelMessage({ type: "LOG_READ_FINISHED" });
+        });
         isWatching = true;
+        pushDebug("[bg] watcher started ok");
       } catch (e) {
-        console.error("Failed to start log watcher:", e);
+        pushDebug(`[bg] FAILED to start watcher: ${String(e)}`);
       }
     }
 

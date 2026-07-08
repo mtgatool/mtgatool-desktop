@@ -33,3 +33,5 @@ dist-cards-worker
 dist-tooldb-worker
 
 src-tauri/target
+# local log fixtures for testing (not committed)
+test-data/

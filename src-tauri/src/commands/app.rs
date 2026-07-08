@@ -72,3 +72,40 @@ pub fn restart_app(app: tauri::AppHandle) {
 pub fn quit_app() {
     std::process::exit(0);
 }
+
+/// Relaunch the app elevated (Windows UAC) and exit the current instance.
+/// MTGA runs elevated, so memory reading only works when this app is too.
+/// Waits for the elevation prompt to resolve: on accept, launches the new
+/// instance and exits this one; on cancel, returns an error and stays open.
+#[cfg(target_os = "windows")]
+#[tauri::command]
+pub fn relaunch_as_admin(app: tauri::AppHandle) -> Result<(), String> {
+    let exe = env::current_exe().map_err(|e| e.to_string())?;
+    // Escape single quotes for the PowerShell single-quoted string.
+    let exe_str = exe.to_string_lossy().replace('\'', "''");
+
+    let status = std::process::Command::new("powershell")
+        .args([
+            "-NoProfile",
+            "-WindowStyle",
+            "Hidden",
+            "-Command",
+            &format!("Start-Process -FilePath '{}' -Verb RunAs", exe_str),
+        ])
+        .status()
+        .map_err(|e| format!("Failed to launch elevated instance: {}", e))?;
+
+    if status.success() {
+        app.exit(0);
+        Ok(())
+    } else {
+        // UAC was declined / cancelled.
+        Err("Elevation was cancelled".to_string())
+    }
+}
+
+#[cfg(not(target_os = "windows"))]
+#[tauri::command]
+pub fn relaunch_as_admin(_app: tauri::AppHandle) -> Result<(), String> {
+    Err("Elevation is only supported on Windows".to_string())
+}

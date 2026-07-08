@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Switch, useHistory } from "react-router-dom";
 
+import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import overlayHandler from "../common/overlayHandler";
 import { LOGIN_OK } from "../constants";
 import { getCloudSession } from "../data/cloudAuth";
@@ -21,6 +22,7 @@ import Auth from "./Auth";
 import CardHover from "./CardHover";
 import ContentWrapper from "./ContentWrapper";
 import DataStatus from "./DataStatus";
+import DebugPanel from "./DebugPanel";
 import ErrorBoundary from "./ErrorBoundary";
 import LoadingBar from "./LoadingBar";
 import PopupComponent from "./PopupComponent";
@@ -98,6 +100,13 @@ function App(props: AppProps) {
               type: "SET_LOGIN_STATE",
               arg: LOGIN_OK,
             });
+
+            // Start reading the Arena log on auto-login too (manual login in
+            // Auth.tsx does this; without it, returning users never start the
+            // watcher and nothing populates).
+            if (isTauri()) {
+              postChannelMessage({ type: "START_LOG_READING" });
+            }
 
             if (
               history.location.pathname === "" ||
@@ -257,6 +266,7 @@ function App(props: AppProps) {
           <></>
         )}
       </div>
+      {isTauri() && <DebugPanel />}
     </>
   );
 }

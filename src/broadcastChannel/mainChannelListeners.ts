@@ -9,12 +9,14 @@ import upsertDbInventory from "../data/upsertDbInventory";
 import upsertDbRank from "../data/upsertDbRank";
 import readCards from "../reader/readCards";
 import readPlayerId from "../reader/readPlayerid";
+import sceneSync, { syncAll } from "../reader/sceneSync";
 import UICheckAdmin from "../reader/uiCheckAdmin";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import { InternalDraftv2 } from "../types";
 import LogEntry from "../types/logDecoder";
 import bcConnect from "../utils/bcConnect";
+import { pushDebug } from "../utils/debugLog";
 import globalData from "../utils/globalData";
 import switchPlayerUUID from "../utils/switchPlayerUUID";
 import { ChannelMessage } from "./channelMessages";
@@ -24,8 +26,18 @@ export default function mainChannelListeners() {
 
   let last = Date.now();
 
+  // Distinguishes the initial (historical) log replay from live entries, so
+  // scene-driven memory reads only fire for real, current scene changes.
+  let logReadFinished = false;
+
   channel.onmessage = (msg: MessageEvent<ChannelMessage>) => {
-    // console.log(msg.data.type);
+    // Surface every non-spammy channel message in the debug panel so we can
+    // see what actually reaches the UI. LOG_MESSAGE_RECV / OVERLAY_UPDATE are
+    // per-entry/per-frame floods, so they're skipped here.
+    const mtype = msg.data.type;
+    if (mtype !== "LOG_MESSAGE_RECV" && mtype !== "OVERLAY_UPDATE") {
+      pushDebug(`ch: ${mtype}`);
+    }
 
     if (msg.data.type === "POPUP") {
       reduxAction(store.dispatch, {
@@ -53,6 +65,12 @@ export default function mainChannelListeners() {
     }
 
     if (msg.data.type == "LOG_READ_FINISHED") {
+      pushDebug("log read finished → syncAll (reading memory)");
+      logReadFinished = true;
+      // Populate everything from memory once the log has caught up.
+      syncAll().catch(() => {
+        // errors are surfaced via debug log inside syncAll
+      });
       if (store.getState().renderer.loading === true) {
         reduxAction(store.dispatch, {
           type: "SET_LOGIN_STATE",
@@ -105,10 +123,17 @@ export default function mainChannelListeners() {
     }
 
     if (msg.data.type === "SET_SCENE") {
+      const scene = msg.data.value;
       reduxAction(store.dispatch, {
         type: "SET_SCENE",
-        arg: msg.data.value.toSceneName,
+        arg: scene.toSceneName,
       });
+      // Use the scene transition as a cue to read fresh data from memory
+      // (decks, collection, inventory, rank) — but only for live changes,
+      // not the historical log replay. See reader/sceneSync.
+      if (logReadFinished) {
+        sceneSync(scene.fromSceneName, scene.toSceneName);
+      }
     }
 
     if (msg.data.type === "GAME_STATS") {

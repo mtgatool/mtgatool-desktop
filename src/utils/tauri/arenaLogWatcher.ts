@@ -7,18 +7,25 @@ export interface LogChunkPayload {
 }
 
 let unlisten: (() => void) | null = null;
+let unlistenFinished: (() => void) | null = null;
 
 export async function startLogWatcher(
   path: string,
-  onChunk: (payload: LogChunkPayload) => void
+  onChunk: (payload: LogChunkPayload) => void,
+  onFinished?: () => void
 ): Promise<void> {
   if (isTauri()) {
     const { invoke } = await import("@tauri-apps/api/tauri");
     const { listen } = await import("@tauri-apps/api/event");
 
-    // Set up event listener first
+    // Set up event listeners first
     unlisten = await listen<LogChunkPayload>("log_chunk", (event) => {
       onChunk(event.payload);
+    });
+
+    // Fired once when the initial (historical) read has caught up.
+    unlistenFinished = await listen("log_finished", () => {
+      if (onFinished) onFinished();
     });
 
     // Start the watcher
@@ -35,5 +42,9 @@ export async function stopLogWatcher(): Promise<void> {
   if (unlisten) {
     unlisten();
     unlisten = null;
+  }
+  if (unlistenFinished) {
+    unlistenFinished();
+    unlistenFinished = null;
   }
 }

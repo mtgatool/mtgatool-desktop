@@ -25,11 +25,16 @@ export default async function createOverlay(
       return;
     }
 
-    // Create new overlay window
+    // Create new overlay window.
+    // NOTE: coerce these explicitly. Persisted settings migrated from older
+    // versions may omit `overlaysTransparency`/`overlayFrame`, and Tauri's JS
+    // WebviewWindow treats `decorations: undefined` as true (title bar) and
+    // `transparent: undefined` as false (opaque white) — which is exactly the
+    // "framed + white overlay" bug. Default to frameless + transparent.
     const newWindow = new WebviewWindow(label, {
       url: "/", // Tauri serves from the build folder
-      transparent: allSettings.overlaysTransparency,
-      decorations: allSettings.overlayFrame,
+      transparent: allSettings.overlaysTransparency !== false,
+      decorations: allSettings.overlayFrame === true,
       alwaysOnTop: true,
       skipTaskbar: true,
       width: settings.bounds.width,

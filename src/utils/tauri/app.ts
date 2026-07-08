@@ -29,3 +29,15 @@ export async function quitApp(): Promise<void> {
     await invoke("quit_app");
   }
 }
+
+/**
+ * Relaunch the app elevated (Windows UAC). On accept, the current instance
+ * exits and a new elevated one starts; on cancel, this rejects and the app
+ * stays open. No-op outside Tauri.
+ */
+export async function relaunchAsAdmin(): Promise<void> {
+  if (isTauri()) {
+    const { invoke } = await import("@tauri-apps/api/tauri");
+    await invoke("relaunch_as_admin");
+  }
+}

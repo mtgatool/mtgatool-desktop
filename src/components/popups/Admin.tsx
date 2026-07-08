@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 import { ReactComponent as Close } from "../../assets/images/svg/close.svg";
+import { relaunchAsAdmin } from "../../utils/tauri/app";
+import isTauri from "../../utils/tauri/isTauri";
 import Button from "../ui/Button";
 
 interface AdminProps {
@@ -11,6 +13,23 @@ export default function Admin(props: AdminProps) {
   const { onClose } = props;
 
   const [page, setPage] = useState(0);
+  const [error, setError] = useState("");
+  const [relaunching, setRelaunching] = useState(false);
+
+  const doRelaunch = (): void => {
+    setError("");
+    setRelaunching(true);
+    // On success the app exits and this promise never resolves; on a
+    // cancelled UAC prompt it rejects and we surface a message.
+    relaunchAsAdmin().catch((e: unknown) => {
+      setRelaunching(false);
+      setError(
+        typeof e === "string"
+          ? e
+          : "Could not restart as administrator. Please launch it manually."
+      );
+    });
+  };
 
   return (
     <>
@@ -19,20 +38,54 @@ export default function Admin(props: AdminProps) {
       </div>
       <div style={{ margin: "22px 16px 16px 16px" }}>
         <h2 style={{ marginBottom: "16px", color: "var(--color-r)" }}>
-          MTG Arena Tool requires Administrator privileges!
+          MTG Arena Tool needs Administrator privileges
         </h2>
 
         <p style={{ color: "var(--color-text-dark)" }}>
-          Administrator privileges are required for MTG Arena Tool to record
-          some of the data it needs to function properly, like ranks and
-          collection. You can run MTG Arena Tool as an Administrator by right
-          clicking on the shortcut and selecting &quot;Run as
-          Administrator&quot;
+          MTG Arena runs elevated, so this app must run elevated too in order to
+          read the game&apos;s memory. Without it, your account, collection,
+          decks, rank and inventory can&apos;t be read and will appear empty.
+        </p>
+
+        {isTauri() && (
+          <div style={{ display: "flex", marginTop: "20px" }}>
+            <Button
+              style={{ width: "220px", margin: "auto" }}
+              text={
+                relaunching ? "Waiting for UAC…" : "Restart as Administrator"
+              }
+              disabled={relaunching}
+              onClick={doRelaunch}
+            />
+          </div>
+        )}
+
+        {error !== "" && (
+          <p
+            style={{
+              color: "var(--color-r)",
+              textAlign: "center",
+              marginTop: "12px",
+            }}
+          >
+            {error}
+          </p>
+        )}
+
+        <p
+          style={{
+            color: "var(--color-text-dark)",
+            marginTop: "24px",
+            textAlign: "center",
+          }}
+        >
+          You can also right-click the shortcut and choose &quot;Run as
+          administrator&quot;, or set it permanently below.
         </p>
 
         <div
           className="page-slider-container"
-          style={{ marginTop: "48px", height: "320px" }}
+          style={{ marginTop: "16px", height: "320px" }}
         >
           <div
             className="page-slider"

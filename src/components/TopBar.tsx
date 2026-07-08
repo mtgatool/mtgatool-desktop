@@ -19,11 +19,14 @@ import {
 } from "../types/app";
 import isTauri from "../utils/tauri/isTauri";
 
-// Get current window label in Tauri
+// Get current window label in Tauri (from the reliable per-window metadata;
+// the old window.__TAURI__.window.appWindow path returned "main" for every
+// window in this build).
 function getWindowLabel(): string {
   if (isTauri()) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (window as any).__TAURI__?.window?.appWindow?.label || "main";
+    const meta = (window as any).__TAURI_METADATA__;
+    return meta?.__currentWindow?.label || "main";
   }
   return "main";
 }
@@ -269,6 +272,9 @@ export default function TopBar(props: TopBarProps): JSX.Element {
     <div
       className="top click-on"
       style={{ flexDirection: isReverse ? "row-reverse" : "row" }}
+      // Tauri drags the window from elements marked with this attribute
+      // (Tauri ignores Electron's -webkit-app-region CSS).
+      data-tauri-drag-region
     >
       {isOverlay && (
         <div
@@ -281,6 +287,7 @@ export default function TopBar(props: TopBarProps): JSX.Element {
         />
       )}
       <div
+        data-tauri-drag-region
         style={{
           display: "flex",
           margin: isReverse ? "auto" : "",

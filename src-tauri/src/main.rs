@@ -12,6 +12,12 @@ use std::sync::Mutex;
 use tauri::{WindowBuilder, WindowUrl};
 
 fn main() {
+    // WebView2 paints an opaque (white) backdrop by default, which shows through
+    // transparent windows until they are resized (the "white overlay until you
+    // drag it" artifact). Force the default backdrop to fully transparent ARGB
+    // so transparent overlay/hover windows render correctly from first paint.
+    std::env::set_var("WEBVIEW2_DEFAULT_BACKGROUND_COLOR", "00000000");
+
     tauri::Builder::default()
         .manage(state::AppState {
             log_watcher: Mutex::new(arena_log::watcher::ArenaLogWatcher::new()),
@@ -45,6 +51,7 @@ fn main() {
             commands::app::restart_app,
             commands::app::quit_app,
             commands::app::get_platform,
+            commands::app::relaunch_as_admin,
             // Arena log watcher
             arena_log::watcher::start_log_watcher,
             arena_log::watcher::stop_log_watcher,
@@ -76,16 +83,20 @@ fn main() {
                 .visible(false)
                 .build()?;
 
-            // Create hover window (hidden initially)
-            // Note: Transparency is configured in tauri.conf.json, not in WindowBuilder for Tauri 1.x
+            // Create hover window (hidden initially) — borderless + transparent
             WindowBuilder::new(app, "hover", background_url)
                 .title("mtgatool-hover")
                 .visible(false)
                 .decorations(false)
+                .transparent(true)
                 .always_on_top(true)
                 .skip_taskbar(true)
                 .inner_size(400.0, 600.0)
                 .build()?;
+
+            // Devtools are available on demand via right-click -> Inspect in dev
+            // builds; we no longer auto-open them (they spawned extra decorated
+            // windows that were easy to mistake for overlays).
 
             Ok(())
         })
