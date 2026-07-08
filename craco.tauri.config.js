@@ -19,6 +19,37 @@ module.exports = {
         ...webpackConfig.resolve.alias,
         ...supabaseCjsAlias(),
       };
+
+      // The @tauri-apps/* v2 packages ship modern syntax (?? , ?., ??=) that
+      // webpack 4's parser can't handle, and babel-preset-react-app's modern
+      // browserslist target leaves it untransformed. Force-transform those
+      // operators by appending explicit plugins to CRA's existing node_modules
+      // ("dependencies") babel-loader.
+      const forceModernSyntaxPlugins = [
+        require.resolve("@babel/plugin-proposal-optional-chaining"),
+        require.resolve("@babel/plugin-proposal-nullish-coalescing-operator"),
+        require.resolve("@babel/plugin-proposal-logical-assignment-operators"),
+      ];
+      webpackConfig.module.rules.forEach((rule) => {
+        if (!Array.isArray(rule.oneOf)) return;
+        rule.oneOf.forEach((one) => {
+          const isDepsBabel =
+            one.loader &&
+            one.loader.includes("babel-loader") &&
+            one.options &&
+            Array.isArray(one.options.presets) &&
+            JSON.stringify(one.options.presets).includes(
+              "preset-react-app/dependencies"
+            );
+          if (isDepsBabel) {
+            one.options.plugins = [
+              ...(one.options.plugins || []),
+              ...forceModernSyntaxPlugins,
+            ];
+          }
+        });
+      });
+
       return webpackConfig;
     },
     plugins: [
