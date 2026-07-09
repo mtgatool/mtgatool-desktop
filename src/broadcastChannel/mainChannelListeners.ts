@@ -1,6 +1,5 @@
 ﻿import _ from "lodash";
 
-import { overlayTitleToId } from "../common/maps";
 import { LOGIN_OK } from "../constants";
 import setDbMatch from "../data/setDbMatch";
 import { putData } from "../data/store";
@@ -15,6 +14,7 @@ import UICheckAdmin from "../reader/uiCheckAdmin";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import { InternalDraftv2 } from "../types";
+import { getOverlayIndexFromLabel } from "../types/app";
 import LogEntry from "../types/logDecoder";
 import bcConnect from "../utils/bcConnect";
 import { pushDebug } from "../utils/debugLog";
@@ -212,21 +212,24 @@ export default function mainChannelListeners() {
     }
 
     if (msg.data.type == "OVERLAY_UPDATE_BOUNDS") {
-      const id = overlayTitleToId[msg.data.value.window];
-      if (id !== undefined) {
+      // Map by the actual window label. The old overlayTitleToId used Electron
+      // titles (mtgatool-overlay-N); v2 labels are overlay-N, so that lookup
+      // returned undefined and dropped every bounds save.
+      const id = getOverlayIndexFromLabel(msg.data.value.window);
+      if (id >= 0) {
         reduxAction(store.dispatch, {
           type: "SET_OVERLAY_SETTINGS",
-          arg: { settings: { bounds: msg.data.value.bounds }, id: id },
+          arg: { settings: { bounds: msg.data.value.bounds }, id },
         });
       }
     }
 
     if (msg.data.type == "OVERLAY_SET_SETTINGS") {
-      const id = overlayTitleToId[msg.data.value.window];
-      if (id !== undefined) {
+      const id = getOverlayIndexFromLabel(msg.data.value.window);
+      if (id >= 0) {
         reduxAction(store.dispatch, {
           type: "SET_OVERLAY_SETTINGS",
-          arg: { settings: { ...msg.data.value.settings }, id: id },
+          arg: { settings: { ...msg.data.value.settings }, id },
         });
       }
     }
