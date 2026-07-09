@@ -213,6 +213,25 @@ export default function Auth(props: AuthProps) {
       <div>{`Reading player log: ${
         Math.round(logCompletion * 1000) / 10
       }%`}</div>
+      <div
+        style={{
+          width: "240px",
+          height: "6px",
+          background: "var(--color-section)",
+          borderRadius: "3px",
+          margin: "10px auto",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            width: `${Math.round(logCompletion * 100)}%`,
+            height: "100%",
+            background: "var(--color-g)",
+            transition: "width 0.2s ease",
+          }}
+        />
+      </div>
     </div>
   );
 
