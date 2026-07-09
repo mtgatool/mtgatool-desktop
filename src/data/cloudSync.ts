@@ -38,6 +38,29 @@ export async function isCloudActive(): Promise<boolean> {
   return (await getActiveUserId()) !== null;
 }
 
+/**
+ * The set of match ids already stored in Supabase for the current user (across
+ * all their linked arena accounts — match_id is unique per user). Used to
+ * reconcile the local match history against the cloud (which matches still
+ * need pushing) and to drive the per-match "synced" indicator. Empty when
+ * offline or on error.
+ */
+export async function fetchRemoteMatchIds(): Promise<Set<string>> {
+  try {
+    const userId = await getActiveUserId();
+    if (!userId) return new Set();
+    const { data, error } = await supabase.from("matches").select("match_id");
+    if (error) {
+      console.error("[cloudSync] fetchRemoteMatchIds:", error.message);
+      return new Set();
+    }
+    return new Set((data ?? []).map((r) => r.match_id));
+  } catch (e) {
+    console.error("[cloudSync] fetchRemoteMatchIds threw:", e);
+    return new Set();
+  }
+}
+
 async function upsertArenaAccount(
   userId: string,
   arenaId: string,

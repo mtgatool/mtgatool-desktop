@@ -10,6 +10,7 @@ import overlayHandler from "../common/overlayHandler";
 import { LOGIN_OK } from "../constants";
 import { getCloudSession } from "../data/cloudAuth";
 import localLogin from "../data/localLogin";
+import syncMatches from "../data/syncMatches";
 import info from "../info.json";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
@@ -107,6 +108,10 @@ function App(props: AppProps) {
             if (isTauri()) {
               postChannelMessage({ type: "START_LOG_READING" });
             }
+
+            // Reconcile local match history with the cloud so the synced
+            // indicators are accurate and any backlog is pushed (no-op offline).
+            syncMatches().catch(() => undefined);
 
             if (
               history.location.pathname === "" ||

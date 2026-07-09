@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ReactComponent as SyncIcon } from "../../assets/images/svg/cloud-sync.svg";
 import { ReactComponent as StatsIcon } from "../../assets/images/svg/stats.svg";
 import localLogin from "../../data/localLogin";
+import syncMatches from "../../data/syncMatches";
 import {
   DateOption,
   dateOptions,
@@ -95,7 +96,11 @@ export default function FilterSection(props: FilterSectionProps) {
   ];
 
   const refreshMatches = useCallback(() => {
-    localLogin().catch(console.warn);
+    // Refresh the local view, then reconcile with Supabase: push any matches
+    // the cloud is missing and update the per-match synced indicators.
+    localLogin()
+      .then(() => syncMatches())
+      .catch(console.warn);
   }, []);
 
   return (
