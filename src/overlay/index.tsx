@@ -103,7 +103,18 @@ async function setWindowHeight(height: number): Promise<void> {
 
 export default function Overlay() {
   const [deck, setDeck] = useState<Deck>();
-  const [settings, setSettings] = useState<OverlaySettings>();
+  // Initialize from shared localStorage on mount instead of waiting for an
+  // OVERLAY_UPDATE_SETTINGS broadcast — that message is sent as the window is
+  // being created, so a freshly-spawned overlay misses it and would otherwise
+  // render blank/at defaults until the next settings change (e.g. a log update).
+  const [settings, setSettings] = useState<OverlaySettings | undefined>(() => {
+    try {
+      const all = JSON.parse(getLocalSetting("settings")) as Settings;
+      return all.overlays[getCurrentOverlayId()];
+    } catch {
+      return undefined;
+    }
+  });
   const [matchState, setMatchState] = useState<OverlayUpdateMatchState>();
   const [draftState, setDraftState] = useState<InternalDraftv2>();
   const [draftVotes, setDraftVotes] = useState<Record<string, DbDraftVote>>({});
