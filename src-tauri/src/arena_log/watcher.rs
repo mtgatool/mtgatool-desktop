@@ -134,10 +134,13 @@ impl ArenaLogWatcher {
                                 position: old_position,
                                 size,
                             };
-                            // Only the background window consumes log chunks;
-                            // emit_to it instead of broadcasting the (large)
-                            // payload to every window.
-                            let _ = app_clone.emit_to("background", "log_chunk", payload);
+                            // Global emit: Rust `emit_to(label, ...)` is unreliable
+                            // reaching a webview's frontend `listen` in Tauri v2, so
+                            // broadcast instead. Only the background window listens
+                            // for "log_chunk", so the other windows just ignore it.
+                            if let Err(e) = app_clone.emit("log_chunk", payload) {
+                                eprintln!("[log-watcher] emit log_chunk failed: {}", e);
+                            }
                         }
 
                         position = new_position;
@@ -145,7 +148,7 @@ impl ArenaLogWatcher {
                         if !initial_read_done && position >= size {
                             initial_read_done = true;
                             eprintln!("[log-watcher] initial read finished at {} bytes", size);
-                            let _ = app_clone.emit_to("background", "log_finished", ());
+                            let _ = app_clone.emit("log_finished", ());
                         }
                     }
                     Err(e) => {

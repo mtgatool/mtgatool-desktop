@@ -20,11 +20,15 @@ export async function startLogWatcher(
 
     // Set up event listeners first
     unlisten = await listen<LogChunkPayload>("log_chunk", (event) => {
+      // eslint-disable-next-line no-console
+      console.log("[log] chunk received", event.payload?.text?.length, "bytes");
       onChunk(event.payload);
     });
 
     // Fired once when the initial (historical) read has caught up.
     unlistenFinished = await listen("log_finished", () => {
+      // eslint-disable-next-line no-console
+      console.log("[log] initial read finished");
       if (onFinished) onFinished();
     });
 
