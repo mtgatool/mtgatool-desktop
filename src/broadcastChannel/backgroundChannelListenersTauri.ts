@@ -51,39 +51,44 @@ export default function backgroundChannelListenersTauri() {
     });
   };
 
+  const startWatching = async (): Promise<void> => {
+    if (isWatching) return;
+
+    // Reset decoder
+    decoder = ArenaLogDecoder();
+
+    // Get log path
+    let logPath = getLocalSetting("logPath");
+    if (!logPath || logPath.indexOf("undefined/") > -1) {
+      try {
+        logPath = await getDefaultLogPath();
+        setLocalSetting("logPath", logPath);
+      } catch (e) {
+        console.error("Failed to get default log path:", e);
+        return;
+      }
+    }
+
+    pushDebug(`[bg] starting watcher on ${logPath}`);
+    try {
+      await startLogWatcher(logPath, handleLogChunk, () => {
+        // Initial (historical) read caught up — tells the app it can
+        // complete login and start live scene-driven memory reads.
+        pushDebug("[bg] log_finished → posting LOG_READ_FINISHED");
+        postChannelMessage({ type: "LOG_READ_FINISHED" });
+      });
+      isWatching = true;
+      pushDebug("[bg] watcher started ok");
+    } catch (e) {
+      pushDebug(`[bg] FAILED to start watcher: ${String(e)}`);
+    }
+  };
+
   // Handle channel messages
   channel.onmessage = async (msg: MessageEvent<ChannelMessage>) => {
-    if (msg.data.type === "START_LOG_READING" && !isWatching) {
-      pushDebug("[bg] START_LOG_READING received, starting watcher");
-
-      // Reset decoder
-      decoder = ArenaLogDecoder();
-
-      // Get log path
-      let logPath = getLocalSetting("logPath");
-      if (!logPath || logPath.indexOf("undefined/") > -1) {
-        try {
-          logPath = await getDefaultLogPath();
-          setLocalSetting("logPath", logPath);
-        } catch (e) {
-          console.error("Failed to get default log path:", e);
-          return;
-        }
-      }
-
-      pushDebug(`[bg] starting watcher on ${logPath}`);
-      try {
-        await startLogWatcher(logPath, handleLogChunk, () => {
-          // Initial (historical) read caught up — tells the app it can
-          // complete login and start live scene-driven memory reads.
-          pushDebug("[bg] log_finished → posting LOG_READ_FINISHED");
-          postChannelMessage({ type: "LOG_READ_FINISHED" });
-        });
-        isWatching = true;
-        pushDebug("[bg] watcher started ok");
-      } catch (e) {
-        pushDebug(`[bg] FAILED to start watcher: ${String(e)}`);
-      }
+    if (msg.data.type === "START_LOG_READING") {
+      pushDebug("[bg] START_LOG_READING received");
+      await startWatching();
     }
 
     if (msg.data.type === "STOP_LOG_READING" && isWatching) {
@@ -97,17 +102,13 @@ export default function backgroundChannelListenersTauri() {
     }
   };
 
-  // Initialize log path on startup
+  // Start the watcher on init. We do NOT wait for a START_LOG_READING message
+  // from the main window: that message races the async bridge setup at startup
+  // and is silently lost if it arrives before this window's listener attaches,
+  // which left the watcher never started. Watching the log is this (background)
+  // window's own responsibility and needs no login, so start it directly.
   (async () => {
-    const logUri = getLocalSetting("logPath");
-    if (!logUri || logUri.indexOf("undefined/") > -1) {
-      try {
-        const defaultPath = await getDefaultLogPath();
-        setLocalSetting("logPath", defaultPath);
-        console.log("Initialized log path:", defaultPath);
-      } catch (e) {
-        console.error("Failed to initialize log path:", e);
-      }
-    }
+    pushDebug("[bg] init → starting log watcher autonomously");
+    await startWatching();
   })();
 }
