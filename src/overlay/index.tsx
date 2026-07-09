@@ -231,7 +231,9 @@ export default function Overlay() {
     }
   }, [settings, matchState]);
 
-  // Handle autosize for Tauri
+  // Handle autosize for Tauri. Re-measure whenever the rendered content
+  // changes (deck, match, odds, action log, draft), not just when the setting
+  // toggles — otherwise the window never grows to fit the loaded deck.
   useEffect(() => {
     if (settings?.autosize && heightDivAdjustRef.current) {
       // 24px topbar
@@ -242,7 +244,15 @@ export default function Overlay() {
         (allSettings.overlaysTransparency ? 12 : 0);
       setWindowHeight(height);
     }
-  }, [settings?.autosize, allSettings.overlaysTransparency]);
+  }, [
+    settings,
+    allSettings.overlaysTransparency,
+    deck,
+    matchState,
+    odds,
+    actionLog,
+    draftState,
+  ]);
 
   let subTitle = deck?.getName() || "Deck";
   if (settings?.mode == OVERLAY_LOG) {
