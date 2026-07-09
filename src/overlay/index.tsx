@@ -110,6 +110,11 @@ export default function Overlay() {
   const [actionLog, setActionLog] = useState<ActionLogV2 | null>(null);
   const [odds, setOdds] = useState<Chances>();
   const heightDivAdjustRef = useRef<HTMLDivElement>(null);
+  // Last height we actually pushed to the window. Autosize must be idempotent:
+  // resizing the window fires onResized → saves bounds → settings change →
+  // OVERLAY_UPDATE_SETTINGS → re-render → autosize again. Only resize when the
+  // height truly changed, so the loop settles instead of flickering forever.
+  const lastHeightRef = useRef(0);
 
   const allSettings = JSON.parse(getLocalSetting("settings")) as Settings;
 
@@ -242,7 +247,12 @@ export default function Overlay() {
         Math.ceil(heightDivAdjustRef.current.offsetHeight) +
         24 +
         (allSettings.overlaysTransparency ? 12 : 0);
-      setWindowHeight(height);
+      // Idempotent: skip if the height hasn't meaningfully changed, otherwise
+      // the resize → bounds-save → settings → autosize loop never settles.
+      if (Math.abs(height - lastHeightRef.current) > 2) {
+        lastHeightRef.current = height;
+        setWindowHeight(height);
+      }
     }
   }, [
     settings,

@@ -17,6 +17,14 @@ import isTauri from "../utils/tauri/isTauri";
 export class OverlayHandler {
   private _openState = [false, false, false, false, false];
 
+  // _updateOverlays is async (it probes each window). settingsUpdated fires on
+  // every settings change, so without serialization concurrent runs race and
+  // thrash create/close (the flicker). Run one at a time; coalesce extra calls
+  // into a single trailing re-run.
+  private _updating = false;
+
+  private _rerun = false;
+
   private _checkOverlaysState = async (): Promise<boolean[]> => {
     const currentStates = [false, false, false, false, false];
 
@@ -41,16 +49,29 @@ export class OverlayHandler {
   };
 
   private _updateOverlays = async () => {
-    // currentStates is not the state we want, but the state we have
-    const currentStates = await this._checkOverlaysState();
-    currentStates.forEach((state, index) => {
-      if (state === true && this._openState[index] === false) {
-        closeOverlay(index);
+    if (this._updating) {
+      this._rerun = true;
+      return;
+    }
+    this._updating = true;
+    try {
+      // currentStates is not the state we want, but the state we have
+      const currentStates = await this._checkOverlaysState();
+      currentStates.forEach((state, index) => {
+        if (state === true && this._openState[index] === false) {
+          closeOverlay(index);
+        }
+        if (state === false && this._openState[index] === true) {
+          createOverlay(index);
+        }
+      });
+    } finally {
+      this._updating = false;
+      if (this._rerun) {
+        this._rerun = false;
+        this._updateOverlays();
       }
-      if (state === false && this._openState[index] === true) {
-        createOverlay(index);
-      }
-    });
+    }
   };
 
   public settingsUpdated = () => {

@@ -26,6 +26,10 @@ export default function mainChannelListeners() {
   const channel = bcConnect() as any;
 
   let last = Date.now();
+  // The catch-up % must never go backwards. The log file grows while we read it
+  // (MTGA keeps writing), so position/size isn't monotonic; clamp to the max so
+  // far and reset when a new read starts (LOG_MODE -> init/reread).
+  let maxCompletion = 0;
 
   channel.onmessage = (msg: MessageEvent<ChannelMessage>) => {
     // Surface every non-spammy channel message in the debug panel so we can
@@ -50,13 +54,15 @@ export default function mainChannelListeners() {
     if (msg.data.type === "LOG_MESSAGE_RECV") {
       const entry = msg.data.value as LogEntry;
 
-      const completion = entry.position / entry.size;
-      // console.log(`Log read completion: ${Math.round(completion * 100)}%`);
+      const completion = entry.size
+        ? Math.min(1, entry.position / entry.size)
+        : 0;
+      if (completion > maxCompletion) maxCompletion = completion;
       if (Date.now() - last > 333) {
         last = Date.now();
         reduxAction(store.dispatch, {
           type: "SET_LOG_COMPLETION",
-          arg: completion,
+          arg: maxCompletion,
         });
       }
     }
@@ -115,6 +121,8 @@ export default function mainChannelListeners() {
     // the UI can show it and main-side gating (cloud push, scene-driven memory
     // reads) follows the mode.
     if (msg.data.type === "LOG_MODE") {
+      // A new catch-up / re-read read restarts progress from 0.
+      if (msg.data.value !== "tail") maxCompletion = 0;
       reduxAction(store.dispatch, {
         type: "SET_LOG_MODE",
         arg: msg.data.value,
