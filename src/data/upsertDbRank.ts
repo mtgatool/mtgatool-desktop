@@ -5,6 +5,7 @@ import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import { DbRankData, defaultRankData } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
+import { pushRanks } from "./cloudSync";
 import { getData, putData } from "./store";
 
 export default async function upsertDbRank(arg: Partial<CombinedRankInfo>) {
@@ -28,6 +29,7 @@ export default async function upsertDbRank(arg: Partial<CombinedRankInfo>) {
       });
 
       putData<DbRankData>(`${uuid}-rank`, newData, true);
+      pushRanks(uuid, newData);
     } else {
       putData<DbRankData>(
         `${uuid}-rank`,

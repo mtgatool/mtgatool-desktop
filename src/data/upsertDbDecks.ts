@@ -1,5 +1,6 @@
 import getLocalSetting from "../utils/getLocalSetting";
 import { ReaderDeck } from "../utils/mtgaReader";
+import { pushDecks } from "./cloudSync";
 import { putData } from "./store";
 
 export interface DbDecksData {
@@ -20,4 +21,5 @@ export default async function upsertDbDecks(decks: ReaderDeck[]) {
     { decks, updated: new Date().getTime() },
     true
   );
+  pushDecks(uuid, decks);
 }

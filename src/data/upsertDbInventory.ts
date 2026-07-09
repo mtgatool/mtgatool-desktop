@@ -6,6 +6,7 @@ import {
   defaultInventoryData,
 } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
+import { pushInventory } from "./cloudSync";
 import { getData, putData } from "./store";
 
 export default async function upsertDbInventory(
@@ -30,6 +31,7 @@ export default async function upsertDbInventory(
       });
 
       putData<DbInventoryData>(`${uuid}-inventory`, newData, true);
+      pushInventory(uuid, newData);
     } else {
       putData<DbInventoryData>(
         `${uuid}-inventory`,

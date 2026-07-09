@@ -6,6 +6,7 @@ import { DbMatch } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
 import globalData from "../utils/globalData";
 import Deck from "../utils/mtga/deck";
+import { pushMatch } from "./cloudSync";
 import { getUserNamespacedKey, putData } from "./store";
 
 export default async function setDbMatch(match: InternalMatch) {
@@ -33,6 +34,8 @@ export default async function setDbMatch(match: InternalMatch) {
   if (!globalData.matchesIndex.includes(storedKey)) {
     putData<DbMatch>(`matches-${match.id}`, newDbMatch, true);
     globalData.matchesIndex.push(storedKey);
+    // Mirror to Supabase (no-op offline); arena_id = the persona/playerId.
+    pushMatch(newDbMatch.playerId, newDbMatch);
   }
 
   reduxAction(store.dispatch, {

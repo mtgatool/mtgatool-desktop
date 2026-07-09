@@ -3,6 +3,7 @@ import store from "../redux/stores/rendererStore";
 import { Cards } from "../types";
 import { DbCardsData, defaultCardsData } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
+import { pushCollection } from "./cloudSync";
 import { getData, putData } from "./store";
 
 export default async function upsertDbCards(cards: Cards) {
@@ -29,6 +30,7 @@ export default async function upsertDbCards(cards: Cards) {
       });
 
       putData<DbCardsData>(`${uuid}-cards`, newData, true);
+      pushCollection(uuid, cards, newData.prevCards as Cards);
     } else {
       putData<DbCardsData>(
         `${uuid}-cards`,
@@ -39,6 +41,7 @@ export default async function upsertDbCards(cards: Cards) {
         },
         true
       );
+      pushCollection(uuid, cards);
     }
   });
 }

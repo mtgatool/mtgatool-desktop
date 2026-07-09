@@ -1,5 +1,6 @@
 ﻿import _ from "lodash";
 
+import { ensureArenaAccount } from "../data/cloudSync";
 import upsertDbDisplayName from "../data/upsertDbDisplayName";
 import upsertDbUserdata from "../data/upsertDbUserdata";
 import reduxAction from "../redux/reduxAction";
@@ -26,5 +27,10 @@ export default async function switchPlayerUUID(
     if (displayName) {
       upsertDbDisplayName(displayName, uuid);
     }
+
+    // Link (or refresh) this MTGA account on the cloud. arena_accounts is the
+    // FK parent of all synced data, so this must land before any push; it is a
+    // no-op when signed in locally/offline.
+    ensureArenaAccount(uuid, displayName);
   }
 }
