@@ -37,6 +37,8 @@ function createTauriChannel(): ChannelLike {
   const doEmit = (msg: unknown): void => {
     // Tag with our window label so we can drop our own echo (a global Tauri
     // emit is delivered to the sender too, unlike BroadcastChannel).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    console.log("[bc] emit", (msg as any)?.type, "from", label);
     if (emitFn) emitFn(TAURI_BC_EVENT, { __from: label, msg });
   };
 
@@ -52,10 +54,12 @@ function createTauriChannel(): ChannelLike {
       label = win.getCurrentWindow().label;
       emitFn = evt.emit;
 
+      console.log("[bc] Tauri channel bridge ready on window", label);
       await evt.listen(TAURI_BC_EVENT, (event: { payload: unknown }) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const p = (event.payload || {}) as any;
         if (p.__from === label) return; // ignore our own echo
+        console.log("[bc] recv", p.msg?.type, "on", label, "from", p.__from);
         if (channel.onmessage) channel.onmessage({ data: p.msg });
       });
 
