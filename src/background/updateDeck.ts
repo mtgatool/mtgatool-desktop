@@ -4,6 +4,23 @@ import getOpponentDeck from "./getOpponentDeck";
 import globalStore from "./store";
 import { OverlayUpdateMatchState } from "./store/types";
 
+// updateDeck() fires on every GREToClient game-state message, which during
+// active play is many per second. Each post is broadcast cross-window to the
+// overlays, so posting them all floods WebView2's IPC queue (0x80070718).
+// Throttle to ~5/s with a trailing post so the overlay stays responsive and
+// always ends on the final state.
+const OVERLAY_MIN_INTERVAL = 200;
+let lastOverlayPost = 0;
+let trailingTimer: ReturnType<typeof setTimeout> | null = null;
+let latestCopy: OverlayUpdateMatchState | null = null;
+
+function flushOverlay(): void {
+  if (!latestCopy) return;
+  lastOverlayPost = Date.now();
+  postChannelMessage({ type: "OVERLAY_UPDATE", value: latestCopy });
+  latestCopy = null;
+}
+
 function updateDeck(): void {
   forceDeckUpdate();
   const { currentMatch } = globalStore;
@@ -22,10 +39,21 @@ function updateDeck(): void {
   delete currentMatchCopy.processedAnnotations;
   delete currentMatchCopy.zones;
 
-  postChannelMessage({
-    type: "OVERLAY_UPDATE",
-    value: currentMatchCopy,
-  });
+  latestCopy = currentMatchCopy;
+
+  const since = Date.now() - lastOverlayPost;
+  if (since >= OVERLAY_MIN_INTERVAL) {
+    if (trailingTimer) {
+      clearTimeout(trailingTimer);
+      trailingTimer = null;
+    }
+    flushOverlay();
+  } else if (!trailingTimer) {
+    trailingTimer = setTimeout(() => {
+      trailingTimer = null;
+      flushOverlay();
+    }, OVERLAY_MIN_INTERVAL - since);
+  }
 }
 
 export default updateDeck;

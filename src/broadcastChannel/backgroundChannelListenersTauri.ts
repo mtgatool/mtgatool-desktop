@@ -18,6 +18,11 @@ export default function backgroundChannelListenersTauri() {
 
   let decoder = ArenaLogDecoder();
   let isWatching = false;
+  // Throttles the cross-window progress notification. Posting one per log entry
+  // and broadcasting it to every window flooded WebView2's IPC queue on the
+  // initial read (0x80070718 "not enough quota"). The main window only uses
+  // this for a progress %, which it already throttles to 333ms on receipt.
+  let lastProgressPost = 0;
 
   // Handle log chunks from Rust watcher
   const handleLogChunk = (payload: LogChunkPayload) => {
@@ -35,11 +40,15 @@ export default function backgroundChannelListenersTauri() {
         console.error("logEntrySwitch error:", e);
       }
 
-      // Progress notification only (json stripped to keep the message light).
-      postChannelMessage({
-        type: "LOG_MESSAGE_RECV",
-        value: { ...entry, position, size, json: {} },
-      });
+      // Progress notification only (json stripped), throttled to ~3/s.
+      const now = Date.now();
+      if (now - lastProgressPost > 333) {
+        lastProgressPost = now;
+        postChannelMessage({
+          type: "LOG_MESSAGE_RECV",
+          value: { ...entry, position, size, json: {} },
+        });
+      }
     });
     pushDebug(
       `[bg] log chunk ${text.length}b @${position}/${size} → ${entryCount} entries`

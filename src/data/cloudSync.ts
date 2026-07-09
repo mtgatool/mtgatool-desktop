@@ -23,6 +23,29 @@ type Tables = Database["public"]["Tables"];
 
 const asJson = (v: unknown): Json => v as unknown as Json;
 
+// State tables (collection/inventory/ranks/decks) are re-read on every scene
+// change, but rarely actually change. Skip a push when the payload is identical
+// to the last one we sent this session, so the full collection (~25k cards)
+// isn't re-uploaded on every read. Keyed by `table:arenaId`.
+const lastFingerprint = new Map<string, string>();
+function unchangedSinceLastPush(key: string, fingerprint: string): boolean {
+  if (lastFingerprint.get(key) === fingerprint) return true;
+  lastFingerprint.set(key, fingerprint);
+  return false;
+}
+
+// Cheap fingerprint for a card collection: distinct-card count + total count.
+// Avoids stringifying the whole ~25k-entry map just to detect a no-op.
+function collectionFingerprint(cards: Cards): string {
+  const map = cards as unknown as Record<string, number>;
+  const keys = Object.keys(map);
+  let total = 0;
+  keys.forEach((k) => {
+    total += map[k] || 0;
+  });
+  return `${keys.length}:${total}`;
+}
+
 /** The logged-in cloud user's id, or null in local/offline mode. */
 async function getActiveUserId(): Promise<string | null> {
   try {
@@ -133,6 +156,13 @@ export async function pushCollection(
   try {
     const userId = await getActiveUserId();
     if (!userId || !arenaId) return;
+    if (
+      unchangedSinceLastPush(
+        `collection:${arenaId}`,
+        collectionFingerprint(cards)
+      )
+    )
+      return;
     if (!(await upsertArenaAccount(userId, arenaId))) return;
 
     const row: Tables["arena_collection"]["Insert"] = {
@@ -158,6 +188,8 @@ export async function pushDecks(
   try {
     const userId = await getActiveUserId();
     if (!userId || !arenaId || !decks?.length) return;
+    if (unchangedSinceLastPush(`decks:${arenaId}`, JSON.stringify(decks)))
+      return;
     if (!(await upsertArenaAccount(userId, arenaId))) return;
 
     const now = new Date().toISOString();
@@ -188,6 +220,8 @@ export async function pushInventory(
   try {
     const userId = await getActiveUserId();
     if (!userId || !arenaId || !inv) return;
+    if (unchangedSinceLastPush(`inventory:${arenaId}`, JSON.stringify(inv)))
+      return;
     if (!(await upsertArenaAccount(userId, arenaId))) return;
 
     const row: Tables["arena_inventory"]["Insert"] = {
@@ -220,6 +254,8 @@ export async function pushRanks(
   try {
     const userId = await getActiveUserId();
     if (!userId || !arenaId || !rank) return;
+    if (unchangedSinceLastPush(`ranks:${arenaId}`, JSON.stringify(rank)))
+      return;
     if (!(await upsertArenaAccount(userId, arenaId))) return;
 
     // CombinedRankInfo is flat (constructed*/limited*); split into the two
