@@ -60,8 +60,6 @@ function changePriority(previous: number, current: number, time: number): void {
   priorityTimers.timers[previous] += time - priorityTimers.last;
   priorityTimers.last = globalStore.currentMatch.logTime.getTime();
 
-  console.log("changePriority", previous, priorityTimers, time);
-
   setCurrentMatchMany({
     priorityTimers: priorityTimers,
     currentPriority: current,
@@ -1150,10 +1148,17 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
     });
   }
 
-  if (turnInfo.priorityPlayer !== currentPriority) {
+  // Chess-clock semantics: only switch the running clock when a real player
+  // (seat 1 or 2) takes priority. Priority constantly passes through 0 while
+  // the game processes actions between passes; attributing those windows would
+  // dump the elapsed time into the unused timers[0] bucket, so each player's
+  // clock only counted the instants they literally held priority. Ignoring the
+  // ->0 transitions keeps the clock running for the current holder until the
+  // opponent actually receives priority — i.e. total time on each player's side.
+  if (turnInfo.priorityPlayer && turnInfo.priorityPlayer !== currentPriority) {
     changePriority(
       currentPriority,
-      turnInfo.priorityPlayer || 0,
+      turnInfo.priorityPlayer,
       currentMatch.logTime.getTime()
     );
   }
