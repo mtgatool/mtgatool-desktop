@@ -13,12 +13,16 @@ export default async function getWindowLabel(): Promise<string> {
 
 export function getWindowLabelSync(): string {
   if (isTauri()) {
-    // Tauri injects per-window metadata before scripts run; this is what
-    // appWindow.label reads from. The old window.__TAURI__.window.appWindow
-    // path was undefined in this build and wrongly returned "main".
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const meta = (window as any).__TAURI_METADATA__;
-    return meta?.__currentWindow?.label || WINDOW_MAIN;
+    try {
+      // Tauri v2 exposes the current window label synchronously via
+      // getCurrentWindow(). The old __TAURI_METADATA__ global is v1-only
+      // (undefined in v2) and wrongly returned "main" for every window.
+      // eslint-disable-next-line global-require, @typescript-eslint/no-var-requires
+      const { getCurrentWindow } = require("@tauri-apps/api/window");
+      return getCurrentWindow().label || WINDOW_MAIN;
+    } catch {
+      return WINDOW_MAIN;
+    }
   }
   return WINDOW_MAIN;
 }

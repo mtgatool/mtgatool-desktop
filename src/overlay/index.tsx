@@ -32,9 +32,18 @@ import DraftOverlay from "./DraftOverlay";
 // Reliable per-window label from Tauri's injected metadata (the old
 // window.__TAURI__.window.appWindow path returned "main" for every window).
 function currentLabel(): string {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const meta = (window as any).__TAURI_METADATA__;
-  return meta?.__currentWindow?.label || "";
+  if (typeof window === "undefined") return "";
+  try {
+    // Tauri v2: the current window label is read synchronously via
+    // getCurrentWindow(). The old __TAURI_METADATA__ global is v1-only and is
+    // undefined in v2, which made every overlay resolve to "" -> wrong id ->
+    // no settings -> opacity 0 -> a blank overlay.
+    // eslint-disable-next-line global-require, @typescript-eslint/no-var-requires
+    const { getCurrentWindow } = require("@tauri-apps/api/window");
+    return getCurrentWindow().label || "";
+  } catch {
+    return "";
+  }
 }
 
 // Get current overlay ID from Tauri window label

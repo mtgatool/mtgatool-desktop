@@ -24,9 +24,16 @@ import isTauri from "../utils/tauri/isTauri";
 // window in this build).
 function getWindowLabel(): string {
   if (isTauri()) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const meta = (window as any).__TAURI_METADATA__;
-    return meta?.__currentWindow?.label || "main";
+    try {
+      // Tauri v2 reads the label synchronously via getCurrentWindow(); the old
+      // __TAURI_METADATA__ global is v1-only (undefined in v2), which made
+      // every window report "main" — so overlays lost their colored icon.
+      // eslint-disable-next-line global-require, @typescript-eslint/no-var-requires
+      const { getCurrentWindow } = require("@tauri-apps/api/window");
+      return getCurrentWindow().label || "main";
+    } catch {
+      return "main";
+    }
   }
   return "main";
 }
