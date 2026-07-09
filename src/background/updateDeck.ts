@@ -1,6 +1,7 @@
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import forceDeckUpdate from "./forceDeckUpdate";
 import getOpponentDeck from "./getOpponentDeck";
+import { isLogLive } from "./logReadState";
 import globalStore from "./store";
 import { OverlayUpdateMatchState } from "./store/types";
 
@@ -22,6 +23,12 @@ function flushOverlay(): void {
 }
 
 function updateDeck(): void {
+  // During the historical catch-up read there is no live match on screen, so
+  // building and broadcasting overlay updates for every replayed game-state
+  // message is wasted work that floods the IPC. Overlay updates resume the
+  // moment the log switches to live tailing.
+  if (!isLogLive()) return;
+
   forceDeckUpdate();
   const { currentMatch } = globalStore;
 

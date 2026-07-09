@@ -1,5 +1,6 @@
 import ArenaLogDecoder from "../background/arena-log-decoder/arena-log-decoder";
 import logEntrySwitch from "../background/logEntrySwitch";
+import { setLogLive } from "../background/logReadState";
 import bcConnect from "../utils/bcConnect";
 import { pushDebug } from "../utils/debugLog";
 import getLocalSetting from "../utils/getLocalSetting";
@@ -63,8 +64,10 @@ export default function backgroundChannelListenersTauri() {
   const startWatching = async (): Promise<void> => {
     if (isWatching) return;
 
-    // Reset decoder
+    // Reset decoder + mark catch-up mode (live-only work is suppressed until
+    // the historical read finishes).
     decoder = ArenaLogDecoder();
+    setLogLive(false);
 
     // Get log path
     let logPath = getLocalSetting("logPath");
@@ -81,8 +84,10 @@ export default function backgroundChannelListenersTauri() {
     pushDebug(`[bg] starting watcher on ${logPath}`);
     try {
       await startLogWatcher(logPath, handleLogChunk, () => {
-        // Initial (historical) read caught up — tells the app it can
-        // complete login and start live scene-driven memory reads.
+        // Initial (historical) read caught up — switch to live mode (overlay
+        // updates resume) and tell the app it can complete login and start
+        // live scene-driven memory reads.
+        setLogLive(true);
         pushDebug("[bg] log_finished → posting LOG_READ_FINISHED");
         postChannelMessage({ type: "LOG_READ_FINISHED" });
       });

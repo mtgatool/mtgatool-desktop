@@ -8,7 +8,7 @@ use std::sync::mpsc;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use tauri::{AppHandle, Emitter, Manager};
+use tauri::{AppHandle, Emitter};
 
 use crate::state::AppState;
 
@@ -23,6 +23,12 @@ pub struct LogChunkPayload {
 /// Returns (new_text, new_position, size). `new_text` is empty when there is
 /// nothing new. If the file shrank (game restarted / log rotated) it re-reads
 /// from the beginning. Uses lossy UTF-8 so a stray byte can't stall the read.
+/// Max bytes returned per call. The initial read of a multi-MB log must not be
+/// delivered as one giant chunk — that freezes the frontend (which parses every
+/// entry synchronously) with no chance to render progress. Bounded chunks give
+/// the UI yield points and let the progress bar advance.
+const MAX_CHUNK_BYTES: u64 = 256 * 1024;
+
 fn read_from(path: &str, position: u64) -> std::io::Result<(String, u64, u64)> {
     let size = std::fs::metadata(path)?.len();
 
@@ -37,12 +43,27 @@ fn read_from(path: &str, position: u64) -> std::io::Result<(String, u64, u64)> {
 
     let mut file = File::open(path)?;
     file.seek(SeekFrom::Start(pos))?;
-    let mut buffer = vec![0u8; (size - pos) as usize];
+    let to_read = std::cmp::min(size - pos, MAX_CHUNK_BYTES) as usize;
+    let mut buffer = vec![0u8; to_read];
     let bytes_read = file.read(&mut buffer)?;
     buffer.truncate(bytes_read);
-    let text = String::from_utf8_lossy(&buffer).to_string();
+    let at_eof = pos + bytes_read as u64 >= size;
 
-    Ok((text, pos + bytes_read as u64, size))
+    // Emit only up to the last newline so chunks are line-aligned: never a
+    // partial line, and never a UTF-8 char split mid-chunk. At EOF (or if a
+    // single line is longer than the chunk) emit the remainder as-is to avoid
+    // stalling; the decoder buffers any partial line across calls anyway.
+    let end = match buffer.iter().rposition(|&b| b == b'\n') {
+        Some(i) => i + 1,
+        None if at_eof || bytes_read == to_read => bytes_read,
+        None => 0,
+    };
+    if end == 0 {
+        return Ok((String::new(), pos, size));
+    }
+
+    let text = String::from_utf8_lossy(&buffer[..end]).to_string();
+    Ok((text, pos + end as u64, size))
 }
 
 pub struct ArenaLogWatcher {
@@ -104,7 +125,9 @@ impl ArenaLogWatcher {
                 }
             }
 
-            // Polling loop
+            // Polling loop: wait for a change, then drain all available data in
+            // bounded, line-aligned chunks so the frontend can process and
+            // render progress between chunks instead of freezing on one big read.
             loop {
                 if stop_flag_clone.load(Ordering::Relaxed) {
                     break;
@@ -113,47 +136,62 @@ impl ArenaLogWatcher {
                 // Wake on a file change, or every 500ms as a fallback.
                 let _ = rx.recv_timeout(Duration::from_millis(500));
 
-                let old_position = position;
-                match read_from(&path_clone, position) {
-                    Ok((text, new_position, size)) => {
-                        // Detect a restart (read_from reset to 0 internally).
-                        if new_position < old_position {
-                            initial_read_done = false;
+                // Drain loop: keep reading bounded chunks until caught up.
+                loop {
+                    if stop_flag_clone.load(Ordering::Relaxed) {
+                        break;
+                    }
+
+                    let old_position = position;
+                    let (text, new_position, size) = match read_from(&path_clone, position) {
+                        Ok(r) => r,
+                        Err(e) => {
+                            eprintln!("[log-watcher] read error: {}", e);
+                            break;
                         }
+                    };
 
-                        if !text.is_empty() {
-                            eprintln!(
-                                "[log-watcher] chunk {} bytes (pos {} -> {} / {})",
-                                text.len(),
-                                old_position,
-                                new_position,
-                                size
-                            );
-                            let payload = LogChunkPayload {
-                                text,
-                                position: old_position,
-                                size,
-                            };
-                            // Global emit: Rust `emit_to(label, ...)` is unreliable
-                            // reaching a webview's frontend `listen` in Tauri v2, so
-                            // broadcast instead. Only the background window listens
-                            // for "log_chunk", so the other windows just ignore it.
-                            if let Err(e) = app_clone.emit("log_chunk", payload) {
-                                eprintln!("[log-watcher] emit log_chunk failed: {}", e);
-                            }
-                        }
+                    // Detect a restart (read_from reset to 0 internally).
+                    if new_position < old_position {
+                        initial_read_done = false;
+                    }
 
-                        position = new_position;
-
-                        if !initial_read_done && position >= size {
-                            initial_read_done = true;
-                            eprintln!("[log-watcher] initial read finished at {} bytes", size);
-                            let _ = app_clone.emit("log_finished", ());
+                    if !text.is_empty() {
+                        eprintln!(
+                            "[log-watcher] chunk {} bytes (pos {} -> {} / {})",
+                            text.len(),
+                            old_position,
+                            new_position,
+                            size
+                        );
+                        let payload = LogChunkPayload {
+                            text,
+                            position: old_position,
+                            size,
+                        };
+                        // Only the background window listens for "log_chunk";
+                        // the others ignore it. (Rust emit_to is unreliable in v2.)
+                        if let Err(e) = app_clone.emit("log_chunk", payload) {
+                            eprintln!("[log-watcher] emit log_chunk failed: {}", e);
                         }
                     }
-                    Err(e) => {
-                        eprintln!("[log-watcher] read error: {}", e);
+
+                    position = new_position;
+
+                    if !initial_read_done && position >= size {
+                        initial_read_done = true;
+                        eprintln!("[log-watcher] initial read finished at {} bytes", size);
+                        let _ = app_clone.emit("log_finished", ());
                     }
+
+                    // Nothing new this pass, or fully caught up: stop draining.
+                    if new_position == old_position || position >= size {
+                        break;
+                    }
+
+                    // Small pace so the frontend keeps up (processes + renders
+                    // progress) rather than receiving the whole file at once.
+                    thread::sleep(Duration::from_millis(5));
                 }
             }
 
