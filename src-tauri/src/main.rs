@@ -104,9 +104,17 @@ fn main() {
                 .inner_size(400.0, 600.0)
                 .build()?;
 
-            // Devtools are available on demand via right-click -> Inspect in dev
-            // builds; we no longer auto-open them (they spawned extra decorated
-            // windows that were easy to mistake for overlays).
+            // Overlay/main devtools are available on demand via right-click ->
+            // Inspect. The background window is hidden, so in dev we auto-open
+            // its devtools to expose its console ([bc]/[bg] logs) for debugging
+            // the cross-window match-data bridge.
+            #[cfg(debug_assertions)]
+            {
+                use tauri::Manager;
+                if let Some(bg) = app.get_webview_window("background") {
+                    bg.open_devtools();
+                }
+            }
 
             Ok(())
         })
