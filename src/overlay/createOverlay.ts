@@ -35,6 +35,7 @@ export default async function createOverlay(
       url: "/", // Tauri serves from the build folder
       transparent: allSettings.overlaysTransparency !== false,
       decorations: allSettings.overlayFrame === true,
+      shadow: false, // no drop-shadow border around the frameless overlay
       alwaysOnTop: true,
       skipTaskbar: true,
       width: settings.bounds.width,

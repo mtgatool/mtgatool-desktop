@@ -98,6 +98,7 @@ fn main() {
                 .visible(false)
                 .decorations(false)
                 .transparent(true)
+                .shadow(false)
                 .always_on_top(true)
                 .skip_taskbar(true)
                 .inner_size(400.0, 600.0)
