@@ -142,7 +142,9 @@ export default function mainChannelListeners() {
         arg: false,
       });
       if (msg.data.value.eventId !== "AIBotMatch") {
-        setDbMatch(msg.data.value);
+        // Live (tail) matches cloud-push immediately; catch-up matches save
+        // locally and are pushed later by the login reconcile (syncMatches).
+        setDbMatch(msg.data.value, logReadFinished);
       }
     }
 

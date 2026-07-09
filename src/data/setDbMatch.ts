@@ -9,7 +9,13 @@ import Deck from "../utils/mtga/deck";
 import { pushMatch } from "./cloudSync";
 import { getUserNamespacedKey, putData } from "./store";
 
-export default async function setDbMatch(match: InternalMatch) {
+export default async function setDbMatch(
+  match: InternalMatch,
+  // During the initial catch-up read we save matches locally (idempotent) but
+  // do NOT cloud-push each replayed match — the login reconcile (syncMatches)
+  // pushes the whole backlog once. Live play passes true.
+  pushToCloud = true
+) {
   console.log("> Set match", match);
 
   const newDbMatch: DbMatch = {
@@ -35,7 +41,9 @@ export default async function setDbMatch(match: InternalMatch) {
     putData<DbMatch>(`matches-${match.id}`, newDbMatch, true);
     globalData.matchesIndex.push(storedKey);
     // Mirror to Supabase (no-op offline); arena_id = the persona/playerId.
-    pushMatch(newDbMatch.playerId, newDbMatch);
+    if (pushToCloud) {
+      pushMatch(newDbMatch.playerId, newDbMatch);
+    }
   }
 
   reduxAction(store.dispatch, {
