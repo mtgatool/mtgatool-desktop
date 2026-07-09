@@ -1,3 +1,4 @@
+import { LogMode } from "../background/logReadState";
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { OverlayUpdateMatchState } from "../background/store/types";
 import { OverlaySettings } from "../common/defaultConfig";
@@ -40,7 +41,10 @@ export type MessageType =
   | "DRAFT_VOTES"
   | "DRAFT_END"
   | "UPDATE_ACTIVE_EVENTS"
-  | "DAEMON_GET_PLAYER_ID";
+  | "DAEMON_GET_PLAYER_ID"
+  | "REREAD_LOG"
+  | "LOG_MODE"
+  | "REREAD_FINISHED";
 
 export interface ChannelMessageBase {
   type: MessageType;
@@ -188,6 +192,22 @@ export interface DaemonGetPlayerId extends ChannelMessageBase {
   type: "DAEMON_GET_PLAYER_ID";
 }
 
+/** UI → background: force a full re-parse of the current log for matches. */
+export interface RereadLogMessage extends ChannelMessageBase {
+  type: "REREAD_LOG";
+}
+
+/** background → main: the log-reader mode changed (init | tail | reread). */
+export interface LogModeMessage extends ChannelMessageBase {
+  type: "LOG_MODE";
+  value: LogMode;
+}
+
+/** background → main: a forced re-read finished; reconcile matches to cloud. */
+export interface RereadFinishedMessage extends ChannelMessageBase {
+  type: "REREAD_FINISHED";
+}
+
 export type ChannelMessage =
   | PopupMessage
   | LogCheckMessage
@@ -217,4 +237,7 @@ export type ChannelMessage =
   | DraftVotesMessage
   | DraftEndMessage
   | UpdateActiveEventsMessage
-  | DaemonGetPlayerId;
+  | DaemonGetPlayerId
+  | RereadLogMessage
+  | LogModeMessage
+  | RereadFinishedMessage;

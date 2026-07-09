@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+import { LogMode } from "../../background/logReadState";
 import {
   LOGIN_AUTH,
   LOGIN_FAILED,
@@ -50,6 +51,7 @@ export const initialRendererState = {
   currentDraft: null as InternalDraftv2 | null,
   currentScene: "",
   readingLog: false,
+  logMode: "init" as LogMode,
   matchesTotal: 0,
   matchesSaved: 0,
 };
@@ -75,6 +77,12 @@ const rendererSlice = createSlice({
       action: PayloadAction<boolean>
     ): void => {
       state.readingLog = action.payload;
+    },
+    setLogMode: (
+      state: RendererState,
+      action: PayloadAction<LogMode>
+    ): void => {
+      state.logMode = action.payload;
     },
     showPostSignup: (
       state: RendererState,
@@ -219,6 +227,7 @@ export const {
   setPubKey,
   setMyUsername,
   setReadingLog,
+  setLogMode,
   showPostSignup,
   setLoginState,
   setLogCompletion,

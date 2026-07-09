@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
-import reduxAction from "../../../redux/reduxAction";
+import { AppState } from "../../../redux/stores/rendererStore";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import globalData from "../../../utils/globalData";
 import setLocalSetting from "../../../utils/setLocalSetting";
@@ -23,7 +23,7 @@ async function checkLogExists(path: string): Promise<boolean> {
 }
 
 export default function LogsSettingsPanel(): JSX.Element {
-  const dispatch = useDispatch();
+  const logMode = useSelector((state: AppState) => state.renderer.logMode);
   const lastLogUpdate = globalData.lastLogCheck;
   const [path, setPath] = useState(getLocalSetting("logPath"));
   const [_rerender, setRerender] = useState(0);
@@ -89,16 +89,13 @@ export default function LogsSettingsPanel(): JSX.Element {
         style={{
           margin: "16px auto",
         }}
+        disabled={logMode === "reread"}
         onClick={() => {
-          postChannelMessage({
-            type: isReading ? "STOP_LOG_READING" : "START_LOG_READING",
-          });
-          reduxAction(dispatch, {
-            type: "SET_READING_LOG",
-            arg: true,
-          });
+          // Force a full re-parse of the current log for matches (recovers
+          // games played while the tracker was off), then reconcile to cloud.
+          postChannelMessage({ type: "REREAD_LOG" });
         }}
-        text={isReading ? "Stop reading log" : "Re-read log"}
+        text={logMode === "reread" ? "Re-reading log…" : "Re-read log"}
       />
 
       <ReaderStatus />

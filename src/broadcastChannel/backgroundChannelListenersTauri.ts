@@ -1,6 +1,6 @@
 import ArenaLogDecoder from "../background/arena-log-decoder/arena-log-decoder";
 import logEntrySwitch from "../background/logEntrySwitch";
-import { setLogLive } from "../background/logReadState";
+import { getLogMode, LogMode, setLogMode } from "../background/logReadState";
 import bcConnect from "../utils/bcConnect";
 import { pushDebug } from "../utils/debugLog";
 import getLocalSetting from "../utils/getLocalSetting";
@@ -61,13 +61,20 @@ export default function backgroundChannelListenersTauri() {
     });
   };
 
+  // Set the reader mode (background source of truth) and mirror it to the main
+  // window so the UI + main-side gating (cloud push, scene-driven memory reads)
+  // follow along.
+  const applyMode = (mode: LogMode): void => {
+    setLogMode(mode);
+    postChannelMessage({ type: "LOG_MODE", value: mode });
+  };
+
   const startWatching = async (): Promise<void> => {
     if (isWatching) return;
 
-    // Reset decoder + mark catch-up mode (live-only work is suppressed until
-    // the historical read finishes).
+    // Reset decoder + progress throttle for a fresh read.
     decoder = ArenaLogDecoder();
-    setLogLive(false);
+    lastProgressPost = 0;
 
     // Get log path
     let logPath = getLocalSetting("logPath");
@@ -81,15 +88,21 @@ export default function backgroundChannelListenersTauri() {
       }
     }
 
-    pushDebug(`[bg] starting watcher on ${logPath}`);
+    pushDebug(`[bg] starting watcher on ${logPath} (${getLogMode()})`);
     try {
       await startLogWatcher(logPath, handleLogChunk, () => {
-        // Initial (historical) read caught up — switch to live mode (overlay
-        // updates resume) and tell the app it can complete login and start
-        // live scene-driven memory reads.
-        setLogLive(true);
-        pushDebug("[bg] log_finished → posting LOG_READ_FINISHED");
-        postChannelMessage({ type: "LOG_READ_FINISHED" });
+        // Catch-up read finished. A forced re-read reconciles matches to cloud;
+        // a normal init completes login + starts live memory reads. Either way
+        // we now switch to live tailing (overlay updates resume).
+        const wasReread = getLogMode() === "reread";
+        applyMode("tail");
+        if (wasReread) {
+          pushDebug("[bg] reread finished → posting REREAD_FINISHED");
+          postChannelMessage({ type: "REREAD_FINISHED" });
+        } else {
+          pushDebug("[bg] log_finished → posting LOG_READ_FINISHED");
+          postChannelMessage({ type: "LOG_READ_FINISHED" });
+        }
       });
       isWatching = true;
       pushDebug("[bg] watcher started ok");
@@ -98,11 +111,32 @@ export default function backgroundChannelListenersTauri() {
     }
   };
 
+  // Forced re-parse of the current log (UI "Re-read log"). Restart the read
+  // from 0 in re_read mode: matches are re-scanned into local history with live
+  // side effects suppressed, then REREAD_FINISHED triggers a cloud reconcile.
+  const rereadLog = async (): Promise<void> => {
+    pushDebug("[bg] REREAD_LOG → re-reading current log");
+    try {
+      if (isWatching) {
+        await stopLogWatcher();
+        isWatching = false;
+      }
+    } catch (e) {
+      console.error("Failed to stop watcher for re-read:", e);
+    }
+    applyMode("reread");
+    await startWatching();
+  };
+
   // Handle channel messages
   channel.onmessage = async (msg: MessageEvent<ChannelMessage>) => {
     if (msg.data.type === "START_LOG_READING") {
       pushDebug("[bg] START_LOG_READING received");
       await startWatching();
+    }
+
+    if (msg.data.type === "REREAD_LOG") {
+      await rereadLog();
     }
 
     if (msg.data.type === "STOP_LOG_READING" && isWatching) {
@@ -123,6 +157,7 @@ export default function backgroundChannelListenersTauri() {
   // window's own responsibility and needs no login, so start it directly.
   (async () => {
     pushDebug("[bg] init → starting log watcher autonomously");
+    applyMode("init");
     await startWatching();
   })();
 }

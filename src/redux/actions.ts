@@ -33,6 +33,7 @@ export const actions = {
   SET_PUBKEY: RendererSlice.setPubKey,
   SET_MY_USERNAME: RendererSlice.setMyUsername,
   SET_READING_LOG: RendererSlice.setReadingLog,
+  SET_LOG_MODE: RendererSlice.setLogMode,
   SHOW_POST_SIGNUP: RendererSlice.showPostSignup,
   SET_LOGIN_STATE: RendererSlice.setLoginState,
   SET_DETAILED_LOGS: RendererSlice.setDetailedLogs,

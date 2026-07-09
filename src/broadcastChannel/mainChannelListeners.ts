@@ -4,6 +4,7 @@ import { overlayTitleToId } from "../common/maps";
 import { LOGIN_OK } from "../constants";
 import setDbMatch from "../data/setDbMatch";
 import { putData } from "../data/store";
+import syncMatches from "../data/syncMatches";
 import upsertDbCards from "../data/upsertDbCards";
 import upsertDbInventory from "../data/upsertDbInventory";
 import upsertDbRank from "../data/upsertDbRank";
@@ -25,10 +26,6 @@ export default function mainChannelListeners() {
   const channel = bcConnect() as any;
 
   let last = Date.now();
-
-  // Distinguishes the initial (historical) log replay from live entries, so
-  // scene-driven memory reads only fire for real, current scene changes.
-  let logReadFinished = false;
 
   channel.onmessage = (msg: MessageEvent<ChannelMessage>) => {
     // Surface every non-spammy channel message in the debug panel so we can
@@ -66,7 +63,6 @@ export default function mainChannelListeners() {
 
     if (msg.data.type == "LOG_READ_FINISHED") {
       pushDebug("log read finished → syncAll (reading memory)");
-      logReadFinished = true;
       // Populate everything from memory once the log has caught up.
       syncAll().catch(() => {
         // errors are surfaced via debug log inside syncAll
@@ -115,6 +111,23 @@ export default function mainChannelListeners() {
       globalData.lastLogCheck = new Date().getTime();
     }
 
+    // Mirror the log-reader mode (init | tail | reread) from the background so
+    // the UI can show it and main-side gating (cloud push, scene-driven memory
+    // reads) follows the mode.
+    if (msg.data.type === "LOG_MODE") {
+      reduxAction(store.dispatch, {
+        type: "SET_LOG_MODE",
+        arg: msg.data.value,
+      });
+    }
+
+    // A forced re-read finished: reconcile local matches to the cloud (push
+    // whatever the re-parse recovered that the cloud was missing).
+    if (msg.data.type === "REREAD_FINISHED") {
+      pushDebug("reread finished → reconciling matches to cloud");
+      syncMatches().catch(() => undefined);
+    }
+
     if (msg.data.type === "GAME_START") {
       reduxAction(store.dispatch, {
         type: "SET_MATCH_IN_PROGRESS",
@@ -129,9 +142,10 @@ export default function mainChannelListeners() {
         arg: scene.toSceneName,
       });
       // Use the scene transition as a cue to read fresh data from memory
-      // (decks, collection, inventory, rank) — but only for live changes,
-      // not the historical log replay. See reader/sceneSync.
-      if (logReadFinished) {
+      // (decks, collection, inventory, rank) — but only while live tailing,
+      // never during the init catch-up or a forced re-read (which replay old
+      // scene changes we must not act on). See reader/sceneSync.
+      if (store.getState().renderer.logMode === "tail") {
         sceneSync(scene.fromSceneName, scene.toSceneName);
       }
     }
@@ -142,9 +156,12 @@ export default function mainChannelListeners() {
         arg: false,
       });
       if (msg.data.value.eventId !== "AIBotMatch") {
-        // Live (tail) matches cloud-push immediately; catch-up matches save
-        // locally and are pushed later by the login reconcile (syncMatches).
-        setDbMatch(msg.data.value, logReadFinished);
+        // Live (tail) matches cloud-push immediately; catch-up / re-read matches
+        // save locally and are pushed later by the reconcile (syncMatches).
+        setDbMatch(
+          msg.data.value,
+          store.getState().renderer.logMode === "tail"
+        );
       }
     }
 
