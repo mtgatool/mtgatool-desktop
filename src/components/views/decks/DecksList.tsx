@@ -11,7 +11,7 @@ import {
   setDeckSort,
 } from "../../../redux/slices/FilterSlice";
 import { AppState } from "../../../redux/stores/rendererStore";
-import setDbHiddenDecks from "../../../toolDb/setDbHiddenDecks";
+import setDbHiddenDecks from "../../../data/setDbHiddenDecks";
 import { StatsDeck } from "../../../types/dbTypes";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import globalData from "../../../utils/globalData";

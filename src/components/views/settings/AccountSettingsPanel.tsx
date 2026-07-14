@@ -14,7 +14,7 @@ import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
 import saveKeysCallback from "../../../toolDb/saveKeysCallback";
-import { getData, putData } from "../../../toolDb/worker-wrapper";
+import { getData, putData } from "../../../data/store";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 
-import { putData, queryKeys } from "../../../toolDb/worker-wrapper";
+import { putData, queryKeys } from "../../../data/store";
 import { DbMatch } from "../../../types/dbTypes";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import Flex from "../../Flex";

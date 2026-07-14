@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { DEFAULT_AVATAR } from "../constants";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
-import { getData } from "../toolDb/worker-wrapper";
+import { getData } from "../data/store";
 import globalData from "../utils/globalData";
 
 export default function useFetchAvatar() {

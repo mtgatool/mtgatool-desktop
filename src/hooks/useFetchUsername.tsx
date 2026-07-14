@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
-import { getData } from "../toolDb/worker-wrapper";
+import { getData } from "../data/store";
 import cleanUsername from "../utils/cleanUsername";
 
 export default function useFetchUsername() {

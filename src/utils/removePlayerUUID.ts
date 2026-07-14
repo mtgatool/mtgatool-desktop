@@ -2,7 +2,7 @@ import _ from "lodash";
 
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
-import { getData, putData } from "../toolDb/worker-wrapper";
+import { getData, putData } from "../data/store";
 import { DbUserids } from "../types/dbTypes";
 
 export default async function removePlayerUUID(uuid: string) {

@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import { DEFAULT_AVATAR } from "../../../constants";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
-import { doFunction } from "../../../toolDb/worker-wrapper";
+import { doFunction } from "../../../data/store";
 import { DbRankDataWithKey } from "../../../types/dbTypes";
 import cleanUsername from "../../../utils/cleanUsername";
 import timeAgo from "../../../utils/timeAgo";

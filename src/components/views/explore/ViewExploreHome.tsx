@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 
-import { queryKeys } from "../../../toolDb/worker-wrapper";
+import { queryKeys } from "../../../data/store";
 import getEventExplorerSection from "../../../utils/getEventExplorerSection";
 import Flex from "../../Flex";
 import Section from "../../ui/Section";

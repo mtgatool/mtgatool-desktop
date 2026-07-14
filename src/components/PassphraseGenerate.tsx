@@ -4,7 +4,7 @@ import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
 import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
 import newResetPassphrase from "../toolDb/newResetPassphrase";
-import { getData } from "../toolDb/worker-wrapper";
+import { getData } from "../data/store";
 import copyToClipboard from "../utils/copyToClipboard";
 import getLocalSetting from "../utils/getLocalSetting";
 import Button from "./ui/Button";

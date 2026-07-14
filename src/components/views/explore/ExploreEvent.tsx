@@ -7,7 +7,7 @@ import { useHistory } from "react-router-dom";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
 import { AppState } from "../../../redux/stores/rendererStore";
-import { getData } from "../../../toolDb/worker-wrapper";
+import { getData } from "../../../data/store";
 import getEventExplorerSection from "../../../utils/getEventExplorerSection";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import timeAgo from "../../../utils/timeAgo";

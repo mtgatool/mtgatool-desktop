@@ -1,0 +1,8 @@
+# Machine-local build config (gitignored).
+#
+# This repo lives under OneDrive, which syncs/locks Rust build artifacts
+# mid-link and corrupts .pdb files (LINK : fatal error LNK1318). Redirect
+# the Cargo target dir to a non-synced local path to avoid that entirely and
+# to keep 10+ GB of build output out of OneDrive.
+[build]
+target-dir = "C:/Users/manue/AppData/Local/mtgatool-target"

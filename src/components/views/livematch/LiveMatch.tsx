@@ -12,7 +12,7 @@ import {
   addKeyListener,
   removeKeyListener,
   subscribeData,
-} from "../../../toolDb/worker-wrapper";
+} from "../../../data/store";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { getCardArtCrop } from "../../../utils/getCardArtCrop";
 import getEventPrettyName from "../../../utils/getEventPrettyName";

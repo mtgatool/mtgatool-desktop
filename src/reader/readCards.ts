@@ -1,4 +1,4 @@
-import upsertDbCards from "../toolDb/upsertDbCards";
+import upsertDbCards from "../data/upsertDbCards";
 import { Cards } from "../types";
 import isElectron from "../utils/electron/isElectron";
 

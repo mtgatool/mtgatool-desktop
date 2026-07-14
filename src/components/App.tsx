@@ -11,7 +11,7 @@ import { LOGIN_OK } from "../constants";
 import info from "../info.json";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
-import { login } from "../toolDb/worker-wrapper";
+import { login } from "../data/store";
 import electron from "../utils/electron/electronWrapper";
 import isElectron from "../utils/electron/isElectron";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
