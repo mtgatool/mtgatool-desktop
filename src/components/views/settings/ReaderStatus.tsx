@@ -25,21 +25,36 @@ export default function ReaderStatus() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const found = findMTGA();
-      const isAdmin = checkAdmin();
-      const player = readPlayerTest();
-
-      if (found) {
-        if (!player && !isAdmin) {
+      // Every reader call goes through OpenProcess, which fails without
+      // elevation. Guard the whole tick so a reader throw surfaces as a status
+      // instead of crashing the app with a dev error overlay.
+      try {
+        // Admin first: nothing else can work unelevated, so don't even attempt
+        // to probe the process or read memory in that case.
+        if (!checkAdmin()) {
           setReaderStatus("err");
           setErrorText("App is not running with admin/elevated privileges");
           return;
         }
 
+        if (!findMTGA()) {
+          setReaderStatus("err");
+          setErrorText("MTGA process not found");
+          return;
+        }
+
+        // Elevated and MTGA is running — confirm we can actually read memory.
+        if (!readPlayerTest()) {
+          setReaderStatus("warn");
+          setErrorText("Waiting for MTGA data…");
+          return;
+        }
+
         setReaderStatus("ok");
-      } else {
+        setErrorText("");
+      } catch {
         setReaderStatus("err");
-        setErrorText("MTGA process not found");
+        setErrorText("Reader error — try running the app as administrator");
       }
     }, 1000);
     return () => clearInterval(interval);
