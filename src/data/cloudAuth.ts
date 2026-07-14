@@ -114,6 +114,14 @@ export async function cloudLogin(
   setLocalSetting("username", display);
 }
 
+export async function cloudUpdatePassword(newPassword: string): Promise<void> {
+  if (newPassword.length < 8) {
+    throw new Error("Passwords must contain at least 8 characters.");
+  }
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) throw new Error(error.message);
+}
+
 export async function cloudLogout(): Promise<void> {
   await supabase.auth.signOut();
 }

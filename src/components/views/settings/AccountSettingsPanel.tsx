@@ -7,6 +7,7 @@ import { ReactComponent as ShowIcon } from "../../../assets/images/svg/archive.s
 import { ReactComponent as HideIcon } from "../../../assets/images/svg/unarchive.svg";
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 import { LOGIN_AUTH } from "../../../constants";
+import { cloudLogout, cloudUpdatePassword } from "../../../data/cloudAuth";
 import { getData, putData } from "../../../data/store";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
@@ -14,7 +15,6 @@ import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import setLocalSetting from "../../../utils/setLocalSetting";
-import sha1 from "../../../utils/sha1";
 import vodiFn from "../../../utils/voidfn";
 import PassphraseGenerate from "../../PassphraseGenerate";
 import Button from "../../ui/Button";
@@ -87,10 +87,11 @@ export default function AccountSettingsPanel(
     }
   }, [newAlias]);
 
-  const changePassword = useCallback((_newPassword: string) => {
-    // TODO(supabase): wire to supabase.auth.updateUser({ password }). tool-db's
-    // worker-based password change is gone; this is a no-op stub for now.
-    console.warn("Password change is not wired to Supabase yet.");
+  const changePassword = useCallback((newPassword: string) => {
+    // Supabase stores/hashes the password itself, so we pass it raw (no sha1).
+    cloudUpdatePassword(newPassword)
+      .then(() => setNewPass(""))
+      .catch((e: Error) => console.error("Password change failed:", e.message));
   }, []);
 
   const handleSetNewPass = useCallback(
@@ -241,7 +242,7 @@ export default function AccountSettingsPanel(
         </div>
         <Button
           disabled={newPass.length < 8}
-          onClick={() => changePassword(sha1(newPass))}
+          onClick={() => changePassword(newPass)}
           text="Save"
         />
       </div>
@@ -260,11 +261,18 @@ export default function AccountSettingsPanel(
         className="button-simple-red"
         onClick={() => {
           doClose();
+          cloudLogout().catch(() => undefined);
           setLocalSetting("savedPass", "");
           setLocalSetting("autoLogin", "false");
           reduxAction(dispatch, {
             type: "SET_LOGIN_STATE",
             arg: LOGIN_AUTH,
+          });
+          // Back to "offline" until the next sign-in (clears the cloud-connected
+          // indicator).
+          reduxAction(dispatch, {
+            type: "SET_OFFLINE",
+            arg: true,
           });
           postChannelMessage({
             type: "STOP_LOG_READING",
