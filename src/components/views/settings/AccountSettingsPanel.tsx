@@ -208,9 +208,8 @@ export default function AccountSettingsPanel(
           marginBottom: "16px",
         }}
       >
-        Setting a new password will make your old password invalid, and other
-        devices will need to login again. You can always use your keys to login
-        if you forget your password.
+        Setting a new password signs you out of other devices; they will need to
+        log in again with the new password.
       </p>
       <div className="form-input-container" style={{ height: "36px" }}>
         <label>New Password:</label>
