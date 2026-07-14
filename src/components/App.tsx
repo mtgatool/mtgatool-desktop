@@ -1,17 +1,19 @@
 /* eslint-disable import/no-webpack-loader-syntax */
 /* eslint-disable no-nested-ternary */
 import _ from "lodash";
-import { sha1 } from "mtgatool-db";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Switch, useHistory } from "react-router-dom";
 
+import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import overlayHandler from "../common/overlayHandler";
 import { LOGIN_OK } from "../constants";
+import { getCloudSession } from "../data/cloudAuth";
+import localLogin from "../data/localLogin";
+import syncMatches from "../data/syncMatches";
 import info from "../info.json";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
-import { login } from "../data/store";
 import electron from "../utils/electron/electronWrapper";
 import isElectron from "../utils/electron/isElectron";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
@@ -57,24 +59,6 @@ function App(props: AppProps) {
   const os = forceOs || (isElectron() ? process.platform : "");
 
   useEffect(() => {
-    window.toolDbWorker.addEventListener("message", (e) => {
-      // console.warn("Worker REDUX_ACTION", action.type, action.arg);
-      if (e.data.type === "REDUX_ACTION") {
-        const action = e.data.arg;
-        // console.warn("Worker REDUX_ACTION", action.type, action.arg);
-        reduxAction(dispatch, {
-          type: action.type,
-          arg: action.arg,
-        });
-      }
-      // lets experiment removing this
-      // if (e.data.type === "CONNECTED") {
-      //   setCanLogin(true);
-      // }
-    });
-  }, []);
-
-  useEffect(() => {
     if (overlayHandler) {
       overlayHandler.settingsUpdated();
     }
@@ -85,30 +69,52 @@ function App(props: AppProps) {
     const welcome = getLocalSetting("welcome");
     if (!welcome || welcome === "false") {
       history.push("/welcome");
-    } else if (!electron && canLogin) {
-      const pwd = getLocalSetting("savedPass");
-      const user = getLocalSetting("username");
+    } else if (canLogin) {
+      const autoLogin = getLocalSetting("autoLogin");
 
-      login(user, sha1(pwd))
-        .then(() => {
-          reduxAction(dispatch, {
-            type: "SET_LOGIN_STATE",
-            arg: LOGIN_OK,
-          });
+      // "local" = offline mode (no account); "true" = cloud account, valid
+      // only while a Supabase session is persisted.
+      const checkSession =
+        autoLogin === "local"
+          ? Promise.resolve(true)
+          : autoLogin === "true"
+          ? getCloudSession().then((session) => !!session)
+          : Promise.resolve(false);
 
-          if (
-            history.location.pathname === "" ||
-            history.location.pathname === "/"
-          ) {
+      checkSession
+        .then((ok) => {
+          if (!ok) {
             history.push("/auth");
+            return undefined;
           }
+          return localLogin().then(() => {
+            reduxAction(dispatch, {
+              type: "SET_LOGIN_STATE",
+              arg: LOGIN_OK,
+            });
+
+            // Start reading the Arena log on auto-login too (manual login in
+            // Auth.tsx does this; without it, returning users never start the
+            // watcher and nothing populates).
+            if (electron) {
+              postChannelMessage({ type: "START_LOG_READING" });
+            }
+
+            // Reconcile local match history with the cloud (no-op offline).
+            syncMatches().catch(() => undefined);
+
+            if (
+              history.location.pathname === "" ||
+              history.location.pathname === "/"
+            ) {
+              history.push("/auth");
+            }
+          });
         })
         .catch((e: Error) => {
           console.error(e);
           history.push("/auth");
         });
-    } else if (canLogin) {
-      history.push("/auth");
     }
   }, [canLogin, history, dispatch]);
 

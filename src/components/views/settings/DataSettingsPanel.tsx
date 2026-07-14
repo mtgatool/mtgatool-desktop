@@ -2,6 +2,7 @@ import _ from "lodash";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 
+import { putData } from "../../../data/store";
 import reduxAction from "../../../redux/reduxAction";
 import { DbMatch } from "../../../types/dbTypes";
 import { loadDbFromCache } from "../../../utils/database-wrapper";
@@ -101,9 +102,9 @@ export default function DataSettingsPanel(): JSX.Element {
     if (toMigrate.length !== 0) {
       const match = toMigrate[0];
 
-      window.toolDb
-        .putData<DbMatch>(`matches-${match.matchId}`, match, true)
-        .finally(() => setToMigrate(toMigrate.slice(1)));
+      putData<DbMatch>(`matches-${match.matchId}`, match, true).finally(() =>
+        setToMigrate(toMigrate.slice(1))
+      );
     }
   }, [toMigrate]);
 

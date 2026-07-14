@@ -30,9 +30,8 @@ import getLocalSetting from "./utils/getLocalSetting";
 import initDirectories from "./utils/initDirectories";
 import registerShortcuts from "./utils/registerShortcuts";
 
-window.toolDbWorker = new Worker("tooldb-worker/index.js", {
-  type: "module",
-});
+// tool-db removed — the p2p worker is no longer created. Data now lives in the
+// local IndexedDB store (src/data) and syncs to Supabase.
 
 const title = getWindowTitle();
 

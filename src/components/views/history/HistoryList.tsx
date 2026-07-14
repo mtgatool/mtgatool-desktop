@@ -8,7 +8,7 @@ import usePagingControls from "../../../hooks/usePagingControls";
 import reduxAction from "../../../redux/reduxAction";
 import { selectCurrentFilterDate } from "../../../redux/slices/FilterSlice";
 import { AppState } from "../../../redux/stores/rendererStore";
-import getUserNamespacedKey from "../../../data/store";
+import { getUserNamespacedKey } from "../../../data/store";
 import aggregateStats from "../../../utils/aggregateStats";
 import doHistoryFilter from "../../../utils/tables/doHistoryFilter";
 import PagingControls from "../../PagingControls";

@@ -156,7 +156,7 @@ export default function BestRanksFeed() {
 
     doFunction<DbRankDataWithKey[]>("getLatestRanks", {}).then((fnRet) => {
       const data: DbRankDataWithKey[] =
-        fnRet.code === "OK" && fnRet.return ? fnRet.return : [];
+        fnRet?.code === "OK" && fnRet.return ? fnRet.return : [];
 
       const promises = data.map((rankInfo) =>
         finallyThen(fetchAvatar(rankInfo.pubKey)).then((avatar) =>

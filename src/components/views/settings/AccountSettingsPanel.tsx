@@ -1,22 +1,20 @@
 import _ from "lodash";
-import { sha1 } from "mtgatool-db";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import { ReactComponent as ShowIcon } from "../../../assets/images/svg/archive.svg";
-import { ReactComponent as KeysIcon } from "../../../assets/images/svg/keys.svg";
 import { ReactComponent as HideIcon } from "../../../assets/images/svg/unarchive.svg";
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 import { LOGIN_AUTH } from "../../../constants";
+import { getData, putData } from "../../../data/store";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
-import saveKeysCallback from "../../../toolDb/saveKeysCallback";
-import { getData, putData } from "../../../data/store";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import setLocalSetting from "../../../utils/setLocalSetting";
+import sha1 from "../../../utils/sha1";
 import vodiFn from "../../../utils/voidfn";
 import PassphraseGenerate from "../../PassphraseGenerate";
 import Button from "../../ui/Button";
@@ -89,11 +87,10 @@ export default function AccountSettingsPanel(
     }
   }, [newAlias]);
 
-  const changePassword = useCallback((newPassword: string) => {
-    window.toolDbWorker.postMessage({
-      type: "SET_PASSWORD",
-      password: newPassword,
-    });
+  const changePassword = useCallback((_newPassword: string) => {
+    // TODO(supabase): wire to supabase.auth.updateUser({ password }). tool-db's
+    // worker-based password change is gone; this is a no-op stub for now.
+    console.warn("Password change is not wired to Supabase yet.");
   }, []);
 
   const handleSetNewPass = useCallback(
@@ -248,26 +245,6 @@ export default function AccountSettingsPanel(
           text="Save"
         />
       </div>
-      <p
-        style={{
-          textAlign: "center",
-          borderTop: "1px solid var(--color-line-sep)",
-          paddingTop: "24px",
-          marginBottom: "16px",
-        }}
-      >
-        Download your keys for password-less access:
-      </p>
-      <Button
-        className="keys-button"
-        onClick={saveKeysCallback}
-        text=""
-        style={{ margin: "8px auto" }}
-      >
-        <KeysIcon />
-        <div>Save</div>
-      </Button>
-
       <p
         style={{
           borderTop: "1px solid var(--color-line-sep)",

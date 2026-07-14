@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import { AppState } from "../../../redux/stores/rendererStore";
-import createLiveDraft from "../../../toolDb/createLiveDraft";
 import Button from "../../ui/Button";
 
 export default function DraftsHome() {
@@ -11,7 +10,7 @@ export default function DraftsHome() {
   const draftInProgress = useSelector(
     (state: AppState) => state.renderer.draftInProgress
   );
-  const [liveDraftUrl, setLiveDraftUrl] = useState<string | undefined>(
+  const [liveDraftUrl, _setLiveDraftUrl] = useState<string | undefined>(
     undefined
   );
 
@@ -20,12 +19,7 @@ export default function DraftsHome() {
   );
 
   const beginLiveDraft = useCallback(() => {
-    if (currentDraft) {
-      createLiveDraft(currentDraft);
-      setLiveDraftUrl(
-        `https://app.mtgatool.com/drafts/live/v1-${currentDraft.id}`
-      );
-    }
+    // Live draft sharing was a tool-db p2p feature; removed with tool-db.
   }, [history, currentDraft]);
 
   return (

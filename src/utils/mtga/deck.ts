@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable func-names */
-import { sha1 } from "mtgatool-db";
+import sha1 from "../sha1";
 
 import { DEFAULT_TILE } from "../../constants";
 import {

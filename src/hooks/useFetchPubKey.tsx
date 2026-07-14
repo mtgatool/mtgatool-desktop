@@ -1,17 +1,10 @@
-import { UserRootData } from "mtgatool-db";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-export default function useFetchPubKey(username: string) {
-  const [pubKey, setPubkey] = useState<string | null>(null);
-
-  useEffect(() => {
-    window.toolDb.getData<UserRootData>(`==${username}`).then((userRoot) => {
-      console.log(userRoot);
-      if (userRoot) {
-        setPubkey(userRoot.keys.skpub);
-      }
-    });
-  }, [username]);
-
+/**
+ * tool-db removed: users no longer have an ECDSA public key. Kept as a no-op
+ * hook so existing callers (avatars / user views) still compile. Always null.
+ */
+export default function useFetchPubKey(_username: string) {
+  const [pubKey] = useState<string | null>(null);
   return pubKey;
 }

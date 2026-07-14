@@ -10,7 +10,6 @@ import store from "../redux/stores/rendererStore";
 import setDbMatch from "../data/setDbMatch";
 import upsertDbCards from "../data/upsertDbCards";
 import upsertDbInventory from "../data/upsertDbInventory";
-import upsertDbLiveMatch from "../toolDb/upsertDbLiveMatch";
 import upsertDbRank from "../data/upsertDbRank";
 import { putData } from "../data/store";
 import { InternalDraftv2 } from "../types";
@@ -25,13 +24,9 @@ export default function mainChannelListeners() {
 
   let last = Date.now();
 
-  let logReadFinished = false;
-
   channel.onmessage = (msg: MessageEvent<ChannelMessage>) => {
     // console.log(msg.data.type);
-    if (logReadFinished && msg.data.type === "OVERLAY_UPDATE") {
-      upsertDbLiveMatch(msg.data.value);
-    }
+    // Live-match sharing was a tool-db p2p feature; removed with tool-db.
 
     if (msg.data.type === "POPUP") {
       reduxAction(store.dispatch, {
@@ -59,7 +54,6 @@ export default function mainChannelListeners() {
     }
 
     if (msg.data.type == "LOG_READ_FINISHED") {
-      logReadFinished = true;
       if (store.getState().renderer.loading === true) {
         reduxAction(store.dispatch, {
           type: "SET_LOGIN_STATE",

@@ -1,4 +1,4 @@
-import { sha1 } from "mtgatool-db";
+import sha1 from "../utils/sha1";
 
 import { defaultConfig } from "../common/defaultConfig";
 import { DEFAULT_PEERS } from "../constants";

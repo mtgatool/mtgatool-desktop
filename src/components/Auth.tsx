@@ -38,9 +38,7 @@ export default function Auth(props: AuthProps) {
     setTimeout(() => {
       setRefresh(2);
 
-      UICheckAdmin().catch((err) => {
-        console.error("UICheckAdmin error:", err);
-      });
+      UICheckAdmin();
     }, 100);
   }, []);
 
