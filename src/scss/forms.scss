@@ -98,7 +98,10 @@
 
 .form-authenticate {
   max-width: 24em;
-  height: 20em;
+  // Fit the content instead of a fixed 20em (which was sized for the old
+  // 3-page carousel and left dead space under the shorter single login panel).
+  height: auto;
+  min-height: 12em;
   z-index: 5;
   width: calc(100% - 16px);
   margin: auto;
