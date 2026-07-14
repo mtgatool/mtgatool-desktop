@@ -36,14 +36,14 @@ import HistoryStats from "./views/history/HistoryStats";
 import ViewHistory from "./views/history/ViewHistory";
 import ViewHome from "./views/home/ViewHome";
 import ViewLiveMatch from "./views/livematch/ViewLiveMatch";
+import ViewTimeline from "./views/timeline/ViewTimeline";
 import ViewUser from "./views/user/ViewUser";
-import ViewWip from "./views/wip/ViewWip";
 
 const views = {
   home: ViewHome,
   decks: ViewDecks,
   history: ViewHistory,
-  timeline: ViewWip,
+  timeline: ViewTimeline,
   drafts: ViewDrafts,
   match: ViewLiveMatch,
   explore: ViewExplore,
