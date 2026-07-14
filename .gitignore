@@ -31,3 +31,6 @@ src/info.json
 dist-worker
 dist-cards-worker
 dist-tooldb-worker
+# v6-tests (Tauri) leftovers — not part of the Electron branch
+src-tauri/
+test-data/
