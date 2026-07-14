@@ -98,6 +98,12 @@ export default function Auth(props: AuthProps) {
 
   // Shared post-auth flow: load local data and start reading the Arena log.
   const startSession = useCallback(() => {
+    // Connection status now reflects the mtgatool cloud (Supabase) account, not
+    // tool-db peers: "true" = signed in (online), "local" = offline mode.
+    reduxAction(dispatch, {
+      type: "SET_OFFLINE",
+      arg: getLocalSetting("autoLogin") !== "true",
+    });
     return localLogin().then(() => {
       if (electron) {
         postChannelMessage({

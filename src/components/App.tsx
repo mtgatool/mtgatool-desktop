@@ -93,6 +93,13 @@ function App(props: AppProps) {
               arg: LOGIN_OK,
             });
 
+            // Connection status reflects the mtgatool cloud (Supabase) account:
+            // "true" = signed in (online), "local" = offline mode.
+            reduxAction(dispatch, {
+              type: "SET_OFFLINE",
+              arg: autoLogin !== "true",
+            });
+
             // Start reading the Arena log on auto-login too (manual login in
             // Auth.tsx does this; without it, returning users never start the
             // watcher and nothing populates).
