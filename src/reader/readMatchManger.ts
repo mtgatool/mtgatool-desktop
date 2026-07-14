@@ -21,7 +21,15 @@ export default function readMatchManger(): MatchManager | undefined {
 
   const { readData } = reader;
 
-  const matchManager = readData("MTGA", ["PAPA", "_instance", "_matchManager"]);
+  // 2026 layout: the match manager lives under the MatchSceneManager singleton
+  // (WrapperController is unloaded during a match). "PAPA"/"_instance" were the
+  // old obfuscated names; the fields below (_matchManager, <LocalPlayerInfo>,
+  // <OpponentInfo>, <MatchID>) are unchanged.
+  const matchManager = readData("MTGA", [
+    "MatchSceneManager",
+    "Instance",
+    "_matchManager",
+  ]);
 
   if (matchManager.error) return undefined;
 

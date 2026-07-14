@@ -29,6 +29,10 @@ export interface MatchPlayer {
   tier: number;
   percentile: number;
   leaderboardPlace: number;
+  // Pip step within the tier and numeric rank class (0..6), captured per match
+  // for the rank-progression timeline.
+  step?: number;
+  classValue?: number;
 }
 
 export interface CardCast {

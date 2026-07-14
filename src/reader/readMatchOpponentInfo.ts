@@ -18,8 +18,8 @@ export default function readMatchOpponentInfo(): PlayerInfo | undefined {
   const { readData } = reader;
 
   const opponentInfo = readData("MTGA", [
-    "PAPA",
-    "_instance",
+    "MatchSceneManager",
+    "Instance",
     "_matchManager",
     "<OpponentInfo>k__BackingField",
   ]);
