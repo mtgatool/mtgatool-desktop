@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { ReactComponent as SyncIcon } from "../../assets/images/svg/cloud-sync.svg";
 import { ReactComponent as StatsIcon } from "../../assets/images/svg/stats.svg";
+import syncMatches from "../../data/syncMatches";
 import {
   DateOption,
   dateOptions,
@@ -94,11 +95,10 @@ export default function FilterSection(props: FilterSectionProps) {
   ];
 
   const refreshMatches = useCallback(() => {
-    if (window.toolDbWorker) {
-      window.toolDbWorker.postMessage({
-        type: "REFRESH_MATCHES",
-      });
-    }
+    // Reconcile local match history with Supabase: push whatever the cloud is
+    // missing and refresh the per-match "synced" indicator. (Replaces the old
+    // tool-db worker REFRESH_MATCHES message.)
+    syncMatches().catch(() => undefined);
   }, []);
 
   return (

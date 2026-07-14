@@ -12,6 +12,7 @@
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import { DbMatch } from "../types/dbTypes";
+import getLocalSetting from "../utils/getLocalSetting";
 import { fetchRemoteMatchIds, isCloudActive, pushMatch } from "./cloudSync";
 import { kvGet } from "./localKV";
 import { queryKeys } from "./store";
@@ -35,8 +36,14 @@ export default async function syncMatches(): Promise<number> {
   ).filter((m): m is DbMatch => !!m && !!m.matchId);
 
   // Push everything the cloud is missing (arena_id = the match's playerId).
+  // Matches saved during the catch-up read — before the persona was read from
+  // memory — have an empty playerId baked in, which pushMatch rejects. Fall
+  // back to the current persona so that backlog still syncs.
+  const currentPersona = getLocalSetting("playerId");
   const missing = localMatches.filter((m) => !remote.has(m.matchId));
-  await Promise.all(missing.map((m) => pushMatch(m.playerId, m)));
+  await Promise.all(
+    missing.map((m) => pushMatch(m.playerId || currentPersona, m))
+  );
   missing.forEach((m) => remote.add(m.matchId));
 
   // Reflect the full synced set so the per-match cloud icon is accurate.

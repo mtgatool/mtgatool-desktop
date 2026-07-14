@@ -4,6 +4,7 @@ import { overlayTitleToId } from "../common/maps";
 import { LOGIN_OK } from "../constants";
 import setDbMatch from "../data/setDbMatch";
 import { putData } from "../data/store";
+import syncMatches from "../data/syncMatches";
 import upsertDbCards from "../data/upsertDbCards";
 import upsertDbInventory from "../data/upsertDbInventory";
 import upsertDbRank from "../data/upsertDbRank";
@@ -23,6 +24,17 @@ export default function mainChannelListeners() {
   const channel = bcConnect() as any;
 
   let last = Date.now();
+
+  // Reconcile matches to the cloud once we actually know the persona (arena_id).
+  // Matches saved during the catch-up read before this point have no persona,
+  // so syncMatches at login pushed nothing; re-run it when the persona lands.
+  let syncedPersona = "";
+  const syncOnPersona = (uuid: string) => {
+    if (uuid && uuid !== syncedPersona) {
+      syncedPersona = uuid;
+      syncMatches().catch(() => undefined);
+    }
+  };
 
   channel.onmessage = (msg: MessageEvent<ChannelMessage>) => {
     // console.log(msg.data.type);
@@ -84,10 +96,12 @@ export default function mainChannelListeners() {
 
     if (msg.data.type === "SET_UUID") {
       switchPlayerUUID(msg.data.value);
+      syncOnPersona(msg.data.value);
     }
 
     if (msg.data.type === "SET_UUID_DISPLAYNAME") {
       switchPlayerUUID(msg.data.value.uuid, msg.data.value.displayName);
+      syncOnPersona(msg.data.value.uuid);
     }
 
     if (msg.data.type === "LOG_CHECK") {
