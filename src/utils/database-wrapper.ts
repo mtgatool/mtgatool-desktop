@@ -76,12 +76,20 @@ export function loadDbFromCache(
     // requests are cached so we are cool?
   }
 
+  // Metadata is now served from GitHub Releases (the old mtgatool.com/api route
+  // is being sunset). `releases/latest/download/…` always resolves to the newest
+  // published release. latest.json = { latest, updated }; the per-language DB is
+  // `${lang}-database.json`.
+  const RELEASE_BASE =
+    "https://github.com/mtgatool/mtgatool-metadata/releases/latest/download";
+  const dbLang = lang || "en";
+
   return axios
-    .get(`https://mtgatool.com/api/database/latest/${lang}`)
+    .get(`${RELEASE_BASE}/latest.json`)
     .then((latestRes) => {
       if (forceReload || parseInt(latestRes.data.latest) > database.version) {
         return axios
-          .get<any>(`https://mtgatool.com/api/database/${lang}`)
+          .get<any>(`${RELEASE_BASE}/${dbLang}-database.json`)
           .then((res) => {
             console.log("Updated cards database OK");
             console.log("New DB version: ", latestRes.data.latest);
@@ -91,7 +99,7 @@ export function loadDbFromCache(
           })
           .catch((e) => {
             console.info(
-              "There was a problem updating cards database from https://mtgatool.com/api/database/"
+              `There was a problem updating cards database from ${RELEASE_BASE}/${dbLang}-database.json`
             );
             console.info(e);
             return Promise.resolve();
@@ -102,7 +110,7 @@ export function loadDbFromCache(
     })
     .catch((e) => {
       console.info(
-        "There was a problem updating cards database from https://mtgatool.com/api/database/latest"
+        `There was a problem updating cards database from ${RELEASE_BASE}/latest.json`
       );
       console.info(e);
       return Promise.resolve();
