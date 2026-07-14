@@ -47,18 +47,29 @@ export default async function createOverlay(
       focus: false,
     });
 
-    // Listen for window creation
-    await newWindow.once("tauri://created", async () => {
-      // Show window after a short delay
-      setTimeout(async () => {
-        try {
-          await newWindow.show();
-          await newWindow.setAlwaysOnTop(true);
-        } catch (e) {
-          console.error("Failed to show overlay:", e);
-        }
-      }, 250);
+    // Reveal the window once it's ready. The overlay is created hidden
+    // (visible:false) to avoid a white pre-paint flash, so *something* has to
+    // call .show() — the overlay can't show itself.
+    const reveal = async () => {
+      try {
+        await newWindow.show();
+        await newWindow.setAlwaysOnTop(true);
+      } catch (e) {
+        console.error("Failed to show overlay:", e);
+      }
+    };
+
+    // Primary path: show right after Tauri reports the window was created.
+    await newWindow.once("tauri://created", () => {
+      setTimeout(reveal, 250);
     });
+
+    // Fallback: `once` can miss the "tauri://created" event when the listener
+    // registers after the backend already emitted it, which left the window
+    // created-but-hidden and made enabling an overlay only take effect on the
+    // next settings change. Show unconditionally after a short delay too;
+    // .show() is idempotent so a double-show is harmless.
+    setTimeout(reveal, 400);
 
     // Listen for window close
     await newWindow.once("tauri://close-requested", () => {

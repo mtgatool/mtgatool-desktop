@@ -57,12 +57,18 @@ export class OverlayHandler {
     try {
       // currentStates is not the state we want, but the state we have
       const currentStates = await this._checkOverlaysState();
-      currentStates.forEach((state, index) => {
-        if (state === true && this._openState[index] === false) {
-          closeOverlay(index);
-        }
-        if (state === false && this._openState[index] === true) {
+      currentStates.forEach((exists, index) => {
+        if (this._openState[index]) {
+          // Idempotent on purpose: createOverlay creates the window when it's
+          // absent AND re-shows it when it already exists. An overlay can't make
+          // itself visible — only the handler can — and a freshly-created window
+          // can be left hidden if createOverlay's deferred .show() lost the race
+          // with the "tauri://created" event. Calling createOverlay every pass
+          // (not only on the false→true edge) guarantees the visibility is
+          // applied, instead of needing a second settings change to take hold.
           createOverlay(index);
+        } else if (exists) {
+          closeOverlay(index);
         }
       });
     } finally {

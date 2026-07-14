@@ -19,6 +19,17 @@
   z-index: 11;
 }
 
+/* Tauri only starts a window drag when the literal mousedown target carries
+   data-tauri-drag-region. The decorative leaves (logo, artist text, the SVG
+   glyphs inside the window buttons) sit on top of drag-region parents, so let
+   pointer events fall through to those parents — otherwise clicking them is a
+   dead zone and only the gaps between children drag. Window-control buttons
+   keep working: their onClick is on the wrapping .top-button div, not the SVG. */
+.top svg,
+.top .top-artist {
+  pointer-events: none;
+}
+
 .top::before {
   content: "";
   width: 100%;

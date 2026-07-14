@@ -298,6 +298,7 @@ export default function TopBar(props: TopBarProps): JSX.Element {
       {isOverlay && (
         <div
           className="overlay-icon"
+          data-tauri-drag-region
           style={{
             backgroundColor: `var(--color-${
               COLORS_ALL[getCurrentOverlayIndex()]
