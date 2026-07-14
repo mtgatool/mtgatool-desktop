@@ -7,7 +7,8 @@ export default function readPlayerTest() {
   // eslint-disable-next-line no-undef
   const reader = __non_webpack_require__("mtga-reader");
 
-  const account: ReaderAccount & { error?: string } = reader.readAccount("MTGA");
+  const account: ReaderAccount & { error?: string } =
+    reader.readAccount("MTGA");
 
   if (!account || account.error) return null;
 
