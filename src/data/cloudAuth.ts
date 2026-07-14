@@ -24,6 +24,10 @@ export function normalizeDisplayName(username: string): string {
  * lowercase, then strip anything still not allowed in an email local-part.
  */
 const COMBINING_MARKS = new RegExp("[\\u0300-\\u036f]", "g");
+// Built from a string so babel never tries to transpile the \p{...} unicode
+// property escapes (the runtime — Chromium — supports them natively). Letters
+// incl. accents + combining marks, digits, space, - and _.
+const DISPLAY_NAME_CHARSET = new RegExp("^[\\p{L}\\p{M}0-9 _-]+$", "u");
 
 export function usernameToLoginId(username: string): string {
   return username
@@ -39,7 +43,7 @@ export function validateUsername(username: string): string | null {
     return "Usernames must be 3-24 characters.";
   }
   // Letters (including accented), numbers, spaces, - and _.
-  if (!/^[\p{L}\p{M}0-9 _-]+$/u.test(name)) {
+  if (!DISPLAY_NAME_CHARSET.test(name)) {
     return "Usernames can use letters, numbers, spaces, - and _.";
   }
   // Whatever they type must fold to at least a few usable characters, since the
