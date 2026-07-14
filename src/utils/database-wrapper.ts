@@ -55,6 +55,53 @@ export function updateCache(data: string): void {
   }
 }
 
+// Metadata is served from GitHub Releases (the old mtgatool.com/api route is
+// being sunset). `releases/latest/download/…` always resolves to the newest
+// published release. latest.json = { latest, updated }; the per-language DB is
+// `${lang}-database.json`.
+const RELEASE_BASE =
+  "https://github.com/mtgatool/mtgatool-metadata/releases/latest/download";
+
+/**
+ * Check GitHub Releases for a newer card database and download it if the
+ * published version is greater than the one currently loaded (or forceReload).
+ * Version-gated, so it only transfers the ~24MB payload when there's actually a
+ * newer release — otherwise it's just a tiny latest.json check. Never throws.
+ */
+export function syncCardDatabase(
+  lang?: string,
+  forceReload = false
+): Promise<void> {
+  const dbLang = lang || "en";
+  return axios
+    .get(`${RELEASE_BASE}/latest.json`)
+    .then((latestRes) => {
+      if (forceReload || parseInt(latestRes.data.latest) > database.version) {
+        return axios
+          .get<any>(`${RELEASE_BASE}/${dbLang}-database.json`)
+          .then((res) => {
+            console.log(
+              "Updated cards database. New version:",
+              latestRes.data.latest
+            );
+            database.setDatabaseUnsafely(res.data);
+            updateCache(JSON.stringify(res.data));
+          })
+          .catch((e) => {
+            console.info(
+              `Problem downloading ${RELEASE_BASE}/${dbLang}-database.json`,
+              e
+            );
+          });
+      }
+      console.log(`Cards database up to date. (v${latestRes.data.latest})`);
+      return undefined;
+    })
+    .catch((e) => {
+      console.info(`Problem checking ${RELEASE_BASE}/latest.json`, e);
+    });
+}
+
 export function loadDbFromCache(
   lang?: string,
   forceReload = false
@@ -76,45 +123,19 @@ export function loadDbFromCache(
     // requests are cached so we are cool?
   }
 
-  // Metadata is now served from GitHub Releases (the old mtgatool.com/api route
-  // is being sunset). `releases/latest/download/…` always resolves to the newest
-  // published release. latest.json = { latest, updated }; the per-language DB is
-  // `${lang}-database.json`.
-  const RELEASE_BASE =
-    "https://github.com/mtgatool/mtgatool-metadata/releases/latest/download";
-  const dbLang = lang || "en";
+  return syncCardDatabase(lang, forceReload);
+}
 
-  return axios
-    .get(`${RELEASE_BASE}/latest.json`)
-    .then((latestRes) => {
-      if (forceReload || parseInt(latestRes.data.latest) > database.version) {
-        return axios
-          .get<any>(`${RELEASE_BASE}/${dbLang}-database.json`)
-          .then((res) => {
-            console.log("Updated cards database OK");
-            console.log("New DB version: ", latestRes.data.latest);
-            database.setDatabaseUnsafely(res.data);
-            updateCache(JSON.stringify(res.data));
-            return Promise.resolve();
-          })
-          .catch((e) => {
-            console.info(
-              `There was a problem updating cards database from ${RELEASE_BASE}/${dbLang}-database.json`
-            );
-            console.info(e);
-            return Promise.resolve();
-          });
-      }
-      console.log(`Database up to date. (v${latestRes.data.latest})`);
-      return Promise.resolve();
-    })
-    .catch((e) => {
-      console.info(
-        `There was a problem updating cards database from ${RELEASE_BASE}/latest.json`
-      );
-      console.info(e);
-      return Promise.resolve();
-    });
+// Periodic background sync so a long-running app picks up a freshly published
+// release without needing a restart. Idempotent — only one timer runs.
+let autoSyncTimer: ReturnType<typeof setInterval> | null = null;
+const AUTO_SYNC_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+export function startCardDatabaseAutoSync(lang?: string): void {
+  if (autoSyncTimer) return;
+  autoSyncTimer = setInterval(() => {
+    syncCardDatabase(lang).catch(() => undefined);
+  }, AUTO_SYNC_INTERVAL_MS);
 }
 
 window.database = database;

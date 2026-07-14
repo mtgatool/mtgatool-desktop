@@ -20,10 +20,14 @@ import {
   ALL_OVERLAYS,
   WINDOW_BACKGROUND,
   WINDOW_HOVER,
+  WINDOW_MAIN,
   WINDOW_UPDATER,
 } from "./types/app";
 import Updater from "./updater";
-import { loadDbFromCache } from "./utils/database-wrapper";
+import {
+  loadDbFromCache,
+  startCardDatabaseAutoSync,
+} from "./utils/database-wrapper";
 import defaultLocalSettings from "./utils/defaultLocalSettings";
 import getWindowTitle from "./utils/electron/getWindowTitle";
 import getLocalSetting from "./utils/getLocalSetting";
@@ -137,6 +141,13 @@ if (title !== WINDOW_UPDATER) {
   loadDbFromCache(getLocalSetting("lang")).then(() =>
     reduxAction(store.dispatch, { type: "FORCE_COLLECTION", arg: undefined })
   );
+}
+
+// Keep the card database fresh while the app is open by polling GitHub Releases
+// periodically (version-gated). Only the main window runs the timer so we don't
+// have every window (overlays/hover/background) polling.
+if (title === WINDOW_MAIN) {
+  startCardDatabaseAutoSync(getLocalSetting("lang"));
 }
 
 // If you want your app to work offline and load faster, you can change
