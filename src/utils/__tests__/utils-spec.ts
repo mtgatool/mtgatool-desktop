@@ -1,7 +1,5 @@
 /* eslint-env jest */
 
-import sha1 from "../sha1";
-
 import { cardHasType, cardType } from "../cardTypes";
 import countValues from "../countValues";
 import getEventPrettyName from "../getEventPrettyName";
@@ -9,6 +7,7 @@ import getSetCodeInEventId from "../getSetInEventId";
 import loadDbFromCache from "../loadDbFromCache";
 import CardsList from "../mtga/cardsList";
 import database from "../mtga/database";
+import sha1 from "../sha1";
 
 loadDbFromCache();
 

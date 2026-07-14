@@ -4,6 +4,7 @@ import { ChangeEvent, Fragment, useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
+import setDbHiddenDecks from "../../../data/setDbHiddenDecks";
 import useDebounce from "../../../hooks/useDebounce";
 import usePagingControls from "../../../hooks/usePagingControls";
 import {
@@ -11,7 +12,6 @@ import {
   setDeckSort,
 } from "../../../redux/slices/FilterSlice";
 import { AppState } from "../../../redux/stores/rendererStore";
-import setDbHiddenDecks from "../../../data/setDbHiddenDecks";
 import { StatsDeck } from "../../../types/dbTypes";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import globalData from "../../../utils/globalData";

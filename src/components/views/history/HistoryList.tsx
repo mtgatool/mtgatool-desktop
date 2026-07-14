@@ -4,11 +4,11 @@ import { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
+import { getUserNamespacedKey } from "../../../data/store";
 import usePagingControls from "../../../hooks/usePagingControls";
 import reduxAction from "../../../redux/reduxAction";
 import { selectCurrentFilterDate } from "../../../redux/slices/FilterSlice";
 import { AppState } from "../../../redux/stores/rendererStore";
-import { getUserNamespacedKey } from "../../../data/store";
 import aggregateStats from "../../../utils/aggregateStats";
 import doHistoryFilter from "../../../utils/tables/doHistoryFilter";
 import PagingControls from "../../PagingControls";

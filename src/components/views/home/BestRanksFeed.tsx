@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import { DEFAULT_AVATAR } from "../../../constants";
+import { doFunction } from "../../../data/store";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
-import { doFunction } from "../../../data/store";
 import { DbRankDataWithKey } from "../../../types/dbTypes";
 import cleanUsername from "../../../utils/cleanUsername";
 import timeAgo from "../../../utils/timeAgo";

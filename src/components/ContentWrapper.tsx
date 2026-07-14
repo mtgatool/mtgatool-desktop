@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { animated, useTransition } from "react-spring";
 
+import { getMatchesData } from "../data/store";
 import useDatePicker from "../hooks/useDatePicker";
 import reduxAction from "../redux/reduxAction";
 import {
@@ -11,7 +12,6 @@ import {
   setDateOption,
 } from "../redux/slices/FilterSlice";
 import { AppState } from "../redux/stores/rendererStore";
-import { getMatchesData } from "../data/store";
 import { CardsData } from "../types/collectionTypes";
 import { defaultCardsData } from "../types/dbTypes";
 import aggregateStats from "../utils/aggregateStats";

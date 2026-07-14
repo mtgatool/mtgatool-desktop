@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 
 import { ReactComponent as IconUpload } from "../../../assets/images/svg/upload.svg";
 import { DEFAULT_TILE } from "../../../constants";
-import { AppState } from "../../../redux/stores/rendererStore";
 import setDbMatch from "../../../data/setDbMatch";
+import { AppState } from "../../../redux/stores/rendererStore";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { toMMSS } from "../../../utils/dateTo";
 import getEventPrettyName from "../../../utils/getEventPrettyName";

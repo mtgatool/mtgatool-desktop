@@ -1,9 +1,8 @@
-import sha1 from "../utils/sha1";
-
 import { defaultConfig } from "../common/defaultConfig";
 import { DEFAULT_PEERS } from "../constants";
 import defaultLogUri from "../utils/defaultLogUri";
 import isElectron from "../utils/electron/isElectron";
+import sha1 from "../utils/sha1";
 import textRandom from "../utils/textRandom";
 
 export const settingKeys = [

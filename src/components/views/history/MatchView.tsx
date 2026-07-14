@@ -12,8 +12,8 @@ import { ReactComponent as CopyButton } from "../../../assets/images/svg/copy.sv
 import { ReactComponent as IconCrown } from "../../../assets/images/svg/crown.svg";
 import { ReactComponent as IconEvent } from "../../../assets/images/svg/event.svg";
 import { ReactComponent as IconTime } from "../../../assets/images/svg/time.svg";
-import reduxAction from "../../../redux/reduxAction";
 import { getData } from "../../../data/store";
+import reduxAction from "../../../redux/reduxAction";
 import { MatchGameStats } from "../../../types";
 import { DbMatch } from "../../../types/dbTypes";
 import compareCards from "../../../utils/compareCards";

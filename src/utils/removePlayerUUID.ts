@@ -1,8 +1,8 @@
 import _ from "lodash";
 
+import { getData, putData } from "../data/store";
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
-import { getData, putData } from "../data/store";
 import { DbUserids } from "../types/dbTypes";
 
 export default async function removePlayerUUID(uuid: string) {

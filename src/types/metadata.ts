@@ -49,7 +49,7 @@ interface RankDataNone {
 
 export type RankData = RankDataLola | RankDataMTGCSR | RankDataNone;
 
-export type Rarity = (typeof CARD_RARITIES)[number];
+export type Rarity = typeof CARD_RARITIES[number];
 
 export interface DbCardDataV2 {
   GrpId: number;

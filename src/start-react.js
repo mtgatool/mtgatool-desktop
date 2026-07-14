@@ -16,10 +16,14 @@ const tryConnection = () => {
       startedElectron = true;
       const { spawn } = childProcess;
       // "npm.cmd" for windows, "npm" on the other OS!
-      const ls = spawn(process.platform === "win32" ? "npm.cmd" : "npm", [
-        "run",
-        "electron",
-      ]);
+      // shell:true is required on Windows since Node 20 (CVE-2024-27980):
+      // spawning a .cmd/.bat directly now throws EINVAL. Running through the
+      // shell restores the pre-Node-20 behaviour.
+      const ls = spawn(
+        process.platform === "win32" ? "npm.cmd" : "npm",
+        ["run", "electron"],
+        { shell: true }
+      );
       ls.stdout.on("data", (data) => {
         console.log(data.toString());
       });
@@ -29,7 +33,7 @@ const tryConnection = () => {
       });
 
       ls.on("exit", (code) => {
-        console.warning(`child process exited with code ${code.toString()}`);
+        console.warn(`child process exited with code ${code}`);
       });
     }
   });
