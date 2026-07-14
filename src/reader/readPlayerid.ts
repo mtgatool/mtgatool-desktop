@@ -1,46 +1,16 @@
 import switchPlayerUUID from "../utils/switchPlayerUUID";
-
-interface AccountInformation {
-  AccessToken: string;
-  AccountID: string;
-  Credentials: null;
-  CredentialsState: number;
-  DisplayName: string;
-  Email: string;
-  Expiration: number;
-  ExternalID: string;
-  GameID: string;
-  LinkedAccounts: null;
-  Password: string;
-  PersonaID: string;
-  Roles: null;
-}
+import { ReaderAccount } from "../utils/mtgaReader";
 
 export default function readPlayerId() {
   // eslint-disable-next-line no-undef
   const reader = __non_webpack_require__("mtga-reader");
 
-  const { readData } = reader;
+  // mtga-reader 0.1.6 typed account read: { displayName, personaId, ... }.
+  const account: ReaderAccount & { error?: string } = reader.readAccount("MTGA");
 
-  const data = readData("MTGA", [
-    "WrapperController",
-    "<Instance>k__BackingField",
-    "<AccountClient>k__BackingField",
-    "<AccountInformation>k__BackingField",
-  ]);
+  if (!account || account.error) return;
 
-  if (data.error) return;
-
-  const accountInformation: AccountInformation = data;
-
-  if (
-    accountInformation &&
-    accountInformation.PersonaID &&
-    accountInformation.DisplayName
-  ) {
-    switchPlayerUUID(
-      accountInformation.PersonaID,
-      accountInformation.DisplayName
-    );
+  if (account.personaId && account.displayName) {
+    switchPlayerUUID(account.personaId, account.displayName);
   }
 }

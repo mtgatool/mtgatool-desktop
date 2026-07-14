@@ -22,6 +22,10 @@ export interface CombinedRankInfo {
   constructedLeaderboardPlace: number;
   limitedPercentile: number;
   limitedLeaderboardPlace: number;
+  // Numeric rank class (0..6) kept alongside the string class name; set by the
+  // memory reader (readRank), read via `as any` in the match-room handler.
+  constructedClassValue?: number;
+  limitedClassValue?: number;
 }
 
 export const rankClass: Record<number, string> = {

@@ -1,35 +1,26 @@
 import upsertDbCards from "../data/upsertDbCards";
 import { Cards } from "../types";
 import isElectron from "../utils/electron/isElectron";
-
-interface ReaderCard {
-  key: number;
-  value: number;
-  hashCode: number;
-  next: number;
-}
+import { ReaderCollection } from "../utils/mtgaReader";
 
 export default function readCards() {
   if (!isElectron()) return;
   // eslint-disable-next-line no-undef
   const reader = __non_webpack_require__("mtga-reader");
 
-  const { readData } = reader;
+  // mtga-reader 0.1.6: the collection is read via the typed readCollection,
+  // which returns { count, cards: [{ grpId, qty }] }. The old generic readData
+  // path used stale 0.1.5 field names and no longer returns an array.
+  const collection: ReaderCollection & { error?: string } =
+    reader.readCollection("MTGA");
 
-  const cards = readData("MTGA", [
-    "PAPA",
-    "_instance",
-    "_inventoryManager",
-    "_inventoryServiceWrapper",
-    "<Cards>k__BackingField",
-    "_entries",
-  ]);
-
-  if (cards.error) return;
+  if (!collection || collection.error || !Array.isArray(collection.cards)) {
+    return;
+  }
 
   const parsedCards: Cards = {};
-  cards.forEach((c: ReaderCard) => {
-    parsedCards[c.key] = c.value;
+  collection.cards.forEach((c) => {
+    parsedCards[c.grpId] = c.qty;
   });
 
   upsertDbCards(parsedCards);
