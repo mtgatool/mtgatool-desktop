@@ -5,8 +5,10 @@ import readPlayerTest from "../../../reader/readPlayerTest";
 function findMTGA(): boolean {
   // eslint-disable-next-line no-undef
   const reader = __non_webpack_require__("mtga-reader");
-  const { findPidByName } = reader;
-  return findPidByName("MTGA");
+  // mtga-reader 0.1.6 renamed findPidByName -> findProcess (returns a boolean
+  // "is it running" rather than a pid).
+  const { findProcess } = reader;
+  return findProcess("MTGA");
 }
 
 function checkAdmin(): boolean {
