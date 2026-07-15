@@ -3,6 +3,22 @@ import globalStore from "../background/store";
 import isElectron from "../utils/electron/isElectron";
 import { ReaderRanks } from "../utils/mtgaReader";
 
+// The rank classes a real read can return; anything else (e.g. "Spark" from a
+// closed/unreadable process) means the read is garbage and must be rejected.
+const VALID_RANK_CLASSES = new Set([
+  "beginner",
+  "bronze",
+  "silver",
+  "gold",
+  "platinum",
+  "diamond",
+  "mythic",
+]);
+
+function isValidRankClass(cls?: string): boolean {
+  return typeof cls === "string" && VALID_RANK_CLASSES.has(cls.toLowerCase());
+}
+
 export default function readRank(): CombinedRankInfo | undefined {
   if (!isElectron()) return undefined;
 
@@ -19,6 +35,13 @@ export default function readRank(): CombinedRankInfo | undefined {
   }
 
   const { constructed: c, limited: l } = ranks;
+
+  // A closed/unreadable game can return a zeroed struct with no error flag
+  // (class comes back as e.g. "Spark"). Reject it so we never clobber a good
+  // stored rank — keep whatever we last read instead.
+  if (!isValidRankClass(c.class) && !isValidRankClass(l.class)) {
+    return globalStore.rank || undefined;
+  }
 
   globalStore.rank = {
     playerId: ranks.playerId || "",

@@ -45,26 +45,21 @@ interface Entry extends LogEntry {
   json: CombinedRankInfo;
 }
 
-export default function InEventGetCombinedRankInfo(entry: Entry): void {
-  const { json } = entry;
-
-  // Rank comes from live memory; skip during catch-up (blocking + would stamp
-  // the current rank onto a historical rank-info entry).
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function InEventGetCombinedRankInfo(_entry: Entry): void {
+  // Rank now comes ONLY from live game memory — 2026 dropped it from the log
+  // payload. Skip during catch-up, and if the memory read is missing/invalid
+  // (MTGA closed, unreadable) do nothing: never overwrite the stored rank from
+  // the empty log payload, which rolled the player's rank back to a default.
   const memoryRank = isLiveLog() ? readRank() : null;
+  if (!memoryRank) return;
 
-  if (memoryRank) {
-    postChannelMessage({
-      type: "UPSERT_DB_RANK",
-      value: {
-        ...memoryRank,
-        constructedClass: memoryRank.constructedClass,
-        limitedClass: memoryRank.limitedClass,
-      },
-    });
-  } else {
-    postChannelMessage({
-      type: "UPSERT_DB_RANK",
-      value: json,
-    });
-  }
+  postChannelMessage({
+    type: "UPSERT_DB_RANK",
+    value: {
+      ...memoryRank,
+      constructedClass: memoryRank.constructedClass,
+      limitedClass: memoryRank.limitedClass,
+    },
+  });
 }
