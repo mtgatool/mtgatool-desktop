@@ -25,6 +25,8 @@ export interface DecksArtViewRowProps {
   hidden: boolean;
   unhide: (id: string) => void;
   hide: (id: string) => void;
+  // Saved decks (read from memory) can't be hidden — omit the archive icon.
+  showArchive?: boolean;
 }
 
 function isCached(src: string) {
@@ -36,7 +38,7 @@ function isCached(src: string) {
 export default function DecksArtViewRow(
   props: DecksArtViewRowProps
 ): JSX.Element {
-  const { clickDeck, deck, hidden, unhide, hide } = props;
+  const { clickDeck, deck, hidden, unhide, hide, showArchive = true } = props;
   const imageUrl = getCardArtCrop(deck.deckTileId);
   const [cardUrl, setCardUrl] = useState<string | undefined>(
     isCached(imageUrl) ? imageUrl : undefined
@@ -96,16 +98,18 @@ export default function DecksArtViewRow(
       }}
     >
       <DeckColorsBar deck={deckObj} />
-      <div
-        className="archive-icon-container"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          clickHide(deckObj.id);
-        }}
-      >
-        {hidden ? <ShowIcon /> : <HideIcon />}
-      </div>
+      {showArchive && (
+        <div
+          className="archive-icon-container"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            clickHide(deckObj.id);
+          }}
+        >
+          {hidden ? <ShowIcon /> : <HideIcon />}
+        </div>
+      )}
       <div className="decks-table-deck-inner">
         <div className="decks-table-deck-item">
           {getPreconDeckName(deck.name)}
