@@ -21,8 +21,8 @@ const NEW_IN_V7: WhatsNewItem[] = [
     body: "Win rate and rank progression over time, with bands showing which deck you played across each stretch and a badge each time you rank up.",
   },
   {
-    title: "Saved decks & a revived Explore",
-    body: "Your in-game saved decks show up automatically, and Explore is back — the best decks for each event, aggregated across all players by decklist.",
+    title: "Saved decks & Explore",
+    body: "Your in-game saved decks show up automatically (even those you dont play), and Explore is back — the best decks for each event, aggregated across all players by decklist.",
   },
 ];
 
@@ -62,7 +62,7 @@ export default function WhatsNewPopup({
               marginBottom: "6px",
             }}
           >
-            Please note — this version is a clean break
+            Please note — this version has breaking changes.
           </div>
           <ul
             style={{
@@ -74,11 +74,20 @@ export default function WhatsNewPopup({
           >
             <li>
               You&apos;ll need to <b>create a new account</b> — logins from
-              earlier versions won&apos;t work here.
+              earlier versions won&apos;t work here. The backend has been
+              migrated to a new database and protocol.
             </li>
             <li>
-              Your <b>match history and stats won&apos;t carry over</b> from
-              previous versions. New matches are tracked from here on.
+              Because of this, your{" "}
+              <b>match history and stats won&apos;t carry over</b> from previous
+              versions. New matches are tracked from here on.
+            </li>
+            <li>
+              Due to changes on the MTG Arena logs, we now only parse logs as
+              you play the game (assisted with realtime memory reading) You can
+              change this in the settings but some of the data, like ranks will
+              be missing from past matches, and we can&apos;t ensure it will
+              work properly.
             </li>
           </ul>
         </div>
@@ -90,7 +99,7 @@ export default function WhatsNewPopup({
             marginBottom: "16px",
           }}
         >
-          New in v{info.version}:
+          Notable changes in v{info.version}:
         </div>
         {NEW_IN_V7.map((item) => (
           <div key={item.title} style={{ marginBottom: "16px" }}>
