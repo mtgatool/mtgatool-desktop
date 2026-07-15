@@ -158,16 +158,15 @@ function App(props: AppProps) {
   const openWhatsNew = useRef<() => void>(vodiFn);
   const closeWhatsNew = useRef<() => void>(vodiFn);
 
-  // Show the "What's new" modal once per version, after the user is logged in.
+  // Show the "What's new" modal once per version, on app open — before login,
+  // so returning users see the new-account / no-carryover notice up front.
   useEffect(() => {
-    if (
-      loginState === LOGIN_OK &&
-      getLocalSetting("whatsNewSeen") !== info.version
-    ) {
+    if (getLocalSetting("whatsNewSeen") !== info.version) {
       openWhatsNew.current();
       setLocalSetting("whatsNewSeen", info.version);
     }
-  }, [loginState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (detailedLogs === false) {
