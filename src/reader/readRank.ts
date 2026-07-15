@@ -2,22 +2,7 @@ import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankIn
 import globalStore from "../background/store";
 import isElectron from "../utils/electron/isElectron";
 import { ReaderRanks } from "../utils/mtgaReader";
-
-// The rank classes a real read can return; anything else (e.g. "Spark" from a
-// closed/unreadable process) means the read is garbage and must be rejected.
-const VALID_RANK_CLASSES = new Set([
-  "beginner",
-  "bronze",
-  "silver",
-  "gold",
-  "platinum",
-  "diamond",
-  "mythic",
-]);
-
-function isValidRankClass(cls?: string): boolean {
-  return typeof cls === "string" && VALID_RANK_CLASSES.has(cls.toLowerCase());
-}
+import { isValidRankClass } from "../utils/mtga/rankClasses";
 
 export default function readRank(): CombinedRankInfo | undefined {
   if (!isElectron()) return undefined;

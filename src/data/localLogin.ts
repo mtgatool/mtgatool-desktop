@@ -8,6 +8,7 @@ import {
   DbUserids,
 } from "../types/dbTypes";
 import globalData from "../utils/globalData";
+import { sanitizeRank } from "../utils/mtga/rankClasses";
 import { getData, queryKeys } from "./store";
 
 /**
@@ -82,7 +83,9 @@ export default async function localLogin(): Promise<void> {
         if (rank) {
           reduxAction(dispatch, {
             type: "SET_UUID_RANK_DATA",
-            arg: { rank, uuid },
+            // Blank out any stored bogus class ("Spark") so it shows as
+            // Unranked until a real read corrects it.
+            arg: { rank: sanitizeRank(rank), uuid },
           });
         }
       })

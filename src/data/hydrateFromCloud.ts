@@ -22,6 +22,7 @@ import {
   DbUserids,
   defaultRankData,
 } from "../types/dbTypes";
+import { isValidRankClass, sanitizeRank } from "../utils/mtga/rankClasses";
 import { ReaderDeck } from "../utils/mtgaReader";
 import { isCloudActive } from "./cloudSync";
 import { getData, putData } from "./store";
@@ -142,6 +143,11 @@ export default async function hydrateFromCloud(): Promise<void> {
         const updated = ms(r.updated_at);
         const c = (r.constructed as Record<string, any>) || {};
         const l = (r.limited as Record<string, any>) || {};
+        // Don't pull a bogus cloud rank ("Spark" pushed before the read guard
+        // existed) over a good local one — skip it entirely.
+        if (!isValidRankClass(c.class) && !isValidRankClass(l.class)) {
+          return Promise.resolve();
+        }
         const rank: DbRankData = {
           ...defaultRankData,
           constructedSeasonOrdinal: c.seasonOrdinal ?? 0,
@@ -164,7 +170,7 @@ export default async function hydrateFromCloud(): Promise<void> {
           limitedLeaderboardPlace: l.leaderboardPlace ?? 0,
           updated,
         };
-        return writeIfNewer(`${r.arena_id}-rank`, updated, rank);
+        return writeIfNewer(`${r.arena_id}-rank`, updated, sanitizeRank(rank));
       })
     );
 
