@@ -64,6 +64,16 @@ export function getCardImage(
     }${set}&format=image${isDfc ? `&face=back` : ""}&version=${quality}`;
   }
 
+  // Arena-only digital set that doesn't map to any Scryfall set code (e.g.
+  // Y25-EOE, OMB-OM1, CUBE-52.60 cube collations). The set code lookup above
+  // left `set` as the raw Arena code, so `/cards/{set}/{cn}` 404s. Resolve by
+  // exact name instead, without a set constraint, so the card art still loads.
+  if (!setName && !["BC20", "SPG"].includes(set)) {
+    finalUrl = `https://api.scryfall.com/cards/named?exact="${replaceName}"&format=image${
+      isDfc ? `&face=back` : ""
+    }&version=${quality}`;
+  }
+
   return encodeURI(finalUrl);
 }
 
