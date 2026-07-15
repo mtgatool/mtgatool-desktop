@@ -41,12 +41,9 @@ export default function WhatsNewPopup({
         boxSizing: "border-box",
       }}
     >
-      <h1 style={{ margin: "0 0 4px" }}>
+      <h1 style={{ margin: "0 0 16px" }}>
         Welcome to MTG Arena Tool v{info.version}
       </h1>
-      <div style={{ color: "var(--color-text-dark)", marginBottom: "16px" }}>
-        A fresh start on a new backend
-      </div>
 
       <div style={{ flex: 1, overflowY: "auto", paddingRight: "8px" }}>
         <div
