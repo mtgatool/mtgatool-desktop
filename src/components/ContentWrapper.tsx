@@ -30,7 +30,6 @@ import ViewCollection from "./views/collection/ViewCollection";
 import ViewDecks from "./views/decks/ViewDecks";
 import ViewDrafts from "./views/drafts/ViewDrafts";
 import ViewExplore from "./views/explore/ViewExplore";
-import ViewExploreAggregator from "./views/explore/ViewExploreAggregator";
 import { MatchData } from "./views/history/convertDbMatchData";
 import HistoryStats from "./views/history/HistoryStats";
 import ViewHistory from "./views/history/ViewHistory";
@@ -48,7 +47,6 @@ const views = {
   match: ViewLiveMatch,
   explore: ViewExplore,
   collection: ViewCollection,
-  aggregator: ViewExploreAggregator,
   user: ViewUser,
 };
 

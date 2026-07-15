@@ -37,7 +37,6 @@ import SettingsPersistor from "./SettingsPersistor";
 import TopBar from "./TopBar";
 import TopNav from "./TopNav";
 import ViewSettings from "./views/settings/ViewSettings";
-import Welcome from "./Welcome";
 import WhatsNewPopup from "./WhatsNewPopup";
 
 export interface AppProps {
@@ -68,11 +67,7 @@ function App(props: AppProps) {
   }, [matchInProgress]);
 
   useEffect(() => {
-    console.log("Can log in?", canLogin);
-    const welcome = getLocalSetting("welcome");
-    if (!welcome || welcome === "false") {
-      history.push("/welcome");
-    } else if (canLogin) {
+    if (canLogin) {
       const autoLogin = getLocalSetting("autoLogin");
 
       // "local" = offline mode (no account); "true" = cloud account, valid
@@ -275,7 +270,6 @@ function App(props: AppProps) {
         )}
         <ErrorBoundary>
           <Switch>
-            <Route exact path="/welcome" component={Welcome} />
             <Route exact path="/auth" component={Auth} />
             <Route path="/:page">
               <>
@@ -294,7 +288,14 @@ function App(props: AppProps) {
         </ErrorBoundary>
         {loginState == LOGIN_OK ? <DataStatus /> : <></>}
         {os !== "" ? (
-          <div className="version-number">v{info.version}</div>
+          <div
+            className="version-number"
+            style={{ cursor: "pointer" }}
+            title="What's new"
+            onClick={() => openWhatsNew.current()}
+          >
+            v{info.version}
+          </div>
         ) : (
           <></>
         )}
