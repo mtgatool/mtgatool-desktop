@@ -8,6 +8,7 @@ import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { LOGIN_AUTH, LOGIN_OK, LOGIN_WAITING } from "../constants";
 import { cloudLogin, cloudSignup } from "../data/cloudAuth";
+import hydrateFromCloud from "../data/hydrateFromCloud";
 import localLogin from "../data/localLogin";
 import UICheckAdmin from "../reader/uiCheckAdmin";
 import reduxAction from "../redux/reduxAction";
@@ -104,30 +105,34 @@ export default function Auth(props: AuthProps) {
       type: "SET_OFFLINE",
       arg: getLocalSetting("autoLogin") !== "true",
     });
-    return localLogin().then(() => {
-      if (electron) {
-        postChannelMessage({
-          type: "START_LOG_READING",
-        });
-        reduxAction(dispatch, {
-          type: "SET_LOADING",
-          arg: true,
-        });
-        reduxAction(dispatch, {
-          type: "SET_READING_LOG",
-          arg: true,
-        });
-      } else {
-        reduxAction(dispatch, {
-          type: "SET_LOGIN_STATE",
-          arg: LOGIN_OK,
-        });
-        reduxAction(dispatch, {
-          type: "SET_LOADING",
-          arg: false,
-        });
-      }
-    });
+    // Pull cloud data down first (no-op offline) so a fresh device restores
+    // its matches/decks/collection/rank before localLogin mirrors KV -> Redux.
+    return hydrateFromCloud()
+      .then(() => localLogin())
+      .then(() => {
+        if (electron) {
+          postChannelMessage({
+            type: "START_LOG_READING",
+          });
+          reduxAction(dispatch, {
+            type: "SET_LOADING",
+            arg: true,
+          });
+          reduxAction(dispatch, {
+            type: "SET_READING_LOG",
+            arg: true,
+          });
+        } else {
+          reduxAction(dispatch, {
+            type: "SET_LOGIN_STATE",
+            arg: LOGIN_OK,
+          });
+          reduxAction(dispatch, {
+            type: "SET_LOADING",
+            arg: false,
+          });
+        }
+      });
   }, [dispatch]);
 
   const onAuthError = useCallback(

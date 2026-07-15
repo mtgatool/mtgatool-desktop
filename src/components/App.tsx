@@ -9,6 +9,7 @@ import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import overlayHandler from "../common/overlayHandler";
 import { LOGIN_OK } from "../constants";
 import { getCloudSession } from "../data/cloudAuth";
+import hydrateFromCloud from "../data/hydrateFromCloud";
 import localLogin from "../data/localLogin";
 import syncMatches from "../data/syncMatches";
 import info from "../info.json";
@@ -87,36 +88,40 @@ function App(props: AppProps) {
             history.push("/auth");
             return undefined;
           }
-          return localLogin().then(() => {
-            reduxAction(dispatch, {
-              type: "SET_LOGIN_STATE",
-              arg: LOGIN_OK,
+          // Pull cloud data down first (no-op offline), then localLogin mirrors
+          // the restored KV into Redux.
+          return hydrateFromCloud()
+            .then(() => localLogin())
+            .then(() => {
+              reduxAction(dispatch, {
+                type: "SET_LOGIN_STATE",
+                arg: LOGIN_OK,
+              });
+
+              // Connection status reflects the mtgatool cloud (Supabase) account:
+              // "true" = signed in (online), "local" = offline mode.
+              reduxAction(dispatch, {
+                type: "SET_OFFLINE",
+                arg: autoLogin !== "true",
+              });
+
+              // Start reading the Arena log on auto-login too (manual login in
+              // Auth.tsx does this; without it, returning users never start the
+              // watcher and nothing populates).
+              if (electron) {
+                postChannelMessage({ type: "START_LOG_READING" });
+              }
+
+              // Reconcile local match history with the cloud (no-op offline).
+              syncMatches().catch(() => undefined);
+
+              if (
+                history.location.pathname === "" ||
+                history.location.pathname === "/"
+              ) {
+                history.push("/auth");
+              }
             });
-
-            // Connection status reflects the mtgatool cloud (Supabase) account:
-            // "true" = signed in (online), "local" = offline mode.
-            reduxAction(dispatch, {
-              type: "SET_OFFLINE",
-              arg: autoLogin !== "true",
-            });
-
-            // Start reading the Arena log on auto-login too (manual login in
-            // Auth.tsx does this; without it, returning users never start the
-            // watcher and nothing populates).
-            if (electron) {
-              postChannelMessage({ type: "START_LOG_READING" });
-            }
-
-            // Reconcile local match history with the cloud (no-op offline).
-            syncMatches().catch(() => undefined);
-
-            if (
-              history.location.pathname === "" ||
-              history.location.pathname === "/"
-            ) {
-              history.push("/auth");
-            }
-          });
         })
         .catch((e: Error) => {
           console.error(e);
