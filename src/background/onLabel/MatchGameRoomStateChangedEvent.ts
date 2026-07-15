@@ -14,6 +14,7 @@ import isLimitedEventId from "../../utils/isLimitedEventId";
 import CardsList from "../../utils/mtga/cardsList";
 import Deck from "../../utils/mtga/deck";
 import actionLog from "../actionLog";
+import { isLiveLog } from "../logReadState";
 import saveMatch from "../saveMatch";
 import selectDeck from "../selectDeck";
 import globalStore from "../store";
@@ -157,7 +158,10 @@ export default function onLabelMatchGameRoomStateChangedEvent(
 
     const isLimited = isLimitedEventId(gameRoom.gameRoomConfig.eventId);
 
-    if (isElectron()) {
+    // Live-match rank/opponent memory reads: skip during catch-up. They read
+    // the CURRENT match's memory (irrelevant to a historical game) and, being
+    // synchronous native reads, freeze the UI while replaying past matches.
+    if (isElectron() && isLiveLog()) {
       const matchState = readMatchManger();
 
       const oppInfo = readMatchOpponentInfo();

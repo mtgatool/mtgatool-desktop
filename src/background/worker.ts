@@ -1,6 +1,9 @@
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import getLocalSetting from "../utils/getLocalSetting";
+import readCards from "../reader/readCards";
+import readDecks from "../reader/readDecks";
 import ArenaLogWatcher from "./arena-log-watcher";
+import { isLiveLog, setLiveLog } from "./logReadState";
 import logEntrySwitch from "./logEntrySwitch";
 
 export default function start(): undefined | (() => void) {
@@ -30,6 +33,22 @@ export default function start(): undefined | (() => void) {
     },
     onError: console.error,
     onFinish: () => {
+      // The first onFinish marks the end of the catch-up pass; from here we're
+      // tailing live, so label handlers may do their synchronous memory reads.
+      if (!isLiveLog()) {
+        setLiveLog(true);
+        // We skipped all readDecks/readCards during catch-up. Do a single
+        // current-state refresh instead of the dozens we avoided — deferred so
+        // the UI paints first (these are blocking native reads).
+        global.setTimeout(() => {
+          try {
+            readDecks();
+            readCards();
+          } catch (e) {
+            console.error(e);
+          }
+        }, 3000);
+      }
       postChannelMessage({
         type: "LOG_READ_FINISHED",
       });

@@ -1,6 +1,7 @@
 import postChannelMessage from "../../broadcastChannel/postChannelMessage";
 import readRank from "../../reader/readRank";
 import LogEntry from "../../types/logDecoder";
+import { isLiveLog } from "../logReadState";
 
 export interface CombinedRankInfo {
   playerId: string;
@@ -47,7 +48,9 @@ interface Entry extends LogEntry {
 export default function InEventGetCombinedRankInfo(entry: Entry): void {
   const { json } = entry;
 
-  const memoryRank = readRank();
+  // Rank comes from live memory; skip during catch-up (blocking + would stamp
+  // the current rank onto a historical rank-info entry).
+  const memoryRank = isLiveLog() ? readRank() : null;
 
   if (memoryRank) {
     postChannelMessage({
