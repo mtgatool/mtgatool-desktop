@@ -22,7 +22,7 @@ const NEW_IN_V7: WhatsNewItem[] = [
   },
   {
     title: "Saved decks & Explore",
-    body: "Your in-game saved decks show up automatically (even those you dont play), and Explore is back — the best decks for each event, aggregated across all players by decklist.",
+    body: "Your in-game saved decks show up automatically (even those you don't play), and Explore is back — the best decks for each event, aggregated across all players by decklist.",
   },
 ];
 
@@ -83,11 +83,10 @@ export default function WhatsNewPopup({
               versions. New matches are tracked from here on.
             </li>
             <li>
-              Due to changes on the MTG Arena logs, we now only parse logs as
-              you play the game (assisted with realtime memory reading) You can
-              change this in the settings but some of the data, like ranks will
-              be missing from past matches, and we can&apos;t ensure it will
-              work properly.
+              Due to changes in the MTG Arena logs, we now only read them as you
+              play (assisted by real-time memory reading). You can change this in
+              settings, but some data — like ranks — will be missing from past
+              matches, and we can&apos;t guarantee it works correctly.
             </li>
           </ul>
         </div>
