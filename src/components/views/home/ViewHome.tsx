@@ -2,22 +2,15 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
+import { DEFAULT_TILE } from "../../../constants";
 import { AppState } from "../../../redux/stores/rendererStore";
-import { getCardArtCrop } from "../../../utils/getCardArtCrop";
+import { StatsDeck } from "../../../types/dbTypes";
+import getRankIndex from "../../../utils/getRankIndex";
+import Deck from "../../../utils/mtga/deck";
+import vodiFn from "../../../utils/voidfn";
+import DecksArtViewRow from "../../DecksArtViewRow";
 import Section from "../../ui/Section";
 import { MatchData } from "../history/convertDbMatchData";
-
-// Rank class -> badge colour, matching the Timeline palette.
-const RANK_COLOR: Record<string, string> = {
-  Beginner: "#8a8f98",
-  Bronze: "#cd7f32",
-  Silver: "#bfc4c9",
-  Gold: "#f2c14e",
-  Platinum: "#7fd8d8",
-  Diamond: "#8ecae6",
-  Mythic: "#ff5a1f",
-  Unranked: "#6b7078",
-};
 
 interface ViewHomeProps {
   matchesData?: MatchData[];
@@ -34,26 +27,27 @@ function winStats(matches: MatchData[]) {
   };
 }
 
+// The real rank badge sprite (ranks_constructed_48.png via the `.rank` class),
+// offset to the player's rank + tier — same as the top-nav rank icon.
 function RankChip({
   label,
   rankClass,
-  level,
+  tier,
   step,
   percentile,
 }: {
   label: string;
   rankClass?: string;
-  level?: number;
+  tier?: number;
   step?: number;
   percentile?: number;
 }): JSX.Element {
   const cls = rankClass || "Unranked";
-  const color = RANK_COLOR[cls] || RANK_COLOR.Unranked;
   let detail = "";
   if (cls === "Mythic") {
-    detail = percentile ? `Top ${percentile.toFixed(1)}%` : "";
+    detail = percentile ? `Top ${percentile.toFixed(1)}%` : "Mythic";
   } else if (cls !== "Unranked") {
-    detail = `Tier ${level ?? "-"}${
+    detail = `Tier ${tier ?? "-"}${
       step ? ` · ${step} pip${step > 1 ? "s" : ""}` : ""
     }`;
   }
@@ -62,29 +56,21 @@ function RankChip({
       style={{
         display: "flex",
         alignItems: "center",
-        gap: "12px",
-        padding: "10px 16px",
+        gap: "8px",
+        padding: "8px 20px 8px 8px",
         borderRadius: "6px",
         background: "var(--color-section-hover)",
-        borderLeft: `4px solid ${color}`,
-        minWidth: "180px",
+        minWidth: "190px",
       }}
     >
       <div
+        className="rank"
         style={{
-          width: "34px",
-          height: "34px",
-          borderRadius: "50%",
-          background: color,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontWeight: 700,
-          color: "#1a1a1a",
+          margin: 0,
+          flexShrink: 0,
+          backgroundPosition: `${getRankIndex(cls, tier || 1) * -48}px 0px`,
         }}
-      >
-        {cls[0]}
-      </div>
+      />
       <div>
         <div style={{ fontSize: "12px", color: "var(--color-text-dark)" }}>
           {label}
@@ -123,31 +109,18 @@ function Metric({
   );
 }
 
-function Wildcard({
+// Reuse the app's wildcard icons (wc-explore-cost + wc-<rarity>), which render
+// the wildcard art with the count beneath.
+function WildcardIcon({
+  rarity,
   n,
-  color,
-  label,
 }: {
+  rarity: "common" | "uncommon" | "rare" | "mythic";
   n: number;
-  color: string;
-  label: string;
 }): JSX.Element {
   return (
-    <div style={{ textAlign: "center", minWidth: "70px" }}>
-      <div
-        style={{
-          width: "16px",
-          height: "16px",
-          borderRadius: "50%",
-          margin: "0 auto 4px",
-          background: color,
-          boxShadow: "0 0 6px rgba(0,0,0,0.4)",
-        }}
-      />
-      <div style={{ fontSize: "18px", color: "var(--color-text)" }}>{n}</div>
-      <div style={{ fontSize: "11px", color: "var(--color-text-dark)" }}>
-        {label}
-      </div>
+    <div className={`wc-explore-cost wc-${rarity}`} title={rarity}>
+      {n}
     </div>
   );
 }
@@ -163,7 +136,7 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
   const me = uuidData[currentUUID];
   const rank = me?.rank;
   const inv = me?.inventory;
-  const displayName = me?.displayName || "Planeswalker";
+  const displayName = (me?.displayName || "Planeswalker").split("#")[0];
 
   const data = useMemo(() => {
     const matches = [...(matchesData || [])].sort(
@@ -184,60 +157,87 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
       } else break;
     }
 
-    // Top decks by games played.
-    const deckMap = new Map<
+    // Top decks by games played, as StatsDecks so DecksArtViewRow can render
+    // them exactly like the played-decks list.
+    const agg = new Map<
       string,
-      { id: string; name: string; tile: number; games: number; wins: number }
+      { games: number; wins: number; lastTs: number; pd: any }
     >();
     matches.forEach((m) => {
-      const name = m.internalMatch?.playerDeck?.name || "Unknown deck";
-      const id = m.internalMatch?.playerDeck?.id || name;
-      let d = deckMap.get(id);
+      const pd = m.internalMatch?.playerDeck;
+      const id = pd?.id || pd?.name || "unknown";
+      let d = agg.get(id);
       if (!d) {
-        d = {
-          id,
-          name,
-          tile: m.internalMatch?.playerDeck?.deckTileId || 0,
-          games: 0,
-          wins: 0,
-        };
-        deckMap.set(id, d);
+        d = { games: 0, wins: 0, lastTs: 0, pd };
+        agg.set(id, d);
       }
       d.games += 1;
       if (m.win) d.wins += 1;
+      d.lastTs = Math.max(d.lastTs, m.timestamp);
     });
-    const topDecks = [...deckMap.values()]
+    const topDecks: StatsDeck[] = [...agg.values()]
       .sort((a, b) => b.games - a.games)
-      .slice(0, 5);
+      .slice(0, 5)
+      .map((d) => {
+        const pd = d.pd || {};
+        const deck = new Deck(pd);
+        return {
+          id: pd.id || pd.name || "unknown",
+          name: pd.name || "Unknown deck",
+          deckTileId: pd.deckTileId || DEFAULT_TILE,
+          mainDeck: pd.mainDeck || [],
+          sideboard: pd.sideboard || [],
+          colors: deck.colors.getBits(),
+          playerId: "",
+          deckHash: "",
+          matches: {},
+          lastUsed: d.lastTs,
+          stats: {
+            gameWins: 0,
+            gameLosses: 0,
+            matchWins: d.wins,
+            matchLosses: d.games - d.wins,
+          },
+          totalGames: d.games,
+          cardWinrates: {},
+          winrate: d.games ? (d.wins / d.games) * 100 : 0,
+        };
+      });
 
     return { all, recent, streak, streakWin, topDecks };
   }, [matchesData]);
 
   return (
     <div style={{ padding: "0 16px" }}>
-      <Section
-        style={{
-          margin: "16px 0",
-          padding: "20px",
-          flexDirection: "column",
-          gap: "16px",
-        }}
-      >
-        <div style={{ fontSize: "22px", color: "var(--color-text)" }}>
+      <Section style={{ margin: "16px 0", padding: "24px 20px" }}>
+        <div style={{ fontSize: "24px", color: "var(--color-text)" }}>
           Welcome back, {displayName}
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
+      </Section>
+
+      <Section
+        style={{ margin: "16px 0", padding: "16px", flexDirection: "column" }}
+      >
+        <div className="separator-title">Rank</div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "12px",
+            marginTop: "10px",
+          }}
+        >
           <RankChip
             label="Constructed"
             rankClass={rank?.constructedClass}
-            level={rank?.constructedLevel}
+            tier={rank?.constructedLevel}
             step={rank?.constructedStep}
             percentile={rank?.constructedPercentile}
           />
           <RankChip
             label="Limited"
             rankClass={rank?.limitedClass}
-            level={rank?.limitedLevel}
+            tier={rank?.limitedLevel}
             step={rank?.limitedStep}
             percentile={rank?.limitedPercentile}
           />
@@ -245,12 +245,7 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
       </Section>
 
       <Section
-        style={{
-          margin: "16px 0",
-          padding: "20px",
-          flexDirection: "column",
-          gap: "16px",
-        }}
+        style={{ margin: "16px 0", padding: "20px", flexDirection: "column" }}
       >
         <div className="separator-title">Performance</div>
         <div
@@ -259,6 +254,7 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
             justifyContent: "space-around",
             flexWrap: "wrap",
             gap: "16px",
+            marginTop: "12px",
           }}
         >
           <Metric value={`${data.all.total}`} label="Matches" />
@@ -291,59 +287,20 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
           style={{ margin: "16px 0", padding: "16px", flexDirection: "column" }}
         >
           <div className="separator-title">Top decks</div>
-          <div style={{ marginTop: "10px" }}>
-            {data.topDecks.map((d) => {
-              const wr = d.games ? (d.wins / d.games) * 100 : 0;
-              return (
-                <div
-                  key={d.id}
-                  onClick={() =>
-                    history.push(`/decks/${encodeURIComponent(d.id)}`)
-                  }
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    padding: "8px",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
-                  className="list-item-container"
-                >
-                  <div
-                    style={{
-                      width: "96px",
-                      height: "36px",
-                      borderRadius: "3px",
-                      flexShrink: 0,
-                      backgroundImage: `url(${getCardArtCrop(d.tile)})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                    }}
-                  />
-                  <div style={{ flex: 1, color: "var(--color-text)" }}>
-                    {d.name}
-                  </div>
-                  <div
-                    style={{
-                      color: "var(--color-text-dark)",
-                      fontSize: "13px",
-                    }}
-                  >
-                    {d.games} games
-                  </div>
-                  <div
-                    style={{
-                      width: "56px",
-                      textAlign: "right",
-                      color: wr >= 50 ? "var(--color-g)" : "var(--color-r)",
-                    }}
-                  >
-                    {wr.toFixed(0)}%
-                  </div>
-                </div>
-              );
-            })}
+          <div className="decks-table-wrapper" style={{ marginTop: "10px" }}>
+            {data.topDecks.map((deck) => (
+              <DecksArtViewRow
+                key={deck.id}
+                deck={deck}
+                clickDeck={(d) =>
+                  history.push(`/decks/${encodeURIComponent(d.id)}`)
+                }
+                hidden={false}
+                hide={vodiFn}
+                unhide={vodiFn}
+                showArchive={false}
+              />
+            ))}
           </div>
         </Section>
       )}
@@ -354,7 +311,6 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
             margin: "16px 0 24px",
             padding: "20px",
             flexDirection: "column",
-            gap: "16px",
           }}
         >
           <div className="separator-title">Economy</div>
@@ -362,26 +318,16 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
             style={{
               display: "flex",
               justifyContent: "space-around",
+              alignItems: "center",
               flexWrap: "wrap",
               gap: "16px",
+              marginTop: "8px",
             }}
           >
-            <Wildcard
-              n={inv.WildCardCommons || 0}
-              color="#c8c8c8"
-              label="Common"
-            />
-            <Wildcard
-              n={inv.WildCardUnCommons || 0}
-              color="#a7c7d8"
-              label="Uncommon"
-            />
-            <Wildcard n={inv.WildCardRares || 0} color="#e2b13c" label="Rare" />
-            <Wildcard
-              n={inv.WildCardMythics || 0}
-              color="#f5622e"
-              label="Mythic"
-            />
+            <WildcardIcon rarity="common" n={inv.WildCardCommons || 0} />
+            <WildcardIcon rarity="uncommon" n={inv.WildCardUnCommons || 0} />
+            <WildcardIcon rarity="rare" n={inv.WildCardRares || 0} />
+            <WildcardIcon rarity="mythic" n={inv.WildCardMythics || 0} />
             <Metric value={`${inv.Gems || 0}`} label="Gems" />
             <Metric value={`${inv.Gold || 0}`} label="Gold" />
             <Metric
