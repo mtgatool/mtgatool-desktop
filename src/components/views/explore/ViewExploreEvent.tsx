@@ -1,137 +1,96 @@
-/* eslint-disable radix */
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable react/jsx-props-no-spreading */
-
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useMemo, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
-import { getData } from "../../../data/store";
-import useFetchAvatar from "../../../hooks/useFetchAvatar";
-import useFetchUsername from "../../../hooks/useFetchUsername";
-import { AppState } from "../../../redux/stores/rendererStore";
+import fetchExploreDecks, {
+  ExploreDeckRow as Row,
+} from "../../../data/fetchExploreDecks";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
-import Flex from "../../Flex";
 import Button from "../../ui/Button";
 import Section from "../../ui/Section";
-import { DbExploreAggregated, ExploreDeckData } from "./doExploreAggregation";
-import ExploreDeckView from "./ExploreDeckView";
-import {
-  MODE_DECKVIEW,
-  MODE_EXPLORE_CARDS,
-  MODE_EXPLORE_DECKS,
-  Modes,
-} from "./ExploreTypes";
-import ViewExploreCards from "./ViewExploreCards";
-import ViewExploreDecks from "./ViewExploreDecks";
+import ExploreDeckRow from "./ExploreDeckRow";
 
-export default function ViewExploreEvent() {
+export default function ViewExploreEvent(): JSX.Element {
   const params = useParams<{ id: string }>();
   const history = useHistory();
-
-  const [mode, setMode] = useState<Modes>(MODE_EXPLORE_DECKS);
-  const [currentDeck, setCurrentDeck] = useState<ExploreDeckData | null>(null);
-
-  const avatars = useSelector((state: AppState) => state.avatars.avatars);
-  const usernames = useSelector((state: AppState) => state.usernames.usernames);
-
-  const [data, setData] = useState<DbExploreAggregated | null>(null);
-
-  const fetchAvatar = useFetchAvatar();
-  const fetchUsername = useFetchUsername();
+  const [rows, setRows] = useState<Row[] | null>(null);
 
   useEffect(() => {
-    getData<DbExploreAggregated>(`exploredata-${params.id}`).then((d) => {
-      if (d) {
-        setData(d);
-        fetchUsername(d.aggregator);
-        fetchAvatar(d.aggregator);
-      }
+    let alive = true;
+    fetchExploreDecks(params.id).then((r) => {
+      if (alive) setRows(r);
     });
-  }, [params]);
+    return () => {
+      alive = false;
+    };
+  }, [params.id]);
+
+  // Best decks first, then most-played.
+  const decks = useMemo(
+    () =>
+      [...(rows || [])].sort(
+        (a, b) => b.winrate - a.winrate || b.games - a.games
+      ),
+    [rows]
+  );
 
   return (
-    <>
-      <Section style={{ margin: "16px 0", flexDirection: "column" }}>
-        <Flex
-          style={{
-            textAlign: "center",
-            flexDirection: "column",
-            lineHeight: "32px",
-          }}
-        >
-          {data && (
-            <>
-              <h2>{getEventPrettyName(params.id)}</h2>
-              <i>
-                Results shown range between {new Date(data.from).toDateString()}{" "}
-                and {new Date(data.to).toDateString()}
-              </i>
-              <div className="maker-container">
-                <i className="maker-name">Pushed by</i>
-                <i
-                  className="maker-name link"
-                  style={{ margin: "0 0 0 4px" }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    history.push(
-                      `/user/${encodeURIComponent(data.aggregator || "")}`
-                    );
-                  }}
-                >
-                  {usernames[data.aggregator]}
-                </i>
-                <div
-                  className="maker-avatar"
-                  style={{
-                    backgroundImage: `url(${avatars[data.aggregator]})`,
-                  }}
-                />
-              </div>
-            </>
-          )}
-        </Flex>
-        <Flex
-          style={{
-            marginTop: "16px",
-            justifyContent: "space-between",
-          }}
-        >
-          <Button onClick={() => history.push(`/explore`)} text="Go Back" />
-          <Button
-            disabled={mode === MODE_EXPLORE_DECKS}
-            onClick={() => setMode(MODE_EXPLORE_DECKS)}
-            text="View Decks"
-          />
-          <Button
-            disabled={mode === MODE_EXPLORE_CARDS}
-            onClick={() => setMode(MODE_EXPLORE_CARDS)}
-            text="View Cards"
-          />
-        </Flex>
+    <div style={{ padding: "0 16px" }}>
+      <Section
+        style={{
+          margin: "16px 0",
+          padding: "16px 20px",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div style={{ fontSize: "20px", color: "var(--color-text)" }}>
+          {getEventPrettyName(params.id)}
+        </div>
+        <Button onClick={() => history.push("/explore")} text="Go back" />
       </Section>
-      {mode === MODE_EXPLORE_DECKS && (
-        <>
-          {data ? (
-            <ViewExploreDecks
-              data={data}
-              setMode={setMode}
-              setCurrentDeck={setCurrentDeck}
-            />
-          ) : (
-            <></>
-          )}
-        </>
+
+      {rows === null && (
+        <Section
+          style={{
+            margin: "16px 0",
+            padding: "32px",
+            justifyContent: "center",
+          }}
+        >
+          <div style={{ color: "var(--color-text-dark)" }}>Loading…</div>
+        </Section>
       )}
-      {mode === MODE_EXPLORE_CARDS &&
-        (data ? <ViewExploreCards data={data} setMode={setMode} /> : <></>)}
-      {mode === MODE_DECKVIEW && currentDeck && (
-        <ExploreDeckView
-          data={currentDeck}
-          goBack={() => setMode(MODE_EXPLORE_DECKS)}
-        />
+
+      {rows !== null && decks.length === 0 && (
+        <Section
+          style={{
+            margin: "16px 0",
+            padding: "40px",
+            justifyContent: "center",
+          }}
+        >
+          <div style={{ color: "var(--color-text-dark)", textAlign: "center" }}>
+            No decks with enough data for this event yet.
+          </div>
+        </Section>
       )}
-    </>
+
+      {decks.length > 0 && (
+        <Section
+          style={{
+            margin: "16px 0 24px",
+            padding: "16px",
+            flexDirection: "column",
+          }}
+        >
+          <div className="separator-title" style={{ marginBottom: "8px" }}>
+            Decks by win rate — click to see the list
+          </div>
+          {decks.map((row) => (
+            <ExploreDeckRow key={row.deck_hash} row={row} />
+          ))}
+        </Section>
+      )}
+    </div>
   );
 }
