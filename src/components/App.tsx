@@ -20,6 +20,7 @@ import isElectron from "../utils/electron/isElectron";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
 import getLocalSetting from "../utils/getLocalSetting";
 import getPopupClass from "../utils/getPopupClass";
+import setLocalSetting from "../utils/setLocalSetting";
 import vodiFn from "../utils/voidfn";
 import Auth from "./Auth";
 import CardHover from "./CardHover";
@@ -37,6 +38,7 @@ import TopBar from "./TopBar";
 import TopNav from "./TopNav";
 import ViewSettings from "./views/settings/ViewSettings";
 import Welcome from "./Welcome";
+import WhatsNewPopup from "./WhatsNewPopup";
 
 export interface AppProps {
   forceOs?: string;
@@ -153,6 +155,20 @@ function App(props: AppProps) {
   const openAdmin = useRef<() => void>(vodiFn);
   const closeAdmin = useRef<() => void>(vodiFn);
 
+  const openWhatsNew = useRef<() => void>(vodiFn);
+  const closeWhatsNew = useRef<() => void>(vodiFn);
+
+  // Show the "What's new" modal once per version, after the user is logged in.
+  useEffect(() => {
+    if (
+      loginState === LOGIN_OK &&
+      getLocalSetting("whatsNewSeen") !== info.version
+    ) {
+      openWhatsNew.current();
+      setLocalSetting("whatsNewSeen", info.version);
+    }
+  }, [loginState]);
+
   useEffect(() => {
     if (detailedLogs === false) {
       openDetailedLogs.current();
@@ -223,6 +239,17 @@ function App(props: AppProps) {
         persistent={false}
       >
         <Admin onClose={closeAdmin.current} />
+      </PopupComponent>
+      <PopupComponent
+        open={false}
+        className={getPopupClass(os)}
+        width="640px"
+        height="580px"
+        openFnRef={openWhatsNew}
+        closeFnRef={closeWhatsNew}
+        persistent={false}
+      >
+        <WhatsNewPopup onClose={() => closeWhatsNew.current()} />
       </PopupComponent>
       {os !== "" && os !== "linux" && <TopBar forceOs={os} />}
       <div

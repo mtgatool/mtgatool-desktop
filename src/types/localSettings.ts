@@ -25,6 +25,7 @@ export const settingKeys = [
   "filterEventOptions",
   "pubkey",
   "importLogHistory",
+  "whatsNewSeen",
 ] as const;
 
 export type SettingKey = typeof settingKeys[number];
@@ -51,4 +52,6 @@ export const defaultSettings: Record<SettingKey, string> = {
   // Forward-only log reading by default; "true" opts into replaying the full
   // Player.log history on startup.
   importLogHistory: "false",
+  // The app version whose "What's new" the user has already dismissed.
+  whatsNewSeen: "",
 };
