@@ -32,6 +32,12 @@
     }
 
     .item {
+      // Nav links must stay clickable: the frameless-window title bar (.top)
+      // is a `-webkit-app-region: drag` region, and where it overlaps the nav
+      // the drag region swallows clicks. Excluding the items with `no-drag`
+      // subtracts them from the draggable region (same as the right-side
+      // buttons), so clicks always register.
+      -webkit-app-region: no-drag;
       max-width: 100px;
       min-width: 48px;
       /*height: 48px;*/
@@ -86,6 +92,7 @@
     justify-content: space-between;
   
     .item-compact {
+      -webkit-app-region: no-drag;
       margin: auto;
       width: 100px;
       height: 22px;
