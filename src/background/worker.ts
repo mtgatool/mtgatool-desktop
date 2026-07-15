@@ -1,10 +1,10 @@
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
-import getLocalSetting from "../utils/getLocalSetting";
 import readCards from "../reader/readCards";
 import readDecks from "../reader/readDecks";
+import getLocalSetting from "../utils/getLocalSetting";
 import ArenaLogWatcher from "./arena-log-watcher";
-import { isLiveLog, setLiveLog } from "./logReadState";
 import logEntrySwitch from "./logEntrySwitch";
+import { isLiveLog, setLiveLog } from "./logReadState";
 
 export default function start(): undefined | (() => void) {
   // eslint-disable-next-line global-require
@@ -23,6 +23,10 @@ export default function start(): undefined | (() => void) {
   return ArenaLogWatcher.start({
     path: getLocalSetting("logPath"),
     chunkSize: 268435440,
+    // Forward-only by default: skip replaying the whole Player.log on startup
+    // (rank is gone from the log anyway, and matches are already in the DB /
+    // restored from cloud). Users can opt into a full import in Data settings.
+    skipInitialBackfill: getLocalSetting("importLogHistory") !== "true",
     onLogEntry: (entry) => {
       logEntrySwitch(entry);
       // This was spammy for no reason

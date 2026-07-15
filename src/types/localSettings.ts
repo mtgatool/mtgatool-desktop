@@ -24,6 +24,7 @@ export const settingKeys = [
   "filterDateOption",
   "filterEventOptions",
   "pubkey",
+  "importLogHistory",
 ] as const;
 
 export type SettingKey = typeof settingKeys[number];
@@ -47,4 +48,7 @@ export const defaultSettings: Record<SettingKey, string> = {
   filterDateOption: "All Time",
   filterEventOptions: "",
   pubkey: "",
+  // Forward-only log reading by default; "true" opts into replaying the full
+  // Player.log history on startup.
+  importLogHistory: "false",
 };

@@ -13,6 +13,7 @@ import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
 import Button from "../../ui/Button";
 import Select from "../../ui/Select";
+import Toggle from "../../ui/Toggle";
 
 const SCRYFALL_LANGS = [
   "en",
@@ -63,6 +64,9 @@ export default function DataSettingsPanel(): JSX.Element {
   const [totalToMigrate, setTotalToMigrate] = useState(0);
 
   const [dbLang, setDbLang] = useState<string>(getLocalSetting("lang") || "en");
+  const [importHistory, setImportHistory] = useState(
+    getLocalSetting("importLogHistory") === "true"
+  );
 
   const doDataMigration = useCallback(() => {
     if (dbFileRef.current) {
@@ -175,6 +179,26 @@ export default function DataSettingsPanel(): JSX.Element {
             Changes the cards data language, <b>not the interface</b>.
           </p>
           <p>Card names when exporting will also be changed.</p>
+        </i>
+      </div>
+
+      <div className="centered-setting-container">
+        <Toggle
+          text="Import full match history from log on startup"
+          value={importHistory}
+          callback={(val: boolean): void => {
+            setLocalSetting("importLogHistory", val ? "true" : "false");
+            setImportHistory(val);
+          }}
+        />
+      </div>
+      <div className="settings-note">
+        <i>
+          <p>
+            By default only new matches are read live. Enable this to replay
+            your entire Player.log on the next startup — slower, and older
+            matches have no rank data. Takes effect after a restart.
+          </p>
         </i>
       </div>
     </>

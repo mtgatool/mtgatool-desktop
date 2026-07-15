@@ -9,8 +9,6 @@ import { promisify } from "util";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import ArenaLogDecoder from "./arena-log-decoder/arena-log-decoder";
 
-const skipFirstpass = false;
-
 const fsAsync = {
   close: promisify(fs.close),
   open: promisify(fs.open),
@@ -24,6 +22,10 @@ interface StartProps {
   onLogEntry: (entry: any) => void;
   onError: (err: any) => void;
   onFinish: () => void;
+  // Forward-only mode: on the very first pass, seek to the current end of the
+  // log without replaying its history (matches already live in the DB / cloud).
+  // Live entries appended afterwards are still processed normally.
+  skipInitialBackfill?: boolean;
 }
 
 async function readChunk(
@@ -88,9 +90,11 @@ function start({
   onLogEntry,
   onError,
   onFinish,
+  skipInitialBackfill = false,
 }: StartProps): () => void {
   const q = queue({ concurrency: 1 });
   let position = 0;
+  let firstPass = true;
   let stringDecoder = new StringDecoder();
   let logDecoder = ArenaLogDecoder();
 
@@ -109,21 +113,30 @@ function start({
       logDecoder = ArenaLogDecoder();
       position = 0;
     }
+
+    // Forward-only default: don't replay the whole log on startup. Seek to the
+    // current end and only process entries appended from here. Applies to the
+    // first pass only — a mid-session log rotation (handled above) still reads
+    // the fresh file normally.
+    if (firstPass && skipInitialBackfill) {
+      firstPass = false;
+      position = size;
+      onFinish();
+      return;
+    }
+    firstPass = false;
+
     while (position < size) {
-      if (!skipFirstpass) {
-        // eslint-disable-next-line no-await-in-loop
-        const buffer = await readChunk(
-          path,
-          position,
-          Math.min(size - position, chunkSize)
-        );
-        const text = stringDecoder.write(buffer);
-        logDecoder.append(text, (entry: any) => onLogEntry({ ...entry, size }));
-        // eslint-disable-next-line require-atomic-updates
-        position += buffer.length;
-      } else {
-        position = size;
-      }
+      // eslint-disable-next-line no-await-in-loop
+      const buffer = await readChunk(
+        path,
+        position,
+        Math.min(size - position, chunkSize)
+      );
+      const text = stringDecoder.write(buffer);
+      logDecoder.append(text, (entry: any) => onLogEntry({ ...entry, size }));
+      // eslint-disable-next-line require-atomic-updates
+      position += buffer.length;
     }
     onFinish();
   }
