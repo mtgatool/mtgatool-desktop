@@ -1,11 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
+import { getCardArtCrop } from "../../../utils/getCardArtCrop";
 import Section from "../../ui/Section";
 import { MatchData } from "../history/convertDbMatchData";
-
-interface ViewTimelineProps {
-  matchesData: MatchData[];
-}
 
 // Rank class -> ordinal (matches the reader's rankClass ordering).
 const RANK_ORDER: Record<string, number> = {
@@ -18,24 +15,46 @@ const RANK_ORDER: Record<string, number> = {
   Diamond: 5,
   Mythic: 6,
 };
-const RANK_NAMES = [
-  "Beginner",
-  "Bronze",
-  "Silver",
-  "Gold",
-  "Platinum",
-  "Diamond",
-  "Mythic",
-];
 
-// A monotonic ladder score for a match's player rank, or null if unranked/unknown.
-// Each class spans 4 tiers x ~6 steps = 24 units; higher is better.
-function rankScore(player: any): number | null {
+// Per-class label + badge colour, used for the y-axis and the rank-up badges.
+const RANK_META: Record<number, { name: string; color: string }> = {
+  0: { name: "Beginner", color: "#8a8f98" },
+  1: { name: "Bronze", color: "#cd7f32" },
+  2: { name: "Silver", color: "#bfc4c9" },
+  3: { name: "Gold", color: "#f2c14e" },
+  4: { name: "Platinum", color: "#7fd8d8" },
+  5: { name: "Diamond", color: "#8ecae6" },
+  6: { name: "Mythic", color: "#ff5a1f" },
+};
+
+// A distinct, bright colour per deck, derived deterministically from the deck
+// name — so it's stable across renders and never runs out the way a fixed
+// palette would. Fixed saturation/lightness keeps every deck readable.
+function deckColorFor(key: string): string {
+  let hash = 0;
+  for (let i = 0; i < key.length; i += 1) {
+    // eslint-disable-next-line no-bitwise
+    hash = (hash * 31 + key.charCodeAt(i)) | 0;
+  }
+  const hue = ((hash % 360) + 360) % 360;
+  return `hsl(${hue}deg, 72%, 64%)`;
+}
+
+// The player's rank class for a match, or null if unranked/unknown.
+function matchClass(player: any): number | null {
   const cls =
     typeof player?.classValue === "number"
       ? player.classValue
       : RANK_ORDER[player?.rank];
   if (cls === undefined || cls === null || cls < 0) return null;
+  return cls;
+}
+
+// A monotonic ladder score for a match's player rank (each class spans
+// 4 tiers x ~6 steps = 24 units; higher is better).
+function rankScore(player: any): number | null {
+  const cls = matchClass(player);
+  if (cls === null) return null;
   if (cls >= 6) return 6 * 24; // Mythic — top of the ladder
   const tier = typeof player?.tier === "number" ? player.tier : 4; // 4..1
   const step = typeof player?.step === "number" ? player.step : 0; // 0..~5
@@ -47,7 +66,29 @@ interface Pt {
   y: number;
 }
 
-// Minimal responsive SVG line + area chart.
+interface Marker {
+  i: number;
+  v: number;
+  node: JSX.Element;
+  title?: string;
+}
+
+// A colored background span covering point indices [i0, i1] (inclusive) — used
+// to highlight which deck was played across each stretch of the timeline.
+interface Band {
+  i0: number;
+  i1: number;
+  color: string;
+  name?: string;
+  title?: string;
+}
+
+// Inner vertical padding (percent) so the top/bottom gridline labels never clip.
+const PAD = 8;
+
+// Responsive line + area chart. Gridlines/labels are HTML (positioned by
+// percent) so they never clip or stretch; only the line/area live in the SVG,
+// which uses a non-scaling stroke to stay crisp under non-uniform scaling.
 function LineChart({
   points,
   color,
@@ -55,6 +96,10 @@ function LineChart({
   max,
   height = 200,
   yTicks = [],
+  markers = [],
+  bands = [],
+  activeDeck,
+  onBandHover,
 }: {
   points: Pt[];
   color: string;
@@ -62,56 +107,170 @@ function LineChart({
   max: number;
   height?: number;
   yTicks?: { v: number; label: string }[];
+  markers?: Marker[];
+  bands?: Band[];
+  activeDeck?: string | null;
+  onBandHover?: (name: string | null) => void;
 }): JSX.Element {
-  const W = 1000;
-  const H = height;
-  const pad = 8;
-  const span = max - min || 1;
   const n = points.length;
-  const sx = (i: number) => (n <= 1 ? 0 : (i / (n - 1)) * (W - pad * 2) + pad);
-  const sy = (v: number) => H - pad - ((v - min) / span) * (H - pad * 2);
+  const span = max - min || 1;
+  const xPct = (i: number): number => (n <= 1 ? 50 : (i / (n - 1)) * 100);
+  const yPct = (v: number): number =>
+    PAD + (1 - (v - min) / span) * (100 - PAD * 2);
 
-  const line = points
-    .map(
-      (p, i) =>
-        `${i === 0 ? "M" : "L"} ${sx(i).toFixed(1)} ${sy(p.y).toFixed(1)}`
-    )
+  const path = points
+    .map((p, i) => `${i === 0 ? "M" : "L"} ${xPct(i)} ${yPct(p.y)}`)
     .join(" ");
-  const area = `${line} L ${sx(n - 1).toFixed(1)} ${H - pad} L ${sx(0).toFixed(
-    1
-  )} ${H - pad} Z`;
+  const area = n > 1 ? `${path} L 100 100 L 0 100 Z` : "";
+
+  const LABEL_W = 60;
 
   return (
-    <svg
-      viewBox={`0 0 ${W} ${H}`}
-      preserveAspectRatio="none"
-      style={{ width: "100%", height: `${H}px` }}
+    <div
+      style={{ position: "relative", height: `${height}px`, marginTop: "12px" }}
     >
       {yTicks.map((t) => (
-        <g key={t.label}>
-          <line
-            x1={0}
-            x2={W}
-            y1={sy(t.v)}
-            y2={sy(t.v)}
-            stroke="var(--color-line-sep)"
-            strokeWidth={1}
-            opacity={0.4}
-          />
-          <text
-            x={4}
-            y={sy(t.v) - 3}
-            fill="var(--color-text-dark)"
-            fontSize={11}
+        <div
+          key={t.label}
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: `${yPct(t.v)}%`,
+          }}
+        >
+          <span
+            style={{
+              position: "absolute",
+              left: 0,
+              width: `${LABEL_W - 10}px`,
+              transform: "translateY(-50%)",
+              textAlign: "right",
+              fontSize: "11px",
+              color: "var(--color-text-dark)",
+              whiteSpace: "nowrap",
+            }}
           >
             {t.label}
-          </text>
-        </g>
+          </span>
+          <div
+            style={{
+              position: "absolute",
+              left: `${LABEL_W}px`,
+              right: 0,
+              borderTop: "1px solid var(--color-line-sep)",
+              opacity: 0.35,
+            }}
+          />
+        </div>
       ))}
-      {n > 1 && <path d={area} fill={color} opacity={0.12} />}
-      {n > 1 && <path d={line} fill="none" stroke={color} strokeWidth={2.5} />}
-      {n === 1 && <circle cx={sx(0)} cy={sy(points[0].y)} r={4} fill={color} />}
-    </svg>
+
+      <div
+        style={{
+          position: "absolute",
+          left: `${LABEL_W}px`,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          overflow: "hidden",
+        }}
+      >
+        {bands.map((b) => {
+          const active = activeDeck && b.name === activeDeck;
+          return (
+            <div
+              key={`band-${b.i0}`}
+              title={b.title}
+              onMouseEnter={() => onBandHover?.(b.name ?? null)}
+              onMouseLeave={() => onBandHover?.(null)}
+              style={{
+                position: "absolute",
+                left: `${(b.i0 / n) * 100}%`,
+                width: `${((b.i1 - b.i0 + 1) / n) * 100}%`,
+                top: 0,
+                bottom: 0,
+                background: b.color,
+                opacity: active ? 0.42 : 0.16,
+                transition: "opacity 0.12s ease-in-out",
+                cursor: "pointer",
+              }}
+            />
+          );
+        })}
+
+        <svg
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "block",
+            overflow: "visible",
+            pointerEvents: "none",
+          }}
+        >
+          {n > 1 && <path d={area} fill={color} opacity={0.12} />}
+          {n > 1 && (
+            <path
+              d={path}
+              fill="none"
+              stroke={color}
+              strokeWidth={2.5}
+              vectorEffect="non-scaling-stroke"
+            />
+          )}
+          {n === 1 && (
+            <circle
+              cx={xPct(0)}
+              cy={yPct(points[0].y)}
+              r={3}
+              fill={color}
+              vectorEffect="non-scaling-stroke"
+            />
+          )}
+        </svg>
+
+        {markers.map((m) => (
+          <div
+            key={`${m.i}-${m.v}`}
+            title={m.title}
+            style={{
+              position: "absolute",
+              left: `${xPct(m.i)}%`,
+              top: `${yPct(m.v)}%`,
+              transform: "translate(-50%, -50%)",
+              pointerEvents: "auto",
+            }}
+          >
+            {m.node}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RankBadge({ cls }: { cls: number }): JSX.Element {
+  const meta = RANK_META[cls] || RANK_META[0];
+  return (
+    <div
+      style={{
+        width: "22px",
+        height: "22px",
+        borderRadius: "50%",
+        background: meta.color,
+        border: "2px solid var(--color-section)",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.5)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "11px",
+        fontWeight: 700,
+        color: "#1a1a1a",
+      }}
+    >
+      {meta.name[0]}
+    </div>
   );
 }
 
@@ -136,8 +295,100 @@ function Stat({
   );
 }
 
+interface DeckStat {
+  name: string;
+  games: number;
+  wins: number;
+  color: string;
+  tileId: number;
+  firstTs: number;
+  lastTs: number;
+  minCls: number | null;
+  maxCls: number | null;
+}
+
+// Right-column detail panel for the hovered (or top) deck.
+function DeckPanel({ deck }: { deck?: DeckStat }): JSX.Element {
+  if (!deck) {
+    return (
+      <div style={{ padding: "16px", color: "var(--color-text-dark)" }}>
+        Hover a deck band or legend entry to see its stats.
+      </div>
+    );
+  }
+
+  const losses = deck.games - deck.wins;
+  const wr = deck.games ? (deck.wins / deck.games) * 100 : 0;
+  const dateRange =
+    deck.firstTs && deck.lastTs
+      ? `${new Date(deck.firstTs).toLocaleDateString()} – ${new Date(
+          deck.lastTs
+        ).toLocaleDateString()}`
+      : "—";
+  let rankRange: string | null = null;
+  if (deck.minCls !== null && deck.maxCls !== null) {
+    const lo = RANK_META[deck.minCls]?.name;
+    const hi = RANK_META[deck.maxCls]?.name;
+    rankRange = deck.minCls === deck.maxCls ? lo : `${lo} → ${hi}`;
+  }
+
+  const row = (label: string, value: string) => (
+    <div
+      style={{ display: "flex", justifyContent: "space-between", gap: "8px" }}
+    >
+      <span style={{ color: "var(--color-text-dark)", fontSize: "13px" }}>
+        {label}
+      </span>
+      <span style={{ color: "var(--color-text)", fontSize: "13px" }}>
+        {value}
+      </span>
+    </div>
+  );
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      <div
+        style={{
+          height: "72px",
+          borderRadius: "4px",
+          backgroundImage: `url(${getCardArtCrop(deck.tileId)})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          borderBottom: `3px solid ${deck.color}`,
+        }}
+      />
+      <div style={{ color: "var(--color-text)", fontSize: "17px" }}>
+        {deck.name}
+      </div>
+      <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+        <span
+          style={{
+            fontSize: "30px",
+            color: wr >= 50 ? "var(--color-g)" : "var(--color-r)",
+          }}
+        >
+          {wr.toFixed(0)}%
+        </span>
+        <span style={{ color: "var(--color-text-dark)" }}>
+          {deck.wins}-{losses}
+        </span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+        {row("Games", `${deck.games}`)}
+        {row("Played", dateRange)}
+        {rankRange && row("Ranks", rankRange)}
+      </div>
+    </div>
+  );
+}
+
+interface ViewTimelineProps {
+  matchesData: MatchData[];
+}
+
 export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
   const { matchesData } = props;
+  const [hoveredDeck, setHoveredDeck] = useState<string | null>(null);
 
   const data = useMemo(() => {
     const matches = [...(matchesData || [])].sort(
@@ -155,12 +406,91 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
       return { x: i, y: (running / (i + 1)) * 100 };
     });
 
-    // Rank ladder over the matches that actually carry a rank.
-    const rankSeries: Pt[] = [];
-    matches.forEach((m, i) => {
-      const s = rankScore(m.internalMatch?.player);
-      if (s !== null) rankSeries.push({ x: i, y: s });
+    // The played deck's name (playerDeckName is actually the player's name).
+    const deckNameOf = (m: MatchData): string =>
+      m.internalMatch?.playerDeck?.name || "Unknown deck";
+
+    // Per-deck stats for the legend + right-side panel.
+    const deckMap = new Map<string, DeckStat>();
+    matches.forEach((m) => {
+      const name = deckNameOf(m);
+      let d = deckMap.get(name);
+      if (!d) {
+        d = {
+          name,
+          games: 0,
+          wins: 0,
+          color: deckColorFor(name),
+          tileId: m.internalMatch?.playerDeck?.deckTileId || 0,
+          firstTs: m.timestamp,
+          lastTs: m.timestamp,
+          minCls: null,
+          maxCls: null,
+        };
+        deckMap.set(name, d);
+      }
+      d.games += 1;
+      if (m.win) d.wins += 1;
+      d.firstTs = Math.min(d.firstTs, m.timestamp);
+      d.lastTs = Math.max(d.lastTs, m.timestamp);
+      const cls = matchClass(m.internalMatch?.player);
+      if (cls !== null) {
+        d.minCls = d.minCls === null ? cls : Math.min(d.minCls, cls);
+        d.maxCls = d.maxCls === null ? cls : Math.max(d.maxCls, cls);
+      }
     });
+    const decks = [...deckMap.values()].sort((a, b) => b.games - a.games);
+
+    // Contiguous runs of the same deck -> highlight bands, in the coordinate
+    // space of whichever series they annotate.
+    const bandsFor = (names: string[]): Band[] => {
+      const out: Band[] = [];
+      let prev: string | null = null;
+      names.forEach((name, i) => {
+        if (name === prev) {
+          out[out.length - 1].i1 = i;
+        } else {
+          out.push({
+            i0: i,
+            i1: i,
+            name,
+            color: deckMap.get(name)?.color || "var(--color-text-dark)",
+            title: name,
+          });
+          prev = name;
+        }
+      });
+      return out;
+    };
+
+    const deckBands = bandsFor(matches.map(deckNameOf));
+
+    // Rank ladder over the matches that carry a rank, plus a badge each time
+    // the rank class advances, plus deck bands in rank-series index space.
+    const rankSeries: Pt[] = [];
+    const rankDeckNames: string[] = [];
+    const rankUps: Marker[] = [];
+    let prevCls: number | null = null;
+    matches.forEach((m) => {
+      const s = rankScore(m.internalMatch?.player);
+      const cls = matchClass(m.internalMatch?.player);
+      if (s === null || cls === null) return;
+      const idx = rankSeries.length;
+      rankSeries.push({ x: idx, y: s });
+      rankDeckNames.push(deckNameOf(m));
+      if (prevCls !== null && cls > prevCls) {
+        rankUps.push({
+          i: idx,
+          v: s,
+          node: <RankBadge cls={cls} />,
+          title: `Ranked up to ${RANK_META[cls]?.name || "?"} · ${new Date(
+            m.timestamp
+          ).toLocaleDateString()}`,
+        });
+      }
+      prevCls = cls;
+    });
+    const rankBands = bandsFor(rankDeckNames);
 
     // Current streak (from most recent).
     let streak = 0;
@@ -174,21 +504,20 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
       } else break;
     }
 
-    const activity = matches.slice(-60);
-
     return {
-      matches,
       total,
       wins,
       losses,
       winrate: total ? (wins / total) * 100 : 0,
       winrateSeries,
       rankSeries,
+      rankUps,
+      deckBands,
+      rankBands,
+      decks,
+      deckMap,
       streak,
       streakWin,
-      activity,
-      first: matches[0]?.timestamp,
-      last: matches[matches.length - 1]?.timestamp,
     };
   }, [matchesData]);
 
@@ -203,9 +532,12 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
   }
 
   const rankMax = 6 * 24;
+  const panelDeck =
+    (hoveredDeck && data.deckMap.get(hoveredDeck)) || data.decks[0];
 
   return (
     <div style={{ padding: "0 16px" }}>
+      {/* Full-width summary header */}
       <Section
         style={{
           margin: "16px 0",
@@ -229,84 +561,155 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
         />
       </Section>
 
-      <Section
-        style={{ margin: "16px 0", padding: "16px", flexDirection: "column" }}
-      >
-        <div className="separator-title">Win rate over time</div>
-        <LineChart
-          points={data.winrateSeries}
-          color="var(--color-g)"
-          min={0}
-          max={100}
-          yTicks={[
-            { v: 50, label: "50%" },
-            { v: 100, label: "100%" },
-          ]}
-        />
-      </Section>
-
-      <Section
-        style={{ margin: "16px 0", padding: "16px", flexDirection: "column" }}
-      >
-        <div className="separator-title">Rank progression</div>
-        {data.rankSeries.length > 0 ? (
-          <LineChart
-            points={data.rankSeries}
-            color="var(--color-text-link)"
-            min={0}
-            max={rankMax}
-            yTicks={RANK_NAMES.map((name, idx) => ({
-              v: idx * 24,
-              label: name,
-            }))}
-          />
-        ) : (
-          <div
+      {/* Graphs (left) + deck detail (right) */}
+      <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <Section
             style={{
-              padding: "24px",
-              textAlign: "center",
-              color: "var(--color-text-dark)",
+              margin: "0 0 16px",
+              padding: "16px",
+              flexDirection: "column",
             }}
           >
-            Play ranked matches to see your rank climb here. (Rank is captured
-            per match going forward.)
-          </div>
-        )}
-      </Section>
-
-      <Section
-        style={{
-          margin: "16px 0 24px",
-          padding: "16px",
-          flexDirection: "column",
-        }}
-      >
-        <div className="separator-title">Recent matches</div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "4px",
-            marginTop: "8px",
-          }}
-        >
-          {data.activity.map((m) => (
-            <div
-              key={m.matchId}
-              title={`${m.win ? "Win" : "Loss"} · ${new Date(
-                m.timestamp
-              ).toLocaleDateString()}`}
-              style={{
-                width: "14px",
-                height: "14px",
-                borderRadius: "3px",
-                backgroundColor: m.win ? "var(--color-g)" : "var(--color-r)",
-                opacity: 0.85,
-              }}
+            <div className="separator-title">Win rate over time</div>
+            <div style={{ fontSize: "12px", color: "var(--color-text-dark)" }}>
+              Background bands show the deck played across each stretch — hover
+              for its stats.
+            </div>
+            <LineChart
+              points={data.winrateSeries}
+              color="var(--color-g)"
+              min={0}
+              max={100}
+              bands={data.deckBands}
+              activeDeck={hoveredDeck}
+              onBandHover={setHoveredDeck}
+              yTicks={[
+                { v: 0, label: "0%" },
+                { v: 50, label: "50%" },
+                { v: 100, label: "100%" },
+              ]}
             />
-          ))}
+          </Section>
+
+          <Section
+            style={{
+              margin: "0 0 16px",
+              padding: "16px",
+              flexDirection: "column",
+            }}
+          >
+            <div className="separator-title">Rank progression</div>
+            {data.rankSeries.length > 0 ? (
+              <LineChart
+                points={data.rankSeries}
+                color="var(--color-text-link)"
+                min={0}
+                max={rankMax}
+                bands={data.rankBands}
+                activeDeck={hoveredDeck}
+                onBandHover={setHoveredDeck}
+                yTicks={[1, 2, 3, 4, 5, 6].map((cls) => ({
+                  v: cls * 24,
+                  label: RANK_META[cls].name,
+                }))}
+                markers={data.rankUps}
+              />
+            ) : (
+              <div
+                style={{
+                  padding: "24px",
+                  textAlign: "center",
+                  color: "var(--color-text-dark)",
+                }}
+              >
+                Play ranked matches to see your rank climb here, with a badge
+                each time you advance a rank. (Rank is captured per match going
+                forward.)
+              </div>
+            )}
+          </Section>
+
+          {data.decks.length > 0 && (
+            <Section
+              style={{
+                margin: "0 0 24px",
+                padding: "16px",
+                flexDirection: "column",
+              }}
+            >
+              <div className="separator-title">Decks played</div>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "8px 20px",
+                  marginTop: "10px",
+                }}
+              >
+                {data.decks.map((d) => {
+                  const wr = d.games ? (d.wins / d.games) * 100 : 0;
+                  return (
+                    <div
+                      key={d.name}
+                      onMouseEnter={() => setHoveredDeck(d.name)}
+                      onMouseLeave={() => setHoveredDeck(null)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        cursor: "pointer",
+                        opacity:
+                          hoveredDeck && hoveredDeck !== d.name ? 0.5 : 1,
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: "12px",
+                          height: "12px",
+                          borderRadius: "3px",
+                          background: d.color,
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span style={{ color: "var(--color-text)" }}>
+                        {d.name}
+                      </span>
+                      <span
+                        style={{
+                          color: "var(--color-text-dark)",
+                          fontSize: "13px",
+                        }}
+                      >
+                        {d.wins}-{d.games - d.wins} ({wr.toFixed(0)}%)
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </Section>
+          )}
         </div>
-      </Section>
+
+        <div style={{ width: "260px", flexShrink: 0 }}>
+          <Section
+            style={{
+              margin: 0,
+              padding: "16px",
+              flexDirection: "column",
+              position: "sticky",
+              top: "16px",
+            }}
+          >
+            <div className="separator-title">
+              {hoveredDeck ? "Deck" : "Top deck"}
+            </div>
+            <div style={{ marginTop: "10px" }}>
+              <DeckPanel deck={panelDeck} />
+            </div>
+          </Section>
+        </div>
+      </div>
     </div>
   );
 }
