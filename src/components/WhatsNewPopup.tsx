@@ -84,9 +84,9 @@ export default function WhatsNewPopup({
             </li>
             <li>
               Due to changes in the MTG Arena logs, we now only read them as you
-              play (assisted by real-time memory reading). You can change this in
-              settings, but some data — like ranks — will be missing from past
-              matches, and we can&apos;t guarantee it works correctly.
+              play (assisted by real-time memory reading). You can change this
+              in settings, but some data — like ranks — will be missing from
+              past matches, and we can&apos;t guarantee it works correctly.
             </li>
           </ul>
         </div>

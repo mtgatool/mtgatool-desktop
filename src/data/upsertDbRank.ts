@@ -10,9 +10,10 @@ import { pushRanks } from "./cloudSync";
 import { getData, putData } from "./store";
 
 export default async function upsertDbRank(arg: Partial<CombinedRankInfo>) {
-  const rank = _(arg).omitBy(_.isUndefined).omitBy(_.isNull).value() as Partial<
-    CombinedRankInfo
-  >;
+  const rank = _(arg)
+    .omitBy(_.isUndefined)
+    .omitBy(_.isNull)
+    .value() as Partial<CombinedRankInfo>;
 
   // Never persist a bogus class (e.g. "Spark" from an unreadable process): drop
   // the offending queue's fields so it can't clobber — or get pushed over — a

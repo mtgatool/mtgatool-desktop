@@ -9,7 +9,9 @@ import readerDeckToDeck from "./readerDeckToDeck";
  * so all stat fields are zeroed — they render with the same art-tile look as
  * played decks, just without winrates/progress.
  */
-export default function savedDeckToStatsDeck(readerDeck: ReaderDeck): StatsDeck {
+export default function savedDeckToStatsDeck(
+  readerDeck: ReaderDeck
+): StatsDeck {
   const deck = readerDeckToDeck(readerDeck);
   const save = deck.getSave();
 

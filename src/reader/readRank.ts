@@ -1,8 +1,8 @@
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import globalStore from "../background/store";
 import isElectron from "../utils/electron/isElectron";
-import { ReaderRanks } from "../utils/mtgaReader";
 import { isValidRankClass } from "../utils/mtga/rankClasses";
+import { ReaderRanks } from "../utils/mtgaReader";
 
 export default function readRank(): CombinedRankInfo | undefined {
   if (!isElectron()) return undefined;
