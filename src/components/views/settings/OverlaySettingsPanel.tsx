@@ -329,29 +329,29 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           onChange={overlayAlphaBackHandler}
         />
       </div>
-      <label className="centered-setting-container">
+      <div className="centered-setting-container">
         <span>
           Live-share background <i>(unset = transparent for OBS)</i>:
         </span>
-        <input
-          onClick={shareColorDoShow}
-          style={{ backgroundColor: settings.shareBackColor || "" }}
-          className="color-picker"
-          type="text"
-          defaultValue=""
-        />
-      </label>
-      {shareColorElement}
-      {!!settings.shareBackColor && (
-        <div className="settings-note" style={{ textAlign: "center" }}>
-          <Button
-            text="Reset to transparent"
-            onClick={(): void =>
-              saveOverlaySettings(current, { shareBackColor: "" })
-            }
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          {!!settings.shareBackColor && (
+            <Button
+              text="Reset to transparent"
+              onClick={(): void =>
+                saveOverlaySettings(current, { shareBackColor: "" })
+              }
+            />
+          )}
+          <input
+            onClick={shareColorDoShow}
+            style={{ backgroundColor: settings.shareBackColor || "" }}
+            className="color-picker"
+            type="text"
+            defaultValue=""
           />
         </div>
-      )}
+      </div>
+      {shareColorElement}
       <div className="settings-note" style={{ textAlign: "center" }}>
         Position: [{settings.bounds.x},{settings.bounds.y}]
       </div>
