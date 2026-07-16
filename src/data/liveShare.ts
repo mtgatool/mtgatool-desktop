@@ -59,6 +59,17 @@ function getChannel(shareId: string): LiveChannel {
     const ref = live;
     channel.subscribe((status) => {
       ref.joined = status === "SUBSCRIBED";
+      // A dropped/errored channel would otherwise stay dead forever (sends are
+      // skipped while not joined). Drop it from the map so the next publish
+      // tick recreates and rejoins it.
+      if (
+        status === "CHANNEL_ERROR" ||
+        status === "TIMED_OUT" ||
+        status === "CLOSED"
+      ) {
+        supabase.removeChannel(channel);
+        if (channels.get(shareId) === ref) channels.delete(shareId);
+      }
     });
     channels.set(shareId, live);
   }

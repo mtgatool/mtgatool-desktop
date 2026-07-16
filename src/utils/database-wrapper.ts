@@ -62,6 +62,41 @@ export function updateCache(data: string): void {
 const RELEASE_BASE =
   "https://github.com/mtgatool/mtgatool-metadata/releases/latest/download";
 
+// Web build: `github.com/.../releases/latest/download/...` responses carry no
+// CORS headers, so browsers block them. The GitHub API DOES send
+// Access-Control-Allow-Origin (on the release listing and on the asset
+// redirect to objects.githubusercontent.com), so resolve assets through it.
+// The listing is memoized per session (unauthenticated API allows 60 req/h).
+const API_LATEST_RELEASE =
+  "https://api.github.com/repos/mtgatool/mtgatool-metadata/releases/latest";
+let releaseListing: Promise<any> | null = null;
+
+function fetchReleaseTextWeb(url: string): Promise<string> {
+  const assetName = url.split("/").pop() || "";
+  if (!releaseListing) {
+    releaseListing = axios.get(API_LATEST_RELEASE).then((r) => r.data);
+    // Don't cache a failure.
+    releaseListing.catch(() => {
+      releaseListing = null;
+    });
+  }
+  return releaseListing.then((release) => {
+    const asset = (release?.assets || []).find(
+      (a: any) => a.name === assetName
+    );
+    if (!asset) {
+      throw new Error(`Release asset not found: ${assetName}`);
+    }
+    return axios
+      .get(asset.url, {
+        responseType: "text",
+        transformResponse: [(d) => d],
+        headers: { Accept: "application/octet-stream" },
+      })
+      .then((r) => r.data as string);
+  });
+}
+
 /**
  * Fetch a GitHub Release asset as text. In Electron we MUST use Node's https
  * from the renderer's node context — a renderer XHR/fetch to github.com is
@@ -71,10 +106,8 @@ const RELEASE_BASE =
  */
 function fetchReleaseText(url: string): Promise<string> {
   if (!electron) {
-    // Web build: best-effort XHR (needs a CORS-enabled host to actually work).
-    return axios
-      .get(url, { responseType: "text", transformResponse: [(d) => d] })
-      .then((r) => r.data as string);
+    // Web build: resolve through the GitHub API, which is CORS-enabled.
+    return fetchReleaseTextWeb(url);
   }
 
   // eslint-disable-next-line no-undef

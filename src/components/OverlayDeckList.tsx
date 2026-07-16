@@ -43,6 +43,9 @@ interface DeckListProps {
   settings: OverlaySettings;
   cardOdds?: Chances;
   setOddsCallback?: (sampleSize: number) => void;
+  // False on the public live-share viewer: it renders this same component but
+  // must not offer the share/QR controls.
+  shareControls?: boolean;
 }
 
 export default function OverlayDeckList(props: DeckListProps): JSX.Element {
@@ -53,6 +56,7 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
     highlightCardId,
     cardOdds,
     setOddsCallback,
+    shareControls = true,
   } = props;
 
   const QRCanvas = useRef<HTMLCanvasElement | null>(null);
@@ -265,7 +269,9 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
       {!!settings.title && (
         <div className="decklist-title">
           <div className="title-text">{subTitle}</div>
-          <QrCodeIcon onClick={toggleLiveShare} className="title-qrcode" />
+          {shareControls && (
+            <QrCodeIcon onClick={toggleLiveShare} className="title-qrcode" />
+          )}
         </div>
       )}
       <canvas
