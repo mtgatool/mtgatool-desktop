@@ -11,20 +11,27 @@ interface PlayerInfo {
   _screenName: string;
 }
 
-export default function readMatchOpponentInfo(): PlayerInfo | undefined {
-  // eslint-disable-next-line no-undef
-  const reader = __non_webpack_require__("mtga-reader");
+export default async function readMatchOpponentInfo(): Promise<
+  PlayerInfo | undefined
+> {
+  try {
+    // eslint-disable-next-line no-undef
+    const reader = __non_webpack_require__("mtga-reader");
 
-  const { readData } = reader;
+    const { readData } = reader;
 
-  const opponentInfo = readData("MTGA", [
-    "MatchSceneManager",
-    "Instance",
-    "_matchManager",
-    "<OpponentInfo>k__BackingField",
-  ]);
+    const opponentInfo = await readData("MTGA", [
+      "MatchSceneManager",
+      "Instance",
+      "_matchManager",
+      "<OpponentInfo>k__BackingField",
+    ]);
 
-  if (opponentInfo.error) return undefined;
+    if (!opponentInfo || opponentInfo.error) return undefined;
 
-  return opponentInfo;
+    return opponentInfo;
+  } catch (e) {
+    console.error("readMatchOpponentInfo failed:", e);
+    return undefined;
+  }
 }

@@ -15,23 +15,30 @@ interface MatchManager {
   disposed: boolean;
 }
 
-export default function readMatchManger(): MatchManager | undefined {
-  // eslint-disable-next-line no-undef
-  const reader = __non_webpack_require__("mtga-reader");
+export default async function readMatchManger(): Promise<
+  MatchManager | undefined
+> {
+  try {
+    // eslint-disable-next-line no-undef
+    const reader = __non_webpack_require__("mtga-reader");
 
-  const { readData } = reader;
+    const { readData } = reader;
 
-  // 2026 layout: the match manager lives under the MatchSceneManager singleton
-  // (WrapperController is unloaded during a match). "PAPA"/"_instance" were the
-  // old obfuscated names; the fields below (_matchManager, <LocalPlayerInfo>,
-  // <OpponentInfo>, <MatchID>) are unchanged.
-  const matchManager = readData("MTGA", [
-    "MatchSceneManager",
-    "Instance",
-    "_matchManager",
-  ]);
+    // 2026 layout: the match manager lives under the MatchSceneManager singleton
+    // (WrapperController is unloaded during a match). "PAPA"/"_instance" were the
+    // old obfuscated names; the fields below (_matchManager, <LocalPlayerInfo>,
+    // <OpponentInfo>, <MatchID>) are unchanged.
+    const matchManager = await readData("MTGA", [
+      "MatchSceneManager",
+      "Instance",
+      "_matchManager",
+    ]);
 
-  if (matchManager.error) return undefined;
+    if (!matchManager || matchManager.error) return undefined;
 
-  return matchManager;
+    return matchManager;
+  } catch (e) {
+    console.error("readMatchManger failed:", e);
+    return undefined;
+  }
 }

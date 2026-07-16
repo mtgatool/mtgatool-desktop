@@ -46,12 +46,15 @@ interface Entry extends LogEntry {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function InEventGetCombinedRankInfo(_entry: Entry): void {
+export default async function InEventGetCombinedRankInfo(
+  _entry: Entry
+): Promise<void> {
   // Rank now comes ONLY from live game memory — 2026 dropped it from the log
   // payload. Skip during catch-up, and if the memory read is missing/invalid
   // (MTGA closed, unreadable) do nothing: never overwrite the stored rank from
   // the empty log payload, which rolled the player's rank back to a default.
-  const memoryRank = isLiveLog() ? readRank() : null;
+  // The read runs async on the native threadpool (mtga-reader 0.1.7).
+  const memoryRank = isLiveLog() ? await readRank() : null;
   if (!memoryRank) return;
 
   postChannelMessage({
