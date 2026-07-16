@@ -6,6 +6,7 @@ import QRCode from "qrcode";
 import { useCallback, useRef, useState } from "react";
 
 import { ReactComponent as QrCodeIcon } from "../assets/images/svg/qrcode.svg";
+import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { OverlaySettings } from "../common/defaultConfig";
 import {
   LANDS_HACK,
@@ -18,9 +19,12 @@ import { CardObject } from "../types";
 import Chances from "../types/chances";
 import compareCards from "../utils/compareCards";
 import copyToClipboard from "../utils/copyToClipboard";
+import getWindowTitle from "../utils/electron/getWindowTitle";
 import Colors from "../utils/mtga/colors";
 import database from "../utils/mtga/database";
 import Deck from "../utils/mtga/deck";
+import sha1 from "../utils/sha1";
+import textRandom from "../utils/textRandom";
 import CardTile, { CardTileQuantity, LandsTile } from "./CardTile";
 import DeckManaCurve from "./DeckManaCurve";
 import DeckTypesStats from "./DeckTypesStats";
@@ -33,7 +37,6 @@ function _compareQuantity(a: CardObject, b: CardObject): -1 | 0 | 1 {
 }
 
 interface DeckListProps {
-  matchId: string;
   deck: Deck;
   subTitle: string;
   highlightCardId?: number;
@@ -44,7 +47,6 @@ interface DeckListProps {
 
 export default function OverlayDeckList(props: DeckListProps): JSX.Element {
   const {
-    matchId,
     deck,
     subTitle,
     settings,
@@ -66,6 +68,29 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
     },
     [QRCanvas]
   );
+
+  // Toggle live-sharing for THIS overlay: ensure it has a persistent
+  // unguessable shareId, flip shareEnabled (the background window broadcasts
+  // the live state over Supabase Realtime while it's on), and show a QR of the
+  // public viewer URL. Clicking again hides the QR and stops sharing.
+  const toggleLiveShare = useCallback(() => {
+    const window = getWindowTitle();
+    if (showQrCode) {
+      setShowQrCode(false);
+      postChannelMessage({
+        type: "OVERLAY_SET_SETTINGS",
+        value: { window, settings: { shareEnabled: false } },
+      });
+      return;
+    }
+    const shareId =
+      settings.shareId || sha1(`${textRandom(64)}-${new Date().getTime()}`);
+    postChannelMessage({
+      type: "OVERLAY_SET_SETTINGS",
+      value: { window, settings: { shareId, shareEnabled: true } },
+    });
+    generateQrCode(`https://app.mtgatool.com/live/${shareId}`);
+  }, [showQrCode, settings.shareId, generateQrCode]);
 
   if (!deck) return <></>;
   const deckClone = deck.clone();
@@ -240,13 +265,7 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
       {!!settings.title && (
         <div className="decklist-title">
           <div className="title-text">{subTitle}</div>
-          <QrCodeIcon
-            onClick={() => {
-              if (showQrCode) setShowQrCode(false);
-              else generateQrCode(`https://app.mtgatool.com/match/${matchId}`);
-            }}
-            className="title-qrcode"
-          />
+          <QrCodeIcon onClick={toggleLiveShare} className="title-qrcode" />
         </div>
       )}
       <canvas

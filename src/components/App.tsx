@@ -27,6 +27,7 @@ import CardHover from "./CardHover";
 import ContentWrapper from "./ContentWrapper";
 import DataStatus from "./DataStatus";
 import ErrorBoundary from "./ErrorBoundary";
+import LiveShareView from "./LiveShareView";
 import LoadingBar from "./LoadingBar";
 import PopupComponent from "./PopupComponent";
 import Popups from "./Popups";
@@ -67,6 +68,9 @@ function App(props: AppProps) {
   }, [matchInProgress]);
 
   useEffect(() => {
+    // The public live-share viewer (/live/<token>) must work with no account —
+    // never bounce it to /auth or run the login flow for it.
+    if (history.location.pathname.startsWith("/live/")) return;
     if (canLogin) {
       const autoLogin = getLocalSetting("autoLogin");
 
@@ -271,6 +275,8 @@ function App(props: AppProps) {
         <ErrorBoundary>
           <Switch>
             <Route exact path="/auth" component={Auth} />
+            {/* Public (no login): live overlay share viewer, see LiveShareView */}
+            <Route exact path="/live/:id" component={LiveShareView} />
             <Route path="/:page">
               <>
                 <TopNav

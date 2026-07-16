@@ -15,6 +15,9 @@ export interface OverlaySettingsData {
   title: boolean;
   typeCounts: boolean;
   collapsed: boolean;
+  // Live-share (persisted configs from older versions may lack these).
+  shareId?: string;
+  shareEnabled?: boolean;
 }
 
 export type CardQuality = "small" | "normal" | "large";

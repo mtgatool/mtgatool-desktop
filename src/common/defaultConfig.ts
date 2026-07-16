@@ -38,6 +38,12 @@ const overlayCfg = {
   typeCounts: false,
   autosize: false,
   collapsed: false,
+  // Live-share: a persistent unguessable token per overlay. While shareEnabled
+  // this overlay's live state is broadcast (Supabase Realtime) to the public
+  // viewer at app.mtgatool.com/live/<shareId> — the URL the overlay QR encodes.
+  // Regenerating the id revokes the old link.
+  shareId: "",
+  shareEnabled: false,
 };
 
 export type OverlaySettings = typeof overlayCfg;
