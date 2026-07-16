@@ -46,6 +46,13 @@ export default function LiveShareView(): JSX.Element {
       .finally(() => setDbReady(true));
   }, []);
 
+  // Strip the themed app background so the whole page is transparent for OBS
+  // (see .live-share-page in app.scss). Scoped to this route's lifetime.
+  useEffect(() => {
+    document.body.classList.add("live-share-page");
+    return () => document.body.classList.remove("live-share-page");
+  }, []);
+
   useEffect(() => {
     const channel = supabase
       .channel(`overlay-${params.id}`)
@@ -134,8 +141,8 @@ export default function LiveShareView(): JSX.Element {
         height: "100%",
         overflowY: "auto",
         display: "flex",
-        justifyContent: "center",
-        padding: "12px 0",
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
       }}
     >
       <div
