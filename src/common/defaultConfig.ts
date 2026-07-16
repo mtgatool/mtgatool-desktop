@@ -44,6 +44,9 @@ const overlayCfg = {
   // Regenerating the id revokes the old link.
   shareId: "",
   shareEnabled: false,
+  // Public viewer background. Empty = transparent (so OBS composites it over
+  // your scene); an "#rrggbb(aa)" value paints a flat colour instead.
+  shareBackColor: "",
 };
 
 export type OverlaySettings = typeof overlayCfg;

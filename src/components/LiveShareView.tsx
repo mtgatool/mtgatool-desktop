@@ -124,7 +124,10 @@ export default function LiveShareView(): JSX.Element {
   }
 
   // Render the overlay itself: same component, same settings, fixed overlay
-  // width, dark backdrop (works as an OBS browser source).
+  // width. The backdrop defaults to transparent so an OBS browser source
+  // composites the overlay over your scene; the sharer can opt into a flat
+  // colour (settings.shareBackColor) from the overlay settings.
+  const backColor = settings.shareBackColor || "transparent";
   return (
     <div
       style={{
@@ -138,7 +141,7 @@ export default function LiveShareView(): JSX.Element {
       <div
         style={{
           width: "320px",
-          backgroundColor: "rgba(0,0,0,0.75)",
+          backgroundColor: backColor,
           borderRadius: "4px",
           height: "fit-content",
         }}

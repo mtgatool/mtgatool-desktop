@@ -18,6 +18,7 @@ export interface OverlaySettingsData {
   // Live-share (persisted configs from older versions may lack these).
   shareId?: string;
   shareEnabled?: boolean;
+  shareBackColor?: string;
 }
 
 export type CardQuality = "small" | "normal" | "large";

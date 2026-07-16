@@ -157,6 +157,18 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
     setOverlayAlphaBack(settings ? settings.alphaBack : 0);
   }, [settings]);
 
+  // Background colour for THIS overlay's public live-share viewer. Empty =
+  // transparent, so an OBS browser source composites the overlay over your
+  // scene; picking a colour paints a flat backdrop instead. Each overlay owns
+  // its own picker instance (keyed by index above), so the initial state is
+  // this overlay's saved value.
+  const [, shareColorDoShow, shareColorElement] = useColorPicker(
+    settings?.shareBackColor || "",
+    undefined,
+    (color: string): void =>
+      saveOverlaySettings(current, { shareBackColor: color })
+  );
+
   return show ? (
     <>
       <Toggle
@@ -317,6 +329,30 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           onChange={overlayAlphaBackHandler}
         />
       </div>
+      <label className="centered-setting-container">
+        <span>
+          Live-share background <i>(unset = transparent for OBS)</i>:
+        </span>
+        <input
+          onClick={shareColorDoShow}
+          style={{ backgroundColor: settings.shareBackColor || "transparent" }}
+          className="color-picker"
+          type="text"
+          readOnly
+          value={settings.shareBackColor || ""}
+        />
+      </label>
+      {shareColorElement}
+      {!!settings.shareBackColor && (
+        <div className="settings-note" style={{ textAlign: "center" }}>
+          <Button
+            text="Reset to transparent"
+            onClick={(): void =>
+              saveOverlaySettings(current, { shareBackColor: "" })
+            }
+          />
+        </div>
+      )}
       <div className="settings-note" style={{ textAlign: "center" }}>
         Position: [{settings.bounds.x},{settings.bounds.y}]
       </div>

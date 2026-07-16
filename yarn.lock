@@ -10374,9 +10374,10 @@ ms@2.1.1:
   version "2.1.1"
   integrity sha512-tgp+dl5cGk28utYktBsrFqA7HKgrhgPsg6Z/EfhWI4gl1Hwq8B/GmY/0oXZ6nF8hDVesS/FpnYaD/kOWhYQvyg==
 
-"mtga-reader@file:../mtga-reader":
-  version "0.1.6"
-  resolved "file:../mtga-reader"
+mtga-reader@^0.1.7:
+  version "0.1.7"
+  resolved "https://registry.npmjs.org/mtga-reader/-/mtga-reader-0.1.7.tgz"
+  integrity sha512-0lYtsJcvMSi+Wzha0DW13qhD5CvUQOer9JUpjYj+avTOfxdf+cA3mPCaZZOaiaPhCBRUpNPZVW3cGPodP0zC0A==
 
 mtgatool-shared@^2.2.0:
   version "2.2.0"
