@@ -335,11 +335,10 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
         </span>
         <input
           onClick={shareColorDoShow}
-          style={{ backgroundColor: settings.shareBackColor || "transparent" }}
+          style={{ backgroundColor: settings.shareBackColor || "" }}
           className="color-picker"
           type="text"
-          readOnly
-          value={settings.shareBackColor || ""}
+          defaultValue=""
         />
       </label>
       {shareColorElement}
