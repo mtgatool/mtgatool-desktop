@@ -250,8 +250,10 @@ function LineChart({
   );
 }
 
-function RankBadge({ cls }: { cls: number }): JSX.Element {
+function RankBadge({ cls, tier }: { cls: number; tier?: number }): JSX.Element {
   const meta = RANK_META[cls] || RANK_META[0];
+  // "B1", "G4", ... — Mythic has no tiers, just "M".
+  const label = `${meta.name[0]}${cls >= 6 || !tier ? "" : tier}`;
   return (
     <div
       style={{
@@ -264,12 +266,12 @@ function RankBadge({ cls }: { cls: number }): JSX.Element {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: "11px",
+        fontSize: "10px",
         fontWeight: 700,
         color: "#1a1a1a",
       }}
     >
-      {meta.name[0]}
+      {label}
     </div>
   );
 }
@@ -471,24 +473,47 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
     const rankDeckNames: string[] = [];
     const rankUps: Marker[] = [];
     let prevCls: number | null = null;
+    let prevTierIdx: number | null = null;
     matches.forEach((m) => {
-      const s = rankScore(m.internalMatch?.player);
-      const cls = matchClass(m.internalMatch?.player);
+      const player = m.internalMatch?.player;
+      const s = rankScore(player);
+      const cls = matchClass(player);
       if (s === null || cls === null) return;
+      // Tier is 4..1 (1 = highest); index it so bigger = better. Mythic has no
+      // tiers — treat it as above every tier.
+      const tier =
+        typeof (player as any)?.tier === "number"
+          ? ((player as any).tier as number)
+          : null;
+      const tierIdx = cls >= 6 ? 99 : 4 - (tier ?? 4);
+
       const idx = rankSeries.length;
       rankSeries.push({ x: idx, y: s });
       rankDeckNames.push(deckNameOf(m));
-      if (prevCls !== null && cls > prevCls) {
+
+      // Badge every advance: a new class (Bronze -> Silver) or a new tier
+      // within the class (Bronze 2 -> Bronze 1). Rank is captured at match
+      // start, so the badge lands on the first match played AT the new rank.
+      const classUp = prevCls !== null && cls > prevCls;
+      const tierUp =
+        prevCls !== null &&
+        cls === prevCls &&
+        prevTierIdx !== null &&
+        tierIdx > prevTierIdx;
+      if (classUp || tierUp) {
+        const name = RANK_META[cls]?.name || "?";
+        const tierLabel = cls >= 6 || tier === null ? "" : ` ${tier}`;
         rankUps.push({
           i: idx,
           v: s,
-          node: <RankBadge cls={cls} />,
-          title: `Ranked up to ${RANK_META[cls]?.name || "?"} · ${new Date(
+          node: <RankBadge cls={cls} tier={tier ?? undefined} />,
+          title: `Ranked up to ${name}${tierLabel} · ${new Date(
             m.timestamp
           ).toLocaleDateString()}`,
         });
       }
       prevCls = cls;
+      prevTierIdx = tierIdx;
     });
     const rankBands = bandsFor(rankDeckNames);
 

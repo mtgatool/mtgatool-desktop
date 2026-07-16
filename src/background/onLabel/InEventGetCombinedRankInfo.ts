@@ -49,20 +49,29 @@ interface Entry extends LogEntry {
 export default async function InEventGetCombinedRankInfo(
   _entry: Entry
 ): Promise<void> {
-  // Rank now comes ONLY from live game memory — 2026 dropped it from the log
-  // payload. Skip during catch-up, and if the memory read is missing/invalid
-  // (MTGA closed, unreadable) do nothing: never overwrite the stored rank from
-  // the empty log payload, which rolled the player's rank back to a default.
-  // The read runs async on the native threadpool (mtga-reader 0.1.7).
-  const memoryRank = isLiveLog() ? await readRank() : null;
-  if (!memoryRank) return;
+  // Rank now comes ONLY from live game memory — 2026 dropped class/step from
+  // the log payload. Skip during catch-up, and if the memory read is
+  // missing/invalid (MTGA closed, unreadable) do nothing: never overwrite the
+  // stored rank with a default.
+  if (!isLiveLog()) return;
 
-  postChannelMessage({
-    type: "UPSERT_DB_RANK",
-    value: {
-      ...memoryRank,
-      constructedClass: memoryRank.constructedClass,
-      limitedClass: memoryRank.limitedClass,
-    },
-  });
+  // The client requests this label right as the post-match rank screen comes
+  // up, but it writes the NEW rank into memory slightly AFTER the log line —
+  // a single immediate read raced it and captured the pre-match rank, so a
+  // rank-up didn't show until the next match. Read now and re-read a couple of
+  // times so the updated rank lands. Reads are async (native threadpool) and
+  // upsertDbRank/cloud push dedup unchanged values, so retries are cheap.
+  // eslint-disable-next-line no-restricted-syntax
+  for (const delay of [0, 4000, 15000]) {
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    // eslint-disable-next-line no-await-in-loop
+    const memoryRank = await readRank();
+    if (memoryRank) {
+      postChannelMessage({
+        type: "UPSERT_DB_RANK",
+        value: { ...memoryRank },
+      });
+    }
+  }
 }
