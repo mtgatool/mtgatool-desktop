@@ -62,39 +62,23 @@ export function updateCache(data: string): void {
 const RELEASE_BASE =
   "https://github.com/mtgatool/mtgatool-metadata/releases/latest/download";
 
-// Web build: `github.com/.../releases/latest/download/...` responses carry no
-// CORS headers, so browsers block them. The GitHub API DOES send
-// Access-Control-Allow-Origin (on the release listing and on the asset
-// redirect to objects.githubusercontent.com), so resolve assets through it.
-// The listing is memoized per session (unauthenticated API allows 60 req/h).
-const API_LATEST_RELEASE =
-  "https://api.github.com/repos/mtgatool/mtgatool-metadata/releases/latest";
-let releaseListing: Promise<any> | null = null;
+// Web build: GitHub Release assets (and their objects.githubusercontent.com /
+// release-assets.githubusercontent.com redirects) send no Access-Control-Allow-
+// Origin, so the browser blocks them. Instead the release CI mirrors the same
+// files into a public Supabase Storage bucket, which serves them with CORS. We
+// keep the GitHub filenames (latest.json, `${lang}-database.json`) so only the
+// host changes.
+const SUPABASE_METADATA_BASE =
+  "https://decenyvqkbvydrrolwpk.supabase.co/storage/v1/object/public/metadata";
 
 function fetchReleaseTextWeb(url: string): Promise<string> {
-  const assetName = url.split("/").pop() || "";
-  if (!releaseListing) {
-    releaseListing = axios.get(API_LATEST_RELEASE).then((r) => r.data);
-    // Don't cache a failure.
-    releaseListing.catch(() => {
-      releaseListing = null;
-    });
-  }
-  return releaseListing.then((release) => {
-    const asset = (release?.assets || []).find(
-      (a: any) => a.name === assetName
-    );
-    if (!asset) {
-      throw new Error(`Release asset not found: ${assetName}`);
-    }
-    return axios
-      .get(asset.url, {
-        responseType: "text",
-        transformResponse: [(d) => d],
-        headers: { Accept: "application/octet-stream" },
-      })
-      .then((r) => r.data as string);
-  });
+  const name = url.split("/").pop() || "";
+  return axios
+    .get(`${SUPABASE_METADATA_BASE}/${name}`, {
+      responseType: "text",
+      transformResponse: [(d) => d],
+    })
+    .then((r) => r.data as string);
 }
 
 /**
@@ -106,7 +90,7 @@ function fetchReleaseTextWeb(url: string): Promise<string> {
  */
 function fetchReleaseText(url: string): Promise<string> {
   if (!electron) {
-    // Web build: resolve through the GitHub API, which is CORS-enabled.
+    // Web build: fetch from the CORS-enabled Supabase Storage mirror.
     return fetchReleaseTextWeb(url);
   }
 
