@@ -161,10 +161,9 @@ export default function Overlay() {
     }
   }, [settings, matchState]);
 
-  // Live-share: while this overlay has sharing enabled, publish its state to
-  // its own Realtime channel. Runs here (the visible overlay window) rather
-  // than the hidden background window so the socket isn't throttled. Only the
-  // data the current mode needs is sent, to keep payloads small.
+  // Live-share: while this overlay has sharing enabled, upsert its state to the
+  // live_overlays row on each change (throttled in publishOverlayShare). Only
+  // the data the current mode needs is sent, to keep payloads small.
   useEffect(() => {
     const shareId = settings?.shareId;
     if (!shareId || !settings?.shareEnabled) return;
@@ -179,9 +178,9 @@ export default function Overlay() {
     publishOverlayShare(shareId, payload);
   }, [settings, matchState, actionLog, draftState, draftVotes]);
 
-  // Tear the channel down when sharing is turned off, the shareId changes, or
-  // the window unmounts — but NOT on every state tick (deps are the primitives
-  // only), so the persistent channel survives normal updates.
+  // Stop sharing (delete row + clear the keepalive) when it's turned off, the
+  // shareId changes, or the window unmounts — but NOT on every state tick (deps
+  // are the primitives only), so publishing survives normal updates.
   useEffect(() => {
     const shareId = settings?.shareId;
     if (shareId && !settings?.shareEnabled) stopOverlayShare(shareId);

@@ -40,10 +40,14 @@ const KEEPALIVE_MS = 3000;
 
 const shares = new Map<string, PerShare>();
 
+let upsertSeq = 0;
+
 function upsertNow(shareId: string): void {
   const s = shares.get(shareId);
   if (!s || !s.latest || s.inflight) return;
   s.inflight = true;
+  upsertSeq += 1;
+  const seq = upsertSeq;
   supabase
     .from("live_overlays")
     .upsert(
@@ -57,10 +61,12 @@ function upsertNow(shareId: string): void {
     .then(({ error }) => {
       const cur = shares.get(shareId);
       if (cur) cur.inflight = false;
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`[liveShare] upsert ${shareId} failed:`, error.message);
-      }
+      // eslint-disable-next-line no-console
+      console.log(
+        `[liveShare] upsert #${seq} ${shareId.slice(0, 8)} -> ${
+          error ? `FAILED: ${error.message}` : "ok"
+        }`
+      );
     });
 }
 
@@ -113,6 +119,8 @@ export function publishOverlayShare(
 
 /** Stop sharing this overlay: clear timers and remove the row. */
 export function stopOverlayShare(shareId: string): void {
+  // eslint-disable-next-line no-console
+  console.trace(`[liveShare] STOP ${shareId.slice(0, 8)}`);
   const s = shares.get(shareId);
   if (s) {
     if (s.trailing) clearTimeout(s.trailing);
