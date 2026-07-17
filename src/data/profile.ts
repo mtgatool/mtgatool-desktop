@@ -57,6 +57,31 @@ export async function uploadAvatar(dataUri: string): Promise<string | null> {
   }
 }
 
+/**
+ * Update the login's display name on its public profile. profiles.username is
+ * populated at signup by a DB trigger and is UNIQUE, so a name already taken by
+ * another user is rejected (returns false); the caller keeps its local rename.
+ */
+export async function updateUsername(username: string): Promise<boolean> {
+  try {
+    const uid = await currentUserId();
+    if (!uid) return false;
+    const { error } = await supabase.from("profiles").upsert({
+      id: uid,
+      username,
+      updated_at: new Date().toISOString(),
+    });
+    if (error) {
+      // eslint-disable-next-line no-console
+      console.warn("[profile] username update failed:", error.message);
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** The current login's avatar URL from its profile row, or null. */
 export async function fetchOwnAvatarUrl(): Promise<string | null> {
   try {

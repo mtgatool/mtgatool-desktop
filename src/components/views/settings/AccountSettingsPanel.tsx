@@ -8,7 +8,7 @@ import { ReactComponent as HideIcon } from "../../../assets/images/svg/unarchive
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 import { LOGIN_AUTH } from "../../../constants";
 import { cloudLogout, cloudUpdatePassword } from "../../../data/cloudAuth";
-import { uploadAvatar } from "../../../data/profile";
+import { updateUsername, uploadAvatar } from "../../../data/profile";
 import { getData, putData } from "../../../data/store";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
@@ -81,6 +81,7 @@ export default function AccountSettingsPanel(
           putData(`==${newAlias}`, userData).then(() => {
             putData("username", newAlias, true);
             setLocalSetting("username", newAlias);
+            updateUsername(newAlias); // keep the public profile display name in sync
             setNewAlias("");
           });
         }
