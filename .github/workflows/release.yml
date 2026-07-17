@@ -9,8 +9,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: "Release (${{ matrix.os }})"
     strategy:
+      # windows-2019 and macos-12 runner images were retired by GitHub, so those
+      # matrix jobs hung forever with no runner (only the Linux asset shipped).
+      # Use current images: windows-latest and macos-13 (x64, matches the prior
+      # macos-12 build).
       matrix:
-        os: [ubuntu-latest, windows-2019, macos-12]
+        os: [ubuntu-latest, windows-latest, macos-13]
     steps:
       - name: "Setup node"
         uses: actions/setup-node@v1
