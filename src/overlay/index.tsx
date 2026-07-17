@@ -37,7 +37,20 @@ function getCurrentOverlayId(): number {
 
 export default function Overlay() {
   const [deck, setDeck] = useState<Deck>();
-  const [settings, setSettings] = useState<OverlaySettings>();
+  // Seed from localStorage on mount. A close/reopen destroys and recreates the
+  // overlay window, which mounts too late to catch the one-off
+  // OVERLAY_UPDATE_SETTINGS broadcast that fired when it was reopened — so
+  // without this the recreated overlay would sit with undefined settings
+  // (blank, and never publishing its live share) until the user changed a
+  // setting. OVERLAY_UPDATE_SETTINGS still keeps it in sync afterwards.
+  const [settings, setSettings] = useState<OverlaySettings | undefined>(() => {
+    try {
+      const all = JSON.parse(getLocalSetting("settings")) as Settings;
+      return all.overlays[getCurrentOverlayId()];
+    } catch {
+      return undefined;
+    }
+  });
   const [matchState, setMatchState] = useState<OverlayUpdateMatchState>();
   const [draftState, setDraftState] = useState<InternalDraftv2>();
   const [draftVotes, setDraftVotes] = useState<Record<string, DbDraftVote>>({});
