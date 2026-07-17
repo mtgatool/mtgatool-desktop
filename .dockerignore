@@ -1,0 +1,8 @@
+node_modules
+build
+dist
+dist-cards-worker
+.git
+*.log
+release
+linux-installer
