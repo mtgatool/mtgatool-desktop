@@ -74,14 +74,20 @@ function getChannel(shareId: string): LiveChannel {
     const ref = live;
     channel.subscribe((status) => {
       ref.joined = status === "SUBSCRIBED";
-      // IMPORTANT: do NOT tear the channel down on CHANNEL_ERROR/TIMED_OUT.
-      // Supabase already auto-retries the join with backoff and rejoins the
-      // SAME channel when the connection recovers; removing it here (and
-      // recreating on the same topic) collides with the half-open join and can
-      // wedge recovery permanently. We only track `joined`; the keepalive
-      // resumes sending once it rejoins. Logged so a stall is visible.
       // eslint-disable-next-line no-console
       console.log(`[liveShare] publisher overlay-${shareId} ${status}`);
+      // CHANNEL_ERROR / TIMED_OUT: leave it — supabase auto-retries the join
+      // with backoff and rejoins the SAME channel. Recreating on the same topic
+      // would collide with that half-open join and wedge recovery.
+      //
+      // CLOSED: terminal in supabase-js — it will NOT auto-rejoin. If this
+      // wasn't us stopping (closing flag), drop our map reference so the next
+      // keepalive tick creates a fresh channel and reconnects. Delete the map
+      // entry only; the channel is already closed, so calling removeChannel here
+      // would just re-enter this callback.
+      if (status === "CLOSED" && !ref.closing) {
+        if (channels.get(shareId) === ref) channels.delete(shareId);
+      }
     });
     channels.set(shareId, live);
   }
