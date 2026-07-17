@@ -178,15 +178,19 @@ export default function Overlay() {
     publishOverlayShare(shareId, payload);
   }, [settings, matchState, actionLog, draftState, draftVotes]);
 
-  // Stop sharing (delete row + clear the keepalive) when it's turned off, the
-  // shareId changes, or the window unmounts — but NOT on every state tick (deps
-  // are the primitives only), so publishing survives normal updates.
+  // Stop sharing ONLY when the user explicitly disables it (shareEnabled ->
+  // false). Deliberately no effect-cleanup teardown: React fires cleanups on
+  // unmount/remount and whenever these deps change (autosize resizes and
+  // settings churn cause plenty of those mid-match), which would spuriously
+  // delete the row and clear the keepalive. The keepalive lives in module state
+  // (liveShare.ts), so it survives component remounts on its own; when the
+  // window actually closes, its JS context — and the interval with it — is torn
+  // down anyway.
   useEffect(() => {
     const shareId = settings?.shareId;
-    if (shareId && !settings?.shareEnabled) stopOverlayShare(shareId);
-    return () => {
-      if (shareId) stopOverlayShare(shareId);
-    };
+    if (shareId && settings && !settings.shareEnabled) {
+      stopOverlayShare(shareId);
+    }
   }, [settings?.shareId, settings?.shareEnabled]);
 
   if (remote && settings?.autosize && heightDivAdjustRef.current) {
