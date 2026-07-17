@@ -7,7 +7,7 @@
  * explore/showcase features can list users + avatars). Best-effort; never
  * throws.
  */
-import supabase from "./supabase";
+import supabase, { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "./supabase";
 
 async function currentUserId(): Promise<string | null> {
   const { data } = await supabase.auth.getUser();
@@ -23,16 +23,31 @@ export async function uploadAvatar(dataUri: string): Promise<string | null> {
     const uid = await currentUserId();
     if (!uid) return null;
 
+    // Attach the user JWT explicitly. supabase-js 2.39.x on the web build does
+    // not reliably propagate the session to its Storage client, so the SDK
+    // upload goes out as anon and RLS 403s ("violates row-level security"). A
+    // direct authenticated request avoids that.
+    const { data: sess } = await supabase.auth.getSession();
+    const token = sess.session?.access_token;
+    if (!token) return null;
+
     const blob = await (await fetch(dataUri)).blob();
-    const { error: upErr } = await supabase.storage
-      .from("avatars")
-      .upload(uid, blob, {
-        upsert: true,
-        contentType: blob.type || "image/png",
-      });
-    if (upErr) {
+    const res = await fetch(
+      `${SUPABASE_URL}/storage/v1/object/avatars/${uid}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          apikey: SUPABASE_PUBLISHABLE_KEY,
+          "Content-Type": blob.type || "image/png",
+          "x-upsert": "true",
+        },
+        body: blob,
+      }
+    );
+    if (!res.ok) {
       // eslint-disable-next-line no-console
-      console.warn("[avatar] upload failed:", upErr.message);
+      console.warn("[avatar] upload failed:", res.status, await res.text());
       return null;
     }
 

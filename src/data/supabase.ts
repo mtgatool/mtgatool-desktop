@@ -10,8 +10,8 @@ import { Database } from "./database.types";
  * with the logged-in user's JWT. Secrets (service_role, OAuth providers)
  * live only in the Supabase dashboard / CI, never in this repo.
  */
-const SUPABASE_URL = "https://decenyvqkbvydrrolwpk.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY =
+export const SUPABASE_URL = "https://decenyvqkbvydrrolwpk.supabase.co";
+export const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_9CgHq0DZWlYYxjH7ZDLeOw_zk4EKYKu";
 
 const supabase = createClient<Database>(
