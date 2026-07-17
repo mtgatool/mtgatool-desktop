@@ -67,8 +67,6 @@ function dropChannel(shareId: string, live: LiveChannel): void {
 function getChannel(shareId: string): LiveChannel {
   let live = channels.get(shareId);
   if (!live) {
-    // ack:true so send() resolves only on server confirmation — we use that to
-    // detect a rotted connection and recreate the channel.
     const channel = supabase.channel(`overlay-${shareId}`, {
       config: { broadcast: { ack: true } },
     });
@@ -76,17 +74,14 @@ function getChannel(shareId: string): LiveChannel {
     const ref = live;
     channel.subscribe((status) => {
       ref.joined = status === "SUBSCRIBED";
-      if (
-        status === "CHANNEL_ERROR" ||
-        status === "TIMED_OUT" ||
-        status === "CLOSED"
-      ) {
-        if (!ref.closing) {
-          // eslint-disable-next-line no-console
-          console.warn(`[liveShare] channel overlay-${shareId} ${status}`);
-        }
-        dropChannel(shareId, ref);
-      }
+      // IMPORTANT: do NOT tear the channel down on CHANNEL_ERROR/TIMED_OUT.
+      // Supabase already auto-retries the join with backoff and rejoins the
+      // SAME channel when the connection recovers; removing it here (and
+      // recreating on the same topic) collides with the half-open join and can
+      // wedge recovery permanently. We only track `joined`; the keepalive
+      // resumes sending once it rejoins. Logged so a stall is visible.
+      // eslint-disable-next-line no-console
+      console.log(`[liveShare] publisher overlay-${shareId} ${status}`);
     });
     channels.set(shareId, live);
   }
@@ -97,7 +92,7 @@ function sendNow(shareId: string): void {
   const s = shares.get(shareId);
   if (!s || !s.latest) return;
   const live = getChannel(shareId);
-  if (!live.joined) return; // still connecting; keepalive/trailing will retry
+  if (!live.joined) return; // not joined; Supabase is rejoining, keepalive retries
   live.channel
     .send({
       type: "broadcast",
@@ -107,10 +102,7 @@ function sendNow(shareId: string): void {
     .then((res) => {
       if (res !== "ok") {
         // eslint-disable-next-line no-console
-        console.warn(
-          `[liveShare] send overlay-${shareId} -> ${res}; recreating`
-        );
-        dropChannel(shareId, live);
+        console.warn(`[liveShare] send overlay-${shareId} -> ${res}`);
       }
     })
     .catch((e) => {
