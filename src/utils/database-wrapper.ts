@@ -83,14 +83,14 @@ function gunzipToText(buffer: ArrayBuffer): Promise<string> {
 function fetchReleaseTextWeb(url: string): Promise<string> {
   const name = url.split("/").pop() || "";
   const gzipped = name.endsWith("-database.json");
-  const remote = `${SUPABASE_METADATA_BASE}/${name}${gzipped ? ".gz" : ""}`;
+  const assetUrl = `${SUPABASE_METADATA_BASE}/${name}${gzipped ? ".gz" : ""}`;
   if (!gzipped) {
     return axios
-      .get(remote, { responseType: "text", transformResponse: [(d) => d] })
+      .get(assetUrl, { responseType: "text", transformResponse: [(d) => d] })
       .then((r) => r.data as string);
   }
   return axios
-    .get(remote, { responseType: "arraybuffer" })
+    .get(assetUrl, { responseType: "arraybuffer" })
     .then((r) => gunzipToText(r.data as ArrayBuffer));
 }
 
