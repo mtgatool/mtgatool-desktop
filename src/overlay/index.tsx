@@ -89,9 +89,19 @@ export default function Overlay() {
       }
 
       if (msg.data.type === "OVERLAY_UPDATE_SETTINGS") {
+        const resolvedId = getCurrentOverlayId();
         const newSettings: OverlaySettings = (
           JSON.parse(getLocalSetting("settings")) as Settings
-        ).overlays[getCurrentOverlayId()];
+        ).overlays[resolvedId];
+
+        // eslint-disable-next-line no-console
+        console.log(
+          `[liveShare] settings update: id=${resolvedId} title="${remote
+            ?.getCurrentWindow()
+            .getTitle()}" shareEnabled=${
+            newSettings?.shareEnabled
+          } shareId=${newSettings?.shareId?.slice(0, 8)}`
+        );
 
         setSettings({
           ...settings,

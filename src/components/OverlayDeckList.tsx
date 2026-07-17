@@ -80,6 +80,8 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
   const toggleLiveShare = useCallback(() => {
     const window = getWindowTitle();
     if (showQrCode) {
+      // eslint-disable-next-line no-console
+      console.trace(`[liveShare] toggle OFF via ${window}`);
       setShowQrCode(false);
       postChannelMessage({
         type: "OVERLAY_SET_SETTINGS",
