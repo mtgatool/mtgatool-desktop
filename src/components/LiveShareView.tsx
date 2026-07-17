@@ -58,10 +58,20 @@ export default function LiveShareView(): JSX.Element {
       .channel(`overlay-${params.id}`)
       .on("broadcast", { event: "overlay" }, (msg: any) => {
         if (msg?.payload?.matchState) {
+          // Diagnostic: lets us confirm from the viewer console whether the
+          // publisher keeps streaming. If these stop while the desktop overlay
+          // keeps advancing, the stall is publisher-side.
+          // eslint-disable-next-line no-console
+          console.log(
+            `[liveShare] recv overlay-${params.id} ts=${msg.payload.ts}`
+          );
           setPayload(msg.payload as SharePayload);
         }
       })
-      .subscribe();
+      .subscribe((status: string) => {
+        // eslint-disable-next-line no-console
+        console.log(`[liveShare] viewer overlay-${params.id} ${status}`);
+      });
 
     return () => {
       supabase.removeChannel(channel);
