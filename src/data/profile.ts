@@ -1,13 +1,15 @@
 /**
  * User profile / avatar storage in Supabase.
  *
- * One avatar per LOGIN (auth user): the image is uploaded to the public
- * `avatars` Storage bucket at object name = the user's uid, and the resulting
- * public URL is recorded on the user's `profiles` row (public-read, so future
- * explore/showcase features can list users + avatars). Best-effort; never
- * throws.
+ * One avatar per LOGIN (auth user), stored as a small resized data URI directly
+ * on the public `profiles.avatar_url` column (public-read, so future
+ * explore/showcase features can list users + avatars). We go through PostgREST
+ * rather than Storage because the Storage service on this project doesn't
+ * recognise the (asymmetric ES256) user JWT — it 403s every authenticated write
+ * — whereas PostgREST verifies it fine. Avatars are 128x128 (~a few KB), so a
+ * data URI in a text column is acceptable. Best-effort; never throws.
  */
-import supabase, { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "./supabase";
+import supabase from "./supabase";
 
 async function currentUserId(): Promise<string | null> {
   const { data } = await supabase.auth.getUser();
@@ -15,56 +17,25 @@ async function currentUserId(): Promise<string | null> {
 }
 
 /**
- * Upload a resized avatar data URI to Supabase and record it on the profile.
- * Returns the (cache-busted) public URL, or null on failure.
+ * Store a resized avatar data URI on the user's profile. Returns the stored
+ * value (the data URI) or null on failure.
  */
 export async function uploadAvatar(dataUri: string): Promise<string | null> {
   try {
     const uid = await currentUserId();
     if (!uid) return null;
 
-    // Attach the user JWT explicitly. supabase-js 2.39.x on the web build does
-    // not reliably propagate the session to its Storage client, so the SDK
-    // upload goes out as anon and RLS 403s ("violates row-level security"). A
-    // direct authenticated request avoids that.
-    const { data: sess } = await supabase.auth.getSession();
-    const token = sess.session?.access_token;
-    if (!token) return null;
-
-    const blob = await (await fetch(dataUri)).blob();
-    const res = await fetch(
-      `${SUPABASE_URL}/storage/v1/object/avatars/${uid}`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          apikey: SUPABASE_PUBLISHABLE_KEY,
-          "Content-Type": blob.type || "image/png",
-          "x-upsert": "true",
-        },
-        body: blob,
-      }
-    );
-    if (!res.ok) {
-      // eslint-disable-next-line no-console
-      console.warn("[avatar] upload failed:", res.status, await res.text());
-      return null;
-    }
-
-    const { data: pub } = supabase.storage.from("avatars").getPublicUrl(uid);
-    // The object name is stable (the uid), so bust CDN/browser caches on change.
-    const url = `${pub.publicUrl}?u=${new Date().getTime()}`;
-
-    const { error: pErr } = await supabase.from("profiles").upsert({
+    const { error } = await supabase.from("profiles").upsert({
       id: uid,
-      avatar_url: url,
+      avatar_url: dataUri,
       updated_at: new Date().toISOString(),
     });
-    if (pErr) {
+    if (error) {
       // eslint-disable-next-line no-console
-      console.warn("[avatar] profile upsert failed:", pErr.message);
+      console.warn("[avatar] profile upsert failed:", error.message);
+      return null;
     }
-    return url;
+    return dataUri;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn("[avatar] uploadAvatar threw:", e);
