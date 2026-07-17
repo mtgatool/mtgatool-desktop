@@ -157,7 +157,10 @@ export default function TopBar(props: TopBarProps): JSX.Element {
   );
 
   const isOffline = (
-    <div className="unlink" title="You are not connected to any servers." />
+    <div
+      className="unlink"
+      title="Offline mode — not signed in to your mtgatool cloud account. Data stays on this device."
+    />
   );
 
   return (

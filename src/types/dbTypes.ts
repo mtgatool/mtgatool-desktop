@@ -1,6 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
-import { ToolDb } from "mtgatool-db";
-
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { InventoryInfo } from "../background/onLabel/InStartHook";
 import { OverlayHandler } from "../common/overlayHandler";
@@ -9,9 +6,10 @@ import { Cards, InternalMatch, v2cardsList } from ".";
 
 declare global {
   interface Window {
-    toolDb: ToolDb;
-    toolDbWorker: Worker;
-    toolDbInitialized: boolean;
+    // tool-db is removed. The worker is never created anymore; this optional
+    // handle only keeps the legacy `if (window.toolDbWorker)` guards in the
+    // (now inert) community features type-checking until they're rebuilt.
+    toolDbWorker?: Worker;
     database: DatabaseClass;
     overlayHandler: OverlayHandler | undefined;
     globalStore: any;

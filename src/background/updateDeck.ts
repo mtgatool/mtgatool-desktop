@@ -26,6 +26,9 @@ function updateDeck(): void {
     type: "OVERLAY_UPDATE",
     value: currentMatchCopy,
   });
+  // Live-share publishing now happens in the overlay window (see
+  // overlay/index.tsx) — it's a visible window, so its Realtime socket isn't
+  // throttled the way this hidden background window's would be.
 }
 
 export default updateDeck;

@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import { DEFAULT_AVATAR } from "../../../constants";
+import { doFunction } from "../../../data/store";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
-import { doFunction } from "../../../toolDb/worker-wrapper";
 import { DbRankDataWithKey } from "../../../types/dbTypes";
 import cleanUsername from "../../../utils/cleanUsername";
 import timeAgo from "../../../utils/timeAgo";
@@ -156,7 +156,7 @@ export default function BestRanksFeed() {
 
     doFunction<DbRankDataWithKey[]>("getLatestRanks", {}).then((fnRet) => {
       const data: DbRankDataWithKey[] =
-        fnRet.code === "OK" && fnRet.return ? fnRet.return : [];
+        fnRet?.code === "OK" && fnRet.return ? fnRet.return : [];
 
       const promises = data.map((rankInfo) =>
         finallyThen(fetchAvatar(rankInfo.pubKey)).then((avatar) =>

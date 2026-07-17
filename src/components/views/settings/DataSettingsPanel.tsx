@@ -1,17 +1,12 @@
-import _ from "lodash";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import reduxAction from "../../../redux/reduxAction";
-import { DbMatch } from "../../../types/dbTypes";
 import { loadDbFromCache } from "../../../utils/database-wrapper";
 import getLocalSetting from "../../../utils/getLocalSetting";
-import globalData from "../../../utils/globalData";
-import dataMigration from "../../../utils/migration/dataMigration";
 import setLocalSetting from "../../../utils/setLocalSetting";
-import vodiFn from "../../../utils/voidfn";
-import Button from "../../ui/Button";
 import Select from "../../ui/Select";
+import Toggle from "../../ui/Toggle";
 
 const SCRYFALL_LANGS = [
   "en",
@@ -55,57 +50,11 @@ function getLanguageName(lang: string): string {
 
 export default function DataSettingsPanel(): JSX.Element {
   const dispatch = useDispatch();
-  const dbInputRef = useRef<HTMLInputElement>(null);
-  const [dbFilePath, setDbFilePath] = useState<string | undefined>(undefined);
-  const dbFileRef = useRef<Blob | null>(null);
-  const [toMigrate, setToMigrate] = useState<DbMatch[]>([]);
-  const [totalToMigrate, setTotalToMigrate] = useState(0);
 
   const [dbLang, setDbLang] = useState<string>(getLocalSetting("lang") || "en");
-
-  const doDataMigration = useCallback(() => {
-    if (dbFileRef.current) {
-      const FR = new FileReader();
-
-      FR.addEventListener("load", (ev: any) => {
-        dataMigration(ev.target.result).then((data) => {
-          setTotalToMigrate(data.length);
-          setToMigrate(data);
-
-          const migrateIds = data.map((m) => m.matchId);
-
-          migrateIds.forEach((id) => {
-            if (!globalData.matchesIndex.includes(id)) {
-              globalData.matchesIndex.push(id);
-            }
-          });
-        });
-      });
-
-      FR.readAsText(dbFileRef.current);
-    }
-  }, [dbFileRef]);
-
-  useEffect(() => {
-    if (dbInputRef.current) {
-      dbInputRef.current.addEventListener("change", (e: any) => {
-        if (e && e.target && e.target.files && e.target.files[0]) {
-          setDbFilePath(e.target.files[0].path);
-          [dbFileRef.current] = e.target.files;
-        }
-      });
-    }
-  }, [dbInputRef]);
-
-  useEffect(() => {
-    if (toMigrate.length !== 0) {
-      const match = toMigrate[0];
-
-      window.toolDb
-        .putData<DbMatch>(`matches-${match.matchId}`, match, true)
-        .finally(() => setToMigrate(toMigrate.slice(1)));
-    }
-  }, [toMigrate]);
+  const [importHistory, setImportHistory] = useState(
+    getLocalSetting("importLogHistory") === "true"
+  );
 
   const setCardsLanguage = useCallback(
     (lang: string) => {
@@ -120,45 +69,6 @@ export default function DataSettingsPanel(): JSX.Element {
 
   return (
     <>
-      <div>
-        <p>
-          Select a .db to migrate data from a previous MTG Arena Tool version.
-        </p>
-        <p>This will only migrate matches history.</p>
-      </div>
-      <div className="centered-setting-container">
-        <p>{dbFilePath || "No file selected"}</p>
-        <label htmlFor="dbInput" style={{ margin: "0" }}>
-          <Button text="Select .db file" onClick={vodiFn} />
-          <input
-            style={{ display: "none" }}
-            ref={dbInputRef}
-            id="dbInput"
-            type="file"
-          />
-        </label>
-      </div>
-
-      <div style={{ textAlign: "center", height: "48px" }}>
-        {totalToMigrate > 0 && toMigrate.length > 0 && (
-          <>
-            <p>
-              Restoring data ({totalToMigrate - toMigrate.length}/
-              {totalToMigrate})
-            </p>
-            <b className="red" style={{ lineHeight: "28px" }}>
-              Do not close this dialog!
-            </b>
-          </>
-        )}
-      </div>
-
-      <Button
-        style={{ margin: "16px auto 32px auto" }}
-        text="Begin migration"
-        className="button-simple"
-        onClick={doDataMigration}
-      />
       <div className="centered-setting-container">
         <label>Cards Data</label>
         <Select
@@ -174,6 +84,26 @@ export default function DataSettingsPanel(): JSX.Element {
             Changes the cards data language, <b>not the interface</b>.
           </p>
           <p>Card names when exporting will also be changed.</p>
+        </i>
+      </div>
+
+      <div className="centered-setting-container">
+        <Toggle
+          text="Import full match history from log on startup"
+          value={importHistory}
+          callback={(val: boolean): void => {
+            setLocalSetting("importLogHistory", val ? "true" : "false");
+            setImportHistory(val);
+          }}
+        />
+      </div>
+      <div className="settings-note">
+        <i>
+          <p>
+            By default only new matches are read live. Enable this to replay
+            your entire Player.log on the next startup — slower, and older
+            matches have no rank data. Takes effect after a restart.
+          </p>
         </i>
       </div>
     </>

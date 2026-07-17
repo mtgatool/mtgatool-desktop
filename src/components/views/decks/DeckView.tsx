@@ -9,6 +9,7 @@ import { useHistory, useParams } from "react-router-dom";
 import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
 import { ReactComponent as CameraIcon } from "../../../assets/images/svg/camera-solid.svg";
 import { DEFAULT_TILE, MANA_COLORS } from "../../../constants";
+import useSavedDecks from "../../../hooks/useSavedDecks";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { CardObject, DbCardDataV2 } from "../../../types";
@@ -22,6 +23,7 @@ import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
 import getSampleHand from "../../../utils/getSampleHand";
 import Colors from "../../../utils/mtga/colors";
 import Deck from "../../../utils/mtga/deck";
+import savedDeckToStatsDeck from "../../../utils/mtga/savedDeckToStatsDeck";
 import CardTile from "../../CardTile";
 import CraftingCost from "../../CraftingCost";
 import DeckColorsBar from "../../DeckColorsBar";
@@ -57,14 +59,16 @@ export default function DeckView(props: DeckViewProps): JSX.Element {
   const params = useParams<{ page: string; id: string }>();
 
   const [dbDeck, setDbDeck] = useState<StatsDeck>();
+  // A played deck has match history (deck changes + card winrates). Saved decks
+  // read from memory that were never played have neither.
+  const [isPlayed, setIsPlayed] = useState(false);
 
   const fullStats = useSelector((state: AppState) => state.mainData.fullStats);
+  const savedDecks = useSavedDecks();
 
   useEffect(() => {
-    if (fullStats) {
-      const hashes = fullStats.decks[params.id];
-      if (!hashes) return;
-
+    const hashes = fullStats?.decks[params.id];
+    if (fullStats && hashes) {
       let latestTimestamp = fullStats.deckIndex[hashes[0]].lastUsed;
       let latestHash = hashes[0];
 
@@ -75,8 +79,18 @@ export default function DeckView(props: DeckViewProps): JSX.Element {
         }
       });
       setDbDeck(fullStats.deckIndex[latestHash]);
+      setIsPlayed(true);
+      return;
     }
-  }, [fullStats, params]);
+
+    // Not a played deck — fall back to a saved deck read from memory. Same
+    // view, just no match history / winrates.
+    const saved = savedDecks.find((d) => d.deckId === params.id);
+    if (saved) {
+      setDbDeck(savedDeckToStatsDeck(saved));
+      setIsPlayed(false);
+    }
+  }, [fullStats, params, savedDecks]);
 
   const deck = new Deck(
     {
@@ -205,10 +219,10 @@ export default function DeckView(props: DeckViewProps): JSX.Element {
         {deckView == VIEW_VISUAL && (
           <VisualDeckView deck={deck} setRegularView={regularView} />
         )}
-        {deckView == VIEW_CHANGES && (
+        {deckView == VIEW_CHANGES && isPlayed && (
           <ChangesDeckView setRegularView={regularView} />
         )}
-        {deckView == VIEW_WINRATES && dbDeck && fullStats && (
+        {deckView == VIEW_WINRATES && isPlayed && dbDeck && fullStats && (
           <CardsWinratesView
             fullStats={fullStats}
             dbDeck={dbDeck}
@@ -228,18 +242,22 @@ export default function DeckView(props: DeckViewProps): JSX.Element {
                 style={{ height: "32px", width: "32px", margin: "auto 16px" }}
                 onClick={() => openDeckView(deck)}
               />
-              <Button
-                style={{ margin: "16px" }}
-                className="button-simple"
-                text="Deck Changes"
-                onClick={deckChangesView}
-              />
-              <Button
-                style={{ margin: "16px" }}
-                className="button-simple"
-                text="Card Winrates"
-                onClick={deckWinratesView}
-              />
+              {isPlayed && (
+                <Button
+                  style={{ margin: "16px" }}
+                  className="button-simple"
+                  text="Deck Changes"
+                  onClick={deckChangesView}
+                />
+              )}
+              {isPlayed && (
+                <Button
+                  style={{ margin: "16px" }}
+                  className="button-simple"
+                  text="Card Winrates"
+                  onClick={deckWinratesView}
+                />
+              )}
               <Button
                 style={{ margin: "16px" }}
                 className="button-simple"

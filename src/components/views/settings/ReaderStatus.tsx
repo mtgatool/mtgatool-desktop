@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 
 import readPlayerTest from "../../../reader/readPlayerTest";
 
-function findMTGA(): boolean {
+function findMTGA(): Promise<boolean> {
   // eslint-disable-next-line no-undef
   const reader = __non_webpack_require__("mtga-reader");
-  const { findPidByName } = reader;
-  return findPidByName("MTGA");
+  // mtga-reader 0.1.7: findProcess is async (threadpool) and resolves to a
+  // boolean "is it running".
+  const { findProcess } = reader;
+  return findProcess("MTGA");
 }
 
 function checkAdmin(): boolean {
@@ -22,25 +24,62 @@ export default function ReaderStatus() {
   const [errorText, setErrorText] = useState("");
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const found = findMTGA();
-      const isAdmin = checkAdmin();
-      const player = readPlayerTest();
+    // The probes are async (native threadpool); skip a tick if the previous
+    // one is still in flight so slow reads don't pile up.
+    let busy = false;
+    let alive = true;
 
-      if (found) {
-        if (!player && !isAdmin) {
-          setReaderStatus("err");
-          setErrorText("App is not running with admin/elevated privileges");
+    const interval = setInterval(async () => {
+      if (busy) return;
+      busy = true;
+      // Every reader call goes through OpenProcess, which fails without
+      // elevation. Guard the whole tick so a reader error surfaces as a status
+      // instead of crashing the app with a dev error overlay.
+      try {
+        // Admin first: nothing else can work unelevated, so don't even attempt
+        // to probe the process or read memory in that case.
+        if (!checkAdmin()) {
+          if (alive) {
+            setReaderStatus("err");
+            setErrorText("App is not running with admin/elevated privileges");
+          }
           return;
         }
 
-        setReaderStatus("ok");
-      } else {
-        setReaderStatus("err");
-        setErrorText("MTGA process not found");
+        if (!(await findMTGA())) {
+          if (alive) {
+            setReaderStatus("err");
+            setErrorText("MTGA process not found");
+          }
+          return;
+        }
+
+        // Elevated and MTGA is running — confirm we can actually read memory.
+        if (!(await readPlayerTest())) {
+          if (alive) {
+            setReaderStatus("warn");
+            setErrorText("Waiting for MTGA data…");
+          }
+          return;
+        }
+
+        if (alive) {
+          setReaderStatus("ok");
+          setErrorText("");
+        }
+      } catch {
+        if (alive) {
+          setReaderStatus("err");
+          setErrorText("Reader error — try running the app as administrator");
+        }
+      } finally {
+        busy = false;
       }
     }, 1000);
-    return () => clearInterval(interval);
+    return () => {
+      alive = false;
+      clearInterval(interval);
+    };
   }, []);
 
   return (

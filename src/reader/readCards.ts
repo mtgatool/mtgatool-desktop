@@ -1,36 +1,32 @@
-import upsertDbCards from "../toolDb/upsertDbCards";
+import upsertDbCards from "../data/upsertDbCards";
 import { Cards } from "../types";
 import isElectron from "../utils/electron/isElectron";
+import { ReaderCollection } from "../utils/mtgaReader";
 
-interface ReaderCard {
-  key: number;
-  value: number;
-  hashCode: number;
-  next: number;
-}
-
-export default function readCards() {
+export default async function readCards(): Promise<void> {
   if (!isElectron()) return;
-  // eslint-disable-next-line no-undef
-  const reader = __non_webpack_require__("mtga-reader");
 
-  const { readData } = reader;
+  try {
+    // eslint-disable-next-line no-undef
+    const reader = __non_webpack_require__("mtga-reader");
 
-  const cards = readData("MTGA", [
-    "PAPA",
-    "_instance",
-    "_inventoryManager",
-    "_inventoryServiceWrapper",
-    "<Cards>k__BackingField",
-    "_entries",
-  ]);
+    // mtga-reader 0.1.7: reads run on the native threadpool and return a
+    // Promise, so they never block this renderer's event loop. Returns
+    // { count, cards: [{ grpId, qty }] }.
+    const collection: ReaderCollection & { error?: string } =
+      await reader.readCollection("MTGA");
 
-  if (cards.error) return;
+    if (!collection || collection.error || !Array.isArray(collection.cards)) {
+      return;
+    }
 
-  const parsedCards: Cards = {};
-  cards.forEach((c: ReaderCard) => {
-    parsedCards[c.key] = c.value;
-  });
+    const parsedCards: Cards = {};
+    collection.cards.forEach((c) => {
+      parsedCards[c.grpId] = c.qty;
+    });
 
-  upsertDbCards(parsedCards);
+    upsertDbCards(parsedCards);
+  } catch (e) {
+    console.error("readCards failed:", e);
+  }
 }

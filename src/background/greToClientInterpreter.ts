@@ -1151,7 +1151,13 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
     });
   }
 
-  if (turnInfo.priorityPlayer !== currentPriority) {
+  // Priority constantly passes through priorityPlayer:0 (the game processing
+  // between passes). Attributing those `->0` windows to timers[0] meant each
+  // player's clock only counted the instants they literally held priority, so
+  // the per-player chess clocks read ~00:00. Ignore `->0` transitions: the
+  // current holder's clock keeps running until the opponent actually takes
+  // priority.
+  if (turnInfo.priorityPlayer && turnInfo.priorityPlayer !== currentPriority) {
     changePriority(
       currentPriority,
       turnInfo.priorityPlayer || 0,

@@ -3,11 +3,11 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
 import { DEFAULT_AVATAR } from "../../../constants";
+import { doFunction, getData } from "../../../data/store";
 import useDebounce from "../../../hooks/useDebounce";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useFetchUsername from "../../../hooks/useFetchUsername";
 import { AppState } from "../../../redux/stores/rendererStore";
-import { doFunction, getData } from "../../../toolDb/worker-wrapper";
 import { DbRankData } from "../../../types/dbTypes";
 import Section from "../../ui/Section";
 import { MatchData } from "../history/convertDbMatchData";

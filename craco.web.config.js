@@ -1,5 +1,6 @@
 const ModuleReplacement = require("./module-resolver-file");
 const WebpackReactComponentNamePlugin = require("webpack-react-component-name");
+const supabaseCjsAlias = require("./supabaseCjsAlias");
 
 process.env.PORT = 3006;
 
@@ -10,6 +11,12 @@ module.exports = {
       target: "web",
       node: {
         fs: "empty",
+      },
+      // See supabaseCjsAlias.js / craco.config.js.
+      resolve: {
+        alias: {
+          ...supabaseCjsAlias(),
+        },
       },
     },
     plugins: [

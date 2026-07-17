@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { animated, useTransition } from "react-spring";
 
+import { getMatchesData } from "../data/store";
 import useDatePicker from "../hooks/useDatePicker";
 import reduxAction from "../redux/reduxAction";
 import {
@@ -11,7 +12,6 @@ import {
   setDateOption,
 } from "../redux/slices/FilterSlice";
 import { AppState } from "../redux/stores/rendererStore";
-import { getMatchesData } from "../toolDb/worker-wrapper";
 import { CardsData } from "../types/collectionTypes";
 import { defaultCardsData } from "../types/dbTypes";
 import aggregateStats from "../utils/aggregateStats";
@@ -30,25 +30,23 @@ import ViewCollection from "./views/collection/ViewCollection";
 import ViewDecks from "./views/decks/ViewDecks";
 import ViewDrafts from "./views/drafts/ViewDrafts";
 import ViewExplore from "./views/explore/ViewExplore";
-import ViewExploreAggregator from "./views/explore/ViewExploreAggregator";
 import { MatchData } from "./views/history/convertDbMatchData";
 import HistoryStats from "./views/history/HistoryStats";
 import ViewHistory from "./views/history/ViewHistory";
 import ViewHome from "./views/home/ViewHome";
 import ViewLiveMatch from "./views/livematch/ViewLiveMatch";
+import ViewTimeline from "./views/timeline/ViewTimeline";
 import ViewUser from "./views/user/ViewUser";
-import ViewWip from "./views/wip/ViewWip";
 
 const views = {
   home: ViewHome,
   decks: ViewDecks,
   history: ViewHistory,
-  timeline: ViewWip,
+  timeline: ViewTimeline,
   drafts: ViewDrafts,
   match: ViewLiveMatch,
   explore: ViewExplore,
   collection: ViewCollection,
-  aggregator: ViewExploreAggregator,
   user: ViewUser,
 };
 

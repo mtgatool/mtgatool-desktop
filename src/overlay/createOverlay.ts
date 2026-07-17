@@ -56,6 +56,17 @@ export default function createOverlay(
   newWindow.removeMenu();
   newWindow.setVisibleOnAllWorkspaces(true);
 
+  // The overlay loads the app HTML whose <title> is "MTG Arena Tool"; Electron
+  // would apply that to the window title, overwriting the WINDOW_OVERLAY_<id>
+  // title we set above. Everything that identifies which overlay this is
+  // (getWindowTitle -> overlayTitleToId) reads that title, and on a miss falls
+  // back to `|| 0` — so after the title flips, this overlay would start reading
+  // overlay 0's settings (e.g. shareEnabled:false), silently breaking live
+  // sharing and mode. Keep the title fixed.
+  newWindow.on("page-title-updated", (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+  });
+
   const proc: any = process;
   newWindow.loadURL(
     remote.app.isPackaged

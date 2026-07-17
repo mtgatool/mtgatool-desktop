@@ -25,6 +25,8 @@ import {
 import useColorPicker from "../../../hooks/useColorPicker";
 import reduxAction from "../../../redux/reduxAction";
 import store, { AppState } from "../../../redux/stores/rendererStore";
+import sha1 from "../../../utils/sha1";
+import textRandom from "../../../utils/textRandom";
 import vodiFn from "../../../utils/voidfn";
 import Button from "../../ui/Button";
 import Select from "../../ui/Select";
@@ -156,6 +158,18 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
     setOverlayAlpha(settings ? settings.alpha : 0);
     setOverlayAlphaBack(settings ? settings.alphaBack : 0);
   }, [settings]);
+
+  // Background colour for THIS overlay's public live-share viewer. Empty =
+  // transparent, so an OBS browser source composites the overlay over your
+  // scene; picking a colour paints a flat backdrop instead. Each overlay owns
+  // its own picker instance (keyed by index above), so the initial state is
+  // this overlay's saved value.
+  const [, shareColorDoShow, shareColorElement] = useColorPicker(
+    settings?.shareBackColor || "",
+    undefined,
+    (color: string): void =>
+      saveOverlaySettings(current, { shareBackColor: color })
+  );
 
   return show ? (
     <>
@@ -317,6 +331,51 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           onChange={overlayAlphaBackHandler}
         />
       </div>
+      <Toggle
+        text="Share this overlay live (public)"
+        value={!!settings.shareEnabled}
+        callback={(val: boolean): void => {
+          if (val) {
+            const shareId =
+              settings.shareId ||
+              sha1(`${textRandom(64)}-${new Date().getTime()}`);
+            saveOverlaySettings(current, { shareId, shareEnabled: true });
+          } else {
+            saveOverlaySettings(current, { shareEnabled: false });
+          }
+        }}
+      />
+      {!!settings.shareEnabled && !!settings.shareId && (
+        <div
+          className="settings-note"
+          style={{ textAlign: "center", wordBreak: "break-all" }}
+        >
+          https://app.mtgatool.com/live/{settings.shareId}
+        </div>
+      )}
+      <div className="centered-setting-container">
+        <span>
+          Live-share background <i>(unset = transparent for OBS)</i>:
+        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          {!!settings.shareBackColor && (
+            <Button
+              text="Reset to transparent"
+              onClick={(): void =>
+                saveOverlaySettings(current, { shareBackColor: "" })
+              }
+            />
+          )}
+          <input
+            onClick={shareColorDoShow}
+            style={{ backgroundColor: settings.shareBackColor || "" }}
+            className="color-picker"
+            type="text"
+            defaultValue=""
+          />
+        </div>
+      </div>
+      {shareColorElement}
       <div className="settings-note" style={{ textAlign: "center" }}>
         Position: [{settings.bounds.x},{settings.bounds.y}]
       </div>

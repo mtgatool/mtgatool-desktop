@@ -1,7 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable radix */
 import _ from "lodash";
-import { ServerPeerData } from "mtgatool-db";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 
 import { ConnectionData } from "../../../types/app";
@@ -69,7 +68,7 @@ export default function NetworkSettingsPanel(): JSX.Element {
     setLocalSetting("saved-peer-keys", JSON.stringify(newPeers));
   };
 
-  const connect = (peer: ServerPeerData) => {
+  const connect = (peer: { host: string }) => {
     if (window.toolDbWorker) {
       window.toolDbWorker.postMessage({
         type: "CONNECT",

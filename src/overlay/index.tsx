@@ -6,9 +6,7 @@ import { ChannelMessage } from "../broadcastChannel/channelMessages";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { OverlaySettings, Settings } from "../common/defaultConfig";
 import { overlayTitleToId } from "../common/maps";
-import ActionLog from "../components/action-log-v2";
 import { ActionLogV2 } from "../components/action-log-v2/types";
-import OverlayDeckList from "../components/OverlayDeckList";
 import TopBar from "../components/TopBar";
 import {
   OVERLAY_DRAFT,
@@ -16,6 +14,11 @@ import {
   OVERLAY_LOG,
   OVERLAY_SEEN,
 } from "../constants";
+import {
+  OverlaySharePayload,
+  publishOverlayShare,
+  stopOverlayShare,
+} from "../data/liveShare";
 import useDebounce from "../hooks/useDebounce";
 import { InternalDraftv2 } from "../types";
 import Chances from "../types/chances";
@@ -24,10 +27,8 @@ import bcConnect from "../utils/bcConnect";
 import compareCards from "../utils/compareCards";
 import remote from "../utils/electron/remoteWrapper";
 import getLocalSetting from "../utils/getLocalSetting";
-import getPlayerNameWithoutSuffix from "../utils/getPlayerNameWithoutSuffix";
 import Deck from "../utils/mtga/deck";
-import Clock from "./Clock";
-import DraftOverlay from "./DraftOverlay";
+import OverlayContent from "./OverlayContent";
 
 function getCurrentOverlayId(): number {
   const title = remote.getCurrentWindow().getTitle() || "";
@@ -36,7 +37,20 @@ function getCurrentOverlayId(): number {
 
 export default function Overlay() {
   const [deck, setDeck] = useState<Deck>();
-  const [settings, setSettings] = useState<OverlaySettings>();
+  // Seed from localStorage on mount. A close/reopen destroys and recreates the
+  // overlay window, which mounts too late to catch the one-off
+  // OVERLAY_UPDATE_SETTINGS broadcast that fired when it was reopened — so
+  // without this the recreated overlay would sit with undefined settings
+  // (blank, and never publishing its live share) until the user changed a
+  // setting. OVERLAY_UPDATE_SETTINGS still keeps it in sync afterwards.
+  const [settings, setSettings] = useState<OverlaySettings | undefined>(() => {
+    try {
+      const all = JSON.parse(getLocalSetting("settings")) as Settings;
+      return all.overlays[getCurrentOverlayId()];
+    } catch {
+      return undefined;
+    }
+  });
   const [matchState, setMatchState] = useState<OverlayUpdateMatchState>();
   const [draftState, setDraftState] = useState<InternalDraftv2>();
   const [draftVotes, setDraftVotes] = useState<Record<string, DbDraftVote>>({});
@@ -147,6 +161,38 @@ export default function Overlay() {
     }
   }, [settings, matchState]);
 
+  // Live-share: while this overlay has sharing enabled, upsert its state to the
+  // live_overlays row on each change (throttled in publishOverlayShare). Only
+  // the data the current mode needs is sent, to keep payloads small.
+  useEffect(() => {
+    const shareId = settings?.shareId;
+    if (!shareId || !settings?.shareEnabled) return;
+    // Nothing to share yet.
+    if (!matchState && !draftState && !actionLog) return;
+    const payload: OverlaySharePayload = { matchState, settings };
+    if (settings.mode === OVERLAY_LOG) payload.actionLog = actionLog;
+    if (settings.mode === OVERLAY_DRAFT) {
+      payload.draftState = draftState;
+      payload.draftVotes = draftVotes;
+    }
+    publishOverlayShare(shareId, payload);
+  }, [settings, matchState, actionLog, draftState, draftVotes]);
+
+  // Stop sharing ONLY when the user explicitly disables it (shareEnabled ->
+  // false). Deliberately no effect-cleanup teardown: React fires cleanups on
+  // unmount/remount and whenever these deps change (autosize resizes and
+  // settings churn cause plenty of those mid-match), which would spuriously
+  // delete the row and clear the keepalive. The keepalive lives in module state
+  // (liveShare.ts), so it survives component remounts on its own; when the
+  // window actually closes, its JS context — and the interval with it — is torn
+  // down anyway.
+  useEffect(() => {
+    const shareId = settings?.shareId;
+    if (shareId && settings && !settings.shareEnabled) {
+      stopOverlayShare(shareId);
+    }
+  }, [settings?.shareId, settings?.shareEnabled]);
+
   if (remote && settings?.autosize && heightDivAdjustRef.current) {
     remote.getCurrentWindow().setBounds({
       // 24px topbar
@@ -190,38 +236,18 @@ export default function Overlay() {
         }}
       >
         <div ref={heightDivAdjustRef} style={{ opacity: settings?.alpha || 0 }}>
-          {settings && settings.mode === OVERLAY_DRAFT && draftState && (
-            <DraftOverlay state={draftState} votes={draftVotes} />
-          )}
-          {deck && settings && settings.mode !== OVERLAY_LOG && (
-            <OverlayDeckList
-              matchId={matchState?.matchId || ""}
-              deck={deck}
+          {settings && (
+            <OverlayContent
               settings={settings}
+              deck={deck}
               subTitle={subTitle}
-              cardOdds={odds}
-              setOddsCallback={() => {
-                //
-              }}
+              odds={odds}
+              matchState={matchState}
+              actionLog={actionLog}
+              draftState={draftState}
+              draftVotes={draftVotes}
             />
           )}
-          {settings && settings.mode === OVERLAY_LOG && actionLog && (
-            <ActionLog actionLog={actionLog} />
-          )}
-          {settings &&
-            !!settings.clock &&
-            matchState &&
-            !settings.collapsed && (
-              <Clock
-                matchBeginTime={new Date(matchState.beginTime)}
-                oppName={getPlayerNameWithoutSuffix(
-                  matchState.opponent.name || ""
-                )}
-                playerSeat={matchState.player ? matchState.player.seat : 1}
-                priorityTimers={matchState.priorityTimers}
-                turnPriority={matchState.currentPriority}
-              />
-            )}
         </div>
       </div>
     </div>

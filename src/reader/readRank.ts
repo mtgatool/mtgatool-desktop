@@ -1,60 +1,65 @@
-import {
-  CombinedRankInfo,
-  rankClass,
-} from "../background/onLabel/InEventGetCombinedRankInfo";
+import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import globalStore from "../background/store";
 import isElectron from "../utils/electron/isElectron";
+import { isValidRankClass } from "../utils/mtga/rankClasses";
+import { ReaderRanks } from "../utils/mtgaReader";
 
-interface _ReturnedRankInfo {
-  constructedClass: number;
-  constructedLeaderboardPlace: number;
-  constructedLevel: number;
-  constructedMatchesDrawn: number;
-  constructedMatchesLost: number;
-  constructedMatchesWon: number;
-  constructedPercentile: number;
-  constructedSeasonOrdinal: number;
-  constructedStep: number;
-  limitedClass: number;
-  limitedLeaderboardPlace: number;
-  limitedLevel: number;
-  limitedMatchesDrawn: number;
-  limitedMatchesLost: number;
-  limitedMatchesWon: number;
-  limitedPercentile: number;
-  limitedSeasonOrdinal: number;
-  limitedStep: number;
-  playerId: string;
-}
-
-export default function readRank(): CombinedRankInfo | undefined {
+export default async function readRank(): Promise<
+  CombinedRankInfo | undefined
+> {
   if (!isElectron()) return undefined;
 
-  // eslint-disable-next-line no-undef
-  const reader = __non_webpack_require__("mtga-reader");
+  try {
+    // eslint-disable-next-line no-undef
+    const reader = __non_webpack_require__("mtga-reader");
 
-  const { readData } = reader;
+    // mtga-reader 0.1.7: reads run on the native threadpool and return a
+    // Promise, so they never block this renderer's event loop (the background
+    // window also hosts the GRE parser).
+    const ranks: ReaderRanks & { error?: string } = await reader.readRanks(
+      "MTGA"
+    );
 
-  const rank = readData("MTGA", [
-    "WrapperController",
-    "<Instance>k__BackingField",
-    "<PlayerRankServiceWrapper>k__BackingField",
-    "_combinedRankInfo",
-  ]);
+    if (!ranks || ranks.error || !ranks.constructed || !ranks.limited) {
+      return globalStore.rank || undefined;
+    }
 
-  if (rank.error || Object.keys(rank).length === 0) {
-    if (globalStore.rank) return globalStore.rank;
+    const { constructed: c, limited: l } = ranks;
 
-    return undefined;
+    // A closed/unreadable game can return a zeroed struct with no error flag
+    // (class comes back as e.g. "Spark"). Reject it so we never clobber a good
+    // stored rank — keep whatever we last read instead.
+    if (!isValidRankClass(c.class) && !isValidRankClass(l.class)) {
+      return globalStore.rank || undefined;
+    }
+
+    globalStore.rank = {
+      playerId: ranks.playerId || "",
+      constructedSeasonOrdinal: c.seasonOrdinal || 0,
+      constructedClass: c.class,
+      constructedClassValue: c.classValue,
+      constructedLevel: c.level || 0,
+      constructedStep: c.step || 0,
+      constructedMatchesWon: c.wins || 0,
+      constructedMatchesLost: c.losses || 0,
+      constructedMatchesDrawn: c.draws || 0,
+      constructedPercentile: parseFloat(c.percentile || "0") || 0,
+      constructedLeaderboardPlace: c.leaderboardPlace || 0,
+      limitedSeasonOrdinal: l.seasonOrdinal || 0,
+      limitedClass: l.class,
+      limitedClassValue: l.classValue,
+      limitedLevel: l.level || 0,
+      limitedStep: l.step || 0,
+      limitedMatchesWon: l.wins || 0,
+      limitedMatchesLost: l.losses || 0,
+      limitedMatchesDrawn: l.draws || 0,
+      limitedPercentile: parseFloat(l.percentile || "0") || 0,
+      limitedLeaderboardPlace: l.leaderboardPlace || 0,
+    };
+
+    return globalStore.rank;
+  } catch (e) {
+    console.error("readRank failed:", e);
+    return globalStore.rank || undefined;
   }
-
-  globalStore.rank = {
-    ...rank,
-    constructedClass: rankClass[rank.constructedClass],
-    limitedClass: rankClass[rank.limitedClass],
-    constructedClassValue: rank.constructedClass,
-    limitedClassValue: rank.limitedClass,
-  };
-
-  return globalStore.rank;
 }

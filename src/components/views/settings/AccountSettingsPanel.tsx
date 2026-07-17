@@ -1,20 +1,18 @@
 import _ from "lodash";
-import { sha1 } from "mtgatool-db";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import { ReactComponent as ShowIcon } from "../../../assets/images/svg/archive.svg";
-import { ReactComponent as KeysIcon } from "../../../assets/images/svg/keys.svg";
 import { ReactComponent as HideIcon } from "../../../assets/images/svg/unarchive.svg";
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 import { LOGIN_AUTH } from "../../../constants";
+import { cloudLogout, cloudUpdatePassword } from "../../../data/cloudAuth";
+import { getData, putData } from "../../../data/store";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
-import saveKeysCallback from "../../../toolDb/saveKeysCallback";
-import { getData, putData } from "../../../toolDb/worker-wrapper";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
@@ -90,10 +88,10 @@ export default function AccountSettingsPanel(
   }, [newAlias]);
 
   const changePassword = useCallback((newPassword: string) => {
-    window.toolDbWorker.postMessage({
-      type: "SET_PASSWORD",
-      password: newPassword,
-    });
+    // Supabase stores/hashes the password itself, so we pass it raw (no sha1).
+    cloudUpdatePassword(newPassword)
+      .then(() => setNewPass(""))
+      .catch((e: Error) => console.error("Password change failed:", e.message));
   }, []);
 
   const handleSetNewPass = useCallback(
@@ -210,9 +208,8 @@ export default function AccountSettingsPanel(
           marginBottom: "16px",
         }}
       >
-        Setting a new password will make your old password invalid, and other
-        devices will need to login again. You can always use your keys to login
-        if you forget your password.
+        Setting a new password signs you out of other devices; they will need to
+        log in again with the new password.
       </p>
       <div className="form-input-container" style={{ height: "36px" }}>
         <label>New Password:</label>
@@ -244,30 +241,10 @@ export default function AccountSettingsPanel(
         </div>
         <Button
           disabled={newPass.length < 8}
-          onClick={() => changePassword(sha1(newPass))}
+          onClick={() => changePassword(newPass)}
           text="Save"
         />
       </div>
-      <p
-        style={{
-          textAlign: "center",
-          borderTop: "1px solid var(--color-line-sep)",
-          paddingTop: "24px",
-          marginBottom: "16px",
-        }}
-      >
-        Download your keys for password-less access:
-      </p>
-      <Button
-        className="keys-button"
-        onClick={saveKeysCallback}
-        text=""
-        style={{ margin: "8px auto" }}
-      >
-        <KeysIcon />
-        <div>Save</div>
-      </Button>
-
       <p
         style={{
           borderTop: "1px solid var(--color-line-sep)",
@@ -283,11 +260,18 @@ export default function AccountSettingsPanel(
         className="button-simple-red"
         onClick={() => {
           doClose();
+          cloudLogout().catch(() => undefined);
           setLocalSetting("savedPass", "");
           setLocalSetting("autoLogin", "false");
           reduxAction(dispatch, {
             type: "SET_LOGIN_STATE",
             arg: LOGIN_AUTH,
+          });
+          // Back to "offline" until the next sign-in (clears the cloud-connected
+          // indicator).
+          reduxAction(dispatch, {
+            type: "SET_OFFLINE",
+            arg: true,
           });
           postChannelMessage({
             type: "STOP_LOG_READING",

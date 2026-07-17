@@ -23,6 +23,17 @@ app.disableHardwareAcceleration();
 app.setAppUserModelId("com.mtgatool.desktop");
 app.allowRendererProcessReuse = false;
 
+// The hidden "mtgatool-background" window hosts the log watcher AND the
+// Supabase Realtime socket for live overlay sharing. Chromium aggressively
+// throttles/suspends renderers that are hidden or occluded, which starves
+// Realtime's heartbeat timer and drops the connection — live sharing then
+// stops after ~a minute even though the local overlays keep updating. The
+// webPreferences.backgroundThrottling:false flag is unreliable for a window
+// that is never shown, so force it off process-wide with these switches.
+app.commandLine.appendSwitch("disable-background-timer-throttling");
+app.commandLine.appendSwitch("disable-renderer-backgrounding");
+app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
+
 function quit() {
   app.quit();
   app.exit();
@@ -161,6 +172,13 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true,
+      // This hidden window hosts the log watcher AND the Supabase Realtime
+      // socket used for live overlay sharing. Chromium throttles timers in
+      // backgrounded windows, which starves Realtime's heartbeat interval —
+      // the server then drops the connection and live sharing silently stops
+      // after ~a minute (overlays keep updating because those use in-process
+      // BroadcastChannel, not a server socket). Keep timers running full-rate.
+      backgroundThrottling: false,
     },
   });
 

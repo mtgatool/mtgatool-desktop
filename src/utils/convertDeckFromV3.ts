@@ -5,7 +5,7 @@ import Deck from "./mtga/deck";
 export default function convertDeckFromV3(v3deck: ArenaV3Deck): Deck {
   const newMain = convertV3ListToV2(v3deck.mainDeck);
   const newSide = convertV3ListToV2([
-    ...v3deck.sideboard,
+    ...(v3deck.sideboard || []),
     ...(v3deck.reducedSideboard || []),
   ]);
   const v2Deck: InternalDeck = {

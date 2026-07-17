@@ -1,46 +1,21 @@
+import { ReaderAccount } from "../utils/mtgaReader";
 import switchPlayerUUID from "../utils/switchPlayerUUID";
 
-interface AccountInformation {
-  AccessToken: string;
-  AccountID: string;
-  Credentials: null;
-  CredentialsState: number;
-  DisplayName: string;
-  Email: string;
-  Expiration: number;
-  ExternalID: string;
-  GameID: string;
-  LinkedAccounts: null;
-  Password: string;
-  PersonaID: string;
-  Roles: null;
-}
+export default async function readPlayerId(): Promise<void> {
+  try {
+    // eslint-disable-next-line no-undef
+    const reader = __non_webpack_require__("mtga-reader");
 
-export default function readPlayerId() {
-  // eslint-disable-next-line no-undef
-  const reader = __non_webpack_require__("mtga-reader");
+    // mtga-reader 0.1.7 async typed account read: { displayName, personaId, ... }.
+    const account: ReaderAccount & { error?: string } =
+      await reader.readAccount("MTGA");
 
-  const { readData } = reader;
+    if (!account || account.error) return;
 
-  const data = readData("MTGA", [
-    "WrapperController",
-    "<Instance>k__BackingField",
-    "<AccountClient>k__BackingField",
-    "<AccountInformation>k__BackingField",
-  ]);
-
-  if (data.error) return;
-
-  const accountInformation: AccountInformation = data;
-
-  if (
-    accountInformation &&
-    accountInformation.PersonaID &&
-    accountInformation.DisplayName
-  ) {
-    switchPlayerUUID(
-      accountInformation.PersonaID,
-      accountInformation.DisplayName
-    );
+    if (account.personaId && account.displayName) {
+      switchPlayerUUID(account.personaId, account.displayName);
+    }
+  } catch (e) {
+    console.error("readPlayerId failed:", e);
   }
 }

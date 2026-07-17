@@ -6,6 +6,7 @@ import QRCode from "qrcode";
 import { useCallback, useRef, useState } from "react";
 
 import { ReactComponent as QrCodeIcon } from "../assets/images/svg/qrcode.svg";
+import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { OverlaySettings } from "../common/defaultConfig";
 import {
   LANDS_HACK,
@@ -18,9 +19,12 @@ import { CardObject } from "../types";
 import Chances from "../types/chances";
 import compareCards from "../utils/compareCards";
 import copyToClipboard from "../utils/copyToClipboard";
+import getWindowTitle from "../utils/electron/getWindowTitle";
 import Colors from "../utils/mtga/colors";
 import database from "../utils/mtga/database";
 import Deck from "../utils/mtga/deck";
+import sha1 from "../utils/sha1";
+import textRandom from "../utils/textRandom";
 import CardTile, { CardTileQuantity, LandsTile } from "./CardTile";
 import DeckManaCurve from "./DeckManaCurve";
 import DeckTypesStats from "./DeckTypesStats";
@@ -33,24 +37,26 @@ function _compareQuantity(a: CardObject, b: CardObject): -1 | 0 | 1 {
 }
 
 interface DeckListProps {
-  matchId: string;
   deck: Deck;
   subTitle: string;
   highlightCardId?: number;
   settings: OverlaySettings;
   cardOdds?: Chances;
   setOddsCallback?: (sampleSize: number) => void;
+  // False on the public live-share viewer: it renders this same component but
+  // must not offer the share/QR controls.
+  shareControls?: boolean;
 }
 
 export default function OverlayDeckList(props: DeckListProps): JSX.Element {
   const {
-    matchId,
     deck,
     subTitle,
     settings,
     highlightCardId,
     cardOdds,
     setOddsCallback,
+    shareControls = true,
   } = props;
 
   const QRCanvas = useRef<HTMLCanvasElement | null>(null);
@@ -66,6 +72,29 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
     },
     [QRCanvas]
   );
+
+  // Toggle live-sharing for THIS overlay: ensure it has a persistent
+  // unguessable shareId, flip shareEnabled (the background window broadcasts
+  // the live state over Supabase Realtime while it's on), and show a QR of the
+  // public viewer URL. Clicking again hides the QR and stops sharing.
+  // Clicking the QR icon ENABLES sharing and shows the QR; clicking again only
+  // HIDES the QR image — it never stops sharing. The overlay sits over the game,
+  // so a stray click here must not kill your stream. Disabling is a deliberate
+  // toggle in the overlay settings panel.
+  const toggleLiveShare = useCallback(() => {
+    if (showQrCode) {
+      setShowQrCode(false);
+      return;
+    }
+    const window = getWindowTitle();
+    const shareId =
+      settings.shareId || sha1(`${textRandom(64)}-${new Date().getTime()}`);
+    postChannelMessage({
+      type: "OVERLAY_SET_SETTINGS",
+      value: { window, settings: { shareId, shareEnabled: true } },
+    });
+    generateQrCode(`https://app.mtgatool.com/live/${shareId}`);
+  }, [showQrCode, settings.shareId, generateQrCode]);
 
   if (!deck) return <></>;
   const deckClone = deck.clone();
@@ -240,13 +269,9 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
       {!!settings.title && (
         <div className="decklist-title">
           <div className="title-text">{subTitle}</div>
-          <QrCodeIcon
-            onClick={() => {
-              if (showQrCode) setShowQrCode(false);
-              else generateQrCode(`https://app.mtgatool.com/match/${matchId}`);
-            }}
-            className="title-qrcode"
-          />
+          {shareControls && (
+            <QrCodeIcon onClick={toggleLiveShare} className="title-qrcode" />
+          )}
         </div>
       )}
       <canvas

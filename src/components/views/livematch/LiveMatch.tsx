@@ -7,12 +7,12 @@ import { ReactComponent as CopyButton } from "../../../assets/images/svg/copy.sv
 // import { ReactComponent as IconCrown } from "../../../assets/images/svg/crown.svg";
 import { ReactComponent as IconEvent } from "../../../assets/images/svg/event.svg";
 import { OverlayUpdateMatchState } from "../../../background/store/types";
-import reduxAction from "../../../redux/reduxAction";
 import {
   addKeyListener,
   removeKeyListener,
   subscribeData,
-} from "../../../toolDb/worker-wrapper";
+} from "../../../data/store";
+import reduxAction from "../../../redux/reduxAction";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { getCardArtCrop } from "../../../utils/getCardArtCrop";
 import getEventPrettyName from "../../../utils/getEventPrettyName";

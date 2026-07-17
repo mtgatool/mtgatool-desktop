@@ -111,8 +111,36 @@ export function setPlayerCardsUsed(arg: number[]): void {
   globalStore.currentMatch.player.cardsUsed = arg;
 }
 
+// getOppUsedCards() returns only the opponent cards currently sitting in
+// visible zones (battlefield, graveyard, ...), so replacing cardsUsed with each
+// snapshot made cards flicker in and out of the overlay instead of accumulating
+// as they were seen. Accumulate instead, keeping — per card — the MAXIMUM number
+// of copies ever visible at once. Repeating a grpId N times in the list means
+// "N copies were on screen simultaneously" (removeDuplicates sums those into the
+// displayed quantity), which is the best estimate of how many the opponent runs;
+// taking the max never inflates the count and never lets a seen card disappear.
+function mergeSeenByMax(prev: number[], next: number[]): number[] {
+  const count = (list: number[]): Map<number, number> => {
+    const map = new Map<number, number>();
+    list.forEach((id) => map.set(id, (map.get(id) || 0) + 1));
+    return map;
+  };
+  const a = count(prev);
+  const b = count(next);
+  const ids = new Set<number>();
+  a.forEach((_v, id) => ids.add(id));
+  b.forEach((_v, id) => ids.add(id));
+  const merged: number[] = [];
+  ids.forEach((id) => {
+    const n = Math.max(a.get(id) || 0, b.get(id) || 0);
+    for (let i = 0; i < n; i += 1) merged.push(id);
+  });
+  return merged;
+}
+
 export function setOppCardsUsed(arg: number[]): void {
-  globalStore.currentMatch.opponent.cardsUsed = arg;
+  const prev = globalStore.currentMatch.opponent.cardsUsed || [];
+  globalStore.currentMatch.opponent.cardsUsed = mergeSeenByMax(prev, arg);
 }
 
 export function resetCurrentMatch(): void {
@@ -169,6 +197,12 @@ export function resetCurrentGame(): void {
     handsDrawn: [],
     cardsCast: [],
   });
+  // Seen-cards accumulate within a game (see setOppCardsUsed); clear them at the
+  // start of each new game so per-game totals stay separate — the previous
+  // game's list has already been captured into matchGameStats by then, and
+  // getOpponentDeck sums current cardsUsed + every game's stored cardsSeen.
+  // (Opponent identity — name/seat — lives in other fields and is preserved.)
+  globalStore.currentMatch.opponent.cardsUsed = [];
 }
 
 export function setGameBeginTime(arg: Date): void {

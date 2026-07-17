@@ -1,9 +1,8 @@
-import { sha1 } from "mtgatool-db";
-
 import { defaultConfig } from "../common/defaultConfig";
 import { DEFAULT_PEERS } from "../constants";
 import defaultLogUri from "../utils/defaultLogUri";
 import isElectron from "../utils/electron/isElectron";
+import sha1 from "../utils/sha1";
 import textRandom from "../utils/textRandom";
 
 export const settingKeys = [
@@ -25,6 +24,8 @@ export const settingKeys = [
   "filterDateOption",
   "filterEventOptions",
   "pubkey",
+  "importLogHistory",
+  "whatsNewSeen",
 ] as const;
 
 export type SettingKey = typeof settingKeys[number];
@@ -48,4 +49,9 @@ export const defaultSettings: Record<SettingKey, string> = {
   filterDateOption: "All Time",
   filterEventOptions: "",
   pubkey: "",
+  // Forward-only log reading by default; "true" opts into replaying the full
+  // Player.log history on startup.
+  importLogHistory: "false",
+  // The app version whose "What's new" the user has already dismissed.
+  whatsNewSeen: "",
 };

@@ -21,7 +21,12 @@ export default function logEntrySwitch(entry: LogEntry): void {
       Labels.DetailedLogs(entry);
       break;
 
+    // 2026 log format dropped the Namespace_Method separators on API labels.
+    // Handle both the old and new spellings so a client update either way keeps
+    // working (docs/LOG_FORMAT.md). Labels whose payloads left the log entirely
+    // (collection/inventory/rank/deck lists) are now read from memory instead.
     case "Graph_GetGraphState":
+    case "GraphGetGraphState":
       // We just logged in, try grabbing UUID and DisplayName
       postChannelMessage({
         type: "DAEMON_GET_PLAYER_ID",
@@ -33,6 +38,7 @@ export default function logEntrySwitch(entry: LogEntry): void {
       break;
 
     case "ClientToMatchServiceMessageType_ClientToGREMessage":
+    case "ClientToGremessage":
       Labels.ClientToMatchServiceMessageTypeClientToGREMessage(entry);
       break;
 
@@ -43,6 +49,7 @@ export default function logEntrySwitch(entry: LogEntry): void {
       break;
 
     case "Rank_GetCombinedRankInfo":
+    case "RankGetCombinedRankInfo":
       if (entry.arrow == "<==") {
         Labels.InEventGetCombinedRankInfo(entry);
       }
@@ -83,30 +90,35 @@ export default function logEntrySwitch(entry: LogEntry): void {
       break;
 
     case "Event.GetPlayerCoursesV2":
+    case "EventGetCoursesV2":
       if (entry.arrow == "<==") {
         Labels.InEventGetPlayerCoursesV2(entry);
       }
       break;
 
     case "Deck.GetDeckListsV3":
+    case "DeckGetDeckSummariesV3":
       if (entry.arrow == "<==") {
         Labels.InDeckGetDeckListsV3(entry);
       }
       break;
 
     case "Deck.GetPreconDecks":
+    case "DeckGetAllPreconDecksV3":
       if (entry.arrow == "<==") {
         Labels.InDeckGetPreconDecks(entry);
       }
       break;
 
     case "Deck.UpdateDeckV3":
+    case "DeckUpsertDeckV3":
       if (entry.arrow == "<==") {
         Labels.InDeckUpdateDeckV3(entry);
       }
       break;
 
     case "Event_SetDeckV2":
+    case "EventSetDeckV3":
       if (entry.arrow == "==>") {
         Labels.OutSetDeckV2(entry);
       }
@@ -199,6 +211,7 @@ export default function logEntrySwitch(entry: LogEntry): void {
       break;
 
     case "Event.GetSeasonAndRankDetail":
+    case "RankGetSeasonAndRankDetails":
       if (entry.arrow == "<==") {
         Labels.InEventGetSeasonAndRankDetail(entry);
       }
@@ -211,6 +224,7 @@ export default function logEntrySwitch(entry: LogEntry): void {
       break;
 
     case "PlayerInventory.GetFormats":
+    case "GetFormats":
       if (entry.arrow == "<==") {
         Labels.GetPlayerInventoryGetFormats(entry);
       }

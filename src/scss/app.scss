@@ -32,6 +32,22 @@
   }
 }
 
+// Public live-share viewer (/live/:id) embedded as an OBS browser source: the
+// whole page must be transparent so OBS composites only the overlay. Strip the
+// themed app background (image + inline card art + the :after overlay) while
+// this route is mounted (LiveShareView toggles the body class).
+body.live-share-page,
+body.live-share-page #root,
+body.live-share-page .app-wrapper-back,
+body.live-share-page .app-wrapper-back-no-frame {
+  background: transparent !important;
+}
+
+body.live-share-page .app-wrapper-back:after,
+body.live-share-page .app-wrapper-back-no-frame:after {
+  display: none !important;
+}
+
 .wrapper {
   width: 100%;
   height: calc(100% - 49px);

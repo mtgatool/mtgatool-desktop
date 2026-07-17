@@ -2,6 +2,7 @@
 const WebpackReactComponentNamePlugin = require("webpack-react-component-name");
 const ModuleReplacement = require("./module-resolver-file");
 const eslintConfig = require("./.eslintrc");
+const supabaseCjsAlias = require("./supabaseCjsAlias");
 
 process.env.GENERATE_SOURCEMAP = true;
 
@@ -20,6 +21,15 @@ module.exports = {
       },
       node: {
         fs: "empty",
+      },
+      // Force every @supabase/* package onto its CommonJS build. supabase-js v2
+      // ships .mjs re-exports that webpack 4 (react-scripts 4) can't analyze
+      // ("Attempted import error: createClient is not exported"). See
+      // supabaseCjsAlias.js.
+      resolve: {
+        alias: {
+          ...supabaseCjsAlias(),
+        },
       },
     },
     plugins: [

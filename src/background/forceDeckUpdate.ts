@@ -33,9 +33,15 @@ const forceDeckUpdate = (removeUsed = true): void => {
   let typeEnc = 0;
   let typeLan = 0;
   const { currentMatch } = globalStore;
-  const playerCardsUsed = currentMatch.player.cardsUsed;
-  const playerCardsBottom = currentMatch.cardsBottom;
-  const playerCardsFromSide = currentMatch.cardsFromSideboard;
+  // player starts as {} and isn't re-seeded on game reset, so cardsUsed is
+  // undefined until the first setPlayerCardsUsed of a game. A GameState message
+  // can arrive before that (new game / early turns), and reading `.length` off
+  // undefined here used to throw — which aborted the whole GameStateMessage
+  // handler (forceDeckUpdate runs before updateDeck), freezing both the local
+  // overlays and live sharing. An absent list just means "nothing used yet".
+  const playerCardsUsed = currentMatch.player?.cardsUsed || [];
+  const playerCardsBottom = currentMatch.cardsBottom || [];
+  const playerCardsFromSide = currentMatch.cardsFromSideboard || [];
   const playerCardsLeft = globalStore.currentMatch.currentDeck.clone();
 
   const oddsSampleSize = 1;

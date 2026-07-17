@@ -1,152 +1,135 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable radix */
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable react/jsx-props-no-spreading */
-
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 
-import { queryKeys } from "../../../toolDb/worker-wrapper";
-import getEventExplorerSection from "../../../utils/getEventExplorerSection";
-import Flex from "../../Flex";
+import fetchExploreDecks, {
+  ExploreDeckRow,
+} from "../../../data/fetchExploreDecks";
 import Section from "../../ui/Section";
-import ExploreEvent from "./ExploreEvent";
 
-const eventsBlacklist = (ev: string) =>
-  !ev.includes("NPE_") &&
-  !ev.includes("ColorChallenge_") &&
-  !ev.includes("DirectGame") &&
-  !ev.includes("Decathlon10_TurboDraft_20211230") &&
-  !ev.includes("Decathlon1_Alchemy_20211218") &&
-  !ev.includes("Decathlon4_NewPrecons_20211221") &&
-  !ev.includes("MWM_Cascade_20220208") &&
-  !ev.includes("MWM_HistoricPauper_20211221") &&
-  !ev.includes("MWM_SlowStart_20220125") &&
-  !ev.includes("UnbrokenBlade_20220318");
+function prettyEvent(id: string): string {
+  return id.replace(/_/g, " ");
+}
 
-export default function ViewExploreHome() {
+export default function ViewExploreHome(): JSX.Element {
   const history = useHistory();
-  const [eventsList, setEventsList] = useState<string[]>([]);
+  const [rows, setRows] = useState<ExploreDeckRow[] | null>(null);
 
   useEffect(() => {
-    const finalEventList: string[] = [];
-
-    async function queryExploreKeys(): Promise<string[]> {
-      const dayKeys = await queryKeys(`exploredata-`);
-      return dayKeys?.map((k: string) => k.slice(`exploredata-`.length)) || [];
-    }
-
-    async function doQueryLoop() {
-      const dayKeys = await queryExploreKeys();
-      finalEventList.push(...dayKeys);
-
-      const fixedList = finalEventList.filter(eventsBlacklist);
-
-      setEventsList(Array.from(new Set(fixedList)));
-    }
-
-    doQueryLoop();
+    let alive = true;
+    fetchExploreDecks().then((r) => {
+      if (alive) setRows(r);
+    });
+    return () => {
+      alive = false;
+    };
   }, []);
 
-  const sortedEventsList = eventsList.sort((a, b) => {
-    if (a < b) return -1;
-    if (a > b) return 1;
-    return 0;
-  });
+  const events = useMemo(() => {
+    const map = new Map<string, { decks: number; games: number }>();
+    (rows || []).forEach((r) => {
+      const e = map.get(r.event_id) || { decks: 0, games: 0 };
+      e.decks += 1;
+      e.games += r.games;
+      map.set(r.event_id, e);
+    });
+    return [...map.entries()]
+      .map(([id, v]) => ({ id, ...v }))
+      .sort((a, b) => b.games - a.games);
+  }, [rows]);
 
   return (
-    <Section style={{ margin: "16px 0 32px 0", flexDirection: "column" }}>
-      <h2 style={{ textAlign: "center" }}>Explore Events</h2>
-      <Flex
-        style={{
-          textAlign: "center",
-          flexDirection: "column",
-          lineHeight: "32px",
-          marginBottom: "16px",
-        }}
+    <div style={{ padding: "0 16px" }}>
+      <Section
+        style={{ margin: "16px 0", padding: "20px", flexDirection: "column" }}
       >
-        <i>
-          Want to contribute?{" "}
-          <a
-            className="link"
-            onClick={() => {
-              history.push("/aggregator");
+        <div className="separator-title">Explore — best decks by event</div>
+        <div
+          style={{
+            fontSize: "13px",
+            color: "var(--color-text-dark)",
+            marginTop: "6px",
+          }}
+        >
+          Aggregated across all players and grouped by decklist. A deck appears
+          once it has at least 10 matches from 2+ pilots.
+        </div>
+      </Section>
+
+      {rows === null && (
+        <Section
+          style={{
+            margin: "16px 0",
+            padding: "32px",
+            justifyContent: "center",
+          }}
+        >
+          <div style={{ color: "var(--color-text-dark)" }}>Loading…</div>
+        </Section>
+      )}
+
+      {rows !== null && events.length === 0 && (
+        <Section
+          style={{
+            margin: "16px 0",
+            padding: "40px",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            style={{
+              textAlign: "center",
+              color: "var(--color-text-dark)",
+              maxWidth: "460px",
             }}
           >
-            try the aggregator!
-          </a>
-        </i>
-      </Flex>
-      <Flex className="event-descriptions">
-        <div className="desc-a">Aggregated</div>
-        <div className="desc-r">Ranked</div>
-        <div className="desc-l">Limited</div>
-        <div className="desc-e">Events</div>
-        <div className="desc-p">Play</div>
-        <div className="desc-o">Other</div>
-      </Flex>
-      <div className="explore-events-mosaic">
-        <div className="mosaic-column">
-          {sortedEventsList.length === 0 && (
-            <Flex style={{ flexDirection: "column" }}>
-              {new Array(16).fill("").map((ev, i) => (
-                <ExploreEvent key={`explore-event-${i}`} eventId="" />
-              ))}
-            </Flex>
-          )}
-          <Flex style={{ flexDirection: "column" }}>
-            {sortedEventsList
-              .filter((ev) => getEventExplorerSection(ev) === "Custom")
-              .map((ev) => (
-                <ExploreEvent key={`explore-event-${ev}`} eventId={ev} />
-              ))}
-          </Flex>
-          <Flex style={{ flexDirection: "column" }}>
-            {sortedEventsList
-              .filter((ev) => getEventExplorerSection(ev) === "Ranked")
-              .map((ev) => (
-                <ExploreEvent key={`explore-event-${ev}`} eventId={ev} />
-              ))}
-          </Flex>{" "}
-          <Flex style={{ flexDirection: "column" }}>
-            {sortedEventsList
-              .filter((ev) => getEventExplorerSection(ev) === "Limited")
-              .map((ev) => (
-                <ExploreEvent key={`explore-event-${ev}`} eventId={ev} />
-              ))}
-          </Flex>
-        </div>
-        <div className="mosaic-column">
-          {sortedEventsList.length === 0 && (
-            <Flex style={{ flexDirection: "column" }}>
-              {new Array(16).fill("").map((ev, i) => (
-                <ExploreEvent key={`explore-event-${i}`} eventId="" />
-              ))}
-            </Flex>
-          )}
-          <Flex style={{ flexDirection: "column" }}>
-            {sortedEventsList
-              .filter((ev) => getEventExplorerSection(ev) === "Constructed")
-              .map((ev) => (
-                <ExploreEvent key={`explore-event-${ev}`} eventId={ev} />
-              ))}
-          </Flex>
-          <Flex style={{ flexDirection: "column" }}>
-            {sortedEventsList
-              .filter((ev) => getEventExplorerSection(ev) === "Play")
-              .map((ev) => (
-                <ExploreEvent key={`explore-event-${ev}`} eventId={ev} />
-              ))}
-          </Flex>
-          <Flex style={{ flexDirection: "column" }}>
-            {sortedEventsList
-              .filter((ev) => getEventExplorerSection(ev) === "Other")
-              .map((ev) => (
-                <ExploreEvent key={`explore-event-${ev}`} eventId={ev} />
-              ))}
-          </Flex>
-        </div>
-      </div>
-    </Section>
+            No events have enough data yet. Explore fills in as more players
+            sync their matches — decks show up once an event has at least 10
+            matches from 2 or more pilots.
+          </div>
+        </Section>
+      )}
+
+      {events.length > 0 && (
+        <Section
+          style={{
+            margin: "16px 0 24px",
+            padding: "16px",
+            flexDirection: "column",
+          }}
+        >
+          {events.map((e) => (
+            <div
+              key={e.id}
+              className="list-item-container"
+              onClick={() =>
+                history.push(`/explore/${encodeURIComponent(e.id)}`)
+              }
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                padding: "12px 8px",
+                cursor: "pointer",
+              }}
+            >
+              <div
+                style={{
+                  flex: 1,
+                  color: "var(--color-text)",
+                  fontSize: "16px",
+                }}
+              >
+                {prettyEvent(e.id)}
+              </div>
+              <div
+                style={{ color: "var(--color-text-dark)", fontSize: "13px" }}
+              >
+                {e.decks} deck{e.decks === 1 ? "" : "s"} · {e.games} games
+              </div>
+            </div>
+          ))}
+        </Section>
+      )}
+    </div>
   );
 }

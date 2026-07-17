@@ -1,28 +1,33 @@
 /* eslint-disable import/no-webpack-loader-syntax */
 /* eslint-disable no-nested-ternary */
 import _ from "lodash";
-import { sha1 } from "mtgatool-db";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Switch, useHistory } from "react-router-dom";
 
+import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import overlayHandler from "../common/overlayHandler";
 import { LOGIN_OK } from "../constants";
+import { getCloudSession } from "../data/cloudAuth";
+import hydrateFromCloud from "../data/hydrateFromCloud";
+import localLogin from "../data/localLogin";
+import syncMatches from "../data/syncMatches";
 import info from "../info.json";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
-import { login } from "../toolDb/worker-wrapper";
 import electron from "../utils/electron/electronWrapper";
 import isElectron from "../utils/electron/isElectron";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
 import getLocalSetting from "../utils/getLocalSetting";
 import getPopupClass from "../utils/getPopupClass";
+import setLocalSetting from "../utils/setLocalSetting";
 import vodiFn from "../utils/voidfn";
 import Auth from "./Auth";
 import CardHover from "./CardHover";
 import ContentWrapper from "./ContentWrapper";
 import DataStatus from "./DataStatus";
 import ErrorBoundary from "./ErrorBoundary";
+import LiveShareView from "./LiveShareView";
 import LoadingBar from "./LoadingBar";
 import PopupComponent from "./PopupComponent";
 import Popups from "./Popups";
@@ -33,7 +38,7 @@ import SettingsPersistor from "./SettingsPersistor";
 import TopBar from "./TopBar";
 import TopNav from "./TopNav";
 import ViewSettings from "./views/settings/ViewSettings";
-import Welcome from "./Welcome";
+import WhatsNewPopup from "./WhatsNewPopup";
 
 export interface AppProps {
   forceOs?: string;
@@ -57,58 +62,72 @@ function App(props: AppProps) {
   const os = forceOs || (isElectron() ? process.platform : "");
 
   useEffect(() => {
-    window.toolDbWorker.addEventListener("message", (e) => {
-      // console.warn("Worker REDUX_ACTION", action.type, action.arg);
-      if (e.data.type === "REDUX_ACTION") {
-        const action = e.data.arg;
-        // console.warn("Worker REDUX_ACTION", action.type, action.arg);
-        reduxAction(dispatch, {
-          type: action.type,
-          arg: action.arg,
-        });
-      }
-      // lets experiment removing this
-      // if (e.data.type === "CONNECTED") {
-      //   setCanLogin(true);
-      // }
-    });
-  }, []);
-
-  useEffect(() => {
     if (overlayHandler) {
       overlayHandler.settingsUpdated();
     }
   }, [matchInProgress]);
 
   useEffect(() => {
-    console.log("Can log in?", canLogin);
-    const welcome = getLocalSetting("welcome");
-    if (!welcome || welcome === "false") {
-      history.push("/welcome");
-    } else if (!electron && canLogin) {
-      const pwd = getLocalSetting("savedPass");
-      const user = getLocalSetting("username");
+    // The public live-share viewer (/live/<token>) must work with no account —
+    // never bounce it to /auth or run the login flow for it.
+    if (history.location.pathname.startsWith("/live/")) return;
+    if (canLogin) {
+      const autoLogin = getLocalSetting("autoLogin");
 
-      login(user, sha1(pwd))
-        .then(() => {
-          reduxAction(dispatch, {
-            type: "SET_LOGIN_STATE",
-            arg: LOGIN_OK,
-          });
+      // "local" = offline mode (no account); "true" = cloud account, valid
+      // only while a Supabase session is persisted.
+      const checkSession =
+        autoLogin === "local"
+          ? Promise.resolve(true)
+          : autoLogin === "true"
+          ? getCloudSession().then((session) => !!session)
+          : Promise.resolve(false);
 
-          if (
-            history.location.pathname === "" ||
-            history.location.pathname === "/"
-          ) {
+      checkSession
+        .then((ok) => {
+          if (!ok) {
             history.push("/auth");
+            return undefined;
           }
+          // Pull cloud data down first (no-op offline), then localLogin mirrors
+          // the restored KV into Redux.
+          return hydrateFromCloud()
+            .then(() => localLogin())
+            .then(() => {
+              reduxAction(dispatch, {
+                type: "SET_LOGIN_STATE",
+                arg: LOGIN_OK,
+              });
+
+              // Connection status reflects the mtgatool cloud (Supabase) account:
+              // "true" = signed in (online), "local" = offline mode.
+              reduxAction(dispatch, {
+                type: "SET_OFFLINE",
+                arg: autoLogin !== "true",
+              });
+
+              // Start reading the Arena log on auto-login too (manual login in
+              // Auth.tsx does this; without it, returning users never start the
+              // watcher and nothing populates).
+              if (electron) {
+                postChannelMessage({ type: "START_LOG_READING" });
+              }
+
+              // Reconcile local match history with the cloud (no-op offline).
+              syncMatches().catch(() => undefined);
+
+              if (
+                history.location.pathname === "" ||
+                history.location.pathname === "/"
+              ) {
+                history.push("/auth");
+              }
+            });
         })
         .catch((e: Error) => {
           console.error(e);
           history.push("/auth");
         });
-    } else if (canLogin) {
-      history.push("/auth");
     }
   }, [canLogin, history, dispatch]);
 
@@ -134,6 +153,19 @@ function App(props: AppProps) {
 
   const openAdmin = useRef<() => void>(vodiFn);
   const closeAdmin = useRef<() => void>(vodiFn);
+
+  const openWhatsNew = useRef<() => void>(vodiFn);
+  const closeWhatsNew = useRef<() => void>(vodiFn);
+
+  // Show the "What's new" modal once per version, on app open — before login,
+  // so returning users see the new-account / no-carryover notice up front.
+  useEffect(() => {
+    if (getLocalSetting("whatsNewSeen") !== info.version) {
+      openWhatsNew.current();
+      setLocalSetting("whatsNewSeen", info.version);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (detailedLogs === false) {
@@ -206,6 +238,17 @@ function App(props: AppProps) {
       >
         <Admin onClose={closeAdmin.current} />
       </PopupComponent>
+      <PopupComponent
+        open={false}
+        className={getPopupClass(os)}
+        width="640px"
+        height="580px"
+        openFnRef={openWhatsNew}
+        closeFnRef={closeWhatsNew}
+        persistent={false}
+      >
+        <WhatsNewPopup onClose={() => closeWhatsNew.current()} />
+      </PopupComponent>
       {os !== "" && os !== "linux" && <TopBar forceOs={os} />}
       <div
         className={wrapperClass}
@@ -231,8 +274,9 @@ function App(props: AppProps) {
         )}
         <ErrorBoundary>
           <Switch>
-            <Route exact path="/welcome" component={Welcome} />
             <Route exact path="/auth" component={Auth} />
+            {/* Public (no login): live overlay share viewer, see LiveShareView */}
+            <Route exact path="/live/:id" component={LiveShareView} />
             <Route path="/:page">
               <>
                 <TopNav
@@ -250,7 +294,14 @@ function App(props: AppProps) {
         </ErrorBoundary>
         {loginState == LOGIN_OK ? <DataStatus /> : <></>}
         {os !== "" ? (
-          <div className="version-number">v{info.version}</div>
+          <div
+            className="version-number"
+            style={{ cursor: "pointer" }}
+            title="What's new"
+            onClick={() => openWhatsNew.current()}
+          >
+            v{info.version}
+          </div>
         ) : (
           <></>
         )}

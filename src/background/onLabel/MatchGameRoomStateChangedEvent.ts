@@ -14,6 +14,7 @@ import isLimitedEventId from "../../utils/isLimitedEventId";
 import CardsList from "../../utils/mtga/cardsList";
 import Deck from "../../utils/mtga/deck";
 import actionLog from "../actionLog";
+import { isLiveLog } from "../logReadState";
 import saveMatch from "../saveMatch";
 import selectDeck from "../selectDeck";
 import globalStore from "../store";
@@ -41,9 +42,12 @@ const rankClass: Record<number, string> = {
   "6": "Mythic",
 };
 
-export default function onLabelMatchGameRoomStateChangedEvent(
+// Async: the live-match memory reads (mtga-reader 0.1.7) return Promises.
+// logEntrySwitch fire-and-forgets this handler; all reads self-catch, so the
+// promise never rejects.
+export default async function onLabelMatchGameRoomStateChangedEvent(
   entry: Entry
-): void {
+): Promise<void> {
   const { json } = entry;
 
   const gameRoom = json.matchGameRoomStateChangedEvent.gameRoomInfo;
@@ -157,10 +161,14 @@ export default function onLabelMatchGameRoomStateChangedEvent(
 
     const isLimited = isLimitedEventId(gameRoom.gameRoomConfig.eventId);
 
-    if (isElectron()) {
-      const matchState = readMatchManger();
+    // Live-match rank/opponent memory reads: skip during catch-up — they read
+    // the CURRENT match's memory, irrelevant to a historical game. The reads
+    // run async on the native threadpool, so they never block this renderer's
+    // event loop (which also hosts the GRE parser).
+    if (isElectron() && isLiveLog()) {
+      const matchState = await readMatchManger();
 
-      const oppInfo = readMatchOpponentInfo();
+      const oppInfo = await readMatchOpponentInfo();
       if (
         oppInfo &&
         matchState &&
@@ -177,10 +185,10 @@ export default function onLabelMatchGameRoomStateChangedEvent(
         setOpponent(opponent);
       }
 
-      const playerInfo = readMatchPlayerInfo();
+      const playerInfo = await readMatchPlayerInfo();
 
       // This doesnt work on this screen
-      const playerRank = readRank();
+      const playerRank = await readRank();
 
       // eslint-disable-next-line no-nested-ternary
       const rankData = playerRank
