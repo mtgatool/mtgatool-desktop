@@ -52,8 +52,11 @@ function shareTargets(): ShareTarget[] {
 function getChannel(shareId: string): LiveChannel {
   let live = channels.get(shareId);
   if (!live) {
+    // ack:true so send() resolves only when the server confirms delivery — we
+    // use that signal to detect a rotted Realtime connection and recreate the
+    // channel. At ~1 msg/sec the extra round-trip is negligible.
     const channel = supabase.channel(`overlay-${shareId}`, {
-      config: { broadcast: { ack: false } },
+      config: { broadcast: { ack: true } },
     });
     live = { channel, joined: false };
     const ref = live;
@@ -67,6 +70,8 @@ function getChannel(shareId: string): LiveChannel {
         status === "TIMED_OUT" ||
         status === "CLOSED"
       ) {
+        // eslint-disable-next-line no-console
+        console.warn(`[liveShare] channel overlay-${shareId} ${status}`);
         supabase.removeChannel(channel);
         if (channels.get(shareId) === ref) channels.delete(shareId);
       }
@@ -108,7 +113,23 @@ function doPublish(): void {
           ts: new Date().getTime(),
         },
       })
-      .catch(() => undefined);
+      .then((res) => {
+        // send() resolves "ok" only when the socket accepted it; anything else
+        // means the Realtime connection is unhealthy — recreate the channel so
+        // the next tick rejoins instead of publishing into the void.
+        if (res !== "ok") {
+          // eslint-disable-next-line no-console
+          console.warn(`[liveShare] send overlay-${target.shareId} -> ${res}`);
+          supabase.removeChannel(live.channel);
+          if (channels.get(target.shareId) === live) {
+            channels.delete(target.shareId);
+          }
+        }
+      })
+      .catch((e) => {
+        // eslint-disable-next-line no-console
+        console.warn(`[liveShare] send overlay-${target.shareId} failed`, e);
+      });
   });
 }
 

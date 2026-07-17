@@ -161,6 +161,13 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true,
+      // This hidden window hosts the log watcher AND the Supabase Realtime
+      // socket used for live overlay sharing. Chromium throttles timers in
+      // backgrounded windows, which starves Realtime's heartbeat interval —
+      // the server then drops the connection and live sharing silently stops
+      // after ~a minute (overlays keep updating because those use in-process
+      // BroadcastChannel, not a server socket). Keep timers running full-rate.
+      backgroundThrottling: false,
     },
   });
 
