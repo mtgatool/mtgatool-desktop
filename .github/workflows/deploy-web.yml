@@ -2,9 +2,18 @@ name: Deploy website
 
 on:
   push:
-    tags: 'v*'
     branches:
       - "dev"
+
+# Serialize deploys. Previously a tag push on dev triggered this twice at once
+# (branches: dev + tags: v*), and both ran `dangerous-clean-slate` against the
+# same FTP dir — racing into "553 Could not create file". The web already
+# deploys on every dev push (a release tag points at a dev commit that was just
+# pushed), so the tag trigger was redundant; this guard also prevents two rapid
+# dev pushes from overlapping.
+concurrency:
+  group: web-deploy
+  cancel-in-progress: false
 
 jobs:
   web-deploy:
