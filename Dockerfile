@@ -27,6 +27,10 @@ FROM node:18-slim AS serve
 WORKDIR /app
 RUN npm install -g serve@14
 COPY --from=build /app/build ./build
-# Railway injects $PORT. -s = SPA fallback: every unknown path returns
-# index.html so client-side routing (/live/<id>) works.
-CMD ["sh", "-c", "serve -s build -l tcp://0.0.0.0:${PORT:-3000}"]
+# A minimal package.json with a `start` script so this image serves the SPA
+# whether the platform runs the CMD below OR overrides it with `npm start`
+# (Railway's default start command for Node services). -s = SPA fallback: any
+# unknown path returns index.html so client-side routing (/live/<id>) works.
+# Railway injects $PORT.
+RUN printf '%s' '{"name":"mtgatool-web","private":true,"scripts":{"start":"serve -s build -l tcp://0.0.0.0:${PORT:-3000}"}}' > package.json
+CMD ["npm", "start"]
