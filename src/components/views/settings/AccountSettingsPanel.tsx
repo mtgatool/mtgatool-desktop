@@ -8,7 +8,11 @@ import { ReactComponent as HideIcon } from "../../../assets/images/svg/unarchive
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 import { LOGIN_AUTH } from "../../../constants";
 import { cloudLogout, cloudUpdatePassword } from "../../../data/cloudAuth";
-import { updateUsername, uploadAvatar } from "../../../data/profile";
+import {
+  setProfilePrivate,
+  updateUsername,
+  uploadAvatar,
+} from "../../../data/profile";
 import { getData, putData } from "../../../data/store";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
@@ -134,6 +138,7 @@ export default function AccountSettingsPanel(
         },
       });
       putData("privateMode", value, true);
+      setProfilePrivate(value); // exclude/include from the public feed + lookups
     },
     [dispatch]
   );

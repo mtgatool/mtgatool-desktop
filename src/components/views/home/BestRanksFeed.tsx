@@ -2,10 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import { DEFAULT_AVATAR } from "../../../constants";
-import { doFunction } from "../../../data/store";
-import useFetchAvatar from "../../../hooks/useFetchAvatar";
-import useFetchUsername from "../../../hooks/useFetchUsername";
-import { DbRankDataWithKey } from "../../../types/dbTypes";
+import { getLatestRanks } from "../../../data/publicProfiles";
 import cleanUsername from "../../../utils/cleanUsername";
 import timeAgo from "../../../utils/timeAgo";
 import RankIcon from "../../RankIcon";
@@ -128,18 +125,6 @@ function DrawLoadingRank() {
   );
 }
 
-// Promise utility that will resolve to undefined if the promise fails
-// Used to avoid Promise.all() to fail if one of the promises fails
-function finallyThen<T>(param: Promise<T>) {
-  return param
-    .then((res) => {
-      return res;
-    })
-    .catch(() => {
-      return undefined;
-    });
-}
-
 const emptyList = new Array(8).fill(0);
 
 export default function BestRanksFeed() {
@@ -147,35 +132,14 @@ export default function BestRanksFeed() {
 
   const isLoadingRef = useRef(false);
 
-  const fetchAvatar = useFetchAvatar();
-  const fetchUsername = useFetchUsername();
-
   useEffect(() => {
     if (isLoadingRef.current) return;
     isLoadingRef.current = true;
 
-    doFunction<DbRankDataWithKey[]>("getLatestRanks", {}).then((fnRet) => {
-      const data: DbRankDataWithKey[] =
-        fnRet?.code === "OK" && fnRet.return ? fnRet.return : [];
-
-      const promises = data.map((rankInfo) =>
-        finallyThen(fetchAvatar(rankInfo.pubKey)).then((avatar) =>
-          finallyThen(fetchUsername(rankInfo.pubKey)).then((name) => {
-            return {
-              ...rankInfo,
-              pubKey: rankInfo.pubKey,
-              avatar: avatar || DEFAULT_AVATAR,
-              name: name || "",
-            };
-          })
-        )
-      );
-
-      Promise.all(promises).then((ranks) => {
-        setAllRanks(ranks);
-      });
-    });
-  }, [isLoadingRef, fetchAvatar, fetchUsername]);
+    // Public latest ranks across users (name + avatar resolved server-side,
+    // private-mode users excluded). See data/publicProfiles.ts.
+    getLatestRanks(200).then((ranks) => setAllRanks(ranks));
+  }, [isLoadingRef]);
 
   const bestConstructed = allRanks.sort(sortConstructedRanks).slice(0, 8);
 

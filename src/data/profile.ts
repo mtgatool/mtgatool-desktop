@@ -68,6 +68,25 @@ export async function updateUsername(username: string): Promise<boolean> {
   }
 }
 
+/**
+ * Persist the login's private-mode flag on its profile, so the public feed /
+ * lookups (get_latest_ranks / get_public_profiles) can exclude it.
+ */
+export async function setProfilePrivate(isPrivate: boolean): Promise<void> {
+  try {
+    const uid = await currentUserId();
+    if (!uid) return;
+    await supabase.from("profiles").upsert({
+      id: uid,
+      is_private: isPrivate,
+      updated_at: new Date().toISOString(),
+    });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn("[profile] setProfilePrivate failed:", e);
+  }
+}
+
 /** The current login's avatar URL from its profile row, or null. */
 export async function fetchOwnAvatarUrl(): Promise<string | null> {
   try {

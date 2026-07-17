@@ -261,6 +261,7 @@ export type Database = {
           avatar_url: string | null;
           created_at: string;
           id: string;
+          is_private: boolean;
           updated_at: string;
           username: string | null;
         };
@@ -268,6 +269,7 @@ export type Database = {
           avatar_url?: string | null;
           created_at?: string;
           id: string;
+          is_private?: boolean;
           updated_at?: string;
           username?: string | null;
         };
@@ -275,6 +277,7 @@ export type Database = {
           avatar_url?: string | null;
           created_at?: string;
           id?: string;
+          is_private?: boolean;
           updated_at?: string;
           username?: string | null;
         };
@@ -282,7 +285,29 @@ export type Database = {
       };
     };
     Views: { [_ in never]: never };
-    Functions: { [_ in never]: never };
+    Functions: {
+      get_latest_ranks: {
+        Args: { p_limit?: number };
+        Returns: {
+          arena_id: string;
+          display_name: string | null;
+          username: string | null;
+          avatar_url: string | null;
+          constructed: Json | null;
+          limited: Json | null;
+          updated_at: string;
+        }[];
+      };
+      get_public_profiles: {
+        Args: { p_arena_ids: string[] };
+        Returns: {
+          arena_id: string;
+          display_name: string | null;
+          username: string | null;
+          avatar_url: string | null;
+        }[];
+      };
+    };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
   };
