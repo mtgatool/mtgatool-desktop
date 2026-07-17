@@ -77,18 +77,16 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
   // unguessable shareId, flip shareEnabled (the background window broadcasts
   // the live state over Supabase Realtime while it's on), and show a QR of the
   // public viewer URL. Clicking again hides the QR and stops sharing.
+  // Clicking the QR icon ENABLES sharing and shows the QR; clicking again only
+  // HIDES the QR image — it never stops sharing. The overlay sits over the game,
+  // so a stray click here must not kill your stream. Disabling is a deliberate
+  // toggle in the overlay settings panel.
   const toggleLiveShare = useCallback(() => {
-    const window = getWindowTitle();
     if (showQrCode) {
-      // eslint-disable-next-line no-console
-      console.trace(`[liveShare] toggle OFF via ${window}`);
       setShowQrCode(false);
-      postChannelMessage({
-        type: "OVERLAY_SET_SETTINGS",
-        value: { window, settings: { shareEnabled: false } },
-      });
       return;
     }
+    const window = getWindowTitle();
     const shareId =
       settings.shareId || sha1(`${textRandom(64)}-${new Date().getTime()}`);
     postChannelMessage({
