@@ -91,6 +91,8 @@ function pruneChannels(active: Set<string>): void {
   });
 }
 
+let publishSeq = 0;
+
 function doPublish(): void {
   const state = latestState;
   if (!state) return;
@@ -98,6 +100,15 @@ function doPublish(): void {
   const targets = shareTargets();
   pruneChannels(new Set(targets.map((t) => t.shareId)));
   if (targets.length === 0) return;
+
+  publishSeq += 1;
+  const seq = publishSeq;
+  // eslint-disable-next-line no-console
+  console.log(
+    `[liveShare] publish #${seq} -> ${targets
+      .map((t) => `${t.shareId.slice(0, 8)}(${channels.get(t.shareId)?.joined ? "joined" : "connecting"})`)
+      .join(", ")}`
+  );
 
   targets.forEach((target) => {
     const live = getChannel(target.shareId);
@@ -119,7 +130,9 @@ function doPublish(): void {
         // the next tick rejoins instead of publishing into the void.
         if (res !== "ok") {
           // eslint-disable-next-line no-console
-          console.warn(`[liveShare] send overlay-${target.shareId} -> ${res}`);
+          console.warn(
+            `[liveShare] send #${seq} overlay-${target.shareId} -> ${res}; recreating`
+          );
           supabase.removeChannel(live.channel);
           if (channels.get(target.shareId) === live) {
             channels.delete(target.shareId);
@@ -128,9 +141,24 @@ function doPublish(): void {
       })
       .catch((e) => {
         // eslint-disable-next-line no-console
-        console.warn(`[liveShare] send overlay-${target.shareId} failed`, e);
+        console.warn(`[liveShare] send #${seq} overlay-${target.shareId} failed`, e);
       });
   });
+}
+
+// Re-push the latest state on a fixed cadence, independent of match updates.
+// This (a) keeps the Realtime socket warm, (b) lets a late-joining viewer get
+// current state without waiting for the next in-game change, and (c) recovers
+// automatically if a send ever tore a channel down — the next tick rejoins and
+// resends. Only runs while there's state to share.
+const KEEPALIVE_MS = 3000;
+let keepalive: ReturnType<typeof setInterval> | null = null;
+
+function ensureKeepalive(): void {
+  if (keepalive) return;
+  keepalive = setInterval(() => {
+    if (latestState) doPublish();
+  }, KEEPALIVE_MS);
 }
 
 /**
@@ -143,6 +171,7 @@ export default function publishLiveShare(
 ): void {
   try {
     latestState = matchState;
+    ensureKeepalive();
 
     const now = new Date().getTime();
     if (now - lastPublish >= THROTTLE_MS) {
