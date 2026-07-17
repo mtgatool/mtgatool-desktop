@@ -1,60 +1,54 @@
 /**
- * Live overlay sharing (Supabase Realtime Broadcast).
+ * Live overlay sharing (Supabase Realtime Broadcast), driven per overlay.
  *
- * Replaces the tool-db "livematch-<id>" p2p publishing: while a match is live,
- * the background window broadcasts the overlay match state on one Realtime
- * channel per SHARING-ENABLED overlay ("overlay-<shareId>"). The public web
- * viewer (app.mtgatool.com/live/<shareId>) subscribes to the same channel and
- * renders it — no account needed, and nothing is written to the database
- * (broadcast is ephemeral pub/sub).
+ * Each sharing-enabled overlay WINDOW publishes its own state to one Realtime
+ * channel ("overlay-<shareId>"); the public web viewer
+ * (app.mtgatool.com/live/<shareId>) subscribes and renders the same
+ * OverlayContent. Nothing is written to the database — broadcast is ephemeral
+ * pub/sub.
  *
- * The shareId is an unguessable per-overlay token stored in that overlay's
- * settings, so each overlay (main view, opponent view, draft...) has its own
- * shareable/revocable URL. Publishing is throttled and only happens while at
- * least one overlay has sharing enabled, so idle cost is zero.
+ * Publishing lives in the overlay window (not the hidden background window) on
+ * purpose: overlays are visible during a match, so their Realtime socket isn't
+ * subject to the background-renderer throttling that would starve the heartbeat
+ * and drop the connection. Each call is throttled per shareId, with a keepalive
+ * that re-pushes the latest state so late-joining viewers catch up and a dropped
+ * channel self-heals.
  */
-import { OverlayUpdateMatchState } from "../background/store/types";
-import { OverlaySettingsData } from "../types/settings";
-import getLocalSetting from "../utils/getLocalSetting";
+import { OverlaySettings } from "../common/defaultConfig";
 import supabase from "./supabase";
-
-interface ShareTarget {
-  overlayId: number;
-  shareId: string;
-  settings: OverlaySettingsData;
-}
 
 interface LiveChannel {
   channel: ReturnType<typeof supabase.channel>;
   joined: boolean;
 }
 
-const channels = new Map<string, LiveChannel>();
+// The full payload a viewer needs to render OverlayContent for any mode.
+export interface OverlaySharePayload {
+  matchState: unknown;
+  settings: OverlaySettings;
+  actionLog?: unknown;
+  draftState?: unknown;
+  draftVotes?: unknown;
+}
+
+interface PerShare {
+  latest: OverlaySharePayload | null;
+  lastPublish: number;
+  trailing: ReturnType<typeof setTimeout> | null;
+  keepalive: ReturnType<typeof setInterval> | null;
+}
 
 const THROTTLE_MS = 1000;
-let lastPublish = 0;
-let trailing: ReturnType<typeof setTimeout> | null = null;
-let latestState: OverlayUpdateMatchState | null = null;
+const KEEPALIVE_MS = 3000;
 
-/** Overlays currently sharing, straight from the persisted settings. */
-function shareTargets(): ShareTarget[] {
-  try {
-    const settings = JSON.parse(getLocalSetting("settings"));
-    const overlays: OverlaySettingsData[] = settings?.overlays || [];
-    return overlays
-      .map((o, i) => ({ overlayId: i, shareId: o.shareId || "", settings: o }))
-      .filter((t) => t.shareId && t.settings.shareEnabled);
-  } catch {
-    return [];
-  }
-}
+const channels = new Map<string, LiveChannel>();
+const shares = new Map<string, PerShare>();
 
 function getChannel(shareId: string): LiveChannel {
   let live = channels.get(shareId);
   if (!live) {
-    // ack:true so send() resolves only when the server confirms delivery — we
-    // use that signal to detect a rotted Realtime connection and recreate the
-    // channel. At ~1 msg/sec the extra round-trip is negligible.
+    // ack:true so send() resolves only on server confirmation — we use that to
+    // detect a rotted connection and recreate the channel.
     const channel = supabase.channel(`overlay-${shareId}`, {
       config: { broadcast: { ack: true } },
     });
@@ -62,9 +56,6 @@ function getChannel(shareId: string): LiveChannel {
     const ref = live;
     channel.subscribe((status) => {
       ref.joined = status === "SUBSCRIBED";
-      // A dropped/errored channel would otherwise stay dead forever (sends are
-      // skipped while not joined). Drop it from the map so the next publish
-      // tick recreates and rejoins it.
       if (
         status === "CHANNEL_ERROR" ||
         status === "TIMED_OUT" ||
@@ -81,120 +72,85 @@ function getChannel(shareId: string): LiveChannel {
   return live;
 }
 
-/** Leave channels whose overlay stopped sharing. */
-function pruneChannels(active: Set<string>): void {
-  channels.forEach((live, shareId) => {
-    if (!active.has(shareId)) {
-      supabase.removeChannel(live.channel);
-      channels.delete(shareId);
-    }
-  });
-}
-
-let publishSeq = 0;
-
-// Compact "total in distinct [id×qty,...]" summary of a saved deck's mainboard,
-// for comparing exactly what's on the wire against what the overlay/viewer show.
-function deckSummary(save: any): string {
-  const main: Array<{ id: number; quantity: number }> = save?.mainDeck || [];
-  const total = main.reduce((s, c) => s + (c.quantity || 0), 0);
-  const list = main.map((c) => `${c.id}x${c.quantity}`).join(",");
-  return `${total} in ${main.length} [${list}]`;
-}
-
-function doPublish(): void {
-  const state = latestState;
-  if (!state) return;
-
-  const targets = shareTargets();
-  pruneChannels(new Set(targets.map((t) => t.shareId)));
-  if (targets.length === 0) return;
-
-  publishSeq += 1;
-  const seq = publishSeq;
-
-  targets.forEach((target) => {
-    const live = getChannel(target.shareId);
-    // eslint-disable-next-line no-console
-    console.log(
-      `[liveShare] publish #${seq} -> ${target.shareId.slice(0, 8)} ` +
-        `mode=${target.settings.mode} joined=${live.joined} ` +
-        `left=${deckSummary(state.playerCardsLeft)} ` +
-        `deck=${deckSummary(state.playerDeck)}`
-    );
-    if (!live.joined) return; // still connecting; next tick will catch up
-    live.channel
-      .send({
-        type: "broadcast",
-        event: "overlay",
-        payload: {
-          matchState: state,
-          settings: target.settings,
-          overlayId: target.overlayId,
-          ts: new Date().getTime(),
-        },
-      })
-      .then((res) => {
-        // send() resolves "ok" only when the socket accepted it; anything else
-        // means the Realtime connection is unhealthy — recreate the channel so
-        // the next tick rejoins instead of publishing into the void.
-        if (res !== "ok") {
-          // eslint-disable-next-line no-console
-          console.warn(
-            `[liveShare] send #${seq} overlay-${target.shareId} -> ${res}; recreating`
-          );
-          supabase.removeChannel(live.channel);
-          if (channels.get(target.shareId) === live) {
-            channels.delete(target.shareId);
-          }
-        }
-      })
-      .catch((e) => {
+function sendNow(shareId: string): void {
+  const s = shares.get(shareId);
+  if (!s || !s.latest) return;
+  const live = getChannel(shareId);
+  if (!live.joined) return; // still connecting; keepalive/trailing will retry
+  live.channel
+    .send({
+      type: "broadcast",
+      event: "overlay",
+      payload: { ...s.latest, ts: new Date().getTime() },
+    })
+    .then((res) => {
+      if (res !== "ok") {
         // eslint-disable-next-line no-console
-        console.warn(`[liveShare] send #${seq} overlay-${target.shareId} failed`, e);
-      });
-  });
-}
-
-// Re-push the latest state on a fixed cadence, independent of match updates.
-// This (a) keeps the Realtime socket warm, (b) lets a late-joining viewer get
-// current state without waiting for the next in-game change, and (c) recovers
-// automatically if a send ever tore a channel down — the next tick rejoins and
-// resends. Only runs while there's state to share.
-const KEEPALIVE_MS = 3000;
-let keepalive: ReturnType<typeof setInterval> | null = null;
-
-function ensureKeepalive(): void {
-  if (keepalive) return;
-  keepalive = setInterval(() => {
-    if (latestState) doPublish();
-  }, KEEPALIVE_MS);
+        console.warn(
+          `[liveShare] send overlay-${shareId} -> ${res}; recreating`
+        );
+        supabase.removeChannel(live.channel);
+        if (channels.get(shareId) === live) channels.delete(shareId);
+      }
+    })
+    .catch((e) => {
+      // eslint-disable-next-line no-console
+      console.warn(`[liveShare] send overlay-${shareId} failed`, e);
+    });
 }
 
 /**
- * Publish the current overlay match state to every sharing-enabled overlay
- * channel, throttled (trailing edge keeps the last state of a burst).
- * Fire-and-forget and never throws — called inline from updateDeck.
+ * Publish this overlay's current state to its channel, throttled (trailing edge
+ * keeps the last state of a burst) with a keepalive re-push. Fire-and-forget;
+ * never throws. Call from the overlay window while sharing is enabled.
  */
-export default function publishLiveShare(
-  matchState: OverlayUpdateMatchState
+export function publishOverlayShare(
+  shareId: string,
+  payload: OverlaySharePayload
 ): void {
   try {
-    latestState = matchState;
-    ensureKeepalive();
+    let s = shares.get(shareId);
+    if (!s) {
+      s = { latest: null, lastPublish: 0, trailing: null, keepalive: null };
+      shares.set(shareId, s);
+    }
+    s.latest = payload;
+    if (!s.keepalive) {
+      s.keepalive = setInterval(() => sendNow(shareId), KEEPALIVE_MS);
+    }
 
     const now = new Date().getTime();
-    if (now - lastPublish >= THROTTLE_MS) {
-      lastPublish = now;
-      doPublish();
-    } else if (!trailing) {
-      trailing = setTimeout(() => {
-        trailing = null;
-        lastPublish = new Date().getTime();
-        doPublish();
-      }, THROTTLE_MS - (now - lastPublish));
+    if (now - s.lastPublish >= THROTTLE_MS) {
+      s.lastPublish = now;
+      sendNow(shareId);
+    } else if (!s.trailing) {
+      const wait = THROTTLE_MS - (now - s.lastPublish);
+      s.trailing = setTimeout(() => {
+        const cur = shares.get(shareId);
+        if (cur) {
+          cur.trailing = null;
+          cur.lastPublish = new Date().getTime();
+        }
+        sendNow(shareId);
+      }, wait);
     }
   } catch (e) {
-    console.error("publishLiveShare failed:", e);
+    // eslint-disable-next-line no-console
+    console.error("publishOverlayShare failed:", e);
+  }
+}
+
+/** Stop sharing this overlay: clear timers and leave the channel. */
+export function stopOverlayShare(shareId: string): void {
+  const s = shares.get(shareId);
+  if (s) {
+    if (s.trailing) clearTimeout(s.trailing);
+    if (s.keepalive) clearInterval(s.keepalive);
+    shares.delete(shareId);
+  }
+  const live = channels.get(shareId);
+  if (live) {
+    supabase.removeChannel(live.channel);
+    channels.delete(shareId);
   }
 }

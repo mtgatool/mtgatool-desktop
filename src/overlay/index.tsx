@@ -6,9 +6,7 @@ import { ChannelMessage } from "../broadcastChannel/channelMessages";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { OverlaySettings, Settings } from "../common/defaultConfig";
 import { overlayTitleToId } from "../common/maps";
-import ActionLog from "../components/action-log-v2";
 import { ActionLogV2 } from "../components/action-log-v2/types";
-import OverlayDeckList from "../components/OverlayDeckList";
 import TopBar from "../components/TopBar";
 import {
   OVERLAY_DRAFT,
@@ -16,6 +14,11 @@ import {
   OVERLAY_LOG,
   OVERLAY_SEEN,
 } from "../constants";
+import {
+  OverlaySharePayload,
+  publishOverlayShare,
+  stopOverlayShare,
+} from "../data/liveShare";
 import useDebounce from "../hooks/useDebounce";
 import { InternalDraftv2 } from "../types";
 import Chances from "../types/chances";
@@ -24,10 +27,8 @@ import bcConnect from "../utils/bcConnect";
 import compareCards from "../utils/compareCards";
 import remote from "../utils/electron/remoteWrapper";
 import getLocalSetting from "../utils/getLocalSetting";
-import getPlayerNameWithoutSuffix from "../utils/getPlayerNameWithoutSuffix";
 import Deck from "../utils/mtga/deck";
-import Clock from "./Clock";
-import DraftOverlay from "./DraftOverlay";
+import OverlayContent from "./OverlayContent";
 
 function getCurrentOverlayId(): number {
   const title = remote.getCurrentWindow().getTitle() || "";
@@ -147,6 +148,35 @@ export default function Overlay() {
     }
   }, [settings, matchState]);
 
+  // Live-share: while this overlay has sharing enabled, publish its state to
+  // its own Realtime channel. Runs here (the visible overlay window) rather
+  // than the hidden background window so the socket isn't throttled. Only the
+  // data the current mode needs is sent, to keep payloads small.
+  useEffect(() => {
+    const shareId = settings?.shareId;
+    if (!shareId || !settings?.shareEnabled) return;
+    // Nothing to share yet.
+    if (!matchState && !draftState && !actionLog) return;
+    const payload: OverlaySharePayload = { matchState, settings };
+    if (settings.mode === OVERLAY_LOG) payload.actionLog = actionLog;
+    if (settings.mode === OVERLAY_DRAFT) {
+      payload.draftState = draftState;
+      payload.draftVotes = draftVotes;
+    }
+    publishOverlayShare(shareId, payload);
+  }, [settings, matchState, actionLog, draftState, draftVotes]);
+
+  // Tear the channel down when sharing is turned off, the shareId changes, or
+  // the window unmounts — but NOT on every state tick (deps are the primitives
+  // only), so the persistent channel survives normal updates.
+  useEffect(() => {
+    const shareId = settings?.shareId;
+    if (shareId && !settings?.shareEnabled) stopOverlayShare(shareId);
+    return () => {
+      if (shareId) stopOverlayShare(shareId);
+    };
+  }, [settings?.shareId, settings?.shareEnabled]);
+
   if (remote && settings?.autosize && heightDivAdjustRef.current) {
     remote.getCurrentWindow().setBounds({
       // 24px topbar
@@ -190,37 +220,18 @@ export default function Overlay() {
         }}
       >
         <div ref={heightDivAdjustRef} style={{ opacity: settings?.alpha || 0 }}>
-          {settings && settings.mode === OVERLAY_DRAFT && draftState && (
-            <DraftOverlay state={draftState} votes={draftVotes} />
-          )}
-          {deck && settings && settings.mode !== OVERLAY_LOG && (
-            <OverlayDeckList
-              deck={deck}
+          {settings && (
+            <OverlayContent
               settings={settings}
+              deck={deck}
               subTitle={subTitle}
-              cardOdds={odds}
-              setOddsCallback={() => {
-                //
-              }}
+              odds={odds}
+              matchState={matchState}
+              actionLog={actionLog}
+              draftState={draftState}
+              draftVotes={draftVotes}
             />
           )}
-          {settings && settings.mode === OVERLAY_LOG && actionLog && (
-            <ActionLog actionLog={actionLog} />
-          )}
-          {settings &&
-            !!settings.clock &&
-            matchState &&
-            !settings.collapsed && (
-              <Clock
-                matchBeginTime={new Date(matchState.beginTime)}
-                oppName={getPlayerNameWithoutSuffix(
-                  matchState.opponent.name || ""
-                )}
-                playerSeat={matchState.player ? matchState.player.seat : 1}
-                priorityTimers={matchState.priorityTimers}
-                turnPriority={matchState.currentPriority}
-              />
-            )}
         </div>
       </div>
     </div>

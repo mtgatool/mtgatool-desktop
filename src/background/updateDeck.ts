@@ -1,8 +1,6 @@
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
-import publishLiveShare from "../data/liveShare";
 import forceDeckUpdate from "./forceDeckUpdate";
 import getOpponentDeck from "./getOpponentDeck";
-import { isLiveLog } from "./logReadState";
 import globalStore from "./store";
 import { OverlayUpdateMatchState } from "./store/types";
 
@@ -28,12 +26,9 @@ function updateDeck(): void {
     type: "OVERLAY_UPDATE",
     value: currentMatchCopy,
   });
-
-  // Mirror to any sharing-enabled overlay channels (public live view). Only
-  // for the live log — never while replaying history.
-  if (isLiveLog()) {
-    publishLiveShare(currentMatchCopy);
-  }
+  // Live-share publishing now happens in the overlay window (see
+  // overlay/index.tsx) — it's a visible window, so its Realtime socket isn't
+  // throttled the way this hidden background window's would be.
 }
 
 export default updateDeck;
