@@ -20,6 +20,7 @@ import supabase from "./supabase";
 interface LiveChannel {
   channel: ReturnType<typeof supabase.channel>;
   joined: boolean;
+  closing?: boolean;
 }
 
 // The full payload a viewer needs to render OverlayContent for any mode.
@@ -44,6 +45,25 @@ const KEEPALIVE_MS = 3000;
 const channels = new Map<string, LiveChannel>();
 const shares = new Map<string, PerShare>();
 
+// Tear a channel down exactly once. removeChannel() unsubscribes, which fires
+// the subscribe status callback again with CLOSED — calling removeChannel from
+// there would recurse forever (stack overflow), so guard on `closing`, drop it
+// from the map synchronously, and defer the actual removal out of the current
+// call stack.
+function dropChannel(shareId: string, live: LiveChannel): void {
+  if (live.closing) return;
+  // eslint-disable-next-line no-param-reassign
+  live.closing = true;
+  if (channels.get(shareId) === live) channels.delete(shareId);
+  setTimeout(() => {
+    try {
+      supabase.removeChannel(live.channel);
+    } catch {
+      // already gone
+    }
+  }, 0);
+}
+
 function getChannel(shareId: string): LiveChannel {
   let live = channels.get(shareId);
   if (!live) {
@@ -61,10 +81,11 @@ function getChannel(shareId: string): LiveChannel {
         status === "TIMED_OUT" ||
         status === "CLOSED"
       ) {
-        // eslint-disable-next-line no-console
-        console.warn(`[liveShare] channel overlay-${shareId} ${status}`);
-        supabase.removeChannel(channel);
-        if (channels.get(shareId) === ref) channels.delete(shareId);
+        if (!ref.closing) {
+          // eslint-disable-next-line no-console
+          console.warn(`[liveShare] channel overlay-${shareId} ${status}`);
+        }
+        dropChannel(shareId, ref);
       }
     });
     channels.set(shareId, live);
@@ -89,8 +110,7 @@ function sendNow(shareId: string): void {
         console.warn(
           `[liveShare] send overlay-${shareId} -> ${res}; recreating`
         );
-        supabase.removeChannel(live.channel);
-        if (channels.get(shareId) === live) channels.delete(shareId);
+        dropChannel(shareId, live);
       }
     })
     .catch((e) => {
@@ -149,8 +169,5 @@ export function stopOverlayShare(shareId: string): void {
     shares.delete(shareId);
   }
   const live = channels.get(shareId);
-  if (live) {
-    supabase.removeChannel(live.channel);
-    channels.delete(shareId);
-  }
+  if (live) dropChannel(shareId, live);
 }
