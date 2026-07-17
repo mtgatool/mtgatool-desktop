@@ -194,6 +194,24 @@ export default async function hydrateFromCloud(): Promise<void> {
 
     // Persist the merged userids last so localLogin picks up every persona.
     await putData("userids", userids, true);
+
+    // Profile avatar (one per login) -> local KV, so useFetchAvatar shows it on
+    // this device too (a fresh device or reinstall restores it).
+    try {
+      const uid = (await supabase.auth.getUser()).data.user?.id;
+      if (uid) {
+        const prof = await supabase
+          .from("profiles")
+          .select("avatar_url")
+          .eq("id", uid)
+          .maybeSingle();
+        const url = prof.data?.avatar_url as string | undefined;
+        if (url) await putData("avatar", url, true);
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn("[hydrateFromCloud] avatar:", e);
+    }
   } catch (e) {
     console.error("[hydrateFromCloud] threw:", e);
   }

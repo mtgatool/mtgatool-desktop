@@ -8,6 +8,7 @@ import { ReactComponent as HideIcon } from "../../../assets/images/svg/unarchive
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 import { LOGIN_AUTH } from "../../../constants";
 import { cloudLogout, cloudUpdatePassword } from "../../../data/cloudAuth";
+import { uploadAvatar } from "../../../data/profile";
 import { getData, putData } from "../../../data/store";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
@@ -108,7 +109,8 @@ export default function AccountSettingsPanel(
 
         FR.addEventListener("load", (ev: any) => {
           resizeBase64Img(ev.target.result, 128, 128).then((img) => {
-            putData("avatar", img, true);
+            putData("avatar", img, true); // local cache (offline-safe)
+            uploadAvatar(img); // push to Supabase (one avatar per login)
             fetchAvatar(pubKey);
           });
         });
