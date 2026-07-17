@@ -71,14 +71,27 @@ const RELEASE_BASE =
 const SUPABASE_METADATA_BASE =
   "https://decenyvqkbvydrrolwpk.supabase.co/storage/v1/object/public/metadata";
 
+// The per-language databases are ~25MB of JSON, so the release CI stores them
+// gzipped (`<lang>-database.json.gz`, ~6x smaller) to cut Storage egress; we
+// fetch the .gz and inflate in the browser. latest.json is tiny and stored raw.
+function gunzipToText(buffer: ArrayBuffer): Promise<string> {
+  const DS = (window as any).DecompressionStream;
+  const stream = new Response(buffer).body?.pipeThrough(new DS("gzip"));
+  return new Response(stream).text();
+}
+
 function fetchReleaseTextWeb(url: string): Promise<string> {
   const name = url.split("/").pop() || "";
+  const gzipped = name.endsWith("-database.json");
+  const remote = `${SUPABASE_METADATA_BASE}/${name}${gzipped ? ".gz" : ""}`;
+  if (!gzipped) {
+    return axios
+      .get(remote, { responseType: "text", transformResponse: [(d) => d] })
+      .then((r) => r.data as string);
+  }
   return axios
-    .get(`${SUPABASE_METADATA_BASE}/${name}`, {
-      responseType: "text",
-      transformResponse: [(d) => d],
-    })
-    .then((r) => r.data as string);
+    .get(remote, { responseType: "arraybuffer" })
+    .then((r) => gunzipToText(r.data as ArrayBuffer));
 }
 
 /**
