@@ -21,13 +21,12 @@ interface SharePayload {
   actionLog?: ActionLogV2 | null;
   draftState?: InternalDraftv2;
   draftVotes?: Record<string, DbDraftVote>;
-  ts: number;
 }
 
 /**
  * Public live overlay viewer (app.mtgatool.com/live/<shareId>) — the page the
- * overlay QR points to, embeddable in OBS as a browser source. Subscribes to
- * the Realtime channel the shared overlay publishes on, and renders the SAME
+ * overlay QR points to, embeddable in OBS as a browser source. Polls the
+ * `live_overlays` row the shared overlay upserts, and renders the SAME
  * OverlayContent (deck list, clock, action log or draft picks per the overlay's
  * mode/settings) so what a viewer sees is exactly what the overlay shows.
  * Deliberately unauthenticated: the shareId is an unguessable capability token
@@ -52,22 +51,35 @@ export default function LiveShareView(): JSX.Element {
     return () => document.body.classList.remove("live-share-page");
   }, []);
 
+  // Poll the shared overlay row over plain HTTP. Stateless GET — no socket to
+  // keep alive, so it just works from any network/tab state. The publisher
+  // upserts ~1/s, so a 1s poll tracks it closely enough for an OBS source.
   useEffect(() => {
-    const channel = supabase
-      .channel(`overlay-${params.id}`)
-      .on("broadcast", { event: "overlay" }, (msg: any) => {
-        if (msg?.payload) {
-          // eslint-disable-next-line no-console
-          console.log(
-            `[liveShare] recv overlay-${params.id} ts=${msg.payload.ts}`
-          );
-          setPayload(msg.payload as SharePayload);
-        }
-      })
-      .subscribe();
-
+    let cancelled = false;
+    const poll = (): void => {
+      supabase
+        .from("live_overlays")
+        .select("payload")
+        .eq("share_id", params.id)
+        .maybeSingle()
+        .then(({ data, error }) => {
+          if (cancelled) return;
+          if (error) {
+            // eslint-disable-next-line no-console
+            console.warn(
+              `[liveShare] poll ${params.id} failed:`,
+              error.message
+            );
+            return;
+          }
+          if (data?.payload) setPayload(data.payload as SharePayload);
+        });
+    };
+    poll();
+    const iv = setInterval(poll, 1000);
     return () => {
-      supabase.removeChannel(channel);
+      cancelled = true;
+      clearInterval(iv);
     };
   }, [params.id]);
 
