@@ -93,6 +93,15 @@ function pruneChannels(active: Set<string>): void {
 
 let publishSeq = 0;
 
+// Compact "total in distinct [id×qty,...]" summary of a saved deck's mainboard,
+// for comparing exactly what's on the wire against what the overlay/viewer show.
+function deckSummary(save: any): string {
+  const main: Array<{ id: number; quantity: number }> = save?.mainDeck || [];
+  const total = main.reduce((s, c) => s + (c.quantity || 0), 0);
+  const list = main.map((c) => `${c.id}x${c.quantity}`).join(",");
+  return `${total} in ${main.length} [${list}]`;
+}
+
 function doPublish(): void {
   const state = latestState;
   if (!state) return;
@@ -103,15 +112,16 @@ function doPublish(): void {
 
   publishSeq += 1;
   const seq = publishSeq;
-  // eslint-disable-next-line no-console
-  console.log(
-    `[liveShare] publish #${seq} -> ${targets
-      .map((t) => `${t.shareId.slice(0, 8)}(${channels.get(t.shareId)?.joined ? "joined" : "connecting"})`)
-      .join(", ")}`
-  );
 
   targets.forEach((target) => {
     const live = getChannel(target.shareId);
+    // eslint-disable-next-line no-console
+    console.log(
+      `[liveShare] publish #${seq} -> ${target.shareId.slice(0, 8)} ` +
+        `mode=${target.settings.mode} joined=${live.joined} ` +
+        `left=${deckSummary(state.playerCardsLeft)} ` +
+        `deck=${deckSummary(state.playerDeck)}`
+    );
     if (!live.joined) return; // still connecting; next tick will catch up
     live.channel
       .send({

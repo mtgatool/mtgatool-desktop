@@ -100,6 +100,15 @@ export default function LiveShareView(): JSX.Element {
     playerCardsLeft.getMainboard().removeZeros();
     playerCardsLeft.getSideboard().removeZeros();
     const shown = settings.mode === OVERLAY_FULL ? playerDeck : playerCardsLeft;
+    // Debug: log exactly what this viewer will render (mode + mainboard), to
+    // compare against the publisher's "[liveShare] publish … left=/deck=" line.
+    const main = shown.getMainboard().get();
+    const total = main.reduce((s: number, c: any) => s + (c.quantity || 0), 0);
+    // eslint-disable-next-line no-console
+    console.log(
+      `[liveShare] render mode=${settings.mode} shown=${total} in ${main.length} ` +
+        `[${main.map((c: any) => `${c.id}x${c.quantity}`).join(",")}]`
+    );
     return {
       deck: shown,
       odds: matchState.playerCardsOdds,
