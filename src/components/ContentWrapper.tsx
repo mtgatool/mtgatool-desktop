@@ -34,9 +34,7 @@ import { MatchData } from "./views/history/convertDbMatchData";
 import HistoryStats from "./views/history/HistoryStats";
 import ViewHistory from "./views/history/ViewHistory";
 import ViewHome from "./views/home/ViewHome";
-import ViewLiveMatch from "./views/livematch/ViewLiveMatch";
 import ViewTimeline from "./views/timeline/ViewTimeline";
-import ViewUser from "./views/user/ViewUser";
 
 const views = {
   home: ViewHome,
@@ -44,10 +42,8 @@ const views = {
   history: ViewHistory,
   timeline: ViewTimeline,
   drafts: ViewDrafts,
-  match: ViewLiveMatch,
   explore: ViewExplore,
   collection: ViewCollection,
-  user: ViewUser,
 };
 
 function delay(transition: any, timeout: number): any {

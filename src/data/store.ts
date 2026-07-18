@@ -73,34 +73,3 @@ export function getMatchesData(
       .filter((m) => (uuid ? m.uuid === uuid : true))
   );
 }
-
-// ---------------------------------------------------------------------------
-// Network-era APIs kept as inert stubs so remaining call sites don't break.
-// These all resolved from the p2p swarm; without a network they resolve to
-// "nothing". The Supabase layer will give them real implementations (or the
-// call sites will be rewritten against it directly).
-// ---------------------------------------------------------------------------
-
-/** Legacy server-side function calls (explore aggregation, avatars, ...). */
-export function doFunction<T = any>(
-  _fname: string,
-  _args = {},
-  _timeoutMs = 5000
-): Promise<{ return: T | null; code: string } | null> {
-  return Promise.resolve(null);
-}
-
-export function subscribeData(
-  _key: string,
-  _userNamespaced = false
-): Promise<null> {
-  return Promise.resolve(null);
-}
-
-export function addKeyListener(_key: string): Promise<number> {
-  return Promise.resolve(-1);
-}
-
-export function removeKeyListener(_listenerId: number): Promise<null> {
-  return Promise.resolve(null);
-}
