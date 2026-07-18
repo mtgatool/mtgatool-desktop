@@ -21,7 +21,6 @@ import { AppState } from "../../../redux/stores/rendererStore";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
-import PassphraseGenerate from "../../PassphraseGenerate";
 import Button from "../../ui/Button";
 import Toggle from "../../ui/Toggle";
 import { SettingsPanelProps } from "./ViewSettings";
@@ -207,7 +206,6 @@ export default function AccountSettingsPanel(
         style={{ margin: "auto" }}
         callback={setPrivateMode}
       />
-      <PassphraseGenerate />
       <p
         style={{
           textAlign: "center",

@@ -24,7 +24,6 @@ import doHistoryFilter from "../utils/tables/doHistoryFilter";
 import vodiFn from "../utils/voidfn";
 import PopupComponent from "./PopupComponent";
 import DeckViewPopup from "./popups/DeckViewPopup";
-import PostSignupPopup from "./PostSignupPopup";
 import AdvancedSearch from "./views/collection/advancedSearch";
 import ViewCollection from "./views/collection/ViewCollection";
 import ViewDecks from "./views/decks/ViewDecks";
@@ -83,9 +82,6 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
 
   const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
 
-  const showPostSignup = useSelector(
-    (state: AppState) => state.renderer.showPostSignup
-  );
   const forceCollection = useSelector(
     (state: AppState) => state.mainData.forceCollection
   );
@@ -165,9 +161,6 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
     paths.current.push(params.page);
   }, [params]);
 
-  const openPostSignup = useRef<() => void>(vodiFn);
-  const closePostSignup = useRef<() => void>(vodiFn);
-
   const openAdvancedCollectionSearch = useRef<() => void>(vodiFn);
   const closeAdvancedCollectionSearch = useRef<() => void>(vodiFn);
 
@@ -177,12 +170,6 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   const openDeckView = useRef<() => void>(vodiFn);
   const closenDeckView = useRef<() => void>(vodiFn);
   const [deckView, setDeckView] = useState<Deck>(new Deck());
-
-  useEffect(() => {
-    if (showPostSignup) {
-      openPostSignup.current();
-    }
-  }, [showPostSignup]);
 
   const CurrentPage = Object.values(views)[viewIndex];
 
@@ -201,17 +188,6 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   return (
     <>
       {datePickerElement}
-      <PopupComponent
-        open={false}
-        className={getPopupClass(os)}
-        width="900px"
-        height="440px"
-        openFnRef={openPostSignup}
-        closeFnRef={closePostSignup}
-      >
-        <PostSignupPopup />
-      </PopupComponent>
-
       <PopupComponent
         open={false}
         className={getPopupClass(os)}

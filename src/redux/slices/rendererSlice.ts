@@ -46,7 +46,6 @@ export const initialRendererState = {
   collectionQuery: "f:standard r>token",
   matchInProgress: false,
   draftInProgress: false,
-  showPostSignup: null as null | string,
   currentDraft: null as InternalDraftv2 | null,
   currentScene: "",
   readingLog: false,
@@ -75,12 +74,6 @@ const rendererSlice = createSlice({
       action: PayloadAction<boolean>
     ): void => {
       state.readingLog = action.payload;
-    },
-    showPostSignup: (
-      state: RendererState,
-      action: PayloadAction<null | string>
-    ): void => {
-      state.showPostSignup = action.payload;
     },
     setLoginState: (
       state: RendererState,
@@ -219,7 +212,6 @@ export const {
   setPubKey,
   setMyUsername,
   setReadingLog,
-  showPostSignup,
   setLoginState,
   setLogCompletion,
   setDetailedLogs,
