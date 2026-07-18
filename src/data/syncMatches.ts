@@ -15,11 +15,11 @@ import { DbMatch } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
 import { fetchRemoteMatchIds, isCloudActive, pushMatch } from "./cloudSync";
 import { kvGet } from "./localKV";
-import { queryKeys } from "./store";
+import { LOCAL_KEY, queryKeys } from "./store";
 
 /** The key the history UI compares against `remoteMatchesIndex`. */
-function matchKey(pubKey: string, matchId: string): string {
-  return `:${pubKey}.matches-${matchId}`;
+function matchKey(matchId: string): string {
+  return `:${LOCAL_KEY}.matches-${matchId}`;
 }
 
 /** Returns the number of matches pushed to close the gap. */
@@ -47,10 +47,9 @@ export default async function syncMatches(): Promise<number> {
   missing.forEach((m) => remote.add(m.matchId));
 
   // Reflect the full synced set so the per-match cloud icon is accurate.
-  const { pubKey } = store.getState().renderer;
   reduxAction(store.dispatch, {
     type: "SET_REMOTE_MATCHES_INDEX",
-    arg: [...remote].map((id) => matchKey(pubKey, id)),
+    arg: [...remote].map((id) => matchKey(id)),
   });
 
   return missing.length;

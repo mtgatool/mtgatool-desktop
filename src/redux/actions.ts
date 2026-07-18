@@ -30,7 +30,6 @@ export const actions = {
   SET_REMOTE_MATCHES_INDEX: MainDataSlice.setRemoteMatchesIndex,
   SET_DRAFTS_INDEX: MainDataSlice.setDraftsIndex,
   SET_HIDDEN_DECKS: MainDataSlice.setHiddenDecks,
-  SET_PUBKEY: RendererSlice.setPubKey,
   SET_MY_USERNAME: RendererSlice.setMyUsername,
   SET_READING_LOG: RendererSlice.setReadingLog,
   SET_LOGIN_STATE: RendererSlice.setLoginState,

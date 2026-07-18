@@ -13,7 +13,7 @@ import {
   updateUsername,
   uploadAvatar,
 } from "../../../data/profile";
-import { getData, putData } from "../../../data/store";
+import { getData, LOCAL_KEY, putData } from "../../../data/store";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import reduxAction from "../../../redux/reduxAction";
@@ -55,7 +55,7 @@ export default function AccountSettingsPanel(
   props: SettingsPanelProps
 ): JSX.Element {
   const avatars = useSelector((state: AppState) => state.avatars.avatars);
-  const pubKey = useSelector((state: AppState) => state.renderer.pubKey);
+  const avatarKey = LOCAL_KEY;
   const privateMode = useSelector(
     (state: AppState) => state.settings.privateMode
   );
@@ -115,20 +115,20 @@ export default function AccountSettingsPanel(
           resizeBase64Img(ev.target.result, 128, 128).then((img) => {
             putData("avatar", img, true); // local cache (offline-safe)
             uploadAvatar(img); // push to Supabase (one avatar per login)
-            fetchAvatar(pubKey);
+            fetchAvatar(avatarKey);
           });
         });
 
         FR.readAsDataURL(e.target.files[0]);
       }
     },
-    [fetchAvatar, pubKey]
+    [fetchAvatar, avatarKey]
   );
 
   const setPrivateMode = useCallback(
     (value: boolean) => {
       if (value) {
-        putData(`rank-${pubKey}`, null, false);
+        putData(`rank-${avatarKey}`, null, false);
       }
       reduxAction(dispatch, {
         type: "SET_SETTINGS",
@@ -149,14 +149,14 @@ export default function AccountSettingsPanel(
           if (av) {
             reduxAction(dispatch, {
               type: "SET_AVATAR",
-              arg: { pubKey, avatar: av },
+              arg: { key: avatarKey, avatar: av },
             });
           }
         })
         .catch(console.warn);
       avatarInputRef.current.addEventListener("change", changeAvatar);
     }
-  }, [changeAvatar, pubKey, avatarInputRef]);
+  }, [changeAvatar, avatarKey, avatarInputRef]);
 
   return (
     <>
@@ -164,7 +164,7 @@ export default function AccountSettingsPanel(
         <div
           className="avatar-med"
           style={{
-            backgroundImage: `url(${avatars[pubKey]})`,
+            backgroundImage: `url(${avatars[avatarKey]})`,
           }}
         />
         <h2 style={{ marginLeft: "32px", marginRight: "auto" }}>

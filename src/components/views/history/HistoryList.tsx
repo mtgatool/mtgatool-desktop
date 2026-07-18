@@ -29,7 +29,6 @@ export default function HistoryList(props: HistoryListProps) {
     (state: AppState) => state.filter.matchDataFilters
   );
   const filterDate = useSelector(selectCurrentFilterDate);
-  const pubKey = useSelector((state: AppState) => state.renderer.pubKey);
 
   const matchesTotal = useSelector(
     (state: AppState) => state.renderer.matchesTotal
@@ -67,11 +66,11 @@ export default function HistoryList(props: HistoryListProps) {
     (match: MatchData) => {
       history.push(
         `/history/${encodeURIComponent(
-          getUserNamespacedKey(pubKey, `matches-${match.matchId}`)
+          getUserNamespacedKey(`matches-${match.matchId}`)
         )}`
       );
     },
-    [pubKey, history]
+    [history]
   );
 
   const isFetching =

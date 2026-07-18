@@ -12,25 +12,25 @@ export default function useFetchAvatar() {
   const avatars = useSelector((state: AppState) => state.avatars.avatars);
 
   const fetchAvatar = useCallback(
-    (pubKey: string) => {
-      globalData.fetchedAvatars.push(pubKey);
+    (key: string) => {
+      globalData.fetchedAvatars.push(key);
       return new Promise<string>((resolve, reject) => {
-        if (!avatars[pubKey]) {
+        if (!avatars[key]) {
           reduxAction(dispatch, {
             type: "SET_AVATAR",
-            arg: { pubKey, avatar: "" },
+            arg: { key, avatar: "" },
           });
-          getData<string>(`:${pubKey}.avatar`, false, 1000)
+          getData<string>(`:${key}.avatar`, false, 1000)
             .then((avatar) => {
               reduxAction(dispatch, {
                 type: "SET_AVATAR",
-                arg: { pubKey, avatar: avatar || DEFAULT_AVATAR },
+                arg: { key, avatar: avatar || DEFAULT_AVATAR },
               });
               resolve(avatar || DEFAULT_AVATAR);
             })
             .catch(reject);
         } else {
-          resolve(avatars[pubKey]);
+          resolve(avatars[key]);
         }
       });
     },

@@ -10,30 +10,30 @@ export default function useFetchUsername() {
   const dispatch = useDispatch();
   const usernames = useSelector((state: AppState) => state.usernames.usernames);
 
-  const fetchAvatar = useCallback(
-    (pubKey: string) => {
+  const fetchUsername = useCallback(
+    (key: string) => {
       return new Promise<string>((resolve, reject) => {
-        if (!usernames[pubKey]) {
+        if (!usernames[key]) {
           reduxAction(dispatch, {
             type: "SET_USERNAME",
-            arg: { pubKey, username: "" },
+            arg: { key, username: "" },
           });
-          getData<string>(`:${pubKey}.username`, false, 1000)
+          getData<string>(`:${key}.username`, false, 1000)
             .then((username) => {
               reduxAction(dispatch, {
                 type: "SET_USERNAME",
-                arg: { pubKey, username: cleanUsername(username || "") },
+                arg: { key, username: cleanUsername(username || "") },
               });
               resolve(cleanUsername(username || ""));
             })
             .catch(reject);
         } else {
-          resolve(cleanUsername(usernames[pubKey]));
+          resolve(cleanUsername(usernames[key]));
         }
       });
     },
     [usernames, dispatch]
   );
 
-  return fetchAvatar;
+  return fetchUsername;
 }

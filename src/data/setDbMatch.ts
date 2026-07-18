@@ -35,7 +35,7 @@ export default async function setDbMatch(
     pubKey: "",
   };
 
-  const storedKey = getUserNamespacedKey("", `matches-${match.id}`);
+  const storedKey = getUserNamespacedKey(`matches-${match.id}`);
 
   if (!globalData.matchesIndex.includes(storedKey)) {
     putData<DbMatch>(`matches-${match.id}`, newDbMatch, true);

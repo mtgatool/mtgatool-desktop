@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { ReactComponent as IconUpload } from "../../../assets/images/svg/upload.svg";
 import { DEFAULT_TILE } from "../../../constants";
 import setDbMatch from "../../../data/setDbMatch";
+import { LOCAL_KEY } from "../../../data/store";
 import { AppState } from "../../../redux/stores/rendererStore";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { toMMSS } from "../../../utils/dateTo";
@@ -40,9 +41,7 @@ export default function ListItemMatch({
     (state: AppState) => state.mainData.remoteMatchesIndex
   );
 
-  const pubKey = useSelector((state: AppState) => state.renderer.pubKey);
-
-  const matchKey = `:${pubKey}.matches-${match.matchId}`;
+  const matchKey = `:${LOCAL_KEY}.matches-${match.matchId}`;
 
   const onRowClick = (): void => {
     if (openMatchCallback) {

@@ -13,9 +13,9 @@ const hoverSlice = createSlice({
   reducers: {
     setUsername: (
       state: Usernames,
-      action: PayloadAction<{ pubKey: string; username: string }>
+      action: PayloadAction<{ key: string; username: string }>
     ): void => {
-      state.usernames[action.payload.pubKey] = action.payload.username;
+      state.usernames[action.payload.key] = action.payload.username;
     },
   },
 });

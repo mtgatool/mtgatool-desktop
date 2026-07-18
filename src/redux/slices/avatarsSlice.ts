@@ -13,9 +13,9 @@ const hoverSlice = createSlice({
   reducers: {
     setAvatar: (
       state: Avatars,
-      action: PayloadAction<{ pubKey: string; avatar: string }>
+      action: PayloadAction<{ key: string; avatar: string }>
     ): void => {
-      state.avatars[action.payload.pubKey] = action.payload.avatar;
+      state.avatars[action.payload.key] = action.payload.avatar;
     },
   },
 });

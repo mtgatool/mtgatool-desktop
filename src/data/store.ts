@@ -15,17 +15,17 @@ import {
 import { DbMatch } from "../types/dbTypes";
 import { kvGet, kvPut, kvQueryKeys } from "./localKV";
 
-/**
- * Legacy user-namespaced keys were `:${pubKey}.${key}`. In local mode there
- * is a single implicit profile, so everything lives under `:local.`.
- * The pubKey argument is accepted (and ignored) for call-site compatibility.
- */
-export function getUserNamespacedKey(_pubKey: string, key: string) {
-  return `:local.${key}`;
+// The local KV is single-user-per-device: everything a signed-in user owns is
+// stored under one fixed namespace. Keys used to be `:${pubKey}.${key}` under
+// tool-db's ECDSA identity; that's gone, so it's just `:local.`.
+export const LOCAL_KEY = "local";
+
+export function getUserNamespacedKey(key: string) {
+  return `:${LOCAL_KEY}.${key}`;
 }
 
 function resolveKey(key: string, userNamespaced: boolean) {
-  return userNamespaced ? getUserNamespacedKey("", key) : key;
+  return userNamespaced ? getUserNamespacedKey(key) : key;
 }
 
 export function getData<T = any>(

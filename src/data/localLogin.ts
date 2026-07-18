@@ -20,8 +20,6 @@ import { getData, queryKeys } from "./store";
 export default async function localLogin(): Promise<void> {
   const { dispatch } = store;
 
-  reduxAction(dispatch, { type: "SET_PUBKEY", arg: "local" });
-
   const matches = (await queryKeys("matches-", true)) || [];
   globalData.matchesIndex = matches;
   reduxAction(dispatch, { type: "SET_LOCAL_MATCHES_INDEX", arg: matches });

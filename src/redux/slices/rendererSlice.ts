@@ -23,7 +23,6 @@ export interface Popup {
 }
 
 export const initialRendererState = {
-  pubKey: "",
   archivedCache: {} as Record<string, boolean>,
   backgroundGrpid: null as number | null,
   loading: false,
@@ -59,10 +58,6 @@ const rendererSlice = createSlice({
   name: "renderer",
   initialState: initialRendererState,
   reducers: {
-    setPubKey: (state: RendererState, action: PayloadAction<string>): void => {
-      setLocalSetting("pubkey", action.payload);
-      state.pubKey = action.payload;
-    },
     setMyUsername: (
       state: RendererState,
       action: PayloadAction<string>
@@ -209,7 +204,6 @@ const rendererSlice = createSlice({
 });
 
 export const {
-  setPubKey,
   setMyUsername,
   setReadingLog,
   setLoginState,
