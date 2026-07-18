@@ -23,15 +23,3 @@ export const ALL_OVERLAYS = [
   WINDOW_OVERLAY_3,
   WINDOW_OVERLAY_4,
 ];
-
-// Legacy p2p connection shape. tool-db is removed; the peer payloads are no
-// longer typed against it (the community/peers UI that consumed them is stubbed).
-export interface ConnectionData {
-  peerId: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  peerData: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  serverPeerData: any;
-  host: string;
-  isConnected: boolean;
-}

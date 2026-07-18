@@ -101,24 +101,6 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
         setMatchesData(d);
       }
     });
-
-    // hacky hack to listen for the after login matches data message
-    const listener = (e: any) => {
-      const { type, value } = e.data;
-      if (type === `MATCHES_DATA_OK`) {
-        setMatchesData(value);
-      }
-    };
-
-    if (window.toolDbWorker) {
-      window.toolDbWorker.addEventListener("message", listener);
-    }
-
-    return () => {
-      if (window.toolDbWorker) {
-        window.toolDbWorker.removeEventListener("message", listener);
-      }
-    };
   }, [matchesIndex, currentUUID]);
 
   useEffect(() => {

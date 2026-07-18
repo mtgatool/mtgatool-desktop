@@ -7,7 +7,6 @@ import AboutSettingsPanel from "./AboutSettingsPanel";
 import AccountSettingsPanel from "./AccountSettingsPanel";
 import DataSettingsPanel from "./DataSettingsPanel";
 import LogsSettingsPanel from "./LogsSettingsPanel";
-import NetworkSettingsPanel from "./NetworkSettingsPanel";
 import OverlaySettingsPanel from "./OverlaySettingsPanel";
 import ShortcutsSettingsPanel from "./ShortcutsSettingsPanel";
 import VisualSettingsPanel from "./VisualSettingsPanel";
@@ -17,7 +16,6 @@ const SETTINGS_DATA = 11;
 const SETTINGS_OVERLAY = 12;
 const SETTINGS_VISUAL = 13;
 const SETTINGS_SHORTCUTS = 14;
-const SETTINGS_NETWORK = 15;
 const SETTINGS_ABOUT = 16;
 const SETTINGS_ACCOUNT = 17;
 
@@ -94,12 +92,6 @@ export default function ViewSettings(props: ViewSettingsProps) {
     component: ShortcutsSettingsPanel, // SectionShortcuts,
     title: "Shortcuts",
   };
-  tabs[SETTINGS_NETWORK] = {
-    ...defaultTab,
-    id: SETTINGS_NETWORK,
-    component: NetworkSettingsPanel,
-    title: "Network",
-  };
   tabs[SETTINGS_ABOUT] = {
     ...defaultTab,
     id: SETTINGS_ABOUT,
@@ -132,7 +124,6 @@ export default function ViewSettings(props: ViewSettingsProps) {
             {isElectron() && <SettingsNav {...tabs[SETTINGS_OVERLAY]} />}
             <SettingsNav {...tabs[SETTINGS_VISUAL]} />
             {isElectron() && <SettingsNav {...tabs[SETTINGS_SHORTCUTS]} />}
-            <SettingsNav {...tabs[SETTINGS_NETWORK]} />
             <SettingsNav {...tabs[SETTINGS_ABOUT]} />
           </div>
         </div>

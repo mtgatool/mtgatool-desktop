@@ -13,7 +13,6 @@ import openExternal from "../utils/openExternal";
 import setLocalSetting from "../utils/setLocalSetting";
 import showOpenLogDialog from "../utils/showOpenLogDialog";
 import Toggle from "./ui/Toggle";
-import NetworkSettingsPanel from "./views/settings/NetworkSettingsPanel";
 import ReaderStatus from "./views/settings/ReaderStatus";
 
 function clickBetaChannel(value: boolean): void {
@@ -110,8 +109,6 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
         )}
 
         <div className="separator-title" />
-
-        <NetworkSettingsPanel />
 
         <div className="about">
           <p

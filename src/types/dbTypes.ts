@@ -6,10 +6,6 @@ import { Cards, InternalMatch, v2cardsList } from ".";
 
 declare global {
   interface Window {
-    // tool-db is removed. The worker is never created anymore; this optional
-    // handle only keeps the legacy `if (window.toolDbWorker)` guards in the
-    // (now inert) community features type-checking until they're rebuilt.
-    toolDbWorker?: Worker;
     database: DatabaseClass;
     overlayHandler: OverlayHandler | undefined;
     globalStore: any;
