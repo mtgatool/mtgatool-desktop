@@ -23,6 +23,7 @@ import getLocalSetting from "../../../utils/getLocalSetting";
 import openExternal from "../../../utils/openExternal";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import CardTile from "../../CardTile";
+import InputContainer from "../../InputContainer";
 import Button from "../../ui/Button";
 import Select from "../../ui/Select";
 import Slider from "../../ui/Slider";
@@ -172,14 +173,23 @@ function BackgroundSetting(): JSX.Element {
         </div>
       )}
 
-      <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
-        <input
-          type="text"
-          value={source}
-          onChange={onSourceChange}
-          placeholder="Optional: paste an artofmtg.com art, set or artist URL"
-          style={{ flex: 1, margin: 0 }}
-        />
+      <div
+        style={{
+          display: "flex",
+          gap: "8px",
+          marginTop: "16px",
+          alignItems: "center",
+        }}
+      >
+        <InputContainer style={{ flex: 1, margin: 0 }}>
+          <input
+            type="text"
+            autoComplete="off"
+            value={source}
+            onChange={onSourceChange}
+            placeholder="Optional: paste an artofmtg.com art, set or artist URL"
+          />
+        </InputContainer>
         <Button
           text="Browse ↗"
           onClick={() => openExternal("https://www.artofmtg.com/mtg-sets/")}
