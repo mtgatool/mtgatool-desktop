@@ -17,6 +17,16 @@ import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "./supabase";
 
 /** Device-global key (not tied to a login), readable before auth. */
 const LOCAL_BG_KEY = "customBackground";
+/** Remembered "Art source" URL scoping the shuffle (device-global). */
+const ART_SOURCE_KEY = "artSource";
+
+export function loadArtSource(): Promise<string | null> {
+  return getData<string>(ART_SOURCE_KEY, false);
+}
+
+export function saveArtSource(url: string): Promise<boolean> {
+  return putData(ART_SOURCE_KEY, url, false);
+}
 
 export function loadLocalBackground(): Promise<CustomBackground | null> {
   return getData<CustomBackground>(LOCAL_BG_KEY, false);

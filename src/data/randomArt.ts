@@ -27,9 +27,17 @@ export interface RandomArt {
  *
  * Returns null on any failure — callers should just keep the current background.
  */
-export default async function fetchRandomArt(): Promise<RandomArt | null> {
+/**
+ * @param source Optional artofmtg URL scoping the pick: an `/art/…` page returns
+ *   that exact piece; a set/artist/gallery page returns a random art from it;
+ *   omitted picks randomly across all sets.
+ */
+export default async function fetchRandomArt(
+  source?: string
+): Promise<RandomArt | null> {
   try {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/random-art`, {
+    const qs = source ? `?source=${encodeURIComponent(source)}` : "";
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/random-art${qs}`, {
       headers: { apikey: SUPABASE_PUBLISHABLE_KEY },
     });
     if (!res.ok) return null;

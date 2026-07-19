@@ -1,10 +1,12 @@
 import _ from "lodash";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import mainBackground from "../../../assets/images/main-background.jpg";
 import { ReactComponent as ShuffleIcon } from "../../../assets/images/svg/shuffle.svg";
 import {
+  loadArtSource,
+  saveArtSource,
   saveLocalBackground,
   toDescriptor,
 } from "../../../data/backgroundStore";
@@ -31,7 +33,23 @@ function BackgroundSetting(): JSX.Element {
     (state: AppState) => state.renderer.customBackground
   );
   const [loading, setLoading] = useState(false);
+  const [source, setSource] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Restore the remembered "Art source" (scopes the shuffle).
+  useEffect(() => {
+    loadArtSource()
+      .then((s) => s && setSource(s))
+      .catch(() => undefined);
+  }, []);
+
+  const onSourceChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSource(e.target.value);
+      saveArtSource(e.target.value);
+    },
+    []
+  );
 
   // Apply a background everywhere: Redux (visible now), local KV (restored on
   // next boot before login) and the cloud profile (follows the account, as a
@@ -45,9 +63,13 @@ function BackgroundSetting(): JSX.Element {
     [dispatch]
   );
 
+  // An /art/… source is an exact pick; anything else (set/artist page, or empty)
+  // shuffles. Empty = across all sets.
+  const isExactPick = /\/art\/[a-z0-9-]+/i.test(source);
+
   const shuffle = useCallback(() => {
     setLoading(true);
-    fetchRandomArt()
+    fetchRandomArt(source.trim() || undefined)
       .then((art) => {
         if (art) {
           applyBackground({
@@ -62,7 +84,7 @@ function BackgroundSetting(): JSX.Element {
         }
       })
       .finally(() => setLoading(false));
-  }, [applyBackground]);
+  }, [applyBackground, source]);
 
   const pickFile = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,6 +111,20 @@ function BackgroundSetting(): JSX.Element {
   const preview = customBackground?.url || mainBackground;
   const meta =
     customBackground?.source === "artofmtg" ? customBackground : null;
+
+  let sourceHint = "Empty — the button shuffles across every set.";
+  if (isExactPick) {
+    sourceHint = "Exact art — the button below sets this piece.";
+  } else if (source.trim()) {
+    sourceHint = "Scoped — the button shuffles within this set / artist.";
+  }
+
+  let shuffleLabel = "Shuffle random MtG art";
+  if (loading) {
+    shuffleLabel = "Loading…";
+  } else if (isExactPick) {
+    shuffleLabel = "Use this art";
+  }
 
   return (
     <div
@@ -136,6 +172,23 @@ function BackgroundSetting(): JSX.Element {
         </div>
       )}
 
+      <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
+        <input
+          type="text"
+          value={source}
+          onChange={onSourceChange}
+          placeholder="Optional: paste an artofmtg.com art, set or artist URL"
+          style={{ flex: 1, margin: 0 }}
+        />
+        <Button
+          text="Browse ↗"
+          onClick={() => openExternal("https://www.artofmtg.com/mtg-sets/")}
+        />
+      </div>
+      <div style={{ fontSize: "12px", marginTop: "6px", opacity: 0.8 }}>
+        {sourceHint}
+      </div>
+
       <div
         style={{
           display: "flex",
@@ -158,7 +211,7 @@ function BackgroundSetting(): JSX.Element {
           }}
         >
           <ShuffleIcon style={{ width: "18px", height: "18px" }} />
-          {loading ? "Shuffling…" : "Shuffle random MtG art"}
+          {shuffleLabel}
         </Button>
 
         {isElectron() && (
