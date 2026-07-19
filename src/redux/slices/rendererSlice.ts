@@ -22,9 +22,29 @@ export interface Popup {
   duration: number;
 }
 
+export interface CustomBackground {
+  /** Image to show: a data: URI (artofmtg) or a local file/blob URL. */
+  url: string;
+  source: "artofmtg" | "local";
+  /** artofmtg metadata (absent for local images). */
+  title?: string;
+  artist?: string;
+  set?: string;
+  page?: string;
+  /**
+   * Original remote image URL (artofmtg only). Not directly loadable (hotlink
+   * protected), but it's the compact key we sync to the cloud profile and use
+   * to re-materialize `url` on another device / after login.
+   */
+  imageUrl?: string;
+}
+
 export const initialRendererState = {
   archivedCache: {} as Record<string, boolean>,
   backgroundGrpid: null as number | null,
+  // Optional custom app background (from the Background settings panel); when
+  // set it overrides the default/card-art background.
+  customBackground: null as CustomBackground | null,
   loading: false,
   logCompletion: 0,
   detailedLogs: null as boolean | null,
@@ -115,6 +135,22 @@ const rendererSlice = createSlice({
     ): void => {
       state.backgroundGrpid = action.payload;
       state.topArtist = action.payload ? "" : initialRendererState.topArtist;
+    },
+    setCustomBackground: (
+      state: RendererState,
+      action: PayloadAction<CustomBackground | null>
+    ): void => {
+      if (!action.payload) {
+        state.customBackground = null;
+        state.topArtist = initialRendererState.topArtist;
+        return;
+      }
+      const { title, artist } = action.payload;
+      state.customBackground = action.payload;
+      // Any custom art also clears the card-art background so it can win.
+      state.backgroundGrpid = null;
+      // Top-bar credit line: "<Title> by <Artist>" when we have both.
+      state.topArtist = artist && title ? `${title} by ${artist}` : title || "";
     },
     setLoading: (
       state: RendererState,
@@ -212,6 +248,7 @@ export const {
   setAdminPermissions,
   setMatchesFetchState,
   setBackgroundGrpid,
+  setCustomBackground,
   setLoading,
   setNoLog,
   setOffline,

@@ -259,6 +259,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null;
+          background: Json | null;
           created_at: string;
           id: string;
           is_private: boolean;
@@ -267,6 +268,7 @@ export type Database = {
         };
         Insert: {
           avatar_url?: string | null;
+          background?: Json | null;
           created_at?: string;
           id: string;
           is_private?: boolean;
@@ -275,6 +277,7 @@ export type Database = {
         };
         Update: {
           avatar_url?: string | null;
+          background?: Json | null;
           created_at?: string;
           id?: string;
           is_private?: boolean;

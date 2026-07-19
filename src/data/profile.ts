@@ -9,6 +9,8 @@
  * — whereas PostgREST verifies it fine. Avatars are 128x128 (~a few KB), so a
  * data URI in a text column is acceptable. Best-effort; never throws.
  */
+import { BackgroundDescriptor } from "./backgroundStore";
+import { Json } from "./database.types";
 import supabase from "./supabase";
 
 async function currentUserId(): Promise<string | null> {
@@ -84,6 +86,29 @@ export async function setProfilePrivate(isPrivate: boolean): Promise<void> {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn("[profile] setProfilePrivate failed:", e);
+  }
+}
+
+/**
+ * Persist (or clear) the login's custom background on its profile. We store a
+ * compact descriptor (metadata + original image URL, no data URI) so the choice
+ * follows the account across devices; the client re-materializes the image on
+ * login. Best-effort; never throws.
+ */
+export async function setProfileBackground(
+  descriptor: BackgroundDescriptor | null
+): Promise<void> {
+  try {
+    const uid = await currentUserId();
+    if (!uid) return;
+    await supabase.from("profiles").upsert({
+      id: uid,
+      background: descriptor as unknown as Json,
+      updated_at: new Date().toISOString(),
+    });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn("[profile] setProfileBackground failed:", e);
   }
 }
 

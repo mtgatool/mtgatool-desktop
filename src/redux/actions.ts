@@ -39,6 +39,7 @@ export const actions = {
   SET_MATCHES_FETCH_STATE: RendererSlice.setMatchesFetchState,
   SET_ARCHIVED: RendererSlice.setArchived,
   SET_BACK_GRPID: RendererSlice.setBackgroundGrpid,
+  SET_CUSTOM_BACKGROUND: RendererSlice.setCustomBackground,
   SET_LOADING: RendererSlice.setLoading,
   SET_NO_LOG: RendererSlice.setNoLog,
   SET_OFFLINE: RendererSlice.setOffline,

@@ -9,6 +9,7 @@ import {
 } from "../types/dbTypes";
 import globalData from "../utils/globalData";
 import { sanitizeRank } from "../utils/mtga/rankClasses";
+import { loadLocalBackground } from "./backgroundStore";
 import { getData, queryKeys } from "./store";
 
 /**
@@ -19,6 +20,14 @@ import { getData, queryKeys } from "./store";
  */
 export default async function localLogin(): Promise<void> {
   const { dispatch } = store;
+
+  // Re-apply the (possibly cloud-reconciled) custom background. The boot effect
+  // already showed the local one; hydrateFromCloud may have swapped in the
+  // account's pick just before this runs.
+  const background = await loadLocalBackground();
+  if (background) {
+    reduxAction(dispatch, { type: "SET_CUSTOM_BACKGROUND", arg: background });
+  }
 
   const matches = (await queryKeys("matches-", true)) || [];
   globalData.matchesIndex = matches;

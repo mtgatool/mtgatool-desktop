@@ -11,6 +11,7 @@
  * It writes KV only; the existing localLogin() then mirrors KV into Redux.
  * No-op offline, and never throws (best-effort, like the push layer).
  */
+import { CustomBackground } from "../redux/slices/rendererSlice";
 import { Cards, InternalMatch } from "../types";
 import {
   DbCardsData,
@@ -24,6 +25,12 @@ import {
 } from "../types/dbTypes";
 import { isValidRankClass, sanitizeRank } from "../utils/mtga/rankClasses";
 import { ReaderDeck } from "../utils/mtgaReader";
+import {
+  BackgroundDescriptor,
+  loadLocalBackground,
+  materialize,
+  saveLocalBackground,
+} from "./backgroundStore";
 import { isCloudActive } from "./cloudSync";
 import { getData, putData } from "./store";
 import supabase from "./supabase";
@@ -203,7 +210,7 @@ export default async function hydrateFromCloud(): Promise<void> {
       if (uid) {
         const prof = await supabase
           .from("profiles")
-          .select("avatar_url, username")
+          .select("avatar_url, username, background")
           .eq("id", uid)
           .maybeSingle();
         if (prof.data?.avatar_url) {
@@ -211,6 +218,20 @@ export default async function hydrateFromCloud(): Promise<void> {
         }
         if (prof.data?.username) {
           await putData("username", prof.data.username, true);
+        }
+
+        // Background: only override the locally-restored one if the account has
+        // a *different* artofmtg pick saved. Re-materialize its image (the cloud
+        // stores only a compact descriptor, no data URI).
+        const desc = prof.data?.background as BackgroundDescriptor | null;
+        if (desc?.source === "artofmtg" && desc.imageUrl) {
+          const local = await loadLocalBackground();
+          const same =
+            local?.source === "artofmtg" && local.imageUrl === desc.imageUrl;
+          if (!same) {
+            const full: CustomBackground | null = await materialize(desc);
+            if (full) await saveLocalBackground(full);
+          }
         }
       }
     } catch (e) {

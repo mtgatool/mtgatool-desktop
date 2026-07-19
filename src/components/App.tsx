@@ -8,6 +8,7 @@ import { Route, Switch, useHistory } from "react-router-dom";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import overlayHandler from "../common/overlayHandler";
 import { LOGIN_OK } from "../constants";
+import { loadLocalBackground } from "../data/backgroundStore";
 import { getCloudSession } from "../data/cloudAuth";
 import hydrateFromCloud from "../data/hydrateFromCloud";
 import localLogin from "../data/localLogin";
@@ -56,10 +57,24 @@ function App(props: AppProps) {
     loginState,
     loading,
     backgroundGrpid,
+    customBackground,
     matchInProgress,
   } = useSelector((state: AppState) => state.renderer);
 
   const os = forceOs || (isElectron() ? process.platform : "");
+
+  // Restore the saved background immediately on boot, before (and independent
+  // of) login — so you see your background without waiting on the network. On
+  // login, hydrateFromCloud + localLogin reconcile it with the account's choice.
+  useEffect(() => {
+    loadLocalBackground()
+      .then((bg) => {
+        if (bg) {
+          reduxAction(dispatch, { type: "SET_CUSTOM_BACKGROUND", arg: bg });
+        }
+      })
+      .catch(() => undefined);
+  }, [dispatch]);
 
   useEffect(() => {
     if (overlayHandler) {
@@ -138,7 +153,9 @@ function App(props: AppProps) {
     }
   }
 
-  const backgroundImage = backgroundGrpid
+  const backgroundImage = customBackground
+    ? `url(${customBackground.url})`
+    : backgroundGrpid
     ? `url(${getCardArtCrop(backgroundGrpid)})`
     : undefined;
 
