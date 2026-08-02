@@ -40,14 +40,25 @@ export default async function setDbMatch(
   if (!globalData.matchesIndex.includes(storedKey)) {
     putData<DbMatch>(`matches-${match.id}`, newDbMatch, true);
     globalData.matchesIndex.push(storedKey);
-    // Mirror to Supabase (no-op offline); arena_id = the persona/playerId.
-    if (pushToCloud) {
-      pushMatch(newDbMatch.playerId, newDbMatch);
-    }
   }
 
   reduxAction(store.dispatch, {
     type: "SET_LOCAL_MATCHES_INDEX",
     arg: globalData.matchesIndex,
   });
+
+  // Mirror to Supabase (no-op offline); arena_id = the persona/playerId. When
+  // the push is confirmed, reflect it in the "synced" set right away so the
+  // per-match cloud icon clears immediately instead of waiting for the next
+  // full syncMatches() reconcile. Runs on every call (upsert is idempotent) so
+  // the manual per-match upload icon re-pushes and clears too.
+  if (pushToCloud) {
+    const pushed = await pushMatch(newDbMatch.playerId, newDbMatch);
+    if (pushed) {
+      reduxAction(store.dispatch, {
+        type: "SET_REMOTE_MATCHES_INDEX",
+        arg: [storedKey],
+      });
+    }
+  }
 }

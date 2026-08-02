@@ -117,11 +117,12 @@ export async function ensureArenaAccount(
   }
 }
 
-export async function pushMatch(arenaId: string, m: DbMatch): Promise<void> {
+/** Returns true when the match is confirmed stored in Supabase. */
+export async function pushMatch(arenaId: string, m: DbMatch): Promise<boolean> {
   try {
     const userId = await getActiveUserId();
-    if (!userId || !arenaId || !m?.matchId) return;
-    if (!(await upsertArenaAccount(userId, arenaId))) return;
+    if (!userId || !arenaId || !m?.matchId) return false;
+    if (!(await upsertArenaAccount(userId, arenaId))) return false;
 
     const row: Tables["matches"]["Insert"] = {
       user_id: userId,
@@ -142,9 +143,14 @@ export async function pushMatch(arenaId: string, m: DbMatch): Promise<void> {
     const { error } = await supabase
       .from("matches")
       .upsert(row, { onConflict: "user_id,match_id" });
-    if (error) console.error("[cloudSync] pushMatch:", error.message);
+    if (error) {
+      console.error("[cloudSync] pushMatch:", error.message);
+      return false;
+    }
+    return true;
   } catch (e) {
     console.error("[cloudSync] pushMatch threw:", e);
+    return false;
   }
 }
 

@@ -47,6 +47,14 @@ const logEntryPattern = new RegExp(
   "g"
 );
 
+// V8 caps strings at ~512 MB; concatenating beyond that throws "Invalid string
+// length". The decoder keeps un-parsed bytes in `buffer` between chunks, so an
+// entry that never completes (a perpetual "partial" at the buffer start, e.g. a
+// giant/corrupt GameStateMessage or an oversized line with no newline) would
+// grow the buffer without bound until it crashes the whole log reader. Cap it
+// well below the engine limit and resync at a line boundary when exceeded.
+const MAX_BUFFER_SIZE = 128 * 1024 * 1024;
+
 function unleakString(s: string): string {
   return ` ${s}`.substr(1);
 }
@@ -184,6 +192,20 @@ export default function ArenaLogDecoder(): {
 
   function append(newText: string, callback: any): void {
     logEntryPattern.lastIndex = 0;
+
+    // Guard against unbounded buffer growth before the concat can overflow the
+    // max string length. Drop the un-parseable backlog and resync at the last
+    // newline; if a single line is itself larger than the cap, drop it whole.
+    if (buffer.length + newText.length > MAX_BUFFER_SIZE) {
+      const resyncAt = buffer.lastIndexOf("\n") + 1;
+      const drop = resyncAt > 0 ? resyncAt : buffer.length;
+      bufferDiscarded += drop;
+      buffer = unleakString(buffer.substr(drop));
+      if (buffer.length + newText.length > MAX_BUFFER_SIZE) {
+        bufferDiscarded += buffer.length;
+        buffer = "";
+      }
+    }
 
     buffer = buffer.length ? buffer.concat(newText) : newText;
     let bufferUsed = 0;
