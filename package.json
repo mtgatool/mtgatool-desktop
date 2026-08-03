@@ -142,7 +142,11 @@
       "artifactName": "${productName}-${version}.${ext}",
       "extendInfo": {
         "LSUIElement": 1
-      }
+      },
+      "entitlements": "entitlements.mac.plist",
+      "entitlementsInherit": "entitlements.mac.plist",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
     },
     "linux": {
       "target": "AppImage",
@@ -174,7 +178,8 @@
     ],
     "directories": {
       "buildResources": "public"
-    }
+    },
+    "afterPack": "./scripts/after-pack-macos.js"
   },
   "eslintConfig": {
     "extends": [
