@@ -9,12 +9,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: "Release (${{ matrix.os }})"
     strategy:
-      # windows-2019 and macos-12 runner images were retired by GitHub, so those
-      # matrix jobs hung forever with no runner (only the Linux asset shipped).
-      # Use current images: windows-latest and macos-13 (x64, matches the prior
-      # macos-12 build).
+      # Retired runner images leave the matrix job queued forever with no
+      # runner, and only the other assets ship — this has now happened twice
+      # (macos-12, then macos-13), so no macOS build has ever been released.
+      # macos-14 is current; it is arm64-only, so the macOS artifact is an
+      # Apple Silicon build.
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13]
+        os: [ubuntu-latest, windows-latest, macos-14]
     steps:
       - name: "Setup node"
         uses: actions/setup-node@v1
