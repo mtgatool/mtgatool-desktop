@@ -38,12 +38,17 @@ export default function getWildcardsMissing(
   needed = Math.min(4, needed);
 
   const card = database.card(grpid);
-  let arr = [];
-  if (!card?.Reprints) arr = [grpid];
-  else arr.push(grpid);
+  // Arena counts a card's copies across every printing, not per printing:
+  // https://magic.wizards.com/en/news/mtg-arena/upcoming-improvements-to-reprints
+  // Own four of any one printing and you may play four of any other — which is
+  // also why Arena grants only a single copy of a new printing once you have a
+  // playset. Counting just `grpid` therefore reports cards as missing that are
+  // perfectly playable. `Reprints` lists the sibling printings and excludes the
+  // card itself, so it has to be added back in.
+  const ids = [grpid, ...(card?.Reprints ?? [])];
 
   let have = 0;
-  arr.forEach((id) => {
+  ids.forEach((id) => {
     const n = cards.cards[id];
     if (n !== undefined) {
       have += n;
@@ -52,7 +57,10 @@ export default function getWildcardsMissing(
 
   // Set to a high number to simulate infinity
   const INFINITE = 999;
-  if (have == 4) {
+  // >= rather than ==: summing across printings routinely exceeds four (a
+  // playset of two different printings is eight), and an exact check would
+  // silently skip the playset case it exists to handle.
+  if (have >= 4) {
     have = INFINITE;
   }
 
