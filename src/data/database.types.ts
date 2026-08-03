@@ -42,6 +42,27 @@ export type Database = {
         };
         Relationships: [];
       };
+      auth_recovery: {
+        Row: {
+          email: string;
+          updated_at: string;
+          user_id: string;
+          verified_at: string | null;
+        };
+        Insert: {
+          email: string;
+          updated_at?: string;
+          user_id: string;
+          verified_at?: string | null;
+        };
+        Update: {
+          email?: string;
+          updated_at?: string;
+          user_id?: string;
+          verified_at?: string | null;
+        };
+        Relationships: [];
+      };
       arena_collection: {
         Row: {
           arena_id: string;

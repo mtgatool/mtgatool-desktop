@@ -178,6 +178,20 @@
   -webkit-transition: all 0.3s ease-in;
 }
 
+// The success counterpart of .form-error. Not fixed-height, because these read
+// as sentences ("a code is on its way…") rather than the short failures
+// .form-error is sized for, and a wrapped line would be clipped at 32px.
+.form-notice {
+  text-align: center;
+  line-height: 20px;
+  font-family: var(--main-font-name-it);
+  color: var(--color-g);
+  width: 19em;
+  max-width: 100%;
+  margin: 8px auto;
+  -webkit-transition: all 0.3s ease-in;
+}
+
 .welcome-page {
   width: calc(100% - 48px);
   height: 100%;

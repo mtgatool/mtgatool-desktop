@@ -54,7 +54,12 @@ export function validateUsername(username: string): string | null {
   return null;
 }
 
-function usernameToEmail(username: string): string {
+/**
+ * The synthetic address an account signs in with. Not a secret — anyone can
+ * derive it from a username — which is what lets the password reset flow work
+ * without the client ever learning the real recovery address.
+ */
+export function usernameToEmail(username: string): string {
   return `user-${usernameToLoginId(username)}@mtgatool.com`;
 }
 

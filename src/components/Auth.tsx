@@ -10,6 +10,10 @@ import { LOGIN_AUTH, LOGIN_OK, LOGIN_WAITING } from "../constants";
 import { cloudLogin, cloudSignup } from "../data/cloudAuth";
 import hydrateFromCloud from "../data/hydrateFromCloud";
 import localLogin from "../data/localLogin";
+import {
+  requestPasswordReset,
+  resetPasswordWithCode,
+} from "../data/passwordReset";
 import UICheckAdmin from "../reader/uiCheckAdmin";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
@@ -29,9 +33,17 @@ export interface AuthProps {
 
 export default function Auth(props: AuthProps) {
   const { defaultPage } = props;
-  // 0 = login, 1 = signup
+  // 0 = login, 1 = signup, 2 = forgot password
   const [page, setPage] = useState(defaultPage || 0);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Forgot-password. Step 0 asks for the username, step 1 for the code and the
+  // new password.
+  const [resetStep, setResetStep] = useState(0);
+  const [resetUsername, setResetUsername] = useState("");
+  const [resetCode, setResetCode] = useState("");
+  const [resetPass, setResetPass] = useState("");
+  const [resetBusy, setResetBusy] = useState(false);
 
   const [_refresh, setRefresh] = useState(1);
 
@@ -46,6 +58,9 @@ export default function Auth(props: AuthProps) {
   const history = useHistory();
   const dispatch = useDispatch();
   const [errorMessage, setErrorMessage] = useState("");
+  // Success counterpart of errorMessage — .form-error is red and fixed-height,
+  // so it can't carry these.
+  const [noticeMessage, setNoticeMessage] = useState("");
 
   const [username, setUsername] = useState(getLocalSetting("username"));
   const [pass, setPass] = useState("");
@@ -88,6 +103,55 @@ export default function Auth(props: AuthProps) {
   useEffect(() => {
     setErrorMessage("");
   }, [page]);
+
+  const openForgotPassword = useCallback(() => {
+    setResetStep(0);
+    setResetUsername(username);
+    setResetCode("");
+    setResetPass("");
+    setNoticeMessage("");
+    setPage(2);
+  }, [username]);
+
+  const onRequestReset = useCallback(
+    (e): void => {
+      e.preventDefault();
+      setErrorMessage("");
+      setNoticeMessage("");
+      setResetBusy(true);
+      requestPasswordReset(resetUsername)
+        .then(() => {
+          // The server answers identically whether or not the account exists,
+          // so this can't say "sent" — only what it would mean if it were.
+          setNoticeMessage(
+            "If that account has a confirmed recovery email, a code is on its way. Enter it below."
+          );
+          setResetStep(1);
+        })
+        .catch((err: Error) => setErrorMessage(err.message))
+        .finally(() => setResetBusy(false));
+    },
+    [resetUsername]
+  );
+
+  const onConfirmReset = useCallback(
+    (e): void => {
+      e.preventDefault();
+      setErrorMessage("");
+      setNoticeMessage("");
+      setResetBusy(true);
+      resetPasswordWithCode(resetUsername, resetCode, resetPass)
+        .then(() => {
+          setUsername(resetUsername);
+          setPass("");
+          setPage(0);
+          setNoticeMessage("Password updated — log in with your new password.");
+        })
+        .catch((err: Error) => setErrorMessage(err.message))
+        .finally(() => setResetBusy(false));
+    },
+    [resetUsername, resetCode, resetPass]
+  );
 
   useEffect(() => {
     if (loginState === LOGIN_OK) {
@@ -295,6 +359,106 @@ export default function Auth(props: AuthProps) {
     </div>
   );
 
+  const forgotPanel = (
+    <div className="auth-page-single">
+      {resetStep === 0 ? (
+        <>
+          <label className="form-label">Username</label>
+          <div className="form-input-container">
+            <input
+              type="text"
+              onChange={(ev: InputChange): void =>
+                setResetUsername(ev.target.value)
+              }
+              autoComplete="off"
+              value={resetUsername}
+            />
+          </div>
+          <div
+            className="message-small"
+            style={{ margin: "12px 0 0 0", color: "var(--color-text-dark)" }}
+          >
+            We&apos;ll send a code to the recovery email on that account. If it
+            never had one, there&apos;s no way to reset it — your local data is
+            still on this device, and you can keep using the app offline.
+          </div>
+          <button
+            style={{ margin: "14px 0 4px 0" }}
+            className="form-button"
+            type="submit"
+            disabled={resetBusy || resetUsername.trim() === ""}
+            onClick={onRequestReset}
+          >
+            {resetBusy ? "Sending..." : "Send reset code"}
+          </button>
+        </>
+      ) : (
+        <>
+          <label className="form-label">Code from the email</label>
+          <div className="form-input-container">
+            <input
+              type="text"
+              inputMode="numeric"
+              placeholder="000000"
+              onChange={(ev: InputChange): void =>
+                setResetCode(ev.target.value.replace(/\D/g, "").slice(0, 6))
+              }
+              autoComplete="off"
+              value={resetCode}
+            />
+          </div>
+          <label className="form-label">New password</label>
+          <div className="form-input-container">
+            <input
+              onChange={(ev: InputChange): void =>
+                setResetPass(ev.target.value)
+              }
+              type={showPassword ? "text" : "password"}
+              autoComplete="off"
+              value={resetPass}
+            />
+            <div
+              className="show-password-icon"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <HideIcon /> : <ShowIcon />}
+            </div>
+          </div>
+          {/* The button below is disabled until this is satisfied, so say so
+              rather than leaving it inert for no visible reason. */}
+          <div
+            className="message-small"
+            style={{ margin: "4px 0 0 0", color: "var(--color-text-dark)" }}
+          >
+            At least 8 characters.
+          </div>
+          <button
+            style={{ margin: "14px 0 4px 0" }}
+            className="form-button"
+            type="submit"
+            disabled={
+              resetBusy || resetCode.length !== 6 || resetPass.length < 8
+            }
+            onClick={onConfirmReset}
+          >
+            {resetBusy ? "Setting..." : "Set new password"}
+          </button>
+        </>
+      )}
+      {noticeMessage ? (
+        <div className="form-notice">{noticeMessage}</div>
+      ) : null}
+      <div className="form-error">{errorMessage}</div>
+      <div className="form-options">
+        <div className="message-small">
+          <a onClick={() => setPage(0)} className="signup-link">
+            Back to log in
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+
   const loginPanel = (
     <div className="auth-page-single">
       <label className="form-label">Username</label>
@@ -329,12 +493,20 @@ export default function Auth(props: AuthProps) {
       >
         Login
       </button>
+      {noticeMessage ? (
+        <div className="form-notice">{noticeMessage}</div>
+      ) : null}
       <div className="form-error">{errorMessage}</div>
       <div className="form-options">
         <div className="message-small">
           Dont have an account?{" "}
           <a onClick={() => setPage(1)} className="signup-link">
             Sign up!
+          </a>
+        </div>
+        <div className="message-small">
+          <a onClick={openForgotPassword} className="signup-link">
+            Forgot your password?
           </a>
         </div>
         <div className="message-small">
@@ -353,6 +525,7 @@ export default function Auth(props: AuthProps) {
   let panel = loginPanel;
   if (isBusy) panel = loadingPanel;
   else if (page === 1) panel = signupPanel;
+  else if (page === 2) panel = forgotPanel;
 
   return (
     <>

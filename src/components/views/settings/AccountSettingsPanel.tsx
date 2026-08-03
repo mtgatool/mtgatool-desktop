@@ -8,11 +8,17 @@ import { ReactComponent as HideIcon } from "../../../assets/images/svg/unarchive
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 import { LOGIN_AUTH } from "../../../constants";
 import { cloudLogout, cloudUpdatePassword } from "../../../data/cloudAuth";
+import { isCloudActive } from "../../../data/cloudSync";
 import {
   setProfilePrivate,
   updateUsername,
   uploadAvatar,
 } from "../../../data/profile";
+import {
+  confirmRecoveryEmail,
+  getRecoveryEmail,
+  requestRecoveryEmail,
+} from "../../../data/recoveryEmail";
 import { getData, LOCAL_KEY, putData } from "../../../data/store";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
@@ -69,6 +75,93 @@ export default function AccountSettingsPanel(
   const [newAlias, setNewAlias] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [newPass, setNewPass] = useState("");
+
+  // Recovery email. Cloud accounts only — there is no account to attach one to
+  // in offline/local mode.
+  const [hasCloudAccount, setHasCloudAccount] = useState(false);
+  const [recoveryEmail, setRecoveryEmailInput] = useState("");
+  const [savedRecoveryEmail, setSavedRecoveryEmail] = useState<string | null>(
+    null
+  );
+  const [recoveryStatus, setRecoveryStatus] = useState("");
+  const [recoveryIsError, setRecoveryIsError] = useState(false);
+  const [awaitingCode, setAwaitingCode] = useState(false);
+  const [recoveryCode, setRecoveryCode] = useState("");
+  const [recoveryBusy, setRecoveryBusy] = useState(false);
+
+  const showRecoveryStatus = useCallback((text: string, isError = false) => {
+    setRecoveryStatus(text);
+    setRecoveryIsError(isError);
+  }, []);
+
+  useEffect(() => {
+    isCloudActive().then((active) => {
+      setHasCloudAccount(active);
+      if (!active) return;
+      getRecoveryEmail().then((stored) => {
+        if (stored) {
+          setSavedRecoveryEmail(stored.email);
+          setRecoveryEmailInput(stored.email);
+        }
+      });
+    });
+  }, []);
+
+  const handleSetRecoveryEmail = useCallback(
+    (event: ChangeEvent<HTMLInputElement>): void => {
+      setRecoveryEmailInput(event.target.value);
+      showRecoveryStatus("");
+    },
+    [showRecoveryStatus]
+  );
+
+  const handleSetRecoveryCode = useCallback(
+    (event: ChangeEvent<HTMLInputElement>): void => {
+      // Digits only, so pasting "123 456" or a stray space still works.
+      setRecoveryCode(event.target.value.replace(/\D/g, "").slice(0, 6));
+      showRecoveryStatus("");
+    },
+    [showRecoveryStatus]
+  );
+
+  // Step 1: mail a code. Nothing is stored against the account until it comes
+  // back — an address nobody can read is worse than none, since it looks like
+  // recovery is set up when it isn't.
+  const sendRecoveryCode = useCallback(() => {
+    setRecoveryBusy(true);
+    showRecoveryStatus("");
+    requestRecoveryEmail(recoveryEmail)
+      .then(() => {
+        setAwaitingCode(true);
+        setRecoveryCode("");
+        showRecoveryStatus(`Code sent to ${recoveryEmail.trim()}.`);
+      })
+      .catch((e: Error) => showRecoveryStatus(e.message, true))
+      .finally(() => setRecoveryBusy(false));
+  }, [recoveryEmail, showRecoveryStatus]);
+
+  // Step 2: hand the code back; the server writes the row.
+  const confirmRecoveryCode = useCallback(() => {
+    setRecoveryBusy(true);
+    showRecoveryStatus("");
+    confirmRecoveryEmail(recoveryCode)
+      .then((saved) => {
+        setSavedRecoveryEmail(saved);
+        setRecoveryEmailInput(saved);
+        setAwaitingCode(false);
+        setRecoveryCode("");
+        showRecoveryStatus("Recovery email confirmed.");
+      })
+      .catch((e: Error) => showRecoveryStatus(e.message, true))
+      .finally(() => setRecoveryBusy(false));
+  }, [recoveryCode, showRecoveryStatus]);
+
+  const cancelRecoveryCode = useCallback(() => {
+    setAwaitingCode(false);
+    setRecoveryCode("");
+    showRecoveryStatus("");
+    setRecoveryEmailInput(savedRecoveryEmail || "");
+  }, [savedRecoveryEmail, showRecoveryStatus]);
 
   const handleSetAlias = useCallback(
     (event: ChangeEvent<HTMLInputElement>): void => {
@@ -251,9 +344,115 @@ export default function AccountSettingsPanel(
           text="Save"
         />
       </div>
+
+      {hasCloudAccount && (
+        <>
+          <p
+            style={{
+              textAlign: "center",
+              borderTop: "1px solid var(--color-line-sep)",
+              paddingTop: "24px",
+              marginBottom: "16px",
+            }}
+          >
+            Your account signs in with your username, not an email, so there is
+            no way to reach you if you lose your password. Add an address here
+            and we can send you a reset code. We&apos;ll mail you a confirmation
+            code first — the address is only saved once you enter it. It is used
+            for nothing else: no newsletters, no sharing, and you can remove it
+            at any time.
+          </p>
+          {awaitingCode ? (
+            <div className="form-input-container" style={{ height: "36px" }}>
+              <label>Confirmation code:</label>
+              <input
+                type="text"
+                id="recovery-code"
+                autoComplete="off"
+                inputMode="numeric"
+                placeholder="000000"
+                onChange={handleSetRecoveryCode}
+                style={{
+                  margin: "auto 16px",
+                  width: "calc(100% - 320px)",
+                  letterSpacing: "4px",
+                }}
+                value={recoveryCode}
+              />
+              {/* Two buttons in one flex row: .button-simple is 200px wide, so
+                  they need narrowing or they squeeze the input out. */}
+              <Button
+                className="button-simple-dark"
+                style={{ width: "120px", minWidth: "120px" }}
+                onClick={cancelRecoveryCode}
+                text="Cancel"
+              />
+              <Button
+                style={{ width: "120px", minWidth: "120px" }}
+                disabled={recoveryCode.length !== 6 || recoveryBusy}
+                onClick={confirmRecoveryCode}
+                text={recoveryBusy ? "Checking..." : "Confirm"}
+              />
+            </div>
+          ) : (
+            <div className="form-input-container" style={{ height: "36px" }}>
+              <label>Recovery email:</label>
+              <input
+                type="email"
+                id="recovery-email"
+                autoComplete="off"
+                placeholder="you@example.com"
+                onChange={handleSetRecoveryEmail}
+                style={{
+                  margin: "auto 16px",
+                  width: "calc(100% - 160px)",
+                }}
+                value={recoveryEmail}
+              />
+              <Button
+                disabled={
+                  recoveryEmail.trim() === "" ||
+                  recoveryEmail.trim() === savedRecoveryEmail ||
+                  recoveryBusy
+                }
+                onClick={sendRecoveryCode}
+                text={recoveryBusy ? "Sending..." : "Send code"}
+              />
+            </div>
+          )}
+          {/*
+            Rendered only when there is something to say: an always-present
+            paragraph would reserve its margins as dead space, and an empty one
+            sitting right on the separator's border-top is what made this feel
+            cramped.
+          */}
+          {recoveryStatus ? (
+            <p
+              className={recoveryIsError ? "form-error" : "form-notice"}
+              style={{ width: "100%", height: "auto", margin: "12px 0 0 0" }}
+            >
+              {recoveryStatus}
+            </p>
+          ) : null}
+          {!savedRecoveryEmail && !awaitingCode && !recoveryStatus ? (
+            <p
+              style={{
+                textAlign: "center",
+                margin: "12px 0 0 0",
+                color: "var(--color-text-dark)",
+              }}
+            >
+              No confirmed address on file — a forgotten password can&apos;t be
+              reset.
+            </p>
+          ) : null}
+        </>
+      )}
+
       <p
         style={{
           borderTop: "1px solid var(--color-line-sep)",
+          marginTop: "24px",
           paddingTop: "24px",
           marginBottom: "24px",
         }}
