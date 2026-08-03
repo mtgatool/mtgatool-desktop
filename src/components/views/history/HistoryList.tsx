@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
@@ -22,6 +22,8 @@ interface HistoryListProps {
   openHistoryStatsPopup: () => void;
   datePickerDoShow: () => void;
   matchesData: MatchData[];
+  /** Opens the confirm popup, which lives up in ContentWrapper. */
+  deleteMatchCallback?: (match: MatchData) => void;
 }
 
 export default function HistoryList(props: HistoryListProps) {
@@ -38,7 +40,12 @@ export default function HistoryList(props: HistoryListProps) {
   );
   const history = useHistory();
   const dispatch = useDispatch();
-  const { openHistoryStatsPopup, matchesData, datePickerDoShow } = props;
+  const {
+    openHistoryStatsPopup,
+    matchesData,
+    datePickerDoShow,
+    deleteMatchCallback,
+  } = props;
 
   const [sortValue, setSortValue] = useState<Sort<MatchData>>({
     key: "timestamp",
@@ -61,6 +68,15 @@ export default function HistoryList(props: HistoryListProps) {
   }, [dispatch, matchesData, filters, sortValue, filterDate]);
 
   const pagingControlProps = usePagingControls(filteredData.length, 25);
+  const { pageIndex, pageCount, gotoPage } = pagingControlProps;
+
+  // Deleting the last match on the last page would otherwise leave us stranded
+  // on a page that no longer exists.
+  useEffect(() => {
+    if (pageIndex > 0 && pageIndex >= pageCount) {
+      gotoPage(Math.max(0, pageCount - 1));
+    }
+  }, [pageIndex, pageCount, gotoPage]);
 
   const openMatch = useCallback(
     (match: MatchData) => {
@@ -139,6 +155,7 @@ export default function HistoryList(props: HistoryListProps) {
                     key={match.matchId}
                     match={match}
                     openMatchCallback={openMatch}
+                    deleteMatchCallback={deleteMatchCallback}
                   />
                 );
               })}

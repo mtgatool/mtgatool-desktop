@@ -32,6 +32,7 @@ import {
   saveLocalBackground,
 } from "./backgroundStore";
 import { isCloudActive } from "./cloudSync";
+import { getDeletedMatchIds } from "./deletedMatches";
 import { getData, putData } from "./store";
 import supabase from "./supabase";
 import { DbDecksData } from "./upsertDbDecks";
@@ -92,9 +93,13 @@ export default async function hydrateFromCloud(): Promise<void> {
       })
     );
 
-    // Matches — add only the ones we don't already have locally.
+    // Matches — add only the ones we don't already have locally, and never
+    // resurrect one the user deleted (the remote delete may still be pending,
+    // or have happened on another device).
+    const deletedMatches = await getDeletedMatchIds();
     await Promise.all(
       (matches.data ?? []).map(async (r) => {
+        if (deletedMatches.has(r.match_id)) return;
         const key = `matches-${r.match_id}`;
         if (await getData<DbMatch>(key, true)) return;
         const dbMatch: DbMatch = {

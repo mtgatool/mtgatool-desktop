@@ -15,6 +15,7 @@ import Colors from "../../../utils/mtga/colors";
 import timeAgo from "../../../utils/timeAgo";
 import {
   Column,
+  DeleteButton,
   FlexBottom,
   FlexTop,
   HoverTile,
@@ -29,11 +30,13 @@ import { MatchData } from "./convertDbMatchData";
 interface ListItemMatchProps {
   match: MatchData;
   openMatchCallback?: (match: MatchData) => void;
+  deleteMatchCallback?: (match: MatchData) => void;
 }
 
 export default function ListItemMatch({
   match,
   openMatchCallback,
+  deleteMatchCallback,
 }: ListItemMatchProps): JSX.Element {
   const { internalMatch } = match;
 
@@ -185,6 +188,14 @@ export default function ListItemMatch({
           {match.playerWins}:{match.playerLosses}
         </div>
       </Column>
+
+      {deleteMatchCallback ? (
+        <DeleteButton
+          dataId={match.matchId}
+          deleteCallback={(): void => deleteMatchCallback(match)}
+          title="delete match"
+        />
+      ) : null}
     </ListItem>
   );
 }

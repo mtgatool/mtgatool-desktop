@@ -173,6 +173,18 @@ const mainDataSlice = createSlice({
         ...state.localMatchesIndex,
       ]);
     },
+    // The setters above only ever grow the indexes (_.uniq of old + new), so a
+    // delete needs its own subtractive reducer. Payload is full stored keys.
+    removeMatchesFromIndex: (
+      state: MainState,
+      action: PayloadAction<string[]>
+    ): void => {
+      const removed = new Set(action.payload);
+      const keep = (k: string): boolean => !removed.has(k);
+      state.localMatchesIndex = state.localMatchesIndex.filter(keep);
+      state.remoteMatchesIndex = state.remoteMatchesIndex.filter(keep);
+      state.matchesIndex = state.matchesIndex.filter(keep);
+    },
     setDraftsIndex: (
       state: MainState,
       action: PayloadAction<string[]>
@@ -203,6 +215,7 @@ export const {
   setDecksIndex,
   setRemoteMatchesIndex,
   setLocalMatchesIndex,
+  removeMatchesFromIndex,
   setDraftsIndex,
   setHiddenDecks,
 } = mainDataSlice.actions;

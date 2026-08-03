@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { animated, useTransition } from "react-spring";
 
+import deleteMatch from "../data/deleteMatch";
 import { getMatchesData } from "../data/store";
 import useDatePicker from "../hooks/useDatePicker";
 import reduxAction from "../redux/reduxAction";
@@ -17,12 +18,16 @@ import { defaultCardsData } from "../types/dbTypes";
 import aggregateStats from "../utils/aggregateStats";
 import isElectron from "../utils/electron/isElectron";
 import getCssQuality from "../utils/getCssQuality";
+import getEventPrettyName from "../utils/getEventPrettyName";
+import getPlayerNameWithoutSuffix from "../utils/getPlayerNameWithoutSuffix";
 import getPopupClass from "../utils/getPopupClass";
 import database from "../utils/mtga/database";
 import Deck from "../utils/mtga/deck";
 import doHistoryFilter from "../utils/tables/doHistoryFilter";
+import timeAgo from "../utils/timeAgo";
 import vodiFn from "../utils/voidfn";
 import PopupComponent from "./PopupComponent";
+import ConfirmDialog from "./popups/ConfirmDialog";
 import DeckViewPopup from "./popups/DeckViewPopup";
 import AdvancedSearch from "./views/collection/advancedSearch";
 import ViewCollection from "./views/collection/ViewCollection";
@@ -171,6 +176,25 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   const closenDeckView = useRef<() => void>(vodiFn);
   const [deckView, setDeckView] = useState<Deck>(new Deck());
 
+  // Match deletion confirm. Lives up here with the other popups: PopupComponent
+  // positions itself against the nearest positioned ancestor, so rendering it
+  // down inside the history list would trap it inside the list container.
+  const openDeleteMatch = useRef<() => void>(vodiFn);
+  const closeDeleteMatch = useRef<() => void>(vodiFn);
+  const [matchToDelete, setMatchToDelete] = useState<MatchData | null>(null);
+
+  const askDeleteMatch = useCallback((match: MatchData) => {
+    setMatchToDelete(match);
+    openDeleteMatch.current();
+  }, []);
+
+  // Removing the match from the indexes re-runs the getMatchesData effect
+  // above, which flows back down as new matchesData -> the SET_FULL_STATS /
+  // SET_HISTORY_STATS aggregations. Nothing else to refresh.
+  const confirmDeleteMatch = useCallback(() => {
+    if (matchToDelete) deleteMatch(matchToDelete.matchId);
+  }, [matchToDelete]);
+
   const CurrentPage = Object.values(views)[viewIndex];
 
   const datePickerCallbackRef = useRef((_d: Date) => {
@@ -222,6 +246,59 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
         <DeckViewPopup deck={deckView} onClose={closenDeckView.current} />
       </PopupComponent>
 
+      <PopupComponent
+        open={false}
+        className={getPopupClass(os)}
+        width="480px"
+        height="auto"
+        openFnRef={openDeleteMatch}
+        closeFnRef={closeDeleteMatch}
+        persistent={false}
+        onClose={(): void => setMatchToDelete(null)}
+      >
+        <ConfirmDialog
+          title="Delete match?"
+          danger
+          confirmText="Delete"
+          onConfirm={confirmDeleteMatch}
+          onClose={(): void => closeDeleteMatch.current()}
+          text={
+            <>
+              {matchToDelete ? (
+                <div style={{ color: "var(--color-text)" }}>
+                  <div>
+                    {matchToDelete.internalMatch.playerDeck.name || "Deck"}
+                    {` vs `}
+                    {getPlayerNameWithoutSuffix(
+                      matchToDelete.internalMatch.opponent.name
+                    ) || "Unknown"}
+                    {` `}
+                    <span
+                      className={
+                        matchToDelete.playerWins > matchToDelete.playerLosses
+                          ? "green"
+                          : "red"
+                      }
+                    >
+                      {matchToDelete.playerWins}:{matchToDelete.playerLosses}
+                    </span>
+                  </div>
+                  <div style={{ color: "var(--color-text-dark)" }}>
+                    {getEventPrettyName(matchToDelete.eventId)}
+                    {` · `}
+                    {timeAgo(matchToDelete.timestamp)}
+                  </div>
+                </div>
+              ) : null}
+              <p style={{ marginTop: "16px" }}>
+                It will be removed from your history and stats here and in the
+                cloud, and it won&apos;t be imported again.
+              </p>
+            </>
+          }
+        />
+      </PopupComponent>
+
       <div className="wrapper">
         <div className="wrapper-inner">
           <div className="overflow-ux">
@@ -249,6 +326,7 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
                       }}
                       datePickerDoShow={datePickerDoShow}
                       matchesData={matchesData}
+                      deleteMatchCallback={askDeleteMatch}
                     />
                   </animated.div>
                 );
@@ -271,6 +349,7 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
                   openHistoryStatsPopup={openHistoryStatsPopup.current}
                   datePickerDoShow={datePickerDoShow}
                   matchesData={matchesData}
+                  deleteMatchCallback={askDeleteMatch}
                 />
               </div>
             )}

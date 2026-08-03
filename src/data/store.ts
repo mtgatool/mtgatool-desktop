@@ -13,7 +13,7 @@ import {
   MatchData,
 } from "../components/views/history/convertDbMatchData";
 import { DbMatch } from "../types/dbTypes";
-import { kvGet, kvPut, kvQueryKeys } from "./localKV";
+import { kvDelete, kvGet, kvPut, kvQueryKeys } from "./localKV";
 
 // The local KV is single-user-per-device: everything a signed-in user owns is
 // stored under one fixed namespace. Keys used to be `:${pubKey}.${key}` under
@@ -49,6 +49,10 @@ export function putData<T = any>(
   userNamespaced = false
 ): Promise<boolean> {
   return kvPut(resolveKey(key, userNamespaced), data).then(() => true);
+}
+
+export function deleteData(key: string, userNamespaced = false): Promise<void> {
+  return kvDelete(resolveKey(key, userNamespaced));
 }
 
 /** Returns full stored keys (including the `:local.` prefix) as the legacy API did. */

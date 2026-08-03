@@ -11,10 +11,16 @@ interface ViewHistoryProps {
   openHistoryStatsPopup: () => void;
   datePickerDoShow: () => void;
   matchesData: MatchData[];
+  deleteMatchCallback?: (match: MatchData) => void;
 }
 
 export default function ViewHistory(props: ViewHistoryProps) {
-  const { openHistoryStatsPopup, datePickerDoShow, matchesData } = props;
+  const {
+    openHistoryStatsPopup,
+    datePickerDoShow,
+    matchesData,
+    deleteMatchCallback,
+  } = props;
   const { url } = useRouteMatch();
   const loggedIn = useIsLoggedIn();
 
@@ -27,14 +33,21 @@ export default function ViewHistory(props: ViewHistoryProps) {
       {loggedIn && matchesIndex ? (
         <Switch>
           <Route exact path={`${url}/:id`} component={MatchView} />
+          {/*
+            `render`, not `component`: an inline arrow passed to `component` is
+            a brand new component type on every render, so React remounts the
+            list and its local state (the current page) resets — which it did
+            every time matchesData changed, e.g. right after deleting a match.
+          */}
           <Route
             exact
             path={`${url}/`}
-            component={() => (
+            render={() => (
               <HistoryList
                 datePickerDoShow={datePickerDoShow}
                 openHistoryStatsPopup={openHistoryStatsPopup}
                 matchesData={matchesData}
+                deleteMatchCallback={deleteMatchCallback}
               />
             )}
           />

@@ -7,6 +7,7 @@ import getLocalSetting from "../utils/getLocalSetting";
 import globalData from "../utils/globalData";
 import Deck from "../utils/mtga/deck";
 import { pushMatch } from "./cloudSync";
+import { isMatchDeleted } from "./deletedMatches";
 import { getUserNamespacedKey, putData } from "./store";
 
 export default async function setDbMatch(
@@ -17,6 +18,13 @@ export default async function setDbMatch(
   pushToCloud = true
 ) {
   console.log("> Set match", match);
+
+  // The user deleted this one on purpose; a full log re-import must not bring
+  // it back (nor re-push it to the cloud).
+  if (await isMatchDeleted(match.id)) {
+    console.log("> Skipping deleted match", match.id);
+    return;
+  }
 
   const newDbMatch: DbMatch = {
     matchId: match.id,

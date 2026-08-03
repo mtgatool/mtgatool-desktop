@@ -28,6 +28,7 @@ export const actions = {
   SET_DECKS_INDEX: MainDataSlice.setDecksIndex,
   SET_LOCAL_MATCHES_INDEX: MainDataSlice.setLocalMatchesIndex,
   SET_REMOTE_MATCHES_INDEX: MainDataSlice.setRemoteMatchesIndex,
+  REMOVE_MATCHES_FROM_INDEX: MainDataSlice.removeMatchesFromIndex,
   SET_DRAFTS_INDEX: MainDataSlice.setDraftsIndex,
   SET_HIDDEN_DECKS: MainDataSlice.setHiddenDecks,
   SET_MY_USERNAME: RendererSlice.setMyUsername,

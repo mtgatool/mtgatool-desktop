@@ -154,6 +154,32 @@ export async function pushMatch(arenaId: string, m: DbMatch): Promise<boolean> {
   }
 }
 
+/**
+ * Remove a match from Supabase. RLS already scopes `matches` to auth.uid(), so
+ * matching on match_id alone can only ever hit the current user's own row.
+ * Returns true when the row is gone (including when there was nothing to
+ * delete); false when offline or the delete failed, so the caller can retry.
+ */
+export async function deleteRemoteMatch(matchId: string): Promise<boolean> {
+  try {
+    const userId = await getActiveUserId();
+    if (!userId || !matchId) return false;
+    const { error } = await supabase
+      .from("matches")
+      .delete()
+      .eq("user_id", userId)
+      .eq("match_id", matchId);
+    if (error) {
+      console.error("[cloudSync] deleteRemoteMatch:", error.message);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error("[cloudSync] deleteRemoteMatch threw:", e);
+    return false;
+  }
+}
+
 export async function pushCollection(
   arenaId: string,
   cards: Cards,

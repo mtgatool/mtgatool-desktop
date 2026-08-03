@@ -2,6 +2,7 @@ import { PropsWithChildren, useCallback } from "react";
 import { useDispatch } from "react-redux";
 
 import { ReactComponent as ArchiveIcon } from "../assets/images/svg/archive.svg";
+import { ReactComponent as TrashIcon } from "../assets/images/svg/trash.svg";
 import { getCardArtCrop } from "../utils/getCardArtCrop";
 
 interface ListItemProps extends JSX.ElementChildrenAttribute {
@@ -105,6 +106,44 @@ export function ArchiveButton(props: ArchiveButtonProps): JSX.Element {
       title="delete permanently"
     >
       <ArchiveIcon
+        style={{
+          margin: "auto",
+          fill: `var(--color-icon)`,
+        }}
+      />
+    </div>
+  );
+}
+
+interface DeleteButtonProps {
+  deleteCallback: (id: string) => void;
+  dataId: string;
+  title?: string;
+}
+
+/**
+ * Trash button for a list row. The row itself is clickable, so the click is
+ * swallowed here; the caller is expected to confirm before actually deleting.
+ */
+export function DeleteButton(props: DeleteButtonProps): JSX.Element {
+  const { deleteCallback, dataId, title } = props;
+
+  const onClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
+      event.stopPropagation();
+      event.nativeEvent.stopImmediatePropagation();
+      deleteCallback(dataId);
+    },
+    [deleteCallback, dataId]
+  );
+
+  return (
+    <div
+      onClick={onClick}
+      className="list-item-delete"
+      title={title || "delete permanently"}
+    >
+      <TrashIcon
         style={{
           margin: "auto",
           fill: `var(--color-icon)`,
