@@ -52,13 +52,20 @@ jobs:
           # create release if it doesn't exist
           CI_BUILD_TAG: 1
 
+      # Only the Linux job uploads an extra asset, so only it needs the
+      # release metadata. This action also crashes on current macOS runners
+      # ("undefined is not iterable" — its bundled os-name can't parse macOS
+      # 14+), which failed the mac job *after* it had already built and
+      # uploaded the .dmg successfully.
       - name: Gets latest created release info
         id: latest_release_info
+        if: matrix.os == 'ubuntu-latest'
         uses: jossef/action-latest-release-info@v1.1.0
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: "Package JSON"
+        if: matrix.os == 'ubuntu-latest'
         run: |
           echo "INFO_VERSION=$(jq -r .version ./src/info.json)" >> $GITHUB_ENV
           echo "INFO_BRANCH=$(jq -r .branch ./src/info.json)" >> $GITHUB_ENV
