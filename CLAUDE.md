@@ -165,6 +165,31 @@ node scripts/cdp-console.js --window main --eval "(async () => { \
 Dropping `autoLogin` sends the app to `/auth`, i.e. the **manual** login path —
 which is not the same code as auto-login and has had its own bugs.
 
+### Dev-only trap: HMR silently kills routing
+
+Symptom: clicking the top nav does nothing, logging out does nothing, the app
+looks frozen — but no error appears and the app is otherwise responsive.
+
+`window.location` updates while React Router's location does not. Both indexes
+create their history at module scope (`src/electronIndex.tsx:42`), which is
+stable in a real run — but a hot update re-executes the module and mints a *new*
+history. React Router v5 refuses to swap it (`Warning: You cannot change
+<Router history>`), keeping the original for its location state while handing
+`useHistory()` consumers the new one. Pushes then move the URL and the router
+never hears about it.
+
+**A full page reload fixes it.** Nothing is wrong with the app; the packaged
+build never hot-reloads. Diagnose it in one command — if the pathname disagrees
+with what's rendered, this is why:
+
+```bash
+node scripts/cdp-console.js --window main --eval \
+  "({ pathname: location.pathname, authForm: !!document.querySelector('.form-authenticate'), topNav: !!document.querySelector('.top-nav') })"
+```
+
+`/auth` with `topNav: true` and `authForm: false` is the fingerprint. Grep the
+stream for `You cannot change <Router history>` to confirm.
+
 ### Worked example
 
 Two long-standing bugs were found this way in one sitting, and both diagnoses

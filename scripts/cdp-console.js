@@ -45,12 +45,21 @@ const SHORT = {
   "MTG Arena Tool": "main",
 };
 
+/** Targets can appear mid-creation with an empty url, and `new URL("")` throws. */
+function pathOf(target) {
+  try {
+    return new URL(target.url).pathname;
+  } catch {
+    return target.id ? target.id.slice(0, 6) : "?";
+  }
+}
+
 function shortLabel(windowTitle, target) {
   if (SHORT[windowTitle]) return SHORT[windowTitle];
   if (windowTitle && windowTitle.startsWith("mtgatool-overlay-")) {
     return `ov${windowTitle.slice(-1)}`;
   }
-  return windowTitle || new URL(target.url).pathname;
+  return windowTitle || pathOf(target);
 }
 
 async function listTargets() {
@@ -219,7 +228,7 @@ async function stream(showAll) {
       if (attached.has(target.id)) return;
       // The label needs a round trip to the renderer, so hold it in a box the
       // event handler reads.
-      const box = { label: new URL(target.url).pathname };
+      const box = { label: pathOf(target) };
       const conn = connect(target, (msg) => streamEvent(box.label, msg, showAll));
       attached.set(target.id, conn);
 
@@ -251,7 +260,11 @@ async function stream(showAll) {
 
   await sweep();
   // Windows are created over several seconds at boot, and overlays come and go.
-  setInterval(sweep, POLL_MS);
+  setInterval(() => {
+    // A watcher that dies on one odd target is worse than useless — it stops
+    // collecting silently while the app keeps running.
+    sweep().catch((e) => console.log(`--- sweep failed: ${e.message}`));
+  }, POLL_MS);
   console.log(`--- watching ${HOST} (ctrl-c to stop)`);
 }
 
