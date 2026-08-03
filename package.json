@@ -222,6 +222,7 @@
     "dmg-license": "^1.0.11"
   },
   "resolutions": {
-    "nan": "2.18.0"
+    "nan": "2.18.0",
+    "@babel/traverse": "7.23.2"
   }
 }
