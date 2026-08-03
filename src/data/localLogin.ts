@@ -11,6 +11,7 @@ import globalData from "../utils/globalData";
 import { sanitizeRank } from "../utils/mtga/rankClasses";
 import { loadLocalBackground } from "./backgroundStore";
 import { getData, queryKeys } from "./store";
+import { getDbSeasons } from "./upsertDbSeason";
 
 /**
  * Local-mode session start, replacing the tool-db login + afterLogin flow.
@@ -32,6 +33,11 @@ export default async function localLogin(): Promise<void> {
   const matches = (await queryKeys("matches-", true)) || [];
   globalData.matchesIndex = matches;
   reduxAction(dispatch, { type: "SET_LOCAL_MATCHES_INDEX", arg: matches });
+
+  const seasons = await getDbSeasons();
+  if (Object.keys(seasons).length) {
+    reduxAction(dispatch, { type: "SET_SEASONS", arg: seasons });
+  }
 
   const drafts = (await queryKeys("draft-", true)) || [];
   globalData.draftsIndex = drafts;

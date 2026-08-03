@@ -8,6 +8,7 @@ import syncMatches from "../data/syncMatches";
 import upsertDbCards from "../data/upsertDbCards";
 import upsertDbInventory from "../data/upsertDbInventory";
 import upsertDbRank from "../data/upsertDbRank";
+import upsertDbSeason from "../data/upsertDbSeason";
 import readCards from "../reader/readCards";
 import readPlayerId from "../reader/readPlayerid";
 import UICheckAdmin from "../reader/uiCheckAdmin";
@@ -196,6 +197,10 @@ export default function mainChannelListeners() {
 
     if (msg.data.type === "UPSERT_DB_RANK") {
       upsertDbRank(msg.data.value);
+    }
+
+    if (msg.data.type === "UPSERT_DB_SEASON") {
+      upsertDbSeason(msg.data.value);
     }
 
     if (msg.data.type === "PLAYER_INVENTORY") {

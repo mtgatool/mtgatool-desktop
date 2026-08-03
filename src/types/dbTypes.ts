@@ -103,6 +103,16 @@ export interface DbInventoryData extends DbInventoryInfo {
   updated: number;
 }
 
+/** A ranked season's boundaries, in epoch ms. See data/upsertDbSeason. */
+export interface DbSeason {
+  ordinal: number;
+  start: number;
+  end: number;
+}
+
+/** Keyed by season ordinal. */
+export type DbSeasons = Record<number, DbSeason>;
+
 export interface DbRankData extends CombinedRankInfo {
   updated: number;
 }

@@ -7,6 +7,7 @@ import {
   DbInventoryData,
   DbMatch,
   DbRankData,
+  DbSeasons,
   defaultCardsData,
   defaultInventoryData,
   defaultRankData,
@@ -32,6 +33,7 @@ const mainState = {
   localMatchesIndex: [] as string[],
   remoteMatchesIndex: [] as string[],
   draftsIndex: [] as string[],
+  seasons: {} as DbSeasons,
   hiddenDecks: [] as string[],
   decksIndex: {} as Record<string, number>,
   fullStats: null as AggregatedStats | null,
@@ -185,6 +187,9 @@ const mainDataSlice = createSlice({
       state.remoteMatchesIndex = state.remoteMatchesIndex.filter(keep);
       state.matchesIndex = state.matchesIndex.filter(keep);
     },
+    setSeasons: (state: MainState, action: PayloadAction<DbSeasons>): void => {
+      state.seasons = { ...state.seasons, ...action.payload };
+    },
     setDraftsIndex: (
       state: MainState,
       action: PayloadAction<string[]>
@@ -216,6 +221,7 @@ export const {
   setRemoteMatchesIndex,
   setLocalMatchesIndex,
   removeMatchesFromIndex,
+  setSeasons,
   setDraftsIndex,
   setHiddenDecks,
 } = mainDataSlice.actions;

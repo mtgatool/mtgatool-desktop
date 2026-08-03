@@ -32,6 +32,7 @@ export type MessageType =
   | "SET_SCENE"
   | "UPSERT_DB_CARDS"
   | "UPSERT_DB_RANK"
+  | "UPSERT_DB_SEASON"
   | "INVENTORY_UPDATED"
   | "PLAYER_INVENTORY"
   | "HOVER_IN"
@@ -144,6 +145,15 @@ export interface UpsertDbRankMessage extends ChannelMessageBase {
   value: Partial<CombinedRankInfo>;
 }
 
+export interface UpsertDbSeasonMessage extends ChannelMessageBase {
+  type: "UPSERT_DB_SEASON";
+  value: {
+    seasonOrdinal: number;
+    seasonStartTime: string;
+    seasonEndTime: string;
+  };
+}
+
 export interface InventoryUpdatedMessage extends ChannelMessageBase {
   type: "INVENTORY_UPDATED";
   value: InventoryUpdate;
@@ -208,6 +218,7 @@ export type ChannelMessage =
   | SetSceneMessage
   | UpsertDbCardsMessage
   | UpsertDbRankMessage
+  | UpsertDbSeasonMessage
   | InventoryUpdatedMessage
   | PlayerInventoryMessage
   | HoverInMessage

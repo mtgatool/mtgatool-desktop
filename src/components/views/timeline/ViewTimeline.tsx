@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 
+import { AppState } from "../../../redux/stores/rendererStore";
 import { getCardArtCrop } from "../../../utils/getCardArtCrop";
 import Section from "../../ui/Section";
 import { MatchData } from "../history/convertDbMatchData";
@@ -83,6 +85,13 @@ interface Band {
   title?: string;
 }
 
+/** Vertical rule between two matches — a season reset, for now. */
+interface Divider {
+  i: number;
+  label: string;
+  title?: string;
+}
+
 // Inner vertical padding (percent) so the top/bottom gridline labels never clip.
 const PAD = 8;
 
@@ -98,6 +107,7 @@ function LineChart({
   yTicks = [],
   markers = [],
   bands = [],
+  dividers = [],
   activeDeck,
   onBandHover,
 }: {
@@ -109,6 +119,7 @@ function LineChart({
   yTicks?: { v: number; label: string }[];
   markers?: Marker[];
   bands?: Band[];
+  dividers?: Divider[];
   activeDeck?: string | null;
   onBandHover?: (name: string | null) => void;
 }): JSX.Element {
@@ -197,6 +208,38 @@ function LineChart({
             />
           );
         })}
+
+        {/* Drawn over the bands but under the line, so a reset reads as a
+            boundary between stretches rather than a data point. */}
+        {dividers.map((d) => (
+          <div
+            key={`divider-${d.i}`}
+            title={d.title}
+            style={{
+              position: "absolute",
+              left: `${(d.i / n) * 100}%`,
+              top: 0,
+              bottom: 0,
+              borderLeft: "2px dashed var(--color-text-dark)",
+              opacity: 0.85,
+              pointerEvents: "none",
+            }}
+          >
+            <span
+              style={{
+                position: "absolute",
+                top: "2px",
+                left: "4px",
+                fontSize: "10px",
+                whiteSpace: "nowrap",
+                color: "var(--color-text-dark)",
+                fontFamily: "var(--main-font-name-it)",
+              }}
+            >
+              {d.label}
+            </span>
+          </div>
+        ))}
 
         <svg
           viewBox="0 0 100 100"
@@ -391,6 +434,7 @@ interface ViewTimelineProps {
 export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
   const { matchesData } = props;
   const [hoveredDeck, setHoveredDeck] = useState<string | null>(null);
+  const seasons = useSelector((state: AppState) => state.mainData.seasons);
 
   const data = useMemo(() => {
     const matches = [...(matchesData || [])].sort(
@@ -529,6 +573,28 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
       } else break;
     }
 
+    // Season resets. The x axis is match index, not time, so a season start
+    // lands on the first match played after it — matches carry no seasonOrdinal
+    // to key off, and a rank drop can't be used either (losing a tier looks the
+    // same). Seasons only appear here once the client has reported them, so
+    // older boundaries are simply absent rather than guessed at.
+    const seasonDividers: Divider[] = Object.values(seasons)
+      .filter((s) => s.start > 0)
+      .sort((a, b) => a.start - b.start)
+      .map((s) => {
+        const idx = matches.findIndex((m) => m.timestamp >= s.start);
+        return { season: s, idx };
+      })
+      // Not started yet, or began before any match we hold — nothing to divide.
+      .filter(({ idx }) => idx > 0)
+      .map(({ season, idx }) => ({
+        i: idx,
+        label: `Season ${season.ordinal}`,
+        title: `Season ${season.ordinal} started ${new Date(
+          season.start
+        ).toLocaleString()}`,
+      }));
+
     return {
       total,
       wins,
@@ -539,12 +605,13 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
       rankUps,
       deckBands,
       rankBands,
+      seasonDividers,
       decks,
       deckMap,
       streak,
       streakWin,
     };
-  }, [matchesData]);
+  }, [matchesData, seasons]);
 
   if (data.total === 0) {
     return (
@@ -607,6 +674,7 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
               min={0}
               max={100}
               bands={data.deckBands}
+              dividers={data.seasonDividers}
               activeDeck={hoveredDeck}
               onBandHover={setHoveredDeck}
               yTicks={[
@@ -632,6 +700,7 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
                 min={0}
                 max={rankMax}
                 bands={data.rankBands}
+                dividers={data.seasonDividers}
                 activeDeck={hoveredDeck}
                 onBandHover={setHoveredDeck}
                 yTicks={[1, 2, 3, 4, 5, 6].map((cls) => ({
