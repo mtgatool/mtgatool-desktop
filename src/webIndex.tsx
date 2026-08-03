@@ -21,7 +21,9 @@ import getLocalSetting from "./utils/getLocalSetting";
 
 document.title = "MTG Arena Tool";
 
-const history = createBrowserHistory();
+// Reused across hot updates — see the note in electronIndex.tsx.
+const history =
+  window.__mtgaHistory || (window.__mtgaHistory = createBrowserHistory());
 
 defaultLocalSettings();
 mainChannelListeners();

@@ -1,3 +1,6 @@
+// Aliased: the bare name `History` resolves to the DOM's window.history type.
+import type { History as RouterHistory } from "history";
+
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { InventoryInfo } from "../background/onLabel/InStartHook";
 import { OverlayHandler } from "../common/overlayHandler";
@@ -11,6 +14,8 @@ declare global {
     globalStore: any;
     cards: Cards;
     cardsPrev: Cards;
+    /** Router history, parked here so hot updates reuse one instance. */
+    __mtgaHistory?: RouterHistory;
   }
 }
 

@@ -39,7 +39,15 @@ import registerShortcuts from "./utils/registerShortcuts";
 
 const title = getWindowTitle();
 
-const history = createBrowserHistory();
+// Kept on `window` so a hot update reuses the same instance. Re-executing this
+// module would otherwise mint a second history, and React Router v5 refuses to
+// swap the one it listens on ("You cannot change <Router history>") while still
+// handing the new one to useHistory consumers — pushes then move the URL and
+// the router never hears about it, so navigation dies until a full reload with
+// no error to explain it. Identical behaviour in production, where this module
+// only ever runs once.
+const history =
+  window.__mtgaHistory || (window.__mtgaHistory = createBrowserHistory());
 
 if (title == WINDOW_UPDATER) {
   ReactDOM.render(
