@@ -1,4 +1,7 @@
-import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
+import {
+  CombinedRankInfo,
+  rankClass,
+} from "../background/onLabel/InEventGetCombinedRankInfo";
 import globalStore from "../background/store";
 import isElectron from "../utils/electron/isElectron";
 import { isValidRankClass } from "../utils/mtga/rankClasses";
@@ -26,17 +29,29 @@ export default async function readRank(): Promise<
 
     const { constructed: c, limited: l } = ranks;
 
-    // A closed/unreadable game can return a zeroed struct with no error flag
-    // (class comes back as e.g. "Spark"). Reject it so we never clobber a good
-    // stored rank — keep whatever we last read instead.
-    if (!isValidRankClass(c.class) && !isValidRankClass(l.class)) {
+    // mtga-reader's `class` STRING is one rank behind its own `classValue`:
+    // a live read of a Silver player returns { class: "Bronze", classValue: 2 },
+    // and Bronze comes back as { class: "Spark", classValue: 1 }. The enum it
+    // resolves names against has drifted, so the name is off by one across the
+    // board. classValue is correct, so the name is derived from it instead —
+    // which is also what the "Spark" guards below were really working around.
+    const constructedClass = rankClass[c.classValue];
+    const limitedClass = rankClass[l.classValue];
+
+    // A closed/unreadable game can return a zeroed struct with no error flag.
+    // Now that the class comes from classValue, an unreadable process shows up
+    // as a value outside the enum rather than a junk name.
+    if (
+      !isValidRankClass(constructedClass) &&
+      !isValidRankClass(limitedClass)
+    ) {
       return globalStore.rank || undefined;
     }
 
     globalStore.rank = {
       playerId: ranks.playerId || "",
       constructedSeasonOrdinal: c.seasonOrdinal || 0,
-      constructedClass: c.class,
+      constructedClass,
       constructedClassValue: c.classValue,
       constructedLevel: c.level || 0,
       constructedStep: c.step || 0,
@@ -46,7 +61,7 @@ export default async function readRank(): Promise<
       constructedPercentile: parseFloat(c.percentile || "0") || 0,
       constructedLeaderboardPlace: c.leaderboardPlace || 0,
       limitedSeasonOrdinal: l.seasonOrdinal || 0,
-      limitedClass: l.class,
+      limitedClass,
       limitedClassValue: l.classValue,
       limitedLevel: l.level || 0,
       limitedStep: l.step || 0,
