@@ -134,7 +134,18 @@ function start({
         Math.min(size - position, chunkSize)
       );
       const text = stringDecoder.write(buffer);
-      logDecoder.append(text, (entry: any) => onLogEntry({ ...entry, size }));
+      // One bad entry must not stop the reader. A handler that throws would
+      // otherwise escape the loop before `position` advances, so the next pass
+      // re-reads the same chunk and throws again — the log is never read past
+      // that byte, and every match after it is silently missed. Arena changes
+      // its payload shapes without warning, so this has to be per-entry.
+      logDecoder.append(text, (entry: any) => {
+        try {
+          onLogEntry({ ...entry, size });
+        } catch (e) {
+          console.error(`[log] handler failed for "${entry?.label}":`, e);
+        }
+      });
       // eslint-disable-next-line require-atomic-updates
       position += buffer.length;
     }

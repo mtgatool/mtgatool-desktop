@@ -8,7 +8,11 @@ interface Entry extends LogEntry {
 
 export default function InDeckGetDeckListsV3(entry: Entry): void {
   const { json } = entry;
-  if (json.length == 0) return;
+  // Arena does not always send an array here any more. `json.length` is then
+  // undefined, which slips past a `== 0` check and blows up on forEach — and a
+  // throwing handler used to wedge the whole log reader (see
+  // arena-log-watcher's append callback).
+  if (!Array.isArray(json) || json.length == 0) return;
 
   json.forEach((_d) => {
     //   const deck = convertDeckFromV3(d);
