@@ -14,6 +14,7 @@ import {
   requestPasswordReset,
   resetPasswordWithCode,
 } from "../data/passwordReset";
+import syncMatches from "../data/syncMatches";
 import UICheckAdmin from "../reader/uiCheckAdmin";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
@@ -174,6 +175,12 @@ export default function Auth(props: AuthProps) {
     return hydrateFromCloud()
       .then(() => localLogin())
       .then(() => {
+        // Auto-login (App.tsx) reconciles here too. Without it a manual login
+        // only ever reached syncMatches via the persona-detected path, which
+        // waits on the log read — so a fresh login showed every match with the
+        // "not uploaded" arrow until then, and a restart appeared to fix it.
+        syncMatches().catch(() => undefined);
+
         if (electron) {
           postChannelMessage({
             type: "START_LOG_READING",

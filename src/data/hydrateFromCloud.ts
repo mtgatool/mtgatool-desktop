@@ -11,7 +11,9 @@
  * It writes KV only; the existing localLogin() then mirrors KV into Redux.
  * No-op offline, and never throws (best-effort, like the push layer).
  */
+import reduxAction from "../redux/reduxAction";
 import { CustomBackground } from "../redux/slices/rendererSlice";
+import store from "../redux/stores/rendererStore";
 import { Cards, InternalMatch } from "../types";
 import {
   DbCardsData,
@@ -31,9 +33,9 @@ import {
   materialize,
   saveLocalBackground,
 } from "./backgroundStore";
-import { isCloudActive } from "./cloudSync";
-import { getDeletedMatchIds } from "./deletedMatches";
-import { getData, putData } from "./store";
+import { fetchDeletedMatchIds, isCloudActive } from "./cloudSync";
+import { addDeletedMatchId, getDeletedMatchIds } from "./deletedMatches";
+import { getData, LOCAL_KEY, putData } from "./store";
 import supabase from "./supabase";
 import { DbDecksData } from "./upsertDbDecks";
 
@@ -94,9 +96,18 @@ export default async function hydrateFromCloud(): Promise<void> {
     );
 
     // Matches — add only the ones we don't already have locally, and never
-    // resurrect one the user deleted (the remote delete may still be pending,
-    // or have happened on another device).
+    // resurrect one the user deleted. The cloud tombstones are merged in first
+    // because a fresh device has no local ones at all: without them this would
+    // happily restore everything the account has ever deleted.
+    const cloudDeleted = await fetchDeletedMatchIds();
+    const knownDeleted = await getDeletedMatchIds();
+    await Promise.all(
+      [...cloudDeleted]
+        .filter((id) => !knownDeleted.has(id))
+        .map((id) => addDeletedMatchId(id))
+    );
     const deletedMatches = await getDeletedMatchIds();
+
     await Promise.all(
       (matches.data ?? []).map(async (r) => {
         if (deletedMatches.has(r.match_id)) return;
@@ -122,6 +133,21 @@ export default async function hydrateFromCloud(): Promise<void> {
         if (!userids[r.arena_id]) userids[r.arena_id] = ms(r.played_at);
       })
     );
+
+    // Everything the cloud holds is by definition already synced, so mark it as
+    // such now. Otherwise `remoteMatchesIndex` stays empty until syncMatches
+    // happens to run, and the whole history renders with the "not uploaded"
+    // arrow over matches that were literally just pulled down from the cloud.
+    const syncedKeys = (matches.data ?? [])
+      .map((r) => r.match_id)
+      .filter((id) => !deletedMatches.has(id))
+      .map((id) => `:${LOCAL_KEY}.matches-${id}`);
+    if (syncedKeys.length) {
+      reduxAction(store.dispatch, {
+        type: "SET_REMOTE_MATCHES_INDEX",
+        arg: syncedKeys,
+      });
+    }
 
     // Collection.
     await Promise.all(

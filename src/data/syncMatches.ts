@@ -13,15 +13,17 @@ import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import { DbMatch } from "../types/dbTypes";
 import getLocalSetting from "../utils/getLocalSetting";
+import globalData from "../utils/globalData";
 import {
   deleteRemoteMatch,
+  fetchDeletedMatchIds,
   fetchRemoteMatchIds,
   isCloudActive,
   pushMatch,
 } from "./cloudSync";
-import { getDeletedMatchIds } from "./deletedMatches";
+import { addDeletedMatchId, getDeletedMatchIds } from "./deletedMatches";
 import { kvGet } from "./localKV";
-import { LOCAL_KEY, queryKeys } from "./store";
+import { deleteData, LOCAL_KEY, queryKeys } from "./store";
 
 /** The key the history UI compares against `remoteMatchesIndex`. */
 function matchKey(matchId: string): string {
@@ -32,19 +34,50 @@ function matchKey(matchId: string): string {
 export default async function syncMatches(): Promise<number> {
   if (!(await isCloudActive())) return 0;
 
-  const [remote, localKeys] = await Promise.all([
+  const [remote, localKeys, cloudDeleted] = await Promise.all([
     fetchRemoteMatchIds(),
     queryKeys("matches-", true),
+    fetchDeletedMatchIds(),
   ]);
 
+  // Union of what this device deleted and what any other device deleted. Local
+  // tombstones alone are not enough: a match deleted on another device is still
+  // sitting in this one's KV, and without knowing it was deleted we'd push it
+  // back to the cloud and resurrect it everywhere.
+  const deleted = await getDeletedMatchIds();
+  const fresh = [...cloudDeleted].filter((id) => !deleted.has(id));
+  await Promise.all(fresh.map((id) => addDeletedMatchId(id)));
+
+  // Drop any local copy of a match deleted elsewhere, so this device stops
+  // showing it and stops offering it back to the cloud.
+  const removedKeys: string[] = [];
+  await Promise.all(
+    [...deleted].map(async (id) => {
+      const key = matchKey(id);
+      if (!(localKeys ?? []).includes(key)) return;
+      await deleteData(`matches-${id}`, true);
+      removedKeys.push(key);
+    })
+  );
+  if (removedKeys.length) {
+    globalData.matchesIndex = globalData.matchesIndex.filter(
+      (k) => !removedKeys.includes(k)
+    );
+    reduxAction(store.dispatch, {
+      type: "REMOVE_MATCHES_FROM_INDEX",
+      arg: removedKeys,
+    });
+  }
+
   const localMatches = (
-    await Promise.all((localKeys ?? []).map((k) => kvGet<DbMatch>(k)))
+    await Promise.all(
+      (localKeys ?? [])
+        .filter((k) => !removedKeys.includes(k))
+        .map((k) => kvGet<DbMatch>(k))
+    )
   ).filter((m): m is DbMatch => !!m && !!m.matchId);
 
-  // Deleted matches are gone locally, so they'd otherwise look like a cloud row
-  // we're missing on the *next* hydrate. Push the deletion instead — this is
-  // also the retry path for a delete made while offline.
-  const deleted = await getDeletedMatchIds();
+  // Retry path for a delete made while offline: the row may still be up there.
   await Promise.all(
     [...deleted]
       .filter((id) => remote.has(id))

@@ -42,6 +42,24 @@ export type Database = {
         };
         Relationships: [];
       };
+      deleted_matches: {
+        Row: {
+          deleted_at: string;
+          match_id: string;
+          user_id: string;
+        };
+        Insert: {
+          deleted_at?: string;
+          match_id: string;
+          user_id: string;
+        };
+        Update: {
+          deleted_at?: string;
+          match_id?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       auth_recovery: {
         Row: {
           email: string;

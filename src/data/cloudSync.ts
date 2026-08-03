@@ -180,6 +180,51 @@ export async function deleteRemoteMatch(matchId: string): Promise<boolean> {
   }
 }
 
+/**
+ * Record that a match was deleted, so every other device learns about it.
+ * Without this the tombstone stays local and any device still holding the
+ * match re-pushes it on its next sync — see the deleted_matches migration.
+ */
+export async function pushDeletedMatch(matchId: string): Promise<boolean> {
+  try {
+    const userId = await getActiveUserId();
+    if (!userId || !matchId) return false;
+    const { error } = await supabase
+      .from("deleted_matches")
+      .upsert(
+        { user_id: userId, match_id: matchId },
+        { onConflict: "user_id,match_id" }
+      );
+    if (error) {
+      console.error("[cloudSync] pushDeletedMatch:", error.message);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error("[cloudSync] pushDeletedMatch threw:", e);
+    return false;
+  }
+}
+
+/** Match ids this account has deleted anywhere. Empty offline or on error. */
+export async function fetchDeletedMatchIds(): Promise<Set<string>> {
+  try {
+    const userId = await getActiveUserId();
+    if (!userId) return new Set();
+    const { data, error } = await supabase
+      .from("deleted_matches")
+      .select("match_id");
+    if (error) {
+      console.error("[cloudSync] fetchDeletedMatchIds:", error.message);
+      return new Set();
+    }
+    return new Set((data ?? []).map((r) => r.match_id));
+  } catch (e) {
+    console.error("[cloudSync] fetchDeletedMatchIds threw:", e);
+    return new Set();
+  }
+}
+
 export async function pushCollection(
   arenaId: string,
   cards: Cards,

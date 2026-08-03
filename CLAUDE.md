@@ -94,6 +94,94 @@ codesign -s - -f --deep --entitlements entitlements.mac.plist \
 
 Without it the reader fails and Settings reports it can't read MTGA's memory.
 
+## Debugging a running dev app (renderer consoles + live eval)
+
+The app is three renderer windows — **main**, **background** (log watcher, GRE
+parser, Supabase Realtime) and **hover** — and each sends `console.log` only to
+its own DevTools. None of it reaches the terminal, so `npm run start` shows you
+the CRA dev server and the Electron **main process** only. Everything
+interesting (`setDbMatch`, `src/reader/*`, the log watcher) is invisible by
+default.
+
+`scripts/cdp-console.js` attaches to all three over the Chrome DevTools
+Protocol. Start the app with the port open, then:
+
+```bash
+MTGA_DEBUG_PORT=9222 npm run start
+
+node scripts/cdp-console.js                    # stream every window
+node scripts/cdp-console.js --all              # ...including build noise
+node scripts/cdp-console.js --list             # which windows are attached
+node scripts/cdp-console.js --window bg --eval "globalData.matchesIndex.length"
+```
+
+**`--eval` is the valuable half**: it runs arbitrary JS inside a window and
+returns the result. `window.store` is exposed (`redux/stores/rendererStore`), so
+live Redux state is one command away, as is IndexedDB:
+
+```bash
+# what the history list is actually rendering from
+node scripts/cdp-console.js --window main --eval \
+  "(() => { const s = store.getState().mainData; return { matches: s.matchesIndex.length, remote: s.remoteMatchesIndex.length }; })()"
+```
+
+Run it in the background (`run_in_background`) and read the output file as the
+session goes — no copy-pasting console output.
+
+Things that will bite you if you touch this script:
+
+- **CDP reports the *page* title, which is useless here.** All three windows
+  load the same URL and never set `document.title`, so every target comes back
+  as `localhost:3001`. The app keys its role off the *BrowserWindow* title
+  (`src/utils/electron/getWindowTitle`), reachable only from inside the
+  renderer — hence the script asks each window via
+  `require('@electron/remote').getCurrentWindow().getTitle()`. Also filter out
+  `chrome-extension://` targets or the React/Redux devtools show up as windows.
+- **`Runtime.enable` replays the window's buffered console history**, so stamp
+  events with `params.timestamp`, not `Date.now()`, or a whole boot sequence
+  looks simultaneous. Enable it *after* resolving the label, or the backlog
+  lands under a placeholder.
+- The CRA dev server echoes every scss warning into all three windows; that's
+  what the default noise filter drops.
+
+The port is gated on `!app.isPackaged && MTGA_DEBUG_PORT` (`public/electron.js`).
+The env var alone is not enough — otherwise anyone could set it before launching
+an installed copy and get arbitrary code execution inside the app.
+
+### Wiping local state to retest a fresh login
+
+Settings and the Supabase session live in `localStorage`; everything else is in
+IndexedDB `mtgatool-local`. All three windows share the origin, so clearing from
+one clears for all. Clear the object *store* rather than deleting the database —
+the background window holds an open connection and `deleteDatabase` blocks on it.
+
+```bash
+node scripts/cdp-console.js --window main --eval "(async () => { \
+  const db = await new Promise((res,rej)=>{const q=indexedDB.open('mtgatool-local',1); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error);}); \
+  await new Promise((res,rej)=>{const tx=db.transaction('kv','readwrite'); const r=tx.objectStore('kv').clear(); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error);}); \
+  localStorage.clear(); return 'cleared'; })()"
+```
+
+Dropping `autoLogin` sends the app to `/auth`, i.e. the **manual** login path —
+which is not the same code as auto-login and has had its own bugs.
+
+### Worked example
+
+Two long-standing bugs were found this way in one sitting, and both diagnoses
+came from reading state rather than guessing:
+
+- *Every match showed the "not uploaded" arrow after a fresh login, but not
+  after a restart.* `--eval` showed `remoteMatchesIndex` empty while
+  `matchesIndex` was full; grepping `syncMatches` call sites showed the manual
+  login path never called it, while auto-login did.
+- *Deleted matches kept coming back.* The console said nothing, but the
+  Supabase MCP showed seven rows whose `created_at` was minutes ago and
+  `played_at` weeks ago — another device re-pushing matches it never knew were
+  deleted, because tombstones were local-only.
+
+Pair the CDP tooling with the Supabase MCP: the client tells you what the app
+believes, the database tells you what actually happened.
+
 ## Reader notes
 
 - `isAdmin()` means **"can we read game memory"**, not "are we root" — on macOS it

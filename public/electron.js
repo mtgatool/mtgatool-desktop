@@ -34,6 +34,20 @@ app.commandLine.appendSwitch("disable-background-timer-throttling");
 app.commandLine.appendSwitch("disable-renderer-backgrounding");
 app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
 
+// Opt-in Chrome DevTools Protocol endpoint, so the renderer windows can be read
+// and driven from outside the app — see scripts/cdp-console.js. Renderer
+// console output otherwise only ever reaches that window's own DevTools.
+//
+// Requires BOTH an unpackaged build and the env var. An open debugging port
+// lets any local process execute arbitrary code inside the app, so the env var
+// alone is not enough — otherwise anyone could set it before launching an
+// installed copy and get a shell into it. Chromium binds it to 127.0.0.1 only.
+const debugPort = !app.isPackaged && process.env.MTGA_DEBUG_PORT;
+if (debugPort) {
+  app.commandLine.appendSwitch("remote-debugging-port", debugPort);
+  console.log(`[cdp] devtools protocol on http://127.0.0.1:${debugPort}`);
+}
+
 function quit() {
   app.quit();
   app.exit();

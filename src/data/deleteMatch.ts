@@ -9,7 +9,7 @@
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import globalData from "../utils/globalData";
-import { deleteRemoteMatch } from "./cloudSync";
+import { deleteRemoteMatch, pushDeletedMatch } from "./cloudSync";
 import { addDeletedMatchId } from "./deletedMatches";
 import { deleteData, getUserNamespacedKey } from "./store";
 
@@ -33,5 +33,9 @@ export default async function deleteMatch(matchId: string): Promise<void> {
     arg: [storedKey],
   });
 
+  // Both halves matter. Removing the row alone is not enough: any other device
+  // still holding this match would see the cloud "missing" it and push it back.
+  // The tombstone is what tells them it was deleted on purpose.
+  await pushDeletedMatch(matchId);
   await deleteRemoteMatch(matchId);
 }
