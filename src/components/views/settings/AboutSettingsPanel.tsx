@@ -6,6 +6,11 @@ import { AppState } from "../../../redux/stores/rendererStore";
 import database from "../../../utils/mtga/database";
 import openExternal from "../../../utils/openExternal";
 
+const METADATA_RELEASES =
+  "https://github.com/mtgatool/mtgatool-metadata/releases";
+
+const PRIVACY_POLICY = "https://mtgatool.com/docs/privacy";
+
 export default function AboutSettingsPanel(): JSX.Element {
   const updateState = useSelector(
     (state: AppState) => state.renderer.updateState
@@ -30,26 +35,43 @@ export default function AboutSettingsPanel(): JSX.Element {
         {`Version ${info.version}`}
       </div>
       {database.metadata ? (
-        <div className="message-sub15">
-          Metadata: v{database.metadata.version || "???"} ({database.lang}),
-          updated{" "}
-          {database.metadata.updated
-            ? format(fromUnixTime(database.metadata.updated / 1000), "Pp")
-            : "???"}
-        </div>
+        <>
+          <div
+            className="message-sub15 release-notes-link"
+            onClick={(): void => {
+              openExternal(
+                database.metadata?.version
+                  ? `${METADATA_RELEASES}/tag/v${database.metadata.version}`
+                  : `${METADATA_RELEASES}/latest`
+              );
+            }}
+          >
+            {`Metadata v${database.metadata.version || "???"} (${
+              database.lang
+            })`}
+          </div>
+          <div className="message-sub15">
+            Updated{" "}
+            {database.metadata.updated
+              ? format(fromUnixTime(database.metadata.updated / 1000), "Pp")
+              : "???"}
+          </div>
+        </>
       ) : (
         <></>
       )}
-      <div className="message-updates green">{updateState || "-"}</div>
+      {/* Rendered only when there is something to say; it previously showed a
+          bare "-" placeholder whenever no update was in progress. */}
+      {updateState ? (
+        <div className="message-updates green">{updateState}</div>
+      ) : (
+        <></>
+      )}
 
       <div style={{ margin: "16px auto 0px auto" }} className="flex-item">
         <div
           className="discord-link"
           onClick={(): void => openExternal("https://discord.gg/K9bPkJy")}
-        />
-        <div
-          className="twitter-link"
-          onClick={(): void => openExternal("https://twitter.com/mtgatool")}
         />
         <div
           className="git-link"
@@ -74,6 +96,13 @@ export default function AboutSettingsPanel(): JSX.Element {
           title="Patreon"
           onClick={(): void => openExternal("https://www.patreon.com/mtgatool")}
         />
+      </div>
+      <div
+        style={{ margin: "24px auto 0px auto" }}
+        className="message-sub15 link"
+        onClick={(): void => openExternal(PRIVACY_POLICY)}
+      >
+        Privacy Policy
       </div>
     </div>
   );
