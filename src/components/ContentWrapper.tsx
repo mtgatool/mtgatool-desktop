@@ -76,7 +76,21 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   const workerRef = useRef<Worker | null>(null);
 
   useEffect(() => {
-    workerRef.current = new Worker("cards-worker/index.js", { type: "module" });
+    // index.html carries `<base href="./">`, so a relative worker URL resolves
+    // against the CURRENT ROUTE rather than the app root. Loading /collection/
+    // directly asked for /collection/cards-worker/index.js, which does not
+    // exist, so the SPA fallback answered with index.html — and a module worker
+    // refuses text/html ("Failed to load module script: ... non-JavaScript MIME
+    // type"). The worker never started and the collection page stayed empty.
+    // It only breaks on a direct load or refresh of a nested route; arriving
+    // from "/" resolves correctly, which is why it survived this long.
+    //
+    // Anchored to the origin on web. Electron is left exactly as it was: it
+    // loads from file://, where an origin-absolute URL would not resolve.
+    const workerUrl = isElectron()
+      ? "cards-worker/index.js"
+      : `${window.location.origin}/cards-worker/index.js`;
+    workerRef.current = new Worker(workerUrl, { type: "module" });
   }, []);
 
   const os = forceOs || (isElectron() ? process.platform : "");
