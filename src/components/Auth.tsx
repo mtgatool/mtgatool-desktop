@@ -7,7 +7,9 @@ import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
 import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { LOGIN_AUTH, LOGIN_OK, LOGIN_WAITING } from "../constants";
+import claimLocalStore from "../data/claimLocalStore";
 import { cloudLogin, cloudSignup } from "../data/cloudAuth";
+import { getActiveUserId } from "../data/cloudSync";
 import hydrateFromCloud from "../data/hydrateFromCloud";
 import localLogin from "../data/localLogin";
 import {
@@ -170,9 +172,17 @@ export default function Auth(props: AuthProps) {
       type: "SET_OFFLINE",
       arg: getLocalSetting("autoLogin") !== "true",
     });
-    // Pull cloud data down first (no-op offline) so a fresh device restores
-    // its matches/decks/collection/rank before localLogin mirrors KV -> Redux.
-    return hydrateFromCloud()
+    // Claim the local store BEFORE hydrating: if it belongs to another account
+    // it is wiped here, and doing that after the pull would delete the data we
+    // just fetched. Without it, syncMatches below would upload the previous
+    // account's history to this one.
+    return getActiveUserId()
+      .then(claimLocalStore)
+      .then(() =>
+        // Pull cloud data down first (no-op offline) so a fresh device restores
+        // its matches/decks/collection/rank before localLogin mirrors KV -> Redux.
+        hydrateFromCloud()
+      )
       .then(() => localLogin())
       .then(() => {
         // Auto-login (App.tsx) reconciles here too. Without it a manual login
