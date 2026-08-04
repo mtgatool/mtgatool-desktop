@@ -74,6 +74,17 @@ export function getCardImage(
     }&version=${quality}`;
   }
 
+  // Arena reports no collector number for ~98 cards — almost all of them
+  // Special Guests, where the set DOES resolve, so none of the fallbacks above
+  // catch it and the URL ends up as `/cards/spg/0`. That is why Chrome Mox had
+  // no art. Look it up by name instead, keeping the set constraint when we
+  // actually resolved one so the right printing still wins.
+  if (!cardObj?.CollectorNumber || `${cardObj.CollectorNumber}` === "0") {
+    finalUrl = `https://api.scryfall.com/cards/named?exact="${replaceName}"${
+      setName ? `&set=${set}` : ""
+    }&format=image${isDfc ? `&face=back` : ""}&version=${quality}`;
+  }
+
   return encodeURI(finalUrl);
 }
 

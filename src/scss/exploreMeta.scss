@@ -1,0 +1,188 @@
+@import "./misc.scss";
+
+// Explore uses two grids: one for the aggregated decks, one for the opponent
+// meta. Both auto-fill, so the number of columns follows the window rather than
+// being a fixed count.
+
+.explore-deck-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  width: 100%;
+}
+
+// Deck detail: the list, and the versions panel beside it.
+// The list keeps the deck-image popup's 480px width rather than stretching, so
+// it reads the same way; the versions panel sits beside it and the pair is
+// centred instead of the list being pulled wide.
+.explore-deck-detail {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 512px) 260px;
+  justify-content: center;
+  margin: 16px 0 24px;
+
+  @media screen and (max-width: 900px) {
+    grid-template-columns: minmax(0, 512px);
+  }
+}
+
+.explore-deck-sheet {
+  margin: 8px auto 0;
+  max-width: 480px;
+  width: 100%;
+}
+
+.explore-version {
+  @include animated;
+  background: none;
+  border: none;
+  border-left: 2px solid transparent;
+  color: var(--color-text-dark);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font: inherit;
+  gap: 2px;
+  padding: 8px 10px;
+  text-align: left;
+  width: 100%;
+
+  &:hover {
+    background-color: var(--color-section-hover);
+    color: var(--color-text);
+  }
+}
+
+.explore-version-on {
+  background-color: var(--color-section-active);
+  border-left-color: var(--color-link);
+  color: var(--color-text);
+}
+
+.explore-version-name {
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.explore-version-n {
+  color: var(--color-text-dark);
+  font-size: 12px;
+}
+
+.explore-meta-note {
+  color: var(--color-text-dark);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.explore-meta-sorts {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.explore-meta-sorts-label {
+  color: var(--color-text-dark);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.explore-meta-sort {
+  background: none;
+  border: none;
+  border-bottom: 1px solid transparent;
+  color: var(--color-text-dark);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  padding: 0 0 2px;
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+.explore-meta-sort-on {
+  border-bottom-color: var(--color-link);
+  color: var(--color-text);
+}
+
+.explore-meta-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  width: 100%;
+}
+
+// Card art carries identity; the body under it carries the numbers, so nothing
+// has to be squeezed into the art itself.
+.explore-meta-tile {
+  @include animated;
+  background-color: var(--color-section);
+  border-radius: 4px;
+  overflow: hidden;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}
+
+.explore-meta-tile-art {
+  background-position: center 30%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 90px;
+  width: 100%;
+}
+
+.explore-meta-tile-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px 10px;
+}
+
+.explore-meta-tile-name {
+  color: var(--color-text);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Recessive track, single-hue fill: the bar encodes presence only.
+.explore-meta-tile-bar {
+  background-color: var(--color-dark);
+  border-radius: 3px;
+  height: 6px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.explore-meta-tile-bar-fill {
+  background-color: var(--color-link);
+  border-radius: 3px;
+  height: 100%;
+  min-width: 2px;
+}
+
+.explore-meta-tile-stats {
+  align-items: baseline;
+  display: flex;
+  font-size: 12px;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.explore-meta-tile-presence {
+  color: var(--color-text);
+  font-size: 15px;
+}
+
+.explore-meta-tile-n {
+  color: var(--color-text-dark);
+}

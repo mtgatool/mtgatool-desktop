@@ -4,34 +4,81 @@ import { useHistory, useParams } from "react-router-dom";
 import fetchExploreDecks, {
   ExploreDeckRow as Row,
 } from "../../../data/fetchExploreDecks";
+import {
+  ExploreMetaEventRow,
+  fetchExploreMetaEvents,
+} from "../../../data/fetchExploreMeta";
+import useCardDatabaseVersion from "../../../hooks/useCardDatabaseVersion";
+import { clusterBySimilarity, deckVector } from "../../../utils/deckSimilarity";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import Button from "../../ui/Button";
 import Section from "../../ui/Section";
 import ExploreDeckRow from "./ExploreDeckRow";
+import ExploreMetaCards from "./ExploreMetaCards";
 
 export default function ViewExploreEvent(): JSX.Element {
   const params = useParams<{ id: string }>();
   const history = useHistory();
   const [rows, setRows] = useState<Row[] | null>(null);
+  const [event, setEvent] = useState<ExploreMetaEventRow | undefined>();
 
   useEffect(() => {
     let alive = true;
     fetchExploreDecks(params.id).then((r) => {
       if (alive) setRows(r);
     });
+    fetchExploreMetaEvents().then((events) => {
+      if (alive) setEvent(events.find((e) => e.event_id === params.id));
+    });
     return () => {
       alive = false;
     };
   }, [params.id]);
 
-  // Best decks first, then most-played.
-  const decks = useMemo(
-    () =>
-      [...(rows || [])].sort(
-        (a, b) => b.winrate - a.winrate || b.games - a.games
-      ),
-    [rows]
-  );
+  const dbVersion = useCardDatabaseVersion();
+
+  // Near-identical lists are merged into one entry before ranking: without it a
+  // deck that was tweaked between sessions appears several times over, each copy
+  // holding too few games to say anything. The most-played list in a group
+  // represents it, and its games/wins are the group's total.
+  //
+  // `pilots` is deliberately not summed — the view exposes counts, not user ids,
+  // so the same person's two lists cannot be told from two people's. The number
+  // of versions is shown instead, and pilots falls back to the largest single
+  // list's count, which is a floor rather than a guess.
+  const decks = useMemo(() => {
+    const all = rows || [];
+    if (!dbVersion || all.length === 0) return all;
+
+    const vectors = all.map((row) => deckVector(row.deck?.mainDeck));
+
+    return clusterBySimilarity(vectors)
+      .map((group) => {
+        const members = group
+          .map((i) => all[i])
+          .sort((a, b) => b.games - a.games);
+        const lead = members[0];
+        if (members.length === 1) return { ...lead, versions: 1 };
+
+        const games = members.reduce((sum, m) => sum + m.games, 0);
+        const wins = members.reduce((sum, m) => sum + m.wins, 0);
+        const losses = members.reduce((sum, m) => sum + m.losses, 0);
+        return {
+          ...lead,
+          games,
+          wins,
+          losses,
+          winrate: games ? (wins / games) * 100 : 0,
+          pilots: Math.max(...members.map((m) => m.pilots)),
+          versions: members.length,
+          last_played: members
+            .map((m) => m.last_played)
+            .sort()
+            .reverse()[0],
+        };
+      })
+      .sort((a, b) => b.winrate - a.winrate || b.games - a.games);
+  }, [rows, dbVersion]);
 
   return (
     <div style={{ padding: "0 16px" }}>
@@ -83,14 +130,18 @@ export default function ViewExploreEvent(): JSX.Element {
             flexDirection: "column",
           }}
         >
-          <div className="separator-title" style={{ marginBottom: "8px" }}>
+          <div className="separator-title" style={{ marginBottom: "12px" }}>
             Decks by win rate — click to see the list
           </div>
-          {decks.map((row) => (
-            <ExploreDeckRow key={row.deck_hash} row={row} />
-          ))}
+          <div className="explore-deck-grid">
+            {decks.map((row) => (
+              <ExploreDeckRow key={row.deck_hash} row={row} />
+            ))}
+          </div>
         </Section>
       )}
+
+      <ExploreMetaCards eventId={params.id} event={event} />
     </div>
   );
 }
