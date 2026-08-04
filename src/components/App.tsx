@@ -9,7 +9,9 @@ import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import overlayHandler from "../common/overlayHandler";
 import { LOGIN_OK } from "../constants";
 import { loadLocalBackground } from "../data/backgroundStore";
+import claimLocalStore from "../data/claimLocalStore";
 import { getCloudSession } from "../data/cloudAuth";
+import { getActiveUserId } from "../data/cloudSync";
 import hydrateFromCloud from "../data/hydrateFromCloud";
 import localLogin from "../data/localLogin";
 import syncMatches from "../data/syncMatches";
@@ -104,9 +106,17 @@ function App(props: AppProps) {
             history.push("/auth");
             return undefined;
           }
-          // Pull cloud data down first (no-op offline), then localLogin mirrors
-          // the restored KV into Redux.
-          return hydrateFromCloud()
+          // Claim the local store BEFORE hydrating: if it belongs to another
+          // account it is wiped here, and doing that after the pull would delete
+          // the data we just fetched. Without it, syncMatches below would upload
+          // the previous account's history to this one.
+          return getActiveUserId()
+            .then(claimLocalStore)
+            .then(() =>
+              // Pull cloud data down first (no-op offline), then localLogin
+              // mirrors the restored KV into Redux.
+              hydrateFromCloud()
+            )
             .then(() => localLogin())
             .then(() => {
               reduxAction(dispatch, {

@@ -47,7 +47,7 @@ function collectionFingerprint(cards: Cards): string {
 }
 
 /** The logged-in cloud user's id, or null in local/offline mode. */
-async function getActiveUserId(): Promise<string | null> {
+export async function getActiveUserId(): Promise<string | null> {
   try {
     const { data } = await supabase.auth.getSession();
     return data.session?.user?.id ?? null;
