@@ -116,4 +116,13 @@ export class DatabaseClass {
   }
 }
 
-export default DatabaseClass.getInstance();
+const database = DatabaseClass.getInstance();
+
+// Dev-only handle, same idea as `window.store`: the card metadata is a module
+// singleton with no other way in, so debugging "why did this grpId not render"
+// otherwise means editing code. Never exposed in a packaged build.
+if (process.env.NODE_ENV === "development") {
+  (window as any).__db = database;
+}
+
+export default database;

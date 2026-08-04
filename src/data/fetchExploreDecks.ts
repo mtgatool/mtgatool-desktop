@@ -4,9 +4,10 @@
  *
  * Reads the `explore_decks` materialized view — cross-user, deck-level
  * aggregates grouped by deck hash per event, exposing only aggregates (winrate,
- * games, distinct pilots, colors, a representative decklist). A deck only
- * appears once it has >= 10 matches from >= 2 pilots, so no individual's data
- * is ever surfaced. The view is refreshed hourly by pg_cron.
+ * games, distinct pilots, colors, a representative decklist). A deck appears
+ * once it has >= 5 matches; `pilots` is often 1, since at current volume players
+ * iterate on their own lists rather than sharing them. The view is refreshed
+ * hourly by pg_cron.
  */
 import { InternalDeck } from "../types";
 import supabase from "./supabase";
@@ -22,6 +23,11 @@ export interface ExploreDeckRow {
   colors: number | null;
   last_played: string | null;
   deck: InternalDeck;
+  /**
+   * Number of near-identical lists merged into this entry, added client-side by
+   * the Explore view (see `utils/deckSimilarity`). Absent on the raw view rows.
+   */
+  versions?: number;
 }
 
 export default async function fetchExploreDecks(
