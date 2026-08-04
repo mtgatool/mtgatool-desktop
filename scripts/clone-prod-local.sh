@@ -83,7 +83,9 @@ echo
                  union all select 'meta cards', count(*) from public.explore_meta_cards;"
 
 ANON=$(npx supabase status -o json 2>/dev/null | sed -n 's/.*"ANON_KEY": *"\([^"]*\)".*/\1/p')
-echo "Run the UI against it with:"
-echo "  REACT_APP_SUPABASE_URL=http://127.0.0.1:54321 \\"
-echo "  REACT_APP_SUPABASE_KEY=$ANON \\"
-echo "  npm run start:web"
+echo "To point the UI at it, put these in .env.local (gitignored — see"
+echo ".env.local.example) and restart the dev server. They are inlined at build"
+echo "time, so a server that is already running will not pick them up:"
+echo
+echo "  REACT_APP_SUPABASE_URL=http://127.0.0.1:54321"
+echo "  REACT_APP_SUPABASE_KEY=$ANON"
