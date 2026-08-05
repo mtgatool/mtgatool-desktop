@@ -56,6 +56,10 @@ export default function createPostMatchWindow(): void {
     width: 620,
     height: 800,
     resizable: true,
+    // The layout adapts down to roughly half size; past this the bars stop
+    // being readable at all, so the window refuses rather than degrading.
+    minWidth: 320,
+    minHeight: 380,
     alwaysOnTop: false,
     webPreferences: {
       webSecurity: false,

@@ -352,3 +352,120 @@
     background: linear-gradient(to bottom, #c76a4c, var(--color-r));
   }
 }
+
+// --- narrow / short windows ------------------------------------------------
+//
+// The window is resizable and people shrink it. Everything here still fits at
+// half size; what gives way first is the banner and the timeline, which are
+// the two blocks holding height they don't need, and the per-block life
+// numbers, which stop being legible long before the blocks themselves do.
+//
+// The window itself is clamped (minWidth/minHeight in createPostMatchWindow),
+// so these are the smallest cases that can actually be reached.
+
+@media (max-width: 480px) {
+  .postmatch-mvp {
+    height: 96px;
+  }
+
+  .postmatch-mvp-name {
+    font-size: 17px;
+  }
+
+  .postmatch-header {
+    padding: 10px 12px 4px 12px;
+  }
+
+  .postmatch-name {
+    font-size: 13px;
+  }
+
+  .postmatch-result {
+    font-size: 24px;
+  }
+
+  .postmatch-duration {
+    font-size: 15px;
+  }
+
+  .postmatch-badges {
+    padding: 8px 10px 4px 10px;
+  }
+
+  .postmatch-badges-side {
+    gap: 14px;
+  }
+
+  .postmatch-badge-art {
+    width: 42px;
+    height: 42px;
+  }
+
+  .postmatch-stat {
+    padding: 6px 12px 0 12px;
+  }
+
+  .postmatch-timeline {
+    height: 96px;
+  }
+
+  // Below roughly 30px a block cannot hold two digits; the widths still carry
+  // the shape, and the tooltip still carries the number.
+  .postmatch-life-block span {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .postmatch-mvp {
+    height: 78px;
+  }
+
+  .postmatch-mvp-name {
+    font-size: 15px;
+  }
+
+  .postmatch-badge-art {
+    width: 34px;
+    height: 34px;
+  }
+
+  .postmatch-badges-side {
+    gap: 10px;
+  }
+
+  .postmatch-stat-bar,
+  .postmatch-life-bar {
+    height: 18px;
+  }
+
+  .postmatch-timeline {
+    height: 78px;
+  }
+}
+
+// Short windows: the banner and timeline are the only blocks with height to
+// give back, and giving it keeps the stat bars on screen without scrolling.
+@media (max-height: 640px) {
+  .postmatch-mvp {
+    height: 88px;
+  }
+
+  .postmatch-timeline {
+    height: 88px;
+  }
+}
+
+@media (max-height: 460px) {
+  .postmatch-mvp {
+    height: 66px;
+  }
+
+  .postmatch-timeline {
+    height: 64px;
+  }
+
+  .postmatch-stat {
+    padding: 4px 12px 0 12px;
+  }
+}
