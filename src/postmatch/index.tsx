@@ -97,7 +97,12 @@ export default function PostMatch(): JSX.Element {
   const CloseSVG = process.platform === "darwin" ? MacClose : WinClose;
   const rootClass = `postmatch-root${transparent ? " frameless" : ""}`;
 
-  const chrome = transparent ? (
+  // The close button has to live *inside* the draggable panel, not beside it:
+  // the no-drag carve-out is applied to elements within the drag region, so a
+  // sibling laid over the top keeps rendering and hit-testing normally in the
+  // page while the window drag swallows the actual click. Positioned fixed so
+  // it stays put while the panel scrolls under it.
+  const closeButton = transparent ? (
     <div
       className={`postmatch-close ${
         process.platform === "darwin" ? "mac" : "win"
@@ -107,9 +112,9 @@ export default function PostMatch(): JSX.Element {
     >
       <CloseSVG />
     </div>
-  ) : (
-    <TopBar closeCallback={close} />
-  );
+  ) : null;
+
+  const topBar = transparent ? null : <TopBar closeCallback={close} />;
 
   const casts = useMemo<CardCast[]>(
     () =>
@@ -146,8 +151,9 @@ export default function PostMatch(): JSX.Element {
   if (!match) {
     return (
       <div className={rootClass}>
-        {chrome}
+        {topBar}
         <div className="postmatch-panel postmatch-empty">
+          {closeButton}
           No match to show yet.
         </div>
       </div>
@@ -158,9 +164,10 @@ export default function PostMatch(): JSX.Element {
 
   return (
     <div className={rootClass}>
-      {chrome}
+      {topBar}
 
       <div className="postmatch-panel">
+        {closeButton}
         {mvpGrpId ? (
           <div
             className="postmatch-mvp"

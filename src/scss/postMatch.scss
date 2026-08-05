@@ -19,7 +19,10 @@
 }
 
 .postmatch-close {
-  position: absolute;
+  // Fixed, not absolute: it sits inside the scrolling panel (it must be a
+  // descendant of the drag region for no-drag to take effect) but should stay
+  // pinned to the corner rather than scroll away with the content.
+  position: fixed;
   top: 16px;
   right: 18px;
   z-index: 5;
