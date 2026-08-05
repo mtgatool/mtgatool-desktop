@@ -52,6 +52,7 @@ export default function useDeckCards(
   deck: Deck | undefined | null
 ): DeckCardsState {
   const grpIds = useMemo(() => deckGrpIds(deck), [deck]);
+
   const cards = useCards(grpIds);
 
   const loaded = cards.filter(Boolean).length;
