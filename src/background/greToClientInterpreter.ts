@@ -1306,10 +1306,20 @@ const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
 
   if (!duplicate) {
     processAnnotations();
-    checkForStartingLibrary(gameState);
     forceDeckUpdate();
     updateDeck();
   }
+
+  // Runs for re-delivered messages too. The opening hand can only be read at
+  // the instant a player message carries a MulliganResp, and that message can
+  // arrive before the zones and game objects it needs to resolve the hand into
+  // card ids — in which case the first attempt finds nothing and the only
+  // other chance is the re-delivery. Skipping those lost game one's hand.
+  //
+  // Safe to repeat: it assigns rather than accumulates. The hand is stored at
+  // its mulligan number, so a second pass overwrites the same slot instead of
+  // appending a phantom mulligan.
+  checkForStartingLibrary(gameState);
 
   // Last, so the result and the final player state above have landed first.
   // Deliberately not gated on ordering: the conclusion is often exactly what a
