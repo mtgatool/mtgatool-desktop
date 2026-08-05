@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { CARD_RARITIES } from "../../../constants";
 import reduxAction from "../../../redux/reduxAction";
+import { makeDefaultUUIDData } from "../../../redux/slices/mainDataSlice";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { CardsData } from "../../../types/collectionTypes";
 import { InBoolFilter } from "../../../types/filterTypes";
@@ -66,7 +67,12 @@ export default function CollectionStatsPanel({
 
   const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
 
-  const userData = uuidData[currentUUID];
+  // Offline (and the gap between login and the inventory arriving) leaves no
+  // entry for the current uuid, and the wildcard counts below feed straight
+  // into formatNumber -> value.toLocaleString(), so optional chaining alone
+  // still throws. getCollectionStats already defaults the same way, which
+  // keeps these numbers consistent with the bars they sit above.
+  const userData = uuidData[currentUUID] || makeDefaultUUIDData();
 
   const query = useSelector(
     (state: AppState) => state.renderer.collectionQuery
