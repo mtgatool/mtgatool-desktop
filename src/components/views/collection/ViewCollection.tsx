@@ -9,6 +9,7 @@ import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { CardsData } from "../../../types/collectionTypes";
 import { Filters } from "../../../types/genericFilterTypes";
+import cardsDb from "../../../utils/cardsDb/cardsDbClient";
 import database from "../../../utils/mtga/database";
 import doCollectionFilter from "../../../utils/tables/doCollectionFilter";
 import InputContainer from "../../InputContainer";
@@ -20,12 +21,16 @@ import Section from "../../ui/Section";
 import Toggle from "../../ui/Toggle";
 import CardCollection from "./CardCollection";
 import getFiltersFromQuery, { removeFilterFromQuery } from "./collectionQuery";
+import { buildCollectionQuery, rowsToCardsData } from "./collectionSql";
 import { getCollectionStats } from "./collectionStats";
 import makeExportSetForScryfallFn from "./exportSetForScryfall";
 import SetsView from "./SetsView";
 
 interface ViewCollectionProps {
+  /** Only populated on the legacy path; empty when the SQLite database is up. */
   collectionData: CardsData[];
+  /** Bumped by ContentWrapper when the worker's collection table changes. */
+  collectionEpoch?: number;
   openAdvancedCollectionSearch: () => void;
 }
 
@@ -37,10 +42,9 @@ export default function ViewCollection(props: ViewCollectionProps) {
   const [exportDigital, setExportDigital] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<"cards" | "set">("cards");
 
-  const { collectionData, openAdvancedCollectionSearch } = props;
+  const { collectionData, collectionEpoch, openAdvancedCollectionSearch } =
+    props;
   const dispatch = useDispatch();
-
-  makeExportSetForScryfallFn(collectionData);
 
   const [filters, setFilters] = useState<Filters<CardsData>>();
   const [sortValue, setSortValue] = useState<Sort<CardsData>>({
@@ -77,11 +81,43 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
   const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
 
-  const filteredData = useMemo(
-    () =>
-      filters ? doCollectionFilter(collectionData, filters, sortValue) : [],
-    [filters, sortValue, collectionData]
-  );
+  // SQLite path: filtering and sorting happen in the database, so nothing here
+  // ever holds the card table. collectionSql.ts is a direct translation of
+  // doCollectionFilter, which is still used verbatim when there is no database.
+  const [sqlData, setSqlData] = useState<CardsData[]>([]);
+
+  useEffect(() => {
+    if (!cardsDb.available || !filters) return undefined;
+
+    let cancelled = false;
+    const { sql, params } = buildCollectionQuery(filters, sortValue);
+    cardsDb
+      .query(sql, params)
+      .then((result) => {
+        if (!cancelled) setSqlData(rowsToCardsData(result.values));
+      })
+      .catch((e) => {
+        // eslint-disable-next-line no-console
+        console.log("[cards-db] collection query failed", e);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filters, sortValue, collectionEpoch]);
+
+  const filteredData = useMemo(() => {
+    if (cardsDb.available) return sqlData;
+    return filters
+      ? doCollectionFilter(collectionData, filters, sortValue)
+      : [];
+  }, [filters, sortValue, collectionData, sqlData]);
+
+  // window.exportSetForScryfall — a console helper that picks a set out of the
+  // rows it is given. It used to get the unfiltered collection; on the SQLite
+  // path the view never holds that, so it gets the current result set instead.
+  // Identical with an empty search box, narrower with an active one.
+  makeExportSetForScryfallFn(filteredData);
 
   const pagingControlProps = usePagingControls(filteredData.length, 24);
 

@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "WebWorker"],
+    "module": "ES2020",
+    "moduleResolution": "node",
+    "sourceMap": false,
+    "outDir": "./public/cards-db-worker",
+    "rootDir": "./src/cards-db-worker",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmitOnError": true
+  },
+  "include": ["src/cards-db-worker"]
+}
