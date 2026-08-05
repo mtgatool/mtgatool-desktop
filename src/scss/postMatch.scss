@@ -246,7 +246,7 @@
 .postmatch-timeline {
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 2px;
   height: 128px;
   padding: 0 2px;
@@ -266,10 +266,6 @@
   position: relative;
   flex: 1;
   min-width: 2px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 
   &.turn-start::before {
     content: "";
@@ -282,21 +278,30 @@
   }
 }
 
+// Each bar grows away from the centre line: the player's upward, the
+// opponent's downward, so the two never overlap on the same column.
+//
+// Anchored with top/bottom rather than flex alignment, because a percentage
+// *margin* resolves against the containing block's width, not its height — a
+// `margin-bottom: 50%` here came out as half the column's ~10px width instead
+// of half its 128px height, and the centre line landed nowhere near the
+// middle. `top`/`bottom` percentages do resolve against height.
+//
+// The inline height is already halved to a share of the column, so a maximum
+// bar reaches the top or bottom edge exactly.
 .postmatch-timeline-bar {
-  width: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
   border-radius: 2px;
 
-  // Each bar grows away from the centre line: the player's upward, the
-  // opponent's downward, so the two never overlap on the same column.
   &.player {
-    align-self: flex-end;
-    margin-bottom: 50%;
+    bottom: 50%;
     background: linear-gradient(to top, #7d94bd, var(--color-u));
   }
 
   &.opp {
-    align-self: flex-start;
-    margin-top: 50%;
+    top: 50%;
     background: linear-gradient(to bottom, #c76a4c, var(--color-r));
   }
 }

@@ -42,7 +42,8 @@ export default function Timeline(props: TimelineProps): JSX.Element | null {
         <div className="postmatch-timeline-axis" />
         {heat.map((h, i) => {
           const isPlayer = h.seat === playerSeat;
-          const height = (h.value / max) * 100;
+          // Half, not full: each bar only owns its side of the centre line.
+          const height = (h.value / max) * 50;
           const newTurn = i > 0 && heat[i - 1].turn !== h.turn;
           const phase = PHASE_LABEL[h.phase] || h.phase;
 
@@ -56,9 +57,11 @@ export default function Timeline(props: TimelineProps): JSX.Element | null {
               className={`postmatch-timeline-col${
                 newTurn ? " turn-start" : ""
               }`}
-              title={`Turn ${h.turn} — ${phase} — ${h.value} action${
-                h.value === 1 ? "" : "s"
-              }`}
+              // No turn number: the GRE does not always have one when a heat
+              // entry is recorded (`Heat.turn` is optional for that reason),
+              // and a tooltip reading "Turn undefined" is worse than one that
+              // never mentions turns at all. The separators still mark them.
+              title={`${phase} — ${h.value} action${h.value === 1 ? "" : "s"}`}
             >
               <div
                 className={`postmatch-timeline-bar ${
