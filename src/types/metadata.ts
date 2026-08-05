@@ -12,6 +12,20 @@ export interface CardSet {
   tile: number;
   release: string;
   svg?: string;
+  /**
+   * Whether the set has a card of its own that the collection can list, as
+   * opposed to only alternate printings, basic-land art or tokens. Resolved by
+   * the metadata build (v231+); absent on older databases, where consumers fall
+   * back to deriving it from the card pool.
+   */
+  collectible?: boolean;
+  /**
+   * Every set code a card of this set can answer to, lowercased — the raw
+   * digital codes with their sub-collation suffix ("spg-mkm"), their base, and
+   * the paper/Arena codes, which disagree for Dominaria ("dom"/"dar").
+   * Metadata build v231+.
+   */
+  aliases?: string[];
 }
 
 export interface RewardsDate {

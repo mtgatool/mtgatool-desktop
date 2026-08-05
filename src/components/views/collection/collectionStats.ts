@@ -66,10 +66,20 @@ export function getCollectionStats(cardIds: number[]): CollectionStats {
     if (!card) return;
     if (card.Rarity === "land" || card.IsToken) return;
 
-    const cardSet =
+    // `stats` is keyed by arenacode (see the loop above), but Arena reports
+    // digital printings with a sub-collation suffix ("SPG-MKM"). Looking the
+    // raw code up missed every one of them, and the guard below then dropped
+    // the card silently — which is why Special Guests reported 0 / 0 (NaN%).
+    const rawSet =
       card.DigitalSet === null || card.DigitalSet === ""
-        ? card.Set.toLowerCase()
-        : card.DigitalSet.toLowerCase();
+        ? card.Set
+        : card.DigitalSet;
+    const setName =
+      database.setNames[rawSet] || database.setNames[rawSet.split("-")[0]];
+    const setObj = setName ? database.sets[setName] : undefined;
+    const cardSet = setObj
+      ? setObj.arenacode.toLowerCase()
+      : rawSet.toLowerCase();
 
     const obj: CardStats = {
       id: card.GrpId,

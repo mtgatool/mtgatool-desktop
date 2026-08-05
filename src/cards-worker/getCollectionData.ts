@@ -1,5 +1,6 @@
 import { CardsData } from "../types/collectionTypes";
 import Colors from "./colors";
+import findSetByCode from "./findSetByCode";
 import getCardBanned from "./getCardBanned";
 import getCardFormats from "./getCardFormats";
 import getCardInBoosters from "./getCardInBoosters";
@@ -107,8 +108,31 @@ export default function getCollectionData(
         RANK_SOURCE[card.RankData.rankSource !== -1 ? card.RankData.rank : 0] ??
         "?";
 
-      const setCode = [
-        card.DigitalSet?.toLowerCase() || card.Set.toLowerCase(),
+      // Arena tags digital printings with a sub-collation suffix — Special
+      // Guests ships as "SPG-MKM"/"SPG-OTJ", Marvel Super Heroes Commander as
+      // "MSC-JUMPSTART" — and its own code sometimes differs from the paper one
+      // (Dominaria is "DAR" in Arena, "DOM" everywhere else). The set filter
+      // sends a single bare code and setFilterFn does an array `includes`, so
+      // list every alias the card can legitimately answer to. Storing only the
+      // raw code meant `s:spg` matched nothing despite 127 Special Guests
+      // cards existing, and the same for ~20 other sets.
+      // Metadata v231+ ships the resolved alias list per set; the manual build
+      // below is the fallback for databases generated before that field.
+      const rawSet =
+        card.DigitalSet && card.DigitalSet !== "" ? card.DigitalSet : card.Set;
+      const baseSet = rawSet.split("-")[0];
+      const setObj =
+        findSetByCode(rawSet, setNames, sets) ||
+        findSetByCode(baseSet, setNames, sets);
+      const setCode: string[] = setObj?.aliases || [
+        ...new Set(
+          [
+            rawSet.toLowerCase(),
+            baseSet.toLowerCase(),
+            setObj?.code?.toLowerCase(),
+            setObj?.arenacode?.toLowerCase(),
+          ].filter((code): code is string => !!code)
+        ),
       ];
 
       const format = getCardFormats(card, allCards, setNames, sets);
