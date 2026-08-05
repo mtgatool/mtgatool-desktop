@@ -10,6 +10,8 @@
  */
 import electron from "../electron/electronWrapper";
 import remote from "../electron/remoteWrapper";
+import getLocalSetting from "../getLocalSetting";
+import { ensureDatabaseFile, fetchDatabaseWeb } from "./fetchCardsDb";
 
 export interface CardsDbBytes {
   wasmBinary: ArrayBuffer;
@@ -18,27 +20,25 @@ export interface CardsDbBytes {
 }
 
 /**
- * Where the database may be found, best first.
+ * Local databases, checked before anything is downloaded.
  *
- * `userData` is where a synced copy will land once the release pipeline ships
- * SQLite, and mirrors what database.json already does. The repo path below it
- * is the one that matters today: drop a build from mtgatool-metadata's
- * `npm run sqlite` into src/assets/resources/ and it gets picked up, exactly
- * the way database.json is used for local work.
+ * Drop a build from mtgatool-metadata's `npm run sqlite` into
+ * src/assets/resources/ and it wins over the published one — which is how you
+ * test a schema change without cutting a release. Otherwise the released
+ * database is downloaded into userData; see fetchCardsDb.
  */
-function dbCandidates(path: any, appPath: string, userData: string): string[] {
-  return [
-    path.join(userData, "cards.sqlite"),
-    path.join(appPath, "build", "resources", "en-database.sqlite"),
-    path.join(appPath, "src", "assets", "resources", "en-database.sqlite"),
-    path.join(
-      process.cwd(),
-      "src",
-      "assets",
-      "resources",
-      "en-database.sqlite"
-    ),
+function localCandidates(path: any, appPath: string, lang: string): string[] {
+  const names = [`${lang}-database.sqlite`, "en-database.sqlite"];
+  const dirs = [
+    path.join(appPath, "build", "resources"),
+    path.join(appPath, "src", "assets", "resources"),
+    path.join(process.cwd(), "src", "assets", "resources"),
   ];
+  const out: string[] = [];
+  dirs.forEach((dir) =>
+    names.forEach((name) => out.push(path.join(dir, name)))
+  );
+  return out;
 }
 
 function wasmCandidates(path: any, appPath: string): string[] {
@@ -59,7 +59,7 @@ function toArrayBuffer(buffer: any): ArrayBuffer {
   );
 }
 
-function loadElectron(): CardsDbBytes | null {
+async function loadElectron(lang: string): Promise<CardsDbBytes | null> {
   // eslint-disable-next-line no-undef
   const fs = __non_webpack_require__("fs");
   // eslint-disable-next-line no-undef
@@ -77,20 +77,25 @@ function loadElectron(): CardsDbBytes | null {
       }
     }) || null;
 
-  const dbPath = first(dbCandidates(path, appPath, userData));
-  if (!dbPath) {
-    console.log(
-      "[cards-db] no SQLite database found; staying on the JSON path. " +
-        `Looked in:\n  ${dbCandidates(path, appPath, userData).join("\n  ")}`
-    );
-    return null;
-  }
-
   const wasmPath = first(wasmCandidates(path, appPath));
   if (!wasmPath) {
     console.log(
       "[cards-db] sqlite3.wasm is missing — run `npm run build:cards-db-worker`."
     );
+    return null;
+  }
+
+  // A local build always wins, so a schema change can be tested without
+  // publishing one.
+  let dbPath = first(localCandidates(path, appPath, lang));
+  if (dbPath) {
+    console.log(`[cards-db] using local database ${dbPath}`);
+  } else {
+    dbPath = await ensureDatabaseFile(userData, lang);
+  }
+
+  if (!dbPath) {
+    console.log("[cards-db] no database available.");
     return null;
   }
 
@@ -101,35 +106,44 @@ function loadElectron(): CardsDbBytes | null {
   };
 }
 
-async function loadWeb(): Promise<CardsDbBytes | null> {
+async function loadWeb(lang: string): Promise<CardsDbBytes | null> {
   const base = window.location.origin;
   try {
-    const [wasm, db] = await Promise.all([
-      fetch(`${base}/cards-db-worker/sqlite3.wasm`),
-      fetch(`${base}/en-database.sqlite`),
-    ]);
-    if (!wasm.ok || !db.ok) {
-      console.log(
-        `[cards-db] web assets unavailable (wasm ${wasm.status}, db ${db.status});` +
-          ` staying on the JSON path.`
-      );
+    const wasm = await fetch(`${base}/cards-db-worker/sqlite3.wasm`);
+    if (!wasm.ok) {
+      console.log(`[cards-db] sqlite3.wasm unavailable (${wasm.status})`);
       return null;
     }
-    return {
-      wasmBinary: await wasm.arrayBuffer(),
-      dbBytes: await db.arrayBuffer(),
-      source: `${base}/en-database.sqlite`,
-    };
+    const wasmBinary = await wasm.arrayBuffer();
+
+    // A database served from our own origin takes precedence, so the dev
+    // server can be pointed at a local build.
+    const local = await fetch(`${base}/${lang}-database.sqlite`).catch(
+      () => null
+    );
+    if (local && local.ok) {
+      return {
+        wasmBinary,
+        dbBytes: await local.arrayBuffer(),
+        source: `${base}/${lang}-database.sqlite`,
+      };
+    }
+
+    const dbBytes = await fetchDatabaseWeb(lang);
+    if (!dbBytes) return null;
+
+    return { wasmBinary, dbBytes, source: `mirror:${lang}-database.sqlite.gz` };
   } catch (e) {
-    console.log("[cards-db] web assets failed to load, staying on JSON", e);
+    console.log("[cards-db] web assets failed to load", e);
     return null;
   }
 }
 
-/** Resolves null whenever the SQLite path is not available, never throws. */
+/** Resolves null whenever no database is available, never throws. */
 export default async function loadCardsDbBytes(): Promise<CardsDbBytes | null> {
+  const lang = (getLocalSetting("lang") || "en").toLowerCase();
   try {
-    return electron ? loadElectron() : await loadWeb();
+    return electron ? await loadElectron(lang) : await loadWeb(lang);
   } catch (e) {
     console.log("[cards-db] could not load database bytes", e);
     return null;
