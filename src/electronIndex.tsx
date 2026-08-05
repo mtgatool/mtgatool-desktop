@@ -24,6 +24,7 @@ import {
   WINDOW_UPDATER,
 } from "./types/app";
 import Updater from "./updater";
+import cardsDb from "./utils/cardsDb/cardsDbClient";
 import {
   loadDbFromCache,
   startCardDatabaseAutoSync,
@@ -146,6 +147,15 @@ if (title == WINDOW_UPDATER) {
 }
 
 if (title !== WINDOW_UPDATER) {
+  // Every window that shows cards needs the database, and each owns its own
+  // worker: SharedWorker is unavailable under file://, so there is no way to
+  // share one instance across windows in a packaged build.
+  cardsDb.init().then((ready) => {
+    if (ready) {
+      reduxAction(store.dispatch, { type: "FORCE_COLLECTION", arg: undefined });
+    }
+  });
+
   loadDbFromCache(getLocalSetting("lang")).then(() =>
     reduxAction(store.dispatch, { type: "FORCE_COLLECTION", arg: undefined })
   );
