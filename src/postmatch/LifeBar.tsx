@@ -4,12 +4,17 @@ interface LifeBarProps {
 }
 
 /**
- * Life remaining: one block per life change, the player's run then the
- * opponent's, each block as wide as the life total it records.
+ * Life remaining: one block per life change, each as wide as the life total it
+ * records.
  *
- * So a game that stayed level splits down the middle, and a player taken from
- * 20 to 0 in one hit contributes a single wide block followed by nothing —
- * the shape of the game is legible without reading a number.
+ * Both runs start at the centre seam and drain outwards — the player's to the
+ * left, the opponent's to the right — so the highest totals meet in the
+ * middle and the bar narrows towards whichever side lost more life. Reading
+ * outwards from the centre is reading forwards in time, on both sides.
+ *
+ * That is why the player's run is reversed and the opponent's is not: they are
+ * both recorded oldest-first, but only the opponent's is drawn away from the
+ * seam in that order.
  *
  * Only real life changes are drawn; a player who was never touched has no
  * blocks at all, which is exactly what the parser recorded.
@@ -43,7 +48,9 @@ export default function LifeBar(props: LifeBarProps): JSX.Element | null {
     <div className="postmatch-stat">
       <div className="postmatch-stat-title">Life Remaining</div>
       <div className="postmatch-life-bar">
-        {player.map((life, i) => block(life, "player", `p-${i}`))}
+        {[...player]
+          .reverse()
+          .map((life, i) => block(life, "player", `p-${i}`))}
         {opp.map((life, i) => block(life, "opp", `o-${i}`))}
       </div>
     </div>
