@@ -13,13 +13,14 @@ import { ReactComponent as IconCrown } from "../../../assets/images/svg/crown.sv
 import { ReactComponent as IconEvent } from "../../../assets/images/svg/event.svg";
 import { ReactComponent as IconTime } from "../../../assets/images/svg/time.svg";
 import { getData } from "../../../data/store";
+import { useCardArtCrop } from "../../../hooks/useCardImage";
 import reduxAction from "../../../redux/reduxAction";
 import { MatchGameStats } from "../../../types";
 import { DbMatch } from "../../../types/dbTypes";
 import compareCards from "../../../utils/compareCards";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { toMMSS } from "../../../utils/dateTo";
-import { getCardArtCrop, getCardImage } from "../../../utils/getCardArtCrop";
+import { getCardImage } from "../../../utils/getCardArtCrop";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
 import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
 import isLimitedEventId from "../../../utils/isLimitedEventId";
@@ -154,6 +155,10 @@ export default function MatchView(): JSX.Element {
 
   const [view, setView] = useState(VIEW_MATCH);
   const [gameSeen, setGameSeen] = useState(0);
+
+  const playerDeckArt = useCardArtCrop(
+    matchData?.internalMatch?.playerDeck?.deckTileId
+  );
 
   const playerDeck = matchData
     ? new Deck(matchData.internalMatch.playerDeck)
@@ -319,7 +324,7 @@ export default function MatchView(): JSX.Element {
       <div
         className="matches-top"
         style={{
-          backgroundImage: `url("${getCardArtCrop(playerDeck.tile)}")`,
+          backgroundImage: `url("${playerDeckArt}")`,
         }}
       >
         <DeckColorsBar deck={playerDeck} />

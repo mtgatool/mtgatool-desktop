@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
 import { ExploreDeckRow as Row } from "../../../data/fetchExploreDecks";
-import { getCardArtCrop } from "../../../utils/getCardArtCrop";
+import { useCardArtCrop } from "../../../hooks/useCardImage";
 import Deck from "../../../utils/mtga/deck";
 import DeckColorsBar from "../../DeckColorsBar";
 
@@ -17,6 +17,8 @@ export default function ExploreDeckRow({ row }: { row: Row }): JSX.Element {
     d.tile = pd.deckTileId || d.tile;
     return d;
   }, [row.deck]);
+
+  const tileArt = useCardArtCrop(deck.tile);
 
   const wrColor = row.winrate >= 50 ? "var(--color-g)" : "var(--color-r)";
 
@@ -33,7 +35,7 @@ export default function ExploreDeckRow({ row }: { row: Row }): JSX.Element {
       className="decks-table-deck-tile"
       onClick={open}
       style={{
-        backgroundImage: `url("${getCardArtCrop(deck.tile)}")`,
+        backgroundImage: `url("${tileArt}")`,
         cursor: "pointer",
       }}
     >

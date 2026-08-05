@@ -5,9 +5,9 @@ import { useEffect, useState } from "react";
 import squirrels from "../assets/images/squirrels.png";
 import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
 import { ReactComponent as HideIcon } from "../assets/images/svg/unarchive.svg";
+import { useCardArtCrop } from "../hooks/useCardImage";
 import { StatsDeck } from "../types/dbTypes";
 import formatPercent from "../utils/formatPercent";
-import { getCardArtCrop } from "../utils/getCardArtCrop";
 import getDeckMissing from "../utils/getDeckMissing";
 // import timeAgo from "../utils/timeAgo";
 import getPreconDeckName from "../utils/getPreconDeckName";
@@ -39,7 +39,7 @@ export default function DecksArtViewRow(
   props: DecksArtViewRowProps
 ): JSX.Element {
   const { clickDeck, deck, hidden, unhide, hide, showArchive = true } = props;
-  const imageUrl = getCardArtCrop(deck.deckTileId);
+  const imageUrl = useCardArtCrop(deck.deckTileId);
   const [cardUrl, setCardUrl] = useState<string | undefined>(
     isCached(imageUrl) ? imageUrl : undefined
   );

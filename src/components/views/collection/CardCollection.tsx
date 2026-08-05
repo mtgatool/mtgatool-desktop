@@ -45,17 +45,23 @@ export default function CardCollection(props: CardCollectionProps) {
     };
   }, [cardUrl]);
 
-  useEffect(() => {
-    const img = new Image();
+  const cardObj = useCard(card.id);
 
-    const imageUrl = getCardImage(card.id, cardsQuality);
+  // Built from the resolved card, not from its grpId. getCardImage can look a
+  // grpId up itself, but that read is synchronous and the card has not arrived
+  // on the first render — it produced a URL with an undefined set and collector
+  // number, which Scryfall answers with a placeholder. Depending on cardObj
+  // also means the effect re-runs when the card lands, which the empty
+  // dependency list here never did.
+  useEffect(() => {
+    if (!cardObj) return;
+    const img = new Image();
+    const imageUrl = getCardImage(cardObj, cardsQuality);
     img.src = imageUrl;
     img.onload = (): void => {
       setCardUrl(imageUrl);
     };
-  }, []);
-
-  const cardObj = useCard(card.id);
+  }, [cardObj, cardsQuality]);
 
   return (
     <div

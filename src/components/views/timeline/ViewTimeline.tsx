@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
+import { useCardArtCrop } from "../../../hooks/useCardImage";
 import { AppState } from "../../../redux/stores/rendererStore";
-import { getCardArtCrop } from "../../../utils/getCardArtCrop";
 import Section from "../../ui/Section";
 import { MatchData } from "../history/convertDbMatchData";
 
@@ -354,6 +354,7 @@ interface DeckStat {
 
 // Right-column detail panel for the hovered (or top) deck.
 function DeckPanel({ deck }: { deck?: DeckStat }): JSX.Element {
+  const deckTileArt = useCardArtCrop(deck?.tileId);
   if (!deck) {
     return (
       <div style={{ padding: "16px", color: "var(--color-text-dark)" }}>
@@ -396,7 +397,7 @@ function DeckPanel({ deck }: { deck?: DeckStat }): JSX.Element {
         style={{
           height: "72px",
           borderRadius: "4px",
-          backgroundImage: `url(${getCardArtCrop(deck.tileId)})`,
+          backgroundImage: `url(${deckTileArt})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           borderBottom: `3px solid ${deck.color}`,

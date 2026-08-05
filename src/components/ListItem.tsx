@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 
 import { ReactComponent as ArchiveIcon } from "../assets/images/svg/archive.svg";
 import { ReactComponent as TrashIcon } from "../assets/images/svg/trash.svg";
-import { getCardArtCrop } from "../utils/getCardArtCrop";
+import { useCardArtCrop } from "../hooks/useCardImage";
 
 interface ListItemProps extends JSX.ElementChildrenAttribute {
   click?: () => void;
@@ -29,11 +29,12 @@ export function HoverTile(
   props: PropsWithChildren<HoverTileProps>
 ): JSX.Element {
   const { grpId, children } = props;
+  const artCrop = useCardArtCrop(grpId);
 
   return (
     <div
       className="list-item-image"
-      style={{ backgroundImage: `url("${getCardArtCrop(grpId)}")` }}
+      style={{ backgroundImage: `url("${artCrop}")` }}
     >
       {children}
     </div>
