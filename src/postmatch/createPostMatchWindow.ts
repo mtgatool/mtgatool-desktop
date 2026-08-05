@@ -42,7 +42,11 @@ export default function createPostMatchWindow(): void {
     backgroundColor: allSettings.overlaysTransparency ? undefined : "#0d0d0f",
     title: WINDOW_POSTMATCH,
     show: false,
-    frame: false,
+    // Both governed by the overlay settings, because they answer the same
+    // question for the same reason: a transparent, frameless window is
+    // uninteractable on some Linux setups, and "Show overlay frame" is the
+    // escape hatch users already know about.
+    frame: allSettings.overlayFrame,
     center: true,
     width: 620,
     height: 800,
