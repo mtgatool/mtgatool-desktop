@@ -51,9 +51,17 @@ function main() {
   });
 
   console.log("  compiling worker …");
+  // Run the compiler's entry point with the current node rather than the
+  // node_modules/.bin shim: on Windows that shim is tsc.cmd, which execFileSync
+  // cannot launch without a shell. This works the same everywhere and needs no
+  // shell at all.
   execFileSync(
-    path.join(REPO, "node_modules/.bin/tsc"),
-    ["-p", path.join(REPO, "cards-db-worker-tsconfig.json")],
+    process.execPath,
+    [
+      path.join(REPO, "node_modules", "typescript", "bin", "tsc"),
+      "-p",
+      path.join(REPO, "cards-db-worker-tsconfig.json"),
+    ],
     { stdio: "inherit" }
   );
 
