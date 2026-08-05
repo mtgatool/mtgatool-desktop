@@ -70,7 +70,14 @@ function changePriority(previous: number, current: number, time: number): void {
   });
 }
 
-function _setHeat(seat: number, value: number): void {
+/**
+ * Add to the match timeline.
+ *
+ * One entry per (seat, turn, phase): anything a player does inside the same
+ * phase accumulates into a single bar rather than adding a new one, which is
+ * what keeps a turn with a dozen mana payments from swamping the chart.
+ */
+function setHeat(seat: number, value: number): void {
   const { turnInfo } = globalStore.currentMatch;
   const heat = {
     value,
@@ -242,6 +249,7 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
       player: seat,
     };
     addCardCast(cast);
+    setHeat(seat, 1);
 
     actionLog({
       seat: obj.controllerSeatId || seat,
@@ -512,6 +520,8 @@ const AnnotationType_DamageDealt = (ann: Annotations): void => {
     pstats.damage[affectorGrpId] = (prev || 0) + dmg;
   }
 
+  setHeat(affector.controllerSeatId || 0, 1);
+
   actionLog({
     seat: affector.controllerSeatId || 0,
     timestamp: globalStore.currentMatch.logTime.getTime(),
@@ -541,6 +551,8 @@ const AnnotationType_ModifiedLife = (ann: Annotations): void => {
     else globalStore.currentMatch.oppStats.lifeLost += lifeAbs;
     globalStore.currentMatch.oppStats.lifeTotals.push(Math.max(0, total));
   }
+
+  setHeat(affected, 1);
 
   actionLog({
     seat: affected,
@@ -685,6 +697,8 @@ const AnnotationType_ManaPaid = (ann: Annotations): void => {
   } else {
     globalStore.currentMatch.oppStats.manaUsed += 1;
   }
+
+  setHeat(affector, 1);
 };
 
 function annotationsSwitch(ann: Annotations, type: AnnotationType): void {

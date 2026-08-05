@@ -52,16 +52,13 @@ function generateInternalMatch(): InternalMatch {
     currentMatch.gameInfo.results
   );
 
-  /*
+  const newMatch: InternalMatch = {
     postStats: {
       statsHeatMap: currentMatch.statsHeatMap,
       totalTurns: currentMatch.totalTurns,
       playerStats: currentMatch.playerStats,
       oppStats: currentMatch.oppStats,
     },
-  */
-
-  const newMatch: InternalMatch = {
     onThePlay: currentMatch.onThePlay,
     id: currentMatch.matchId,
     date: currentMatch.logTime.toISOString() || new Date().toISOString(),
