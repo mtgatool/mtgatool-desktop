@@ -2,6 +2,7 @@ import { isEqual } from "lodash";
 import { CSSProperties, useMemo } from "react";
 
 import allFormats from "../common/allFormats";
+import useCardsDbReady from "../hooks/useCardsDbReady";
 import { CardSet } from "../types";
 import database from "../utils/mtga/database";
 
@@ -46,6 +47,11 @@ function getDistributedSets(): string[] {
 
 export default function SetsFilter(props: SetsFilterProps): JSX.Element {
   const { singleSelection, style, callback, filtered } = props;
+  // Sets are empty until the database loads, and the memo below is keyed on the
+  // version, which is 0 until then — without this the filter renders once, with
+  // no sets, and never again.
+  useCardsDbReady();
+
   // const formats = useSelector((state: AppState) => state.renderer.formats);
   const filterable = useMemo(
     getDistributedSets,

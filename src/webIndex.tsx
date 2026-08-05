@@ -15,7 +15,6 @@ import store from "./redux/stores/rendererStore";
 import * as serviceWorker from "./serviceWorker";
 import cardsDb from "./utils/cardsDb/cardsDbClient";
 import defaultLocalSettings from "./utils/defaultLocalSettings";
-import getLocalSetting from "./utils/getLocalSetting";
 
 // tool-db removed — the p2p worker is no longer created.
 

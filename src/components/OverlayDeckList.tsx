@@ -15,6 +15,7 @@ import {
   OVERLAY_MIXED,
   OVERLAY_ODDS,
 } from "../constants";
+import useDeckCards from "../hooks/useDeckCards";
 import { CardObject } from "../types";
 import Chances from "../types/chances";
 import compareCards from "../utils/compareCards";
@@ -58,6 +59,9 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
     setOddsCallback,
     shareControls = true,
   } = props;
+
+  // Same reason as DeckList: everything below reads cards synchronously.
+  useDeckCards(deck);
 
   const QRCanvas = useRef<HTMLCanvasElement | null>(null);
 

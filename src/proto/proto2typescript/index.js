@@ -6,7 +6,7 @@ const DustJS = require("dustjs-linkedin");
 
 function loadDustTemplate(name) {
   const template = fs
-    .readFileSync(__dirname + "/templates/" + name + ".dust", "UTF8")
+    .readFileSync(`${__dirname}/templates/${name}.dust`, "UTF8")
     .toString();
   const compiledTemplate = DustJS.compile(template, name);
   DustJS.loadSource(compiledTemplate);
@@ -19,21 +19,21 @@ function initializeDustJS() {
   };
 
   // Create view filters
-  DustJS.filters["firstLetterInUpperCase"] = function (value) {
+  DustJS.filters.firstLetterInUpperCase = function (value) {
     return value.charAt(0).toUpperCase() + value.slice(1);
   };
 
-  DustJS.filters["firstLetterInLowerCase"] = function (value) {
+  DustJS.filters.firstLetterInLowerCase = function (value) {
     return value.charAt(0).toLowerCase() + value.slice(1);
   };
 
-  DustJS.filters["camelCase"] = function (value) {
+  DustJS.filters.camelCase = function (value) {
     return value.replace(/(_[a-zA-Z])/g, function (match) {
       return match[1].toUpperCase();
     });
   };
 
-  DustJS.filters["convertType"] = function (value) {
+  DustJS.filters.convertType = function (value) {
     switch (value.toLowerCase()) {
       case "string":
         return "string";
@@ -59,11 +59,11 @@ function initializeDustJS() {
     return value;
   };
 
-  DustJS.filters["optionalFieldDeclaration"] = function (value) {
+  DustJS.filters.optionalFieldDeclaration = function (value) {
     return value == "optional" ? "?" : "";
   };
 
-  DustJS.filters["repeatedType"] = function (value) {
+  DustJS.filters.repeatedType = function (value) {
     return value == "repeated" ? "[]" : "";
   };
 }
@@ -86,7 +86,7 @@ function generateNames(model, prefix, name = "") {
     generateNames(
       message,
       model.fullPackageName,
-      "." + (model.name ? model.name : "")
+      `.${model.name ? model.name : ""}`
     );
   }
 
@@ -95,7 +95,7 @@ function generateNames(model, prefix, name = "") {
     const currentEnum = model.enums[key];
     newDefinitions[currentEnum.name] = "";
     currentEnum.fullPackageName =
-      model.fullPackageName + (model.name ? "." + model.name : "");
+      model.fullPackageName + (model.name ? `.${model.name}` : "");
   }
 
   // Add the new definitions in the model for generate builders
@@ -106,7 +106,7 @@ function generateNames(model, prefix, name = "") {
       type: key + newDefinitions[key],
     });
   }
-  
+
   model.definitions = definitions;
 }
 
@@ -149,6 +149,6 @@ proto2typescript(fileStr, (err, out) => {
     console.error(err);
     process.exit(1);
   } else {
-    fs.writeFile(__dirname + "/../../types/greTypes.ts", out, () => {});
+    fs.writeFile(`${__dirname}/../../types/greTypes.ts`, out, () => {});
   }
 });

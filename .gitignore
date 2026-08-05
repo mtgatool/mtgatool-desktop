@@ -47,3 +47,6 @@ public/cards-db-worker/
 
 # Scratch output of scripts/verify-collection-sql.mjs
 dist-verify/
+
+# Local SQLite build served by the web dev server
+public/*.sqlite

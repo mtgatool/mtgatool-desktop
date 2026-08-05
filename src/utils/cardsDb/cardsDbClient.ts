@@ -117,6 +117,17 @@ class CardsDbClient {
 
   public source = "";
 
+  /**
+   * Notified once, when init settles.
+   *
+   * Anything that reads the eagerly-loaded values — sets, version, cardCount —
+   * during its first render sees the empty defaults, because the database is
+   * still being fetched. Without a signal those components never render again
+   * and keep showing them; that is why the status panel read
+   * "Cards database (0)" against a loaded database.
+   */
+  public readyListeners = new Set<() => void>();
+
   public get available(): boolean {
     return this.ready;
   }
@@ -194,10 +205,12 @@ class CardsDbClient {
           `[cards-db] ready in ${(performance.now() - started).toFixed(0)}ms ` +
             `(v${info.version} ${info.language}) from ${bytes.source}`
         );
+        this.readyListeners.forEach((fn) => fn());
         return true;
       } catch (e) {
-        console.log("[cards-db] failed to start, staying on JSON", e);
+        console.log("[cards-db] failed to start", e);
         this.ready = false;
+        this.readyListeners.forEach((fn) => fn());
         return false;
       }
     })();
@@ -370,12 +383,37 @@ class CardsDbClient {
     if (ids.length === 0) return;
     this.pendingIds.clear();
 
+    // Wait for the database before querying it. Views mount as soon as the
+    // page does, which is long before an 18MB database has been fetched and
+    // handed to the worker, so without this every card a deck list asks for on
+    // first paint fails.
+    const ready = await this.init();
+
     const settle = (id: number, card: DbCardDataV2 | null): void => {
       this.cardCache.set(id, card);
       const waiters = this.cardWaiters.get(id);
       this.cardWaiters.delete(id);
       if (waiters) waiters.forEach((w) => w(card));
     };
+
+    /**
+     * Answer the waiters without caching, so the next request retries.
+     *
+     * Caching a failure is indistinguishable from caching a genuine miss, and
+     * `card()` returns any cached value including null — so one transient
+     * failure would make those cards permanently missing for the life of the
+     * page, with nothing to trigger another attempt.
+     */
+    const fail = (id: number): void => {
+      const waiters = this.cardWaiters.get(id);
+      this.cardWaiters.delete(id);
+      if (waiters) waiters.forEach((w) => w(null));
+    };
+
+    if (!ready) {
+      ids.forEach(fail);
+      return;
+    }
 
     try {
       const placeholders = ids.map(() => "?").join(",");
@@ -394,7 +432,9 @@ class CardsDbClient {
         if (!found.has(id)) settle(id, null);
       });
     } catch (e) {
-      ids.forEach((id) => settle(id, null));
+      // Not cached — see `fail`. A query that failed says nothing about
+      // whether the card exists.
+      ids.forEach(fail);
       throw e;
     }
   }
@@ -442,6 +482,8 @@ class CardsDbClient {
       const ids = [...this.pendingAbilities];
       this.pendingAbilities.clear();
       if (ids.length === 0) return;
+      // Same as flushCards: the database is not up when the first views mount.
+      if (!(await this.init())) return;
       try {
         const placeholders = ids.map(() => "?").join(",");
         const result = await this.query(
