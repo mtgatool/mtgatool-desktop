@@ -34,9 +34,9 @@ that mistake.
 wired to it (`publish: github`), so existing users auto-update — treat a tag push
 as shipping to production.
 
-### Two release traps that fail silently
+### A release trap that fails silently
 
-**1. `package-lock.json` pins dependencies, not `package.json`.** CI runs
+**`package-lock.json` pins dependencies, not `package.json`.** CI runs
 `npm install`, which installs from the lockfile. Widening a range in
 `package.json` does nothing on its own. This shipped a broken 7.0.3: a correctly
 signed macOS build that bundled `mtga-reader` 0.1.7 (no macOS support) because the
@@ -48,13 +48,6 @@ Verify the *artifact*, not the config:
 npx @electron/asar extract-file "<App>.app/Contents/Resources/app.asar" \
   node_modules/mtga-reader/package.json
 ```
-
-**2. Retired GitHub runner images leave the matrix job queued forever** — no error,
-no failure, it just never gets scheduled while the other platforms publish happily.
-This bit the macOS job twice (macos-12, then macos-13) and went unnoticed across two
-releases: v7.0.1 and v7.0.2 shipped with **no macOS asset at all**, and v7.0.2's mac
-job was still queued 22 hours later. After any release, check that every matrix job
-actually ran.
 
 ## macOS specifics
 
