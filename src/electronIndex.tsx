@@ -13,6 +13,7 @@ import mainChannelListeners from "./broadcastChannel/mainChannelListeners";
 import App from "./components/App";
 import Hover from "./hover";
 import Overlay from "./overlay";
+import PostMatch from "./postmatch";
 import reduxAction from "./redux/reduxAction";
 import store from "./redux/stores/rendererStore";
 import * as serviceWorker from "./serviceWorker";
@@ -20,6 +21,7 @@ import {
   ALL_OVERLAYS,
   WINDOW_BACKGROUND,
   WINDOW_HOVER,
+  WINDOW_POSTMATCH,
   WINDOW_UPDATER,
 } from "./types/app";
 import Updater from "./updater";
@@ -77,6 +79,30 @@ if (title == WINDOW_UPDATER) {
       <React.StrictMode>
         <Provider store={store}>
           <NextHover />
+        </Provider>
+      </React.StrictMode>,
+      document.getElementById("root")
+    );
+  }
+} else if (title == WINDOW_POSTMATCH) {
+  defaultLocalSettings();
+  ReactDOM.render(
+    <React.StrictMode>
+      <Provider store={store}>
+        <PostMatch />
+      </Provider>
+    </React.StrictMode>,
+    document.getElementById("root")
+  );
+
+  if (module.hot && process.env.NODE_ENV === "development") {
+    module.hot.accept();
+    // eslint-disable-next-line global-require
+    const NextPostMatch = require("./postmatch/index").default;
+    ReactDOM.render(
+      <React.StrictMode>
+        <Provider store={store}>
+          <NextPostMatch />
         </Provider>
       </React.StrictMode>,
       document.getElementById("root")

@@ -57,6 +57,15 @@ import countValues from "../utils/countValues";
 import useSet from "../utils/useSet";
 import objectClone from "../utils/objectClone";
 
+/**
+ * Game state message ids already handled this game.
+ *
+ * The GRE both re-delivers messages and delivers them late, so the id alone
+ * does not say whether a message is new — see the handler for why a high-water
+ * mark is not enough. Reset whenever a new game starts.
+ */
+let processedMsgIds = new Set<number>();
+
 function changePriority(previous: number, current: number, time: number): void {
   const priorityTimers = objectClone(globalStore.currentMatch.priorityTimers);
   priorityTimers.timers[previous] += time - priorityTimers.last;
@@ -70,7 +79,14 @@ function changePriority(previous: number, current: number, time: number): void {
   });
 }
 
-function _setHeat(seat: number, value: number): void {
+/**
+ * Add to the match timeline.
+ *
+ * One entry per (seat, turn, phase): anything a player does inside the same
+ * phase accumulates into a single bar rather than adding a new one, which is
+ * what keeps a turn with a dozen mana payments from swamping the chart.
+ */
+function setHeat(seat: number, value: number): void {
   const { turnInfo } = globalStore.currentMatch;
   const heat = {
     value,
@@ -242,6 +258,7 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
       player: seat,
     };
     addCardCast(cast);
+    setHeat(seat, 1);
 
     actionLog({
       seat: obj.controllerSeatId || seat,
@@ -512,6 +529,8 @@ const AnnotationType_DamageDealt = (ann: Annotations): void => {
     pstats.damage[affectorGrpId] = (prev || 0) + dmg;
   }
 
+  setHeat(affector.controllerSeatId || 0, 1);
+
   actionLog({
     seat: affector.controllerSeatId || 0,
     timestamp: globalStore.currentMatch.logTime.getTime(),
@@ -541,6 +560,8 @@ const AnnotationType_ModifiedLife = (ann: Annotations): void => {
     else globalStore.currentMatch.oppStats.lifeLost += lifeAbs;
     globalStore.currentMatch.oppStats.lifeTotals.push(Math.max(0, total));
   }
+
+  setHeat(affected, 1);
 
   actionLog({
     seat: affected,
@@ -685,6 +706,8 @@ const AnnotationType_ManaPaid = (ann: Annotations): void => {
   } else {
     globalStore.currentMatch.oppStats.manaUsed += 1;
   }
+
+  setHeat(affector, 1);
 };
 
 function annotationsSwitch(ann: Annotations, type: AnnotationType): void {
@@ -1197,36 +1220,61 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
 const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
   const { currentMatch } = globalStore;
 
-  if (msg.msgId) {
+  // A message id below the highest one seen means one of two very different
+  // things, and only a record of what was actually handled tells them apart:
+  //
+  //  - a genuinely late event. The GRE resolves a whole state server-side and
+  //    emits its conclusion before the events that produced it, so the message
+  //    carrying the killing blow can arrive after the message saying the game
+  //    is over. It must be processed or the match loses its final damage.
+  //  - a re-delivery of something already handled. Processing it again counts
+  //    the same life change, mana payment and damage twice.
+  //
+  // Comparing against a high-water mark cannot separate them: it discards the
+  // late events along with the repeats. So the ids actually processed are kept
+  // for the duration of the game.
+  const duplicate = !!msg.msgId && processedMsgIds.has(msg.msgId);
+
+  if (msg.msgId && !duplicate) {
     console.log(`Message id > ${msg.msgId} (${currentMatch.msgId})`);
 
-    if (
-      !currentMatch.msgId ||
-      msg.msgId === 1 ||
-      msg.msgId < currentMatch.msgId
-    ) {
-      // New game, reset per-game fields.
+    // A real new game restarts the numbering at 1 — checked before the id is
+    // recorded, so a re-delivered "1" cannot wipe a game in progress.
+    if (!currentMatch.msgId || msg.msgId === 1) {
       console.warn("Reset current game");
       resetCurrentGame();
+      processedMsgIds = new Set();
       setGameBeginTime(globalStore.currentMatch.logTime);
     }
-    setCurrentMatchMany({ msgId: msg.msgId });
+
+    processedMsgIds.add(msg.msgId);
+
+    // High-water mark only; never rewound, since it is what "new game" and the
+    // stats capture are judged against.
+    if (msg.msgId > (currentMatch.msgId || 0)) {
+      setCurrentMatchMany({ msgId: msg.msgId });
+    }
   }
 
   const gameState = msg.gameStateMessage;
   if (gameState) {
+    // Read from every message, in order or not: these are assignments of the
+    // current truth rather than accumulations, so applying them twice is
+    // harmless — and a late message is frequently the one carrying the result
+    // and the final player state.
     if (gameState.gameInfo) {
       setGameInfo(gameState.gameInfo);
       if (gameState.gameInfo.matchID) {
         setMatchId(gameState.gameInfo.matchID);
         setMatchStarted(true);
       }
-      if (gameState.gameInfo.stage == "GameStage_GameOver") {
-        getMatchGameStats();
-      }
     }
 
-    if (gameState.turnInfo) {
+    if (gameState.players) {
+      setPlayers(gameState.players);
+    }
+
+    if (gameState.turnInfo && !duplicate) {
       checkTurnDiff(gameState.turnInfo);
       setTurnInfo(gameState.turnInfo);
     }
@@ -1240,27 +1288,45 @@ const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
       });
     }
     */
-    if (gameState.zones) {
+    // Everything below accumulates, so a re-delivered message must not reach
+    // it — annotations especially, since `processAnnotations` is what totals
+    // life, mana and damage.
+    if (gameState.zones && !duplicate) {
       setManyZones(gameState.zones);
     }
 
-    if (gameState.players) {
-      setPlayers(gameState.players);
-    }
-
-    if (gameState.gameObjects) {
+    if (gameState.gameObjects && !duplicate) {
       setManyGameObjects(gameState.gameObjects);
     }
 
-    if (gameState.annotations) {
+    if (gameState.annotations && !duplicate) {
       setManyAnnotations(gameState.annotations);
     }
   }
 
-  processAnnotations();
+  if (!duplicate) {
+    processAnnotations();
+    forceDeckUpdate();
+    updateDeck();
+  }
+
+  // Runs for re-delivered messages too. The opening hand can only be read at
+  // the instant a player message carries a MulliganResp, and that message can
+  // arrive before the zones and game objects it needs to resolve the hand into
+  // card ids — in which case the first attempt finds nothing and the only
+  // other chance is the re-delivery. Skipping those lost game one's hand.
+  //
+  // Safe to repeat: it assigns rather than accumulates. The hand is stored at
+  // its mulligan number, so a second pass overwrites the same slot instead of
+  // appending a phantom mulligan.
   checkForStartingLibrary(gameState);
-  forceDeckUpdate();
-  updateDeck();
+
+  // Last, so the result and the final player state above have landed first.
+  // Deliberately not gated on ordering: the conclusion is often exactly what a
+  // late message carries, and getMatchGameStats is written to be repeatable.
+  if (gameState?.gameInfo?.stage == "GameStage_GameOver") {
+    getMatchGameStats();
+  }
 };
 
 // Some game state messages are sent as queued

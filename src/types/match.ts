@@ -38,9 +38,34 @@ export interface InternalPlayer {
   leaderboardPlace?: number;
 }
 
+export interface MatchPlayerStats {
+  lifeGained: number;
+  lifeLost: number;
+  manaUsed: number;
+  /** grpId -> total damage dealt by that card. */
+  damage: Record<string, number>;
+  /** One entry per life change, in order — the "life remaining" blocks. */
+  lifeTotals: number[];
+}
+
+/**
+ * The end-of-match summary, for the post-match overview.
+ *
+ * Optional because it is only written from the version that started recording
+ * it: every match saved before then has none, and the overview hides whatever
+ * is missing rather than drawing empty bars.
+ */
+export interface MatchPostStats {
+  statsHeatMap: Heat[];
+  totalTurns: number;
+  playerStats: MatchPlayerStats;
+  oppStats: MatchPlayerStats;
+}
+
 export interface InternalMatch {
   draws: number;
   arenaId: string;
+  postStats?: MatchPostStats;
   playerDeck: InternalDeck;
   oppDeck: InternalDeck;
   date: string;
