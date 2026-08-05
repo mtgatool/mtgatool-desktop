@@ -9,6 +9,7 @@ import upsertDbCards from "../data/upsertDbCards";
 import upsertDbInventory from "../data/upsertDbInventory";
 import upsertDbRank from "../data/upsertDbRank";
 import upsertDbSeason from "../data/upsertDbSeason";
+import showPostMatchOverview from "../postmatch/showPostMatchOverview";
 import readCards from "../reader/readCards";
 import readPlayerId from "../reader/readPlayerid";
 import UICheckAdmin from "../reader/uiCheckAdmin";
@@ -131,6 +132,11 @@ export default function mainChannelListeners() {
       if (msg.data.value.eventId !== "AIBotMatch") {
         setDbMatch(msg.data.value);
       }
+
+      // The overview is shown for bot matches too, even though those are never
+      // persisted above — it reads the match handed to it here, not the
+      // database, so there is nothing to exclude it from.
+      showPostMatchOverview(msg.data.value);
     }
 
     if (msg.data.type === "DRAFT_STATUS") {

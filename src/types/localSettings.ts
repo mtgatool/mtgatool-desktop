@@ -26,6 +26,7 @@ export const settingKeys = [
   "pubkey",
   "importLogHistory",
   "whatsNewSeen",
+  "postMatchOverview",
 ] as const;
 
 export type SettingKey = typeof settingKeys[number];
@@ -54,4 +55,10 @@ export const defaultSettings: Record<SettingKey, string> = {
   importLogHistory: "false",
   // The app version whose "What's new" the user has already dismissed.
   whatsNewSeen: "",
+  // The match the post-match overview window should render. Handed over here
+  // rather than broadcast, because the window is created in response to the
+  // same event that carries the data — it would still be booting when a
+  // message went out, and would miss it. localStorage is shared across every
+  // window of the app, so the overview reads this the moment it mounts.
+  postMatchOverview: "",
 };
