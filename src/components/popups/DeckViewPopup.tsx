@@ -1,6 +1,5 @@
 import { ReactComponent as Close } from "../../assets/images/svg/close.svg";
-import { DEFAULT_TILE } from "../../constants";
-import { getCardArtCrop } from "../../utils/getCardArtCrop";
+import { useCardArtCrop } from "../../hooks/useCardImage";
 import Deck from "../../utils/mtga/deck";
 import DeckColorsBar from "../DeckColorsBar";
 import DeckList from "../DeckList";
@@ -13,6 +12,7 @@ interface DeckViewPopupProps {
 
 export default function DeckViewPopup(props: DeckViewPopupProps) {
   const { onClose, deck } = props;
+  const tileArt = useCardArtCrop(deck?.tile);
 
   return (
     <>
@@ -23,9 +23,7 @@ export default function DeckViewPopup(props: DeckViewPopupProps) {
         <div
           className="decks-top small"
           style={{
-            backgroundImage: deck
-              ? `url(${getCardArtCrop(deck.tile || DEFAULT_TILE)})`
-              : "",
+            backgroundImage: deck ? `url(${tileArt})` : "",
           }}
         >
           <DeckColorsBar deck={deck} />

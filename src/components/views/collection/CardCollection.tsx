@@ -10,10 +10,10 @@ import { useSelector } from "react-redux";
 
 import LoadingCard from "../../../assets/images/loadingcard.png";
 import { CARD_SIZE_RATIO } from "../../../common/static";
+import useCard from "../../../hooks/useCard";
 import useHoverCard from "../../../hooks/useHoverCard";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { CardsData } from "../../../types/collectionTypes";
-import database from "../../../utils/database-wrapper";
 import { getCardImage } from "../../../utils/getCardArtCrop";
 import getCssQuality from "../../../utils/getCssQuality";
 import openScryfallCard from "../../../utils/openScryfallCard";
@@ -45,17 +45,23 @@ export default function CardCollection(props: CardCollectionProps) {
     };
   }, [cardUrl]);
 
-  useEffect(() => {
-    const img = new Image();
+  const cardObj = useCard(card.id);
 
-    const imageUrl = getCardImage(card.id, cardsQuality);
+  // Built from the resolved card, not from its grpId. getCardImage can look a
+  // grpId up itself, but that read is synchronous and the card has not arrived
+  // on the first render — it produced a URL with an undefined set and collector
+  // number, which Scryfall answers with a placeholder. Depending on cardObj
+  // also means the effect re-runs when the card lands, which the empty
+  // dependency list here never did.
+  useEffect(() => {
+    if (!cardObj) return;
+    const img = new Image();
+    const imageUrl = getCardImage(cardObj, cardsQuality);
     img.src = imageUrl;
     img.onload = (): void => {
       setCardUrl(imageUrl);
     };
-  }, []);
-
-  const cardObj = database.card(card.id);
+  }, [cardObj, cardsQuality]);
 
   return (
     <div

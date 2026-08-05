@@ -1,7 +1,7 @@
 import { ExploreMetaCardRow } from "../../../data/fetchExploreMeta";
+import { useCardArtCrop } from "../../../hooks/useCardImage";
 import useHoverCard from "../../../hooks/useHoverCard";
 import { DbCardDataV2 } from "../../../types";
-import { getCardArtCrop } from "../../../utils/getCardArtCrop";
 import getWinrateClass from "../../../utils/getWinrateClass";
 
 /**
@@ -20,6 +20,7 @@ export default function ExploreMetaCard({
   card: DbCardDataV2;
   maxPresence: number;
 }): JSX.Element {
+  const artCrop = useCardArtCrop(card.GrpId);
   const [hoverIn, hoverOut] = useHoverCard(card.GrpId);
 
   return (
@@ -30,7 +31,7 @@ export default function ExploreMetaCard({
     >
       <div
         className="explore-meta-tile-art"
-        style={{ backgroundImage: `url("${getCardArtCrop(card.GrpId)}")` }}
+        style={{ backgroundImage: `url("${artCrop}")` }}
       />
 
       <div className="explore-meta-tile-body">

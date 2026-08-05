@@ -15,12 +15,12 @@ import { getActiveUserId } from "../data/cloudSync";
 import hydrateFromCloud from "../data/hydrateFromCloud";
 import localLogin from "../data/localLogin";
 import syncMatches from "../data/syncMatches";
+import { useCardArtCrop } from "../hooks/useCardImage";
 import info from "../info.json";
 import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
 import electron from "../utils/electron/electronWrapper";
 import isElectron from "../utils/electron/isElectron";
-import { getCardArtCrop } from "../utils/getCardArtCrop";
 import getLocalSetting from "../utils/getLocalSetting";
 import getPopupClass from "../utils/getPopupClass";
 import setLocalSetting from "../utils/setLocalSetting";
@@ -163,10 +163,12 @@ function App(props: AppProps) {
     }
   }
 
+  const backgroundArt = useCardArtCrop(backgroundGrpid);
+
   const backgroundImage = customBackground
     ? `url(${customBackground.url})`
     : backgroundGrpid
-    ? `url(${getCardArtCrop(backgroundGrpid)})`
+    ? `url(${backgroundArt})`
     : undefined;
 
   const openSettings = useRef<() => void>(vodiFn);

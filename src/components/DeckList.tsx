@@ -1,6 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 import _ from "lodash";
 
+import useDeckCards from "../hooks/useDeckCards";
 import { CardObject, DbCardDataV2 } from "../types";
 import { cardType } from "../utils/cardTypes";
 import database from "../utils/mtga/database";
@@ -204,6 +205,12 @@ interface DeckListProps {
 
 export default function DeckList(props: DeckListProps): JSX.Element {
   const { deck, showWildcards, showOdds } = props;
+
+  // Everything below reads cards synchronously and none of it can await, so
+  // the whole deck is fetched here first. Without this the group-by below
+  // filtered out every card, because none of them had been asked for.
+  useDeckCards(deck);
+
   if (!deck || database.version == 0) return <></>;
   return <>{getDeckComponents(deck, showWildcards, showOdds)}</>;
 }

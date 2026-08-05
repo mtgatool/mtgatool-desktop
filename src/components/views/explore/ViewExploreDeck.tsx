@@ -6,6 +6,7 @@ import { DEFAULT_TILE } from "../../../constants";
 import fetchExploreDecks, {
   ExploreDeckRow as Row,
 } from "../../../data/fetchExploreDecks";
+import { useCards } from "../../../hooks/useCard";
 import useCardDatabaseVersion from "../../../hooks/useCardDatabaseVersion";
 import reduxAction from "../../../redux/reduxAction";
 import compareCards from "../../../utils/compareCards";
@@ -45,6 +46,31 @@ export default function ViewExploreDeck(): JSX.Element {
     };
   }, [id]);
 
+  /**
+   * Load every card these decklists mention, before anything reads them.
+   *
+   * deckVector and averageDecklist both look each card up and skip the ones
+   * they cannot resolve. Card lookups only return what has already been
+   * fetched, and nothing here had ever asked for these — so both produced
+   * empty results, the averaged deck came out with no cards, and DeckList had
+   * nothing to render or even to prefetch. `cardsLoaded` is in the dependency
+   * lists below so they recompute once the cards land.
+   */
+  const rowGrpIds = useMemo(() => {
+    const ids = new Set<number>();
+    (rows || []).forEach((row) => {
+      const deck: any = row.deck || {};
+      [...(deck.mainDeck || []), ...(deck.sideboard || [])].forEach(
+        (card: any) => {
+          if (card?.id) ids.add(card.id);
+        }
+      );
+    });
+    return [...ids];
+  }, [rows]);
+
+  const cardsLoaded = useCards(rowGrpIds).filter(Boolean).length;
+
   // The event view clusters for display only; the grouping is recomputed here
   // from the same inputs so a deep link works without carrying state across.
   const versions = useMemo(() => {
@@ -56,7 +82,7 @@ export default function ViewExploreDeck(): JSX.Element {
         g.some((i) => all[i].deck_hash === hash)
       ) || [];
     return group.map((i) => all[i]).sort((a, b) => b.games - a.games);
-  }, [rows, dbVersion, hash]);
+  }, [rows, dbVersion, hash, cardsLoaded]);
 
   const totals = useMemo(() => {
     const games = versions.reduce((s, v) => s + v.games, 0);
@@ -69,7 +95,7 @@ export default function ViewExploreDeck(): JSX.Element {
       averageDecklist(
         versions.map((v) => ({ cards: v.deck?.mainDeck, weight: v.games }))
       ),
-    [versions]
+    [versions, cardsLoaded]
   );
 
   // Averaged separately so "Copy to Arena" carries a sideboard too.
@@ -78,7 +104,7 @@ export default function ViewExploreDeck(): JSX.Element {
       averageDecklist(
         versions.map((v) => ({ cards: v.deck?.sideboard, weight: v.games }))
       ),
-    [versions]
+    [versions, cardsLoaded]
   );
 
   // The deck currently being shown: either the consensus list or one version.

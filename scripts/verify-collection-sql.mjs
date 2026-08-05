@@ -1,0 +1,298 @@
+#!/usr/bin/env node
+/**
+ * Prove the SQL collection query returns exactly what doCollectionFilter does.
+ *
+ * collectionSql.ts is a translation of doCollectionFilter, and a translation
+ * that drifts is the worst kind of bug here: the collection would quietly
+ * filter on subtly different rules with nothing throwing. So this runs both
+ * over the same real data, for a spread of real query strings, and diffs the
+ * resulting rows — id, order, every field the views read, the ids query that
+ * feeds the pager, and three page offsets.
+ *
+ * Both sides are driven by the actual source: the same collectionQuery parser
+ * produces the filters, the legacy side runs the real cards worker over
+ * database.json, and the SQL side runs the real .sqlite through the same wasm
+ * engine the app uses.
+ *
+ * This only has something to compare against for as long as the JSON path
+ * exists. `query-tests.mjs` pins the same behaviour to golden grpid sets and
+ * outlives it.
+ *
+ *   npm run build:workers
+ *   node scripts/verify-collection-sql.mjs [db.sqlite] [database.json]
+ */
+import fs from "fs";
+import path from "path";
+import { createRequire } from "module";
+
+import _ from "lodash";
+
+import { REPO, DEFAULT_DB, setup } from "./lib/collection-harness.mjs";
+
+const require = createRequire(import.meta.url);
+
+const dbPath = path.resolve(process.argv[2] || DEFAULT_DB);
+const jsonPath = path.resolve(
+  process.argv[3] || path.join(REPO, "src/assets/resources/database.json")
+);
+
+/** Query strings covering every filter branch the translator implements. */
+const SCENARIOS = [
+  "",
+  "dragon",
+  "goblin",
+  "type:creature",
+  "type:instant",
+  "artist:titov",
+  "cmc>=5",
+  "cmc<2",
+  "cmc=3",
+  "rarity:mythic",
+  "rarity>=rare",
+  "rarity!=common",
+  "c:r",
+  "c:wu",
+  "c=g",
+  "c>=br",
+  "legal:standard",
+  "legal:historic",
+  "format:alchemy",
+  "banned:standard",
+  "suspended:historic",
+  "is:craftable",
+  "is:booster",
+  "-is:booster",
+  "s:neo",
+  "s:dmu",
+  "set:woe",
+  "-dragon",
+  "dragon type:creature",
+  "type:creature cmc<=2 c:g",
+  "legal:standard rarity:rare",
+  "legal:standard -is:booster cmc>=4",
+  "in:booster",
+  "-in:booster",
+  "-legal:standard",
+  "-banned:standard",
+  "legal:alchemy",
+  "banned:historic",
+  "-goblin",
+  "legal:standard in:booster rarity:rare",
+];
+
+const SORTS = [
+  { key: "setCode", sort: -1 },
+  { key: "fullName", sort: 1 },
+  { key: "cmc", sort: 1 },
+  { key: "rarityVal", sort: -1 },
+];
+
+const FIELDS = [
+  "id",
+  "cmc",
+  "cid",
+  "fullName",
+  "fullType",
+  "artist",
+  "owned",
+  "acquired",
+  "colors",
+  "colorSortVal",
+  "rankSortVal",
+  "rarityVal",
+  "craftable",
+  "booster",
+];
+
+const ARRAYS = ["setCode", "format", "legal", "banned", "suspended"];
+
+function diffRow(a, b) {
+  for (const f of FIELDS) {
+    const x = a[f];
+    const y = b[f];
+    if (typeof x === "number" && Number.isNaN(x) && Number.isNaN(y)) continue;
+    if (x !== y) return `${f}: ${JSON.stringify(x)} vs ${JSON.stringify(y)}`;
+  }
+  for (const f of ARRAYS) {
+    const x = [...(a[f] || [])].sort().join("|");
+    const y = [...(b[f] || [])].sort().join("|");
+    if (x !== y) return `${f}: ${x} vs ${y}`;
+  }
+  return null;
+}
+
+console.log(`sqlite: ${dbPath}`);
+console.log(`json:   ${jsonPath}\n`);
+
+const {
+  query,
+  getFiltersFromQuery,
+  doCollectionFilter,
+  buildCollectionQuery,
+  buildCollectionIdsQuery,
+  rowsToCardsData,
+} = await setup(dbPath);
+
+console.log("Running the legacy cards worker over database.json …");
+const workerPath = path.join(
+  REPO,
+  "dist-cards-worker/cards-worker/getCollectionData.js"
+);
+if (!fs.existsSync(workerPath)) {
+  console.error(
+    `Missing ${workerPath}\n` +
+      `Compile it first: npx tsc -p cards-worker-tsconfig.json`
+  );
+  process.exit(1);
+}
+const getCollectionData = require(workerPath).default;
+const dbJson = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+const legacyAll = getCollectionData(
+  { prevCards: {}, cards: {} },
+  Object.values(dbJson.cards),
+  dbJson.cards,
+  dbJson.setNames,
+  dbJson.sets
+);
+console.log(`  ${legacyAll.length} rows\n`);
+
+const guardSkippedCases = [];
+let failures = 0;
+let cases = 0;
+
+for (const sort of SORTS) {
+  for (const scenario of SCENARIOS) {
+    cases += 1;
+    const filters = getFiltersFromQuery(scenario);
+
+    // Filter with the legacy chain, but sort separately.
+    //
+    // applySort refuses to sort at all when `data[0][key]` is falsy — a cmc of
+    // 0 in the first row is enough — so "sort by cmc" is currently a no-op in
+    // the app. The SQL path sorts properly, so comparing against the real
+    // applySort would report an ordering mismatch on a bug rather than on a
+    // translation error. Order is compared against a corrected sort instead,
+    // and the scenarios where the guard bites are reported at the end.
+    const unsorted = doCollectionFilter(legacyAll, filters, {
+      key: "",
+      sort: 1,
+    });
+    const guardSkipped =
+      unsorted.length > 0 && sort.key !== "" && !unsorted[0][sort.key];
+    if (guardSkipped) guardSkippedCases.push(`${sort.key}: "${scenario}"`);
+
+    const legacy = _.orderBy(
+      unsorted,
+      [sort.key, "id"],
+      [sort.sort === 1 ? "asc" : "desc", "asc"]
+    );
+
+    const { sql, params } = buildCollectionQuery(filters, sort);
+    const rows = rowsToCardsData(query(sql, params).values);
+
+    const label = `[sort ${sort.key} ${sort.sort}] "${scenario || "(empty)"}"`;
+
+    if (legacy.length !== rows.length) {
+      console.log(
+        `MISMATCH ${label}\n  count: legacy ${legacy.length} vs sql ${rows.length}`
+      );
+      const legacyIds = new Set(legacy.map((r) => r.id));
+      const sqlIds = new Set(rows.map((r) => r.id));
+      const onlyLegacy = [...legacyIds]
+        .filter((i) => !sqlIds.has(i))
+        .slice(0, 5);
+      const onlySql = [...sqlIds].filter((i) => !legacyIds.has(i)).slice(0, 5);
+      if (onlyLegacy.length) {
+        console.log(`  only legacy: ${onlyLegacy.join(", ")}`);
+      }
+      if (onlySql.length) console.log(`  only sql:    ${onlySql.join(", ")}`);
+      failures += 1;
+      continue;
+    }
+
+    // Row-by-row, which checks ordering as well as membership.
+    let rowDiff = null;
+    for (let i = 0; i < legacy.length; i += 1) {
+      if (legacy[i].id !== rows[i].id) {
+        rowDiff = `position ${i}: legacy id ${legacy[i].id} vs sql id ${rows[i].id}`;
+        break;
+      }
+      const d = diffRow(legacy[i], rows[i]);
+      if (d) {
+        rowDiff = `grpid ${legacy[i].id}: ${d}`;
+        break;
+      }
+    }
+
+    if (rowDiff) {
+      console.log(`MISMATCH ${label}\n  ${rowDiff}`);
+      failures += 1;
+      continue;
+    }
+
+    // The ids query drives the pager total and the per-set stats.
+    const idsQuery = buildCollectionIdsQuery(filters);
+    const idRows = query(idsQuery.sql, idsQuery.params).values.map((r) => r[0]);
+    if (idRows.length !== legacy.length) {
+      console.log(
+        `MISMATCH ${label}\n  ids count: ${idRows.length} vs ${legacy.length}`
+      );
+      failures += 1;
+      continue;
+    }
+    const idSet = new Set(idRows);
+    const idMissing = legacy.find((r) => !idSet.has(r.id));
+    if (idMissing) {
+      console.log(`MISMATCH ${label}\n  ids missing grpid ${idMissing.id}`);
+      failures += 1;
+      continue;
+    }
+
+    // Paged reads must line up with the corresponding slice of the full list.
+    const PAGE = 24;
+    let pageDiff = null;
+    for (const pageIndex of [0, 3, Math.floor(legacy.length / PAGE)]) {
+      const offset = pageIndex * PAGE;
+      if (offset >= legacy.length && legacy.length > 0) continue;
+      const paged = buildCollectionQuery(filters, sort, { limit: PAGE, offset });
+      const pageRows = rowsToCardsData(query(paged.sql, paged.params).values);
+      const expected = legacy.slice(offset, offset + PAGE);
+      if (pageRows.length !== expected.length) {
+        pageDiff = `page ${pageIndex}: ${pageRows.length} rows vs ${expected.length}`;
+        break;
+      }
+      for (let i = 0; i < expected.length; i += 1) {
+        if (expected[i].id !== pageRows[i].id) {
+          pageDiff = `page ${pageIndex} position ${i}: ${expected[i].id} vs ${pageRows[i].id}`;
+          break;
+        }
+        const d = diffRow(expected[i], pageRows[i]);
+        if (d) {
+          pageDiff = `page ${pageIndex} grpid ${expected[i].id}: ${d}`;
+          break;
+        }
+      }
+      if (pageDiff) break;
+    }
+
+    if (pageDiff) {
+      console.log(`MISMATCH ${label}\n  ${pageDiff}`);
+      failures += 1;
+    } else {
+      console.log(`ok  ${label.padEnd(52)} ${legacy.length} rows (+ids, +pages)`);
+    }
+  }
+}
+
+console.log(`\n${cases - failures}/${cases} scenarios match.`);
+if (guardSkippedCases.length) {
+  console.log(
+    `\n${guardSkippedCases.length} scenario(s) hit the applySort guard, where the\n` +
+      `legacy path silently does not sort at all and SQL does. Sorting is\n` +
+      `compared against a corrected sort for those. Affected:`
+  );
+  [...new Set(guardSkippedCases)]
+    .slice(0, 8)
+    .forEach((c) => console.log(`  ${c}`));
+}
+if (failures) process.exitCode = 1;

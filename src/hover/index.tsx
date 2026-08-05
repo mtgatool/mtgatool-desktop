@@ -13,6 +13,7 @@ import { ChannelMessage } from "../broadcastChannel/channelMessages";
 import { Settings } from "../common/defaultConfig";
 import { CARD_SIZE_RATIO } from "../common/static";
 import { LANDS_HACK } from "../constants";
+import useCard from "../hooks/useCard";
 import useTransparentFix from "../hooks/useTransparentFix";
 import GroupedLandsDetails from "../overlay/GroupedLandsDetails";
 import {
@@ -44,6 +45,11 @@ export default function Hover() {
   const [hovering, setHovering] = useState(false);
   const [cardOdds, setCardOdds] = useState<Chances>();
   const [grpId, setGrpId] = useState<number>();
+
+  // Resolved before the image URL is built: getCardImage can look a grpId up
+  // itself, but only returns what has already been fetched, so on a first
+  // hover the URL came out with an undefined set and collector number.
+  const hoverCardObj = useCard(grpId);
   const [settings, setSettings] = useState<Settings>(
     JSON.parse(getLocalSetting("settings")) as Settings
   );
@@ -243,10 +249,10 @@ export default function Hover() {
         if (remote) remote.getCurrentWindow().hide();
       }, 250);
     }
-    if (grpId) {
+    if (grpId && hoverCardObj) {
       // Reset the image, begin new loading and clear state
-      const front = getCardImage(grpId, quality);
-      const back = getBackUrl(grpId, quality);
+      const front = getCardImage(hoverCardObj, quality);
+      const back = getBackUrl(hoverCardObj, quality);
       const img = new Image();
       img.src = front;
       img.onload = (): void => {
@@ -267,7 +273,7 @@ export default function Hover() {
       };
     }
     return vodiFn;
-  }, [grpId, hovering, quality, settings, calculatePosition]);
+  }, [grpId, hoverCardObj, hovering, quality, settings, calculatePosition]);
 
   return (
     <div className="click-through hover-root">

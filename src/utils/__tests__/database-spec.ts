@@ -1,9 +1,9 @@
 /* eslint-env jest */
-import loadDbFromCache from "../loadDbFromCache";
 import database from "../mtga/database";
 import request from "../request";
+import testSeedDatabase from "../testSeedDatabase";
 
-loadDbFromCache();
+testSeedDatabase();
 
 interface Latest {
   latest: string;

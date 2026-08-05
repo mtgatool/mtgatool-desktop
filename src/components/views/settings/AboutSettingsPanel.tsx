@@ -34,26 +34,24 @@ export default function AboutSettingsPanel(): JSX.Element {
       >
         {`Version ${info.version}`}
       </div>
-      {database.metadata ? (
+      {database.ok ? (
         <>
           <div
             className="message-sub15 release-notes-link"
             onClick={(): void => {
               openExternal(
-                database.metadata?.version
-                  ? `${METADATA_RELEASES}/tag/v${database.metadata.version}`
+                database.version
+                  ? `${METADATA_RELEASES}/tag/v${database.version}`
                   : `${METADATA_RELEASES}/latest`
               );
             }}
           >
-            {`Metadata v${database.metadata.version || "???"} (${
-              database.lang
-            })`}
+            {`Metadata v${database.version || "???"} (${database.lang})`}
           </div>
           <div className="message-sub15">
             Updated{" "}
-            {database.metadata.updated
-              ? format(fromUnixTime(database.metadata.updated / 1000), "Pp")
+            {database.updated
+              ? format(fromUnixTime(database.updated / 1000), "Pp")
               : "???"}
           </div>
         </>

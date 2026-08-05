@@ -303,8 +303,17 @@ class CardsList {
     this.list.forEach(function (card) {
       const cardObj = db.card(card.id);
       const found = newList.find((c: CardObject) => {
+        // The same printing always merges, whether or not it is loaded.
+        if (c.id === card.id) return true;
         const dbCard = db.card(c.id);
-        return dbCard?.Name === cardObj?.Name;
+        // Merging different printings needs both names, and needs them to be
+        // known. A card lookup only returns what has already been fetched, so
+        // before that every name is undefined — and `undefined === undefined`
+        // made the first entry match every other one, collapsing a whole deck
+        // into a single card. Destructively: replaceList defaults to true, so
+        // the other ids were gone before anything could fetch them, and no
+        // later render could recover the list.
+        return !!dbCard && !!cardObj && dbCard.Name === cardObj.Name;
       });
       if (found) {
         if (found.measurable) {

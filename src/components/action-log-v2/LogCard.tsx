@@ -1,5 +1,5 @@
+import useCard from "../../hooks/useCard";
 import useHoverCard from "../../hooks/useHoverCard";
-import database from "../../utils/mtga/database";
 
 interface LogCardProps {
   grpId: number;
@@ -7,7 +7,7 @@ interface LogCardProps {
 
 export default function LogCard(props: LogCardProps): JSX.Element {
   const { grpId } = props;
-  const cardObj = database.card(grpId);
+  const cardObj = useCard(grpId);
   const cardName = cardObj?.Name;
 
   const [hoverIn, hoverOut] = useHoverCard(grpId);

@@ -9,6 +9,7 @@ import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { CardsData } from "../../../types/collectionTypes";
 import { Filters } from "../../../types/genericFilterTypes";
+import cardsDb from "../../../utils/cardsDb/cardsDbClient";
 import database from "../../../utils/mtga/database";
 import doCollectionFilter from "../../../utils/tables/doCollectionFilter";
 import InputContainer from "../../InputContainer";
@@ -20,12 +21,20 @@ import Section from "../../ui/Section";
 import Toggle from "../../ui/Toggle";
 import CardCollection from "./CardCollection";
 import getFiltersFromQuery, { removeFilterFromQuery } from "./collectionQuery";
+import {
+  buildCollectionIdsQuery,
+  buildCollectionQuery,
+  rowsToCardsData,
+} from "./collectionSql";
 import { getCollectionStats } from "./collectionStats";
 import makeExportSetForScryfallFn from "./exportSetForScryfall";
 import SetsView from "./SetsView";
 
 interface ViewCollectionProps {
+  /** Only populated on the legacy path; empty when the SQLite database is up. */
   collectionData: CardsData[];
+  /** Bumped by ContentWrapper when the worker's collection table changes. */
+  collectionEpoch?: number;
   openAdvancedCollectionSearch: () => void;
 }
 
@@ -37,10 +46,9 @@ export default function ViewCollection(props: ViewCollectionProps) {
   const [exportDigital, setExportDigital] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<"cards" | "set">("cards");
 
-  const { collectionData, openAdvancedCollectionSearch } = props;
+  const { collectionData, collectionEpoch, openAdvancedCollectionSearch } =
+    props;
   const dispatch = useDispatch();
-
-  makeExportSetForScryfallFn(collectionData);
 
   const [filters, setFilters] = useState<Filters<CardsData>>();
   const [sortValue, setSortValue] = useState<Sort<CardsData>>({
@@ -77,13 +85,109 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
   const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
 
-  const filteredData = useMemo(
+  // SQLite path: filtering, sorting and paging all happen in the database, so
+  // nothing here ever holds more than one page. collectionSql.ts is a direct
+  // translation of doCollectionFilter, which is still used verbatim when there
+  // is no database.
+  const sqlAvailable = cardsDb.available;
+
+  // Every matching id, for the pager total and the per-set stats — the only two
+  // things that genuinely need the whole result set. One column, no ORDER BY.
+  const [ids, setIds] = useState<number[]>([]);
+  const [pageRows, setPageRows] = useState<CardsData[]>([]);
+
+  const legacyFiltered = useMemo(
     () =>
-      filters ? doCollectionFilter(collectionData, filters, sortValue) : [],
-    [filters, sortValue, collectionData]
+      !sqlAvailable && filters
+        ? doCollectionFilter(collectionData, filters, sortValue)
+        : [],
+    [sqlAvailable, filters, sortValue, collectionData]
   );
 
-  const pagingControlProps = usePagingControls(filteredData.length, 24);
+  useEffect(() => {
+    if (!sqlAvailable || !filters) return undefined;
+
+    let cancelled = false;
+    const { sql, params } = buildCollectionIdsQuery(filters);
+    cardsDb
+      .query(sql, params)
+      .then((result) => {
+        if (!cancelled) setIds(result.values.map((row) => row[0] as number));
+      })
+      .catch((e) => {
+        // eslint-disable-next-line no-console
+        console.log("[cards-db] collection ids query failed", e);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sqlAvailable, filters, collectionEpoch]);
+
+  const total = sqlAvailable ? ids.length : legacyFiltered.length;
+  const pagingControlProps = usePagingControls(total, 24);
+  const { pageIndex, pageSize, gotoPage } = pagingControlProps;
+
+  useEffect(() => {
+    if (!sqlAvailable || !filters) return undefined;
+
+    let cancelled = false;
+    const { sql, params } = buildCollectionQuery(filters, sortValue, {
+      limit: pageSize,
+      offset: pageIndex * pageSize,
+    });
+    cardsDb
+      .query(sql, params)
+      .then((result) => {
+        if (!cancelled) setPageRows(rowsToCardsData(result.values));
+      })
+      .catch((e) => {
+        // eslint-disable-next-line no-console
+        console.log("[cards-db] collection page query failed", e);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sqlAvailable, filters, sortValue, pageIndex, pageSize, collectionEpoch]);
+
+  // A new search can leave you past the end of a shorter result set, which
+  // reads as an empty collection rather than as page 40 of 2.
+  useEffect(() => {
+    gotoPage(0);
+  }, [filters]);
+
+  /** The rows actually rendered — one page, from whichever path is live. */
+  const visibleRows = useMemo(
+    () =>
+      sqlAvailable
+        ? pageRows
+        : legacyFiltered.slice(
+            pageIndex * pageSize,
+            (pageIndex + 1) * pageSize
+          ),
+    [sqlAvailable, pageRows, legacyFiltered, pageIndex, pageSize]
+  );
+
+  /**
+   * Every matching row, fetched on demand. Only the CSV export and the Scryfall
+   * console helper want this, and both are user-initiated, so the ~1s it costs
+   * is paid when someone asks for it rather than on every render.
+   */
+  const fetchAllRows = useCallback(
+    async (useFilters: boolean): Promise<CardsData[]> => {
+      if (!sqlAvailable) return useFilters ? legacyFiltered : collectionData;
+      const { sql, params } = buildCollectionQuery(
+        useFilters && filters ? filters : [],
+        sortValue
+      );
+      const result = await cardsDb.query(sql, params);
+      return rowsToCardsData(result.values);
+    },
+    [sqlAvailable, filters, sortValue, legacyFiltered, collectionData]
+  );
+
+  makeExportSetForScryfallFn(() => fetchAllRows(false));
 
   useEffect(() => {
     const newFilters = getFiltersFromQuery(collectionQuery);
@@ -100,10 +204,11 @@ export default function ViewCollection(props: ViewCollectionProps) {
     }
   }, []);
 
-  const stats = useMemo(() => {
-    const cardIds = filteredData.map((row) => row.id);
-    return getCollectionStats(cardIds);
-  }, [filteredData]);
+  const stats = useMemo(
+    () =>
+      getCollectionStats(sqlAvailable ? ids : legacyFiltered.map((r) => r.id)),
+    [sqlAvailable, ids, legacyFiltered]
+  );
 
   const setQuery = useCallback(
     (query: string) => {
@@ -152,11 +257,16 @@ export default function ViewCollection(props: ViewCollectionProps) {
     [history]
   );
 
-  const downloadTxtFile = useCallback(() => {
+  // Exports the whole collection, not the current search — which is what it
+  // always did, back when the view held the unfiltered array. On the SQLite
+  // path the rows are fetched here instead, when the button is pressed.
+  const downloadTxtFile = useCallback(async () => {
+    const rows = await fetchAllRows(false);
+
     function generateCollectionCSV() {
       let csv = `Count;Name;Edition;Collector Number;Rarity\n`;
 
-      collectionData.forEach((c) => {
+      rows.forEach((c) => {
         const cardObj = database.card(c.id);
 
         const isDigital =
@@ -201,7 +311,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
     element.download = "collection.csv";
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
-  }, [exportUnowned, exportDigital, collectionData]);
+  }, [exportUnowned, exportDigital, fetchAllRows]);
 
   return (
     <>
@@ -297,19 +407,14 @@ export default function ViewCollection(props: ViewCollectionProps) {
             }}
             className="collection-table"
           >
-            {filteredData
-              .slice(
-                pagingControlProps.pageIndex * pagingControlProps.pageSize,
-                (pagingControlProps.pageIndex + 1) * pagingControlProps.pageSize
-              )
-              .map((card) => {
-                return (
-                  <CardCollection
-                    card={card}
-                    key={`collection-card-${card.id}`}
-                  />
-                );
-              })}
+            {visibleRows.map((card) => {
+              return (
+                <CardCollection
+                  card={card}
+                  key={`collection-card-${card.id}`}
+                />
+              );
+            })}
           </div>
 
           <div style={{ marginTop: "10px" }}>

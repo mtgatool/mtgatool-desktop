@@ -114,6 +114,8 @@ export default function logEntrySwitch(entry: LogEntry): void {
     case "DeckUpsertDeckV3":
       if (entry.arrow == "<==") {
         Labels.InDeckUpdateDeckV3(entry);
+      } else if (entry.arrow == "==>") {
+        Labels.OutDeckUpsertDeckV3(entry);
       }
       break;
 
@@ -160,6 +162,7 @@ export default function logEntrySwitch(entry: LogEntry): void {
       break;
 
     case "Event.AIPractice":
+    case "EventAiBotMatch":
       if (entry.arrow == "==>") {
         Labels.OutEventAIPractice(entry);
       }

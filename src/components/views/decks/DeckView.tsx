@@ -9,6 +9,7 @@ import { useHistory, useParams } from "react-router-dom";
 import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
 import { ReactComponent as CameraIcon } from "../../../assets/images/svg/camera-solid.svg";
 import { DEFAULT_TILE, MANA_COLORS } from "../../../constants";
+import { useCardArtCrop } from "../../../hooks/useCardImage";
 import useSavedDecks from "../../../hooks/useSavedDecks";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
@@ -16,7 +17,6 @@ import { CardObject, DbCardDataV2 } from "../../../types";
 import { StatsDeck } from "../../../types/dbTypes";
 import compareCards from "../../../utils/compareCards";
 import copyToClipboard from "../../../utils/copyToClipboard";
-import { getCardArtCrop } from "../../../utils/getCardArtCrop";
 import getDeckColorsAmmount from "../../../utils/getDeckColorsAmmount";
 import getDeckLandsAmmount from "../../../utils/getDeckLandsAmmount";
 import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
@@ -59,6 +59,7 @@ export default function DeckView(props: DeckViewProps): JSX.Element {
   const params = useParams<{ page: string; id: string }>();
 
   const [dbDeck, setDbDeck] = useState<StatsDeck>();
+  const deckArt = useCardArtCrop(dbDeck?.deckTileId || DEFAULT_TILE);
   // A played deck has match history (deck changes + card winrates). Saved decks
   // read from memory that were never played have neither.
   const [isPlayed, setIsPlayed] = useState(false);
@@ -174,9 +175,7 @@ export default function DeckView(props: DeckViewProps): JSX.Element {
       <div
         className="decks-top"
         style={{
-          backgroundImage: dbDeck
-            ? `url(${getCardArtCrop(dbDeck.deckTileId || DEFAULT_TILE)})`
-            : "",
+          backgroundImage: dbDeck ? `url(${deckArt})` : "",
         }}
       >
         <DeckColorsBar deck={deck} />

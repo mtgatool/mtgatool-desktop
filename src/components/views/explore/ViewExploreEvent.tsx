@@ -8,6 +8,7 @@ import {
   ExploreMetaEventRow,
   fetchExploreMetaEvents,
 } from "../../../data/fetchExploreMeta";
+import { useCards } from "../../../hooks/useCard";
 import useCardDatabaseVersion from "../../../hooks/useCardDatabaseVersion";
 import { clusterBySimilarity, deckVector } from "../../../utils/deckSimilarity";
 import getEventPrettyName from "../../../utils/getEventPrettyName";
@@ -36,6 +37,28 @@ export default function ViewExploreEvent(): JSX.Element {
   }, [params.id]);
 
   const dbVersion = useCardDatabaseVersion();
+
+  /**
+   * Load every card these lists mention, before clustering reads them.
+   *
+   * deckVector looks each card up and skips what it cannot resolve, and card
+   * lookups only return what has already been fetched. Nothing here had ever
+   * asked for these, so on a first visit every vector came out empty, nothing
+   * merged, and one deck appeared as nine separate entries. `cardsLoaded` is in
+   * the memo's dependencies so the clustering redoes itself once they land.
+   */
+  const rowGrpIds = useMemo(() => {
+    const ids = new Set<number>();
+    (rows || []).forEach((row) => {
+      const deck: any = row.deck || {};
+      (deck.mainDeck || []).forEach((card: any) => {
+        if (card?.id) ids.add(card.id);
+      });
+    });
+    return [...ids];
+  }, [rows]);
+
+  const cardsLoaded = useCards(rowGrpIds).filter(Boolean).length;
 
   // Near-identical lists are merged into one entry before ranking: without it a
   // deck that was tweaked between sessions appears several times over, each copy
@@ -78,7 +101,7 @@ export default function ViewExploreEvent(): JSX.Element {
         };
       })
       .sort((a, b) => b.winrate - a.winrate || b.games - a.games);
-  }, [rows, dbVersion]);
+  }, [rows, dbVersion, cardsLoaded]);
 
   return (
     <div style={{ padding: "0 16px" }}>

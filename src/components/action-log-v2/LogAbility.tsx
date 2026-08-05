@@ -1,4 +1,4 @@
-import database from "../../utils/mtga/database";
+import useAbility from "../../hooks/useAbility";
 
 interface LogAbilityProps {
   abId: number;
@@ -6,7 +6,7 @@ interface LogAbilityProps {
 
 export default function LogAbility(props: LogAbilityProps): JSX.Element {
   const { abId } = props;
-  const desc = database.ability(abId);
+  const desc = useAbility(abId);
 
   return (
     <span title={desc} className="ability">

@@ -1,9 +1,9 @@
 /* eslint-env jest */
 
-import loadDbFromCache from "../loadDbFromCache";
 import Deck from "../mtga/deck";
+import testSeedDatabase from "../testSeedDatabase";
 
-loadDbFromCache();
+testSeedDatabase();
 
 describe("deck", () => {
   describe("constructor", () => {});

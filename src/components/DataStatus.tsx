@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { useSelector } from "react-redux";
 
 import { ReactComponent as DataIcon } from "../assets/images/svg/data.svg";
+import useCardsDbReady from "../hooks/useCardsDbReady";
 import { AppState } from "../redux/stores/rendererStore";
 import database from "../utils/mtga/database";
 import vodiFn from "../utils/voidfn";
@@ -26,6 +27,9 @@ function StatusLine(props: StatusLineProps) {
 }
 
 export default function DataStatus() {
+  // Reads database.cardCount below, which is 0 until the database has loaded.
+  useCardsDbReady();
+
   const closeAltRef = useRef<() => void>(vodiFn);
   const openAltRef = useRef<() => void>(vodiFn);
   const positionRef = useRef<HTMLDivElement>(null);
@@ -63,8 +67,8 @@ export default function DataStatus() {
             }
           />
           <StatusLine
-            title={`Cards database (${Object.keys(database.cards).length})`}
-            status={database.cards ? "OK" : "LOADING"}
+            title={`Cards database (${database.cardCount})`}
+            status={database.ok ? "OK" : "LOADING"}
           />
           <StatusLine
             title={`Owned cards (${Object.values(

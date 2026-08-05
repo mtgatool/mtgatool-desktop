@@ -14,8 +14,7 @@ export default function SetCompletionBar({
   setIconCode: string;
   setName: string;
 }): JSX.Element {
-  const iconSvg =
-    database.sets[setIconCode]?.svg ?? database.metadata?.sets[""];
+  const iconSvg = database.sets[setIconCode]?.svg ?? database.sets[""];
   const setIcon = iconSvg
     ? `url(data:image/svg+xml;base64,${iconSvg})`
     : `url(${notFound})`;

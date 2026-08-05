@@ -4,6 +4,7 @@ import _ from "lodash";
 import { Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import useDeckCards from "../../../hooks/useDeckCards";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { CardObject, DbCardDataV2 } from "../../../types";
@@ -125,6 +126,8 @@ export default function VisualDeckView(
   props: VisualDeckViewProps
 ): JSX.Element {
   const { deck, setRegularView } = props;
+
+  useDeckCards(deck);
 
   const sz = useSelector(
     (state: AppState) => 100 + state.settings.cardsSize * 15

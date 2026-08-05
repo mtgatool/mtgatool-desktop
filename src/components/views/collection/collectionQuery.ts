@@ -89,16 +89,28 @@ function getTokenVal(
   val: string
 ): AllFilters<CardsData> | undefined {
   switch (key) {
-    case "name":
+    case "name": {
+      // A bare word reaches here as name:<word>, because parseFilterValue
+      // synthesises the "name" key for anything without one. That means a
+      // leading "-" is still part of the value and never reached isNegative,
+      // so `-dragon` searched for the literal "-dragon" — which matches
+      // "The Ur-Dragon" and two others, and reads as broken negation.
+      // XOR with isNegative so `-name:-dragon` cancels out.
+      const negated = val.startsWith("-");
       if (separator === "=" || separator === ":") {
         const newFilter: StringFilterType<CardsData> = {
           type: "string",
           id: "fullName",
-          value: { string: val, not: isNegative, exact: false },
+          value: {
+            string: negated ? val.slice(1) : val,
+            not: isNegative !== negated,
+            exact: false,
+          },
         };
         return newFilter;
       }
       break;
+    }
     case "type":
       if (separator === "=" || separator === ":") {
         const newFilter: StringFilterType<CardsData> = {
@@ -129,45 +141,57 @@ function getTokenVal(
         return newFilter;
       }
       break;
+    // banned / suspended / legal emit `instringarray`, like `format` above.
+    //
+    // They used to emit `array`, which nothing consumed: doCollectionFilter's
+    // `array` case only handles `setCode`, so every one of these was silently
+    // dropped and `legal:standard` matched the entire collection. The comma
+    // list they parsed was never honoured either, for the same reason, so
+    // taking a single value here loses nothing that worked.
     case "banned":
       if (separator === "=" || separator === ":") {
-        const newFilter: ArrayFilterType<CardsData> = {
-          type: "array",
+        const newFilter: InStringArrayFilterType<CardsData> = {
+          type: "instringarray",
           id: "banned",
-          value: { arr: val.split(","), not: isNegative, mode: ":" },
+          value: { value: val, not: isNegative },
         };
         return newFilter;
       }
       break;
     case "suspended":
       if (separator === "=" || separator === ":") {
-        const newFilter: ArrayFilterType<CardsData> = {
-          type: "array",
+        const newFilter: InStringArrayFilterType<CardsData> = {
+          type: "instringarray",
           id: "suspended",
-          value: { arr: val.split(","), not: isNegative, mode: ":" },
+          value: { value: val, not: isNegative },
         };
         return newFilter;
       }
       break;
+    // `is:` and `in:` accept the same words. They were split — craftable only
+    // under `is:`, booster only under `in:` — so `is:booster` matched no token
+    // at all, fell through to the bare-word path, and searched card names for
+    // the literal string "is:booster", i.e. returned nothing.
+    //
+    // `value` is `true` rather than the old `!!val`, which was always true
+    // anyway because val is a non-empty word by this point. Negation is
+    // `not`, which is what `-is:booster` sets.
     case "is":
+    case "in":
       if (separator === "=" || separator === ":") {
         if (val == "craftable") {
           const newFilter: InBoolFilterType<CardsData> = {
             type: "inbool",
             id: "craftable",
-            value: { value: !!val, type: val, mode: ":", not: isNegative },
+            value: { value: true, type: val, mode: ":", not: isNegative },
           };
           return newFilter;
         }
-      }
-      break;
-    case "in":
-      if (separator === "=" || separator === ":") {
         if (val == "boosters" || val == "booster") {
           const newFilter: InBoolFilterType<CardsData> = {
             type: "inbool",
             id: "booster",
-            value: { value: !!val, type: val, mode: ":", not: isNegative },
+            value: { value: true, type: val, mode: ":", not: isNegative },
           };
           return newFilter;
         }
@@ -183,10 +207,10 @@ function getTokenVal(
       break;
     case "legal":
       if (separator === "=" || separator === ":") {
-        const newFilter: ArrayFilterType<CardsData> = {
-          type: "array",
+        const newFilter: InStringArrayFilterType<CardsData> = {
+          type: "instringarray",
           id: "legal",
-          value: { arr: val.split(","), not: isNegative, mode: ":" },
+          value: { value: val, not: isNegative },
         };
         return newFilter;
       }

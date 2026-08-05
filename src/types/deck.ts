@@ -95,3 +95,24 @@ export interface ArenaV3Deck extends BasicDeck {
   companionGRPId: number;
   type: "ArenaV3Deck";
 }
+
+/**
+ * The deck shape sent by `Event_SetDeckV2` and `DeckUpsertDeckV3`: a summary
+ * beside the lists, each list an array of `{ cardId, quantity }`.
+ *
+ * Only the fields both labels actually carry are declared. `DeckUpsertDeckV3`
+ * sends no `ReducedSideboard`, so nothing may depend on it.
+ */
+export interface ArenaV4DeckPayload {
+  Summary: {
+    DeckId: string;
+    Name?: string;
+    DeckTileId: number;
+  };
+  Deck: {
+    MainDeck: v4cardsList;
+    Sideboard: v4cardsList;
+    CommandZone: v4cardsList;
+    Companions: v4cardsList;
+  };
+}

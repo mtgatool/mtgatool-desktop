@@ -16,12 +16,12 @@ import { AppState } from "../redux/stores/rendererStore";
 import { CardsData } from "../types/collectionTypes";
 import { defaultCardsData } from "../types/dbTypes";
 import aggregateStats from "../utils/aggregateStats";
+import cardsDb from "../utils/cardsDb/cardsDbClient";
 import isElectron from "../utils/electron/isElectron";
 import getCssQuality from "../utils/getCssQuality";
 import getEventPrettyName from "../utils/getEventPrettyName";
 import getPlayerNameWithoutSuffix from "../utils/getPlayerNameWithoutSuffix";
 import getPopupClass from "../utils/getPopupClass";
-import database from "../utils/mtga/database";
 import Deck from "../utils/mtga/deck";
 import doHistoryFilter from "../utils/tables/doHistoryFilter";
 import timeAgo from "../utils/timeAgo";
@@ -71,26 +71,28 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   const dispatch = useDispatch();
   const params = useParams<{ page: string }>();
   const paths = useRef<string[]>([params.page]);
-  const [collectionData, setCollectionData] = useState<CardsData[]>([]);
+  // The collection view reads from SQLite now; this stays only because
+  // ViewCollection still accepts it, and is always empty.
+  const [collectionData] = useState<CardsData[]>([]);
 
-  const workerRef = useRef<Worker | null>(null);
+  // Whether the SQLite card database is up. When it is, the legacy cards worker
+  // below is never started at all: its whole job was to be handed a structured
+  // clone of the entire 26k-card database and derive per-card facts from it,
+  // and both halves of that are now gone — the data lives in one worker, and
+  // the facts are columns.
+  const [cardsDbReady, setCardsDbReady] = useState(false);
+  // Bumped once the worker's collection table reflects the current account, so
+  // the collection view knows to re-run its query.
+  const [collectionEpoch, setCollectionEpoch] = useState(0);
 
   useEffect(() => {
-    // index.html carries `<base href="./">`, so a relative worker URL resolves
-    // against the CURRENT ROUTE rather than the app root. Loading /collection/
-    // directly asked for /collection/cards-worker/index.js, which does not
-    // exist, so the SPA fallback answered with index.html — and a module worker
-    // refuses text/html ("Failed to load module script: ... non-JavaScript MIME
-    // type"). The worker never started and the collection page stayed empty.
-    // It only breaks on a direct load or refresh of a nested route; arriving
-    // from "/" resolves correctly, which is why it survived this long.
-    //
-    // Anchored to the origin on web. Electron is left exactly as it was: it
-    // loads from file://, where an origin-absolute URL would not resolve.
-    const workerUrl = isElectron()
-      ? "cards-worker/index.js"
-      : `${window.location.origin}/cards-worker/index.js`;
-    workerRef.current = new Worker(workerUrl, { type: "module" });
+    let cancelled = false;
+    cardsDb.init().then((ready) => {
+      if (!cancelled) setCardsDbReady(ready);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const os = forceOs || (isElectron() ? process.platform : "");
@@ -119,19 +121,18 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   }, [matchesIndex, currentUUID]);
 
   useEffect(() => {
-    if (workerRef.current) {
-      workerRef.current.postMessage({
-        cards: uuidData[currentUUID]?.cards || defaultCardsData,
-        cardsList: database.cardList,
-        allCards: database.cards,
-        setNames: database.setNames,
-        sets: database.sets,
-      });
-      workerRef.current.onmessage = (e) => {
-        setCollectionData(e.data);
-      };
-    }
-  }, [uuidData, currentUUID, forceCollection]);
+    if (!cardsDbReady) return;
+    const cards = uuidData[currentUUID]?.cards || defaultCardsData;
+
+    // Only the player's own counts cross the worker boundary. This used to
+    // hand a structured clone of the entire card database to a worker on every
+    // one of these updates.
+    cardsDb
+      .setCollection(cards.cards || {}, cards.prevCards || {})
+      .then(() => setCollectionEpoch((epoch) => epoch + 1))
+      // eslint-disable-next-line no-console
+      .catch((e) => console.log("[cards-db] setCollection failed", e));
+  }, [uuidData, currentUUID, forceCollection, cardsDbReady]);
 
   useEffect(() => {
     if (params.page === "decks") {
@@ -330,6 +331,7 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
                     <Page
                       key={`${Object.keys(views)[item]}-page`}
                       collectionData={collectionData}
+                      collectionEpoch={collectionEpoch}
                       openAdvancedCollectionSearch={
                         openAdvancedCollectionSearch.current
                       }
@@ -353,6 +355,7 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
                 <CurrentPage
                   key={`${Object.keys(views)[viewIndex]}-page`}
                   collectionData={collectionData}
+                  collectionEpoch={collectionEpoch}
                   openAdvancedCollectionSearch={
                     openAdvancedCollectionSearch.current
                   }
