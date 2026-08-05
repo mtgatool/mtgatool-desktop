@@ -32,6 +32,7 @@ export { default as MatchGameRoomStateChangedEvent } from "./MatchGameRoomStateC
 export { default as onAuthenticateResponse } from "./onAuthenticateResponse";
 export { default as onClientSceneChange } from "./onClientSceneChange";
 export { default as outBotDraftDraftStatus } from "./outBotDraftDraftStatus";
+export { default as OutDeckUpsertDeckV3 } from "./OutDeckUpsertDeckV3";
 export { default as OutDirectGameChallenge } from "./OutDirectGameChallenge";
 export { default as OutDraftMakePick } from "./OutDraftMakePick";
 export { default as OutEventAIPractice } from "./OutEventAIPractice";
