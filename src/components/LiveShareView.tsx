@@ -8,9 +8,8 @@ import supabase from "../data/supabase";
 import OverlayContent from "../overlay/OverlayContent";
 import { InternalDraftv2 } from "../types";
 import { DbDraftVote } from "../types/dbTypes";
+import cardsDb from "../utils/cardsDb/cardsDbClient";
 import compareCards from "../utils/compareCards";
-import { loadDbFromCache } from "../utils/database-wrapper";
-import getLocalSetting from "../utils/getLocalSetting";
 import Deck from "../utils/mtga/deck";
 import { ActionLogV2 } from "./action-log-v2/types";
 import Section from "./ui/Section";
@@ -39,7 +38,8 @@ export default function LiveShareView(): JSX.Element {
 
   // Card names/art need the cards database; load it without any login.
   useEffect(() => {
-    loadDbFromCache(getLocalSetting("lang") || "en")
+    cardsDb
+      .init()
       .catch(() => undefined)
       .finally(() => setDbReady(true));
   }, []);

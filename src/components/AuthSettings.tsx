@@ -123,11 +123,11 @@ export default function AuthSettings(props: AuthSettingsProps): JSX.Element {
             ).toDateString()}`}
           </p>
 
-          {database.metadata ? (
+          {database.ok ? (
             <p>
-              Metadata: v{database.metadata.version || "???"}, updated{" "}
-              {database.metadata.updated
-                ? format(fromUnixTime(database.metadata.updated / 1000), "Pp")
+              Metadata: v{database.version || "???"}, updated{" "}
+              {database.updated
+                ? format(fromUnixTime(database.updated / 1000), "Pp")
                 : "???"}
             </p>
           ) : (

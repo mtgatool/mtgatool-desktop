@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import reduxAction from "../../../redux/reduxAction";
-import { loadDbFromCache } from "../../../utils/database-wrapper";
+import cardsDb from "../../../utils/cardsDb/cardsDbClient";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import Select from "../../ui/Select";
@@ -60,7 +60,7 @@ export default function DataSettingsPanel(): JSX.Element {
     (lang: string) => {
       setDbLang(lang);
       setLocalSetting("lang", lang);
-      loadDbFromCache(getLocalSetting("lang")).then(() => {
+      cardsDb.init().then(() => {
         reduxAction(dispatch, { type: "FORCE_COLLECTION", arg: undefined });
       });
     },

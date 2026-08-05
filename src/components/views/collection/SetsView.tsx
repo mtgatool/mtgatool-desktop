@@ -43,8 +43,7 @@ export default function SetsView(props: SetsViewProps): JSX.Element {
     (s) => database.sets[s].arenacode.toLowerCase() == firstSet
   )[0];
 
-  const iconSvg =
-    database.sets[currentSetName]?.svg ?? database.metadata?.sets[""].svg;
+  const iconSvg = database.sets[currentSetName]?.svg ?? database.sets[""]?.svg;
 
   const setIcon = iconSvg
     ? `url(data:image/svg+xml;base64,${iconSvg})`

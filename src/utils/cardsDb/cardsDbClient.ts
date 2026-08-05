@@ -75,6 +75,12 @@ class CardsDbClient {
 
   public language = "EN";
 
+  /** When the shipped database was generated (unix ms). */
+  public updated = 0;
+
+  /** Row count, read once so nothing has to hold the rows to count them. */
+  public cardCount = 0;
+
   /**
    * Cards already fetched from the worker.
    *
@@ -94,6 +100,20 @@ class CardsDbClient {
   private pendingIds = new Set<number>();
 
   private flushScheduled = false;
+
+  /**
+   * Ability text, fetched on demand like cards.
+   *
+   * There are 20,836 of them and the log views ask for a handful at a time, so
+   * the same rule applies: nothing is resident until something asks. `ability`
+   * is read synchronously from a component body, so a miss returns undefined
+   * and schedules the fetch, and the next render has it.
+   */
+  private abilityCache = new Map<number, string>();
+
+  private pendingAbilities = new Set<number>();
+
+  private abilityFlushScheduled = false;
 
   public source = "";
 
@@ -284,10 +304,18 @@ class CardsDbClient {
 
     const meta = await this.query("SELECT key, value FROM meta");
     meta.values.forEach((row) => {
-      if (row[0] === "version")
+      if (row[0] === "version") {
         this.version = parseInt(row[1] as string, 10) || 0;
+      }
       if (row[0] === "language") this.language = (row[1] as string) || "EN";
+      if (row[0] === "updated") {
+        this.updated = parseInt(row[1] as string, 10) || 0;
+      }
     });
+
+    // Counted here rather than by holding the rows to count them.
+    const count = await this.query("SELECT COUNT(*) FROM cards");
+    this.cardCount = (count.values[0]?.[0] as number) ?? 0;
   }
 
   /**
@@ -373,10 +401,108 @@ class CardsDbClient {
 
   /** Ability text by id. */
   public async ability(abilityId: number): Promise<string> {
+    const hit = this.abilityCache.get(abilityId);
+    if (hit !== undefined) return hit;
     const result = await this.query("SELECT text FROM abilities WHERE id = ?", [
       abilityId,
     ]);
-    return (result.values[0]?.[0] as string) ?? "";
+    const text = (result.values[0]?.[0] as string) ?? "";
+    this.abilityCache.set(abilityId, text);
+    return text;
+  }
+
+  /** Every ability fetched so far. */
+  public get cachedAbilities(): Record<number, string> {
+    const out: Record<number, string> = {};
+    this.abilityCache.forEach((text, id) => {
+      out[id] = text;
+    });
+    return out;
+  }
+
+  /**
+   * Ability text, if fetched. Schedules the fetch on a miss so the next render
+   * has it — the log views call this straight from a component body.
+   */
+  public cachedAbility(abilityId: number): string | undefined {
+    const hit = this.abilityCache.get(abilityId);
+    if (hit !== undefined) return hit;
+    if (abilityId && !this.pendingAbilities.has(abilityId)) {
+      this.pendingAbilities.add(abilityId);
+      this.scheduleAbilityFlush();
+    }
+    return undefined;
+  }
+
+  private scheduleAbilityFlush(): void {
+    if (this.abilityFlushScheduled) return;
+    this.abilityFlushScheduled = true;
+    Promise.resolve().then(async () => {
+      this.abilityFlushScheduled = false;
+      const ids = [...this.pendingAbilities];
+      this.pendingAbilities.clear();
+      if (ids.length === 0) return;
+      try {
+        const placeholders = ids.map(() => "?").join(",");
+        const result = await this.query(
+          `SELECT id, text FROM abilities WHERE id IN (${placeholders})`,
+          ids
+        );
+        const found = new Set<number>();
+        result.values.forEach((row) => {
+          const id = row[0] as number;
+          found.add(id);
+          this.abilityCache.set(id, (row[1] as string) ?? "");
+        });
+        ids.forEach((id) => {
+          if (!found.has(id)) this.abilityCache.set(id, "");
+        });
+        this.abilityListeners.forEach((fn) => fn());
+      } catch (e) {
+        console.log("[cards-db] ability fetch failed", e);
+      }
+    });
+  }
+
+  /** Notified when a batch of abilities lands, so views can re-render. */
+  public abilityListeners = new Set<() => void>();
+
+  /**
+   * Fill the caches straight from a metadata JSON blob, for tests.
+   *
+   * The app no longer loads that JSON at all — this is the one place it is
+   * still read, so the unit tests that assert things about real card data keep
+   * working without the app paying for it at runtime. Not used outside tests.
+   */
+  public seedForTests(metadata: any): void {
+    this.cardCache.clear();
+    Object.keys(metadata.cards || {}).forEach((key) => {
+      const card = metadata.cards[key];
+      this.cardCache.set(card.GrpId, card as DbCardDataV2);
+    });
+    this.cardCount = this.cardCache.size;
+
+    this.abilityCache.clear();
+    Object.keys(metadata.abilities || {}).forEach((key) => {
+      this.abilityCache.set(parseInt(key, 10), metadata.abilities[key]);
+    });
+
+    this.sets = metadata.sets || {};
+    this.setNames = metadata.setNames || {};
+    this.digitalSets = metadata.digitalSets || [];
+    this.version = parseInt(metadata.version, 10) || 0;
+    this.language = metadata.language || "EN";
+    this.updated = metadata.updated || 0;
+    this.ready = true;
+  }
+
+  /** Every card currently cached — tests only; the app pages instead. */
+  public get cachedCards(): DbCardDataV2[] {
+    const out: DbCardDataV2[] = [];
+    this.cardCache.forEach((card) => {
+      if (card) out.push(card);
+    });
+    return out;
   }
 
   /** Decode a card's legality bitmask into format names. */

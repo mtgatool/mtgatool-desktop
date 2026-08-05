@@ -22,7 +22,6 @@ import getCssQuality from "../utils/getCssQuality";
 import getEventPrettyName from "../utils/getEventPrettyName";
 import getPlayerNameWithoutSuffix from "../utils/getPlayerNameWithoutSuffix";
 import getPopupClass from "../utils/getPopupClass";
-import database from "../utils/mtga/database";
 import Deck from "../utils/mtga/deck";
 import doHistoryFilter from "../utils/tables/doHistoryFilter";
 import timeAgo from "../utils/timeAgo";
@@ -72,9 +71,9 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   const dispatch = useDispatch();
   const params = useParams<{ page: string }>();
   const paths = useRef<string[]>([params.page]);
-  const [collectionData, setCollectionData] = useState<CardsData[]>([]);
-
-  const workerRef = useRef<Worker | null>(null);
+  // The collection view reads from SQLite now; this stays only because
+  // ViewCollection still accepts it, and is always empty.
+  const [collectionData] = useState<CardsData[]>([]);
 
   // Whether the SQLite card database is up. When it is, the legacy cards worker
   // below is never started at all: its whole job was to be handed a structured
@@ -88,31 +87,9 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
 
   useEffect(() => {
     let cancelled = false;
-
     cardsDb.init().then((ready) => {
-      if (cancelled) return;
-      setCardsDbReady(ready);
-      if (ready) return;
-
-      // No SQLite database available — fall back to the original worker.
-      //
-      // index.html carries `<base href="./">`, so a relative worker URL resolves
-      // against the CURRENT ROUTE rather than the app root. Loading /collection/
-      // directly asked for /collection/cards-worker/index.js, which does not
-      // exist, so the SPA fallback answered with index.html — and a module worker
-      // refuses text/html ("Failed to load module script: ... non-JavaScript MIME
-      // type"). The worker never started and the collection page stayed empty.
-      // It only breaks on a direct load or refresh of a nested route; arriving
-      // from "/" resolves correctly, which is why it survived this long.
-      //
-      // Anchored to the origin on web. Electron is left exactly as it was: it
-      // loads from file://, where an origin-absolute URL would not resolve.
-      const workerUrl = isElectron()
-        ? "cards-worker/index.js"
-        : `${window.location.origin}/cards-worker/index.js`;
-      workerRef.current = new Worker(workerUrl, { type: "module" });
+      if (!cancelled) setCardsDbReady(ready);
     });
-
     return () => {
       cancelled = true;
     };
@@ -144,32 +121,17 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   }, [matchesIndex, currentUUID]);
 
   useEffect(() => {
+    if (!cardsDbReady) return;
     const cards = uuidData[currentUUID]?.cards || defaultCardsData;
 
-    if (cardsDbReady) {
-      // Only the player's own counts cross the boundary now — a few thousand
-      // small numbers, against the entire card database that used to be cloned
-      // into the worker on every one of these updates.
-      cardsDb
-        .setCollection(cards.cards || {}, cards.prevCards || {})
-        .then(() => setCollectionEpoch((epoch) => epoch + 1))
-        // eslint-disable-next-line no-console
-        .catch((e) => console.log("[cards-db] setCollection failed", e));
-      return;
-    }
-
-    if (workerRef.current) {
-      workerRef.current.postMessage({
-        cards,
-        cardsList: database.cardList,
-        allCards: database.cards,
-        setNames: database.setNames,
-        sets: database.sets,
-      });
-      workerRef.current.onmessage = (e) => {
-        setCollectionData(e.data);
-      };
-    }
+    // Only the player's own counts cross the worker boundary. This used to
+    // hand a structured clone of the entire card database to a worker on every
+    // one of these updates.
+    cardsDb
+      .setCollection(cards.cards || {}, cards.prevCards || {})
+      .then(() => setCollectionEpoch((epoch) => epoch + 1))
+      // eslint-disable-next-line no-console
+      .catch((e) => console.log("[cards-db] setCollection failed", e));
   }, [uuidData, currentUUID, forceCollection, cardsDbReady]);
 
   useEffect(() => {

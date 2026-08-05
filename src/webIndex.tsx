@@ -13,7 +13,7 @@ import App from "./components/App";
 import reduxAction from "./redux/reduxAction";
 import store from "./redux/stores/rendererStore";
 import * as serviceWorker from "./serviceWorker";
-import { loadDbFromCache } from "./utils/database-wrapper";
+import cardsDb from "./utils/cardsDb/cardsDbClient";
 import defaultLocalSettings from "./utils/defaultLocalSettings";
 import getLocalSetting from "./utils/getLocalSetting";
 
@@ -54,9 +54,11 @@ if (module.hot && process.env.NODE_ENV === "development") {
   );
 }
 
-loadDbFromCache(getLocalSetting("lang")).then(() =>
-  reduxAction(store.dispatch, { type: "FORCE_COLLECTION", arg: undefined })
-);
+cardsDb
+  .init()
+  .then(() =>
+    reduxAction(store.dispatch, { type: "FORCE_COLLECTION", arg: undefined })
+  );
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

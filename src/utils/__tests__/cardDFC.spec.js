@@ -1,7 +1,7 @@
 import isCardDfc from "../isCardDfc";
-import loadDbFromCache from "../loadDbFromCache";
+import testSeedDatabase from "../testSeedDatabase";
 
-loadDbFromCache();
+testSeedDatabase();
 
 it("Can guess if card has two faces", () => {
   expect(isCardDfc(75155)).toBeTruthy();

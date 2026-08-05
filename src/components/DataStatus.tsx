@@ -63,8 +63,8 @@ export default function DataStatus() {
             }
           />
           <StatusLine
-            title={`Cards database (${Object.keys(database.cards).length})`}
-            status={database.cards ? "OK" : "LOADING"}
+            title={`Cards database (${database.cardCount})`}
+            status={database.ok ? "OK" : "LOADING"}
           />
           <StatusLine
             title={`Owned cards (${Object.values(

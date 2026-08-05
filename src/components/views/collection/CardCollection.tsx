@@ -10,10 +10,10 @@ import { useSelector } from "react-redux";
 
 import LoadingCard from "../../../assets/images/loadingcard.png";
 import { CARD_SIZE_RATIO } from "../../../common/static";
+import useCard from "../../../hooks/useCard";
 import useHoverCard from "../../../hooks/useHoverCard";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { CardsData } from "../../../types/collectionTypes";
-import database from "../../../utils/database-wrapper";
 import { getCardImage } from "../../../utils/getCardArtCrop";
 import getCssQuality from "../../../utils/getCssQuality";
 import openScryfallCard from "../../../utils/openScryfallCard";
@@ -55,7 +55,7 @@ export default function CardCollection(props: CardCollectionProps) {
     };
   }, []);
 
-  const cardObj = database.card(card.id);
+  const cardObj = useCard(card.id);
 
   return (
     <div

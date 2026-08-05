@@ -2,14 +2,6 @@ import { isEqual } from "lodash";
 import { CSSProperties, useMemo } from "react";
 
 import allFormats from "../common/allFormats";
-import {
-  FACE_ADVENTURE,
-  FACE_DFC_BACK,
-  FACE_MODAL_BACK,
-  FACE_ROOM,
-  FACE_SPECIALIZE_BACK,
-  FACE_SPLIT,
-} from "../constants";
 import { CardSet } from "../types";
 import database from "../utils/mtga/database";
 
@@ -23,16 +15,6 @@ interface SetsFilterProps {
 type Set = CardSet & { name: string };
 
 // The faces getCollectionData drops, so they never appear as their own row.
-const NON_LISTED_FACES = [
-  FACE_DFC_BACK,
-  3, // meld
-  FACE_ADVENTURE,
-  FACE_SPLIT,
-  FACE_ROOM,
-  FACE_MODAL_BACK,
-  FACE_SPECIALIZE_BACK,
-];
-
 /**
  * The sets Arena actually distributes cards in.
  *
@@ -58,43 +40,8 @@ const NON_LISTED_FACES = [
  * databases generated before that field existed.
  */
 function getDistributedSets(): string[] {
-  const { cards, setNames } = database.metadata || { cards: {}, setNames: {} };
   const { sets } = database;
-
-  const preresolved = Object.keys(sets).filter(
-    (name) => sets[name].collectible !== undefined
-  );
-  if (preresolved.length > 0) {
-    return preresolved.filter((name) => sets[name].collectible);
-  }
-
-  const names = new Set<string>();
-
-  Object.values(cards).forEach((card) => {
-    if (!card || !card.Name || card.IsToken) return;
-    // A set represented only by faces the collection never lists on their own
-    // has nothing to show behind its icon. Hour of Devastation is the whole of
-    // this case today: its only two cards are the halves of Consign // Oblivion.
-    if (NON_LISTED_FACES.includes(card.LinkedFaceType)) return;
-    // Only cards the set actually owns. `IsPrimaryCard` false means this is an
-    // alternate printing of a card whose real entry lives in another set, which
-    // is all Arena ever took from Commander Masters, Clue Edition and Tales of
-    // Middle-earth Commander — thirteen reprints of cards you already see
-    // elsewhere. Basic-land art (`Rarity === "land"`) is the same story for the
-    // Un-sets and the crossover land drops. getCardInBoosters draws the line in
-    // the same place, and getCollectionStats already skips lands outright.
-    if (!card.IsPrimaryCard || card.Rarity === "land") return;
-    const effective =
-      card.DigitalSet && card.DigitalSet !== "" ? card.DigitalSet : card.Set;
-    if (!effective) return;
-    // Digital releases carry a suffix the set table does not ("SPG-MKM",
-    // "Y26-ECL"); fall back to the part before it.
-    const name =
-      setNames[effective] || setNames[effective.split("-")[0]] || undefined;
-    if (name && sets[name]) names.add(name);
-  });
-
-  return [...names];
+  return Object.keys(sets).filter((name) => sets[name].collectible);
 }
 
 export default function SetsFilter(props: SetsFilterProps): JSX.Element {

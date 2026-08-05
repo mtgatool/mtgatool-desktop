@@ -1,13 +1,14 @@
 /* eslint-env jest */
 import _ from "lodash";
 
+import { DbCardDataV2 } from "../../types";
+import cardsDb from "../cardsDb/cardsDbClient";
 import { cardType } from "../cardTypes";
-import loadDbFromCache from "../loadDbFromCache";
-import database from "../mtga/database";
+import testSeedDatabase from "../testSeedDatabase";
 
-loadDbFromCache();
+testSeedDatabase();
 
-const cardsByName = _.keyBy(database.cards, "Name");
+const cardsByName = _.keyBy(cardsDb.cachedCards, "Name");
 
 describe("card-types", () => {
   describe("cardType", () => {
@@ -27,7 +28,7 @@ describe("card-types", () => {
     });
 
     it("can determine the card type of any card except City's Blessing", () => {
-      database.cardList.forEach((card) => {
+      cardsDb.cachedCards.forEach((card: DbCardDataV2) => {
         if (!_.has(card, "name")) return; // some properties are not cards :(
         if (card.Name === "City's Blessing") return; // has no type
         if (card.GrpId === 100) return; // has invalid type
