@@ -5,6 +5,7 @@ import {
   ExploreMetaEventRow,
   fetchExploreMetaCards,
 } from "../../../data/fetchExploreMeta";
+import { useCards } from "../../../hooks/useCard";
 import useCardDatabaseVersion from "../../../hooks/useCardDatabaseVersion";
 import database from "../../../utils/mtga/database";
 import Button from "../../ui/Button";
@@ -86,6 +87,21 @@ export default function ExploreMetaCards({
     };
   }, [eventId]);
 
+  /**
+   * Load the cards these rows name, before the memos below read them.
+   *
+   * Both look each card up and treat a miss as "metadata does not have it" —
+   * but a lookup only returns what has already been fetched, and nothing had
+   * asked for these. On a first visit that made every row unresolved: an empty
+   * table, and an "unresolved" count equal to the whole list.
+   */
+  const rowGrpIds = useMemo(
+    () => [...new Set((rows || []).map((r) => r.grpid).filter(Boolean))],
+    [rows]
+  );
+
+  const cardsLoaded = useCards(rowGrpIds).filter(Boolean).length;
+
   const lines: Line[] = useMemo(() => {
     if (!dbVersion) return [];
     const all = (rows || [])
@@ -104,7 +120,7 @@ export default function ExploreMetaCards({
         ? b.row.winrate - a.row.winrate || b.row.seen_in - a.row.seen_in
         : b.row.presence - a.row.presence || b.row.winrate - a.row.winrate
     );
-  }, [rows, sort, dbVersion]);
+  }, [rows, sort, dbVersion, cardsLoaded]);
 
   // Cards the metadata could not name. Worth saying out loud: a meta view that
   // quietly omits whatever is newest is wrong exactly when it matters most.
@@ -113,7 +129,7 @@ export default function ExploreMetaCards({
       !dbVersion
         ? 0
         : (rows || []).filter((r) => !database.card(r.grpid)).length,
-    [rows, dbVersion]
+    [rows, dbVersion, cardsLoaded]
   );
 
   // Bars are read against the most-played card, not against 100% — at ladder

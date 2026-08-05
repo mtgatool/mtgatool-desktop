@@ -79,13 +79,18 @@ export default function DecksArtViewRow(
     missingWildcards.rare +
     missingWildcards.mythic;
 
+  // Depends on imageUrl, not on the deck. The art is resolved from the card
+  // database, which is empty on first render — so this used to fire once with
+  // an empty src, never load, and leave the tile on the squirrel placeholder
+  // for good, because the deck itself never changed to re-run it.
   useEffect(() => {
+    if (!imageUrl) return;
     const img = new Image();
     img.src = imageUrl;
     img.onload = (): void => {
       setTimeout(() => setCardUrl(imageUrl), 250);
     };
-  }, [deck]);
+  }, [imageUrl]);
 
   const clickHide = hidden ? unhide : hide;
 
