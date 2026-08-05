@@ -222,6 +222,10 @@
     "dmg-license": "^1.0.11"
   },
   "resolutions": {
-    "nan": "2.18.0"
+    "nan": "2.18.0",
+    "cipher-base": "1.0.5"
+  },
+  "overrides": {
+    "cipher-base": "1.0.5"
   }
 }
