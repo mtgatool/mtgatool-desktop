@@ -47,6 +47,11 @@ export default function createPostMatchWindow(): void {
     // uninteractable on some Linux setups, and "Show overlay frame" is the
     // escape hatch users already know about.
     frame: allSettings.overlayFrame,
+    // macOS draws a shadow around the *window*, not around what is painted in
+    // it, so a transparent window gets a hard rounded outline tracing its
+    // bounds — the panel then looks like it sits inside a frame it does not
+    // have. The card carries its own CSS shadow instead.
+    hasShadow: !allSettings.overlaysTransparency,
     center: true,
     width: 620,
     height: 800,

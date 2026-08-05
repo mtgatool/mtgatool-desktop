@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 
+import { ReactComponent as MacClose } from "../assets/images/svg/mac-close.svg";
+import { ReactComponent as WinClose } from "../assets/images/svg/win-close.svg";
 import RankIcon from "../components/RankIcon";
 import TopBar from "../components/TopBar";
 import useCard from "../hooks/useCard";
@@ -80,6 +82,35 @@ export default function PostMatch(): JSX.Element {
     if (remote) remote.getCurrentWindow().close();
   };
 
+  // Transparent windows get the overlay treatment: no title bar, our own close
+  // button, and the card itself as the drag handle — a frame around a floating
+  // translucent panel looks like a mistake. With transparency off the window is
+  // an ordinary opaque one, so it keeps the normal title bar.
+  const transparent = useMemo(() => {
+    try {
+      return !!JSON.parse(getLocalSetting("settings")).overlaysTransparency;
+    } catch (e) {
+      return false;
+    }
+  }, []);
+
+  const CloseSVG = process.platform === "darwin" ? MacClose : WinClose;
+  const rootClass = `postmatch-root${transparent ? " frameless" : ""}`;
+
+  const chrome = transparent ? (
+    <div
+      className={`postmatch-close ${
+        process.platform === "darwin" ? "mac" : "win"
+      }`}
+      onClick={close}
+      title="Close"
+    >
+      <CloseSVG />
+    </div>
+  ) : (
+    <TopBar closeCallback={close} />
+  );
+
   const casts = useMemo<CardCast[]>(
     () =>
       Object.values(match?.gameStats || {}).flatMap((g) => g?.cardsCast || []),
@@ -114,8 +145,8 @@ export default function PostMatch(): JSX.Element {
 
   if (!match) {
     return (
-      <div className="postmatch-root">
-        <TopBar closeCallback={close} />
+      <div className={rootClass}>
+        {chrome}
         <div className="postmatch-panel postmatch-empty">
           No match to show yet.
         </div>
@@ -126,8 +157,8 @@ export default function PostMatch(): JSX.Element {
   const won = (match.player?.wins || 0) > (match.opponent?.wins || 0);
 
   return (
-    <div className="postmatch-root">
-      <TopBar closeCallback={close} />
+    <div className={rootClass}>
+      {chrome}
 
       <div className="postmatch-panel">
         {mvpGrpId ? (

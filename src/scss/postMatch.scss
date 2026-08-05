@@ -7,6 +7,50 @@
   height: 100vh;
   overflow: hidden;
   background: transparent;
+  position: relative;
+}
+
+// Frameless (transparent) mode: the card is the window, so it is also the
+// thing you drag it by. The wheel still scrolls; only click-dragging inside
+// the panel moves the window instead of selecting text, which is the trade a
+// title-bar-less overlay makes everywhere else in the app too.
+.postmatch-root.frameless .postmatch-panel {
+  -webkit-app-region: drag;
+}
+
+.postmatch-close {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  z-index: 5;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // Never part of the drag handle, or it could not be clicked.
+  -webkit-app-region: no-drag;
+  // The banner art behind it is arbitrary, so the button carries its own
+  // backing rather than relying on contrast that may not be there.
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  transition: background 0.15s ease-out;
+
+  &:hover {
+    background: var(--color-r);
+  }
+
+  svg {
+    width: 10px;
+    height: 10px;
+    fill: var(--color-text);
+  }
+
+  &.mac svg {
+    width: 12px;
+    height: 12px;
+  }
 }
 
 .postmatch-panel {
@@ -17,7 +61,10 @@
   padding: 0 0 16px 0;
   border-radius: 10px;
   background: rgba(20, 21, 22, 0.88);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+  // Must fit inside the 8px margin: offset + blur is the reach, and anything
+  // past it lands on the transparent window as a dark halo tracing the panel —
+  // the same false frame the native shadow was drawing. 2 + 6 = 8.
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
   color: var(--color-text);
 }
 
