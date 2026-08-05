@@ -3,7 +3,7 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable react/no-array-index-key */
 
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
 
@@ -13,6 +13,7 @@ import { ReactComponent as IconCrown } from "../../../assets/images/svg/crown.sv
 import { ReactComponent as IconEvent } from "../../../assets/images/svg/event.svg";
 import { ReactComponent as IconTime } from "../../../assets/images/svg/time.svg";
 import { getData } from "../../../data/store";
+import { useCards } from "../../../hooks/useCard";
 import { useCardArtCrop } from "../../../hooks/useCardImage";
 import reduxAction from "../../../redux/reduxAction";
 import { MatchGameStats } from "../../../types";
@@ -47,6 +48,16 @@ interface GameStatsProps {
 
 function GameStats(props: GameStatsProps): JSX.Element {
   const { game, index } = props;
+
+  // Every card in every opening hand, loaded before they are rendered. The
+  // render skips cards it cannot resolve, and a lookup only returns what has
+  // already been fetched — so a seven-card hand showed only the two or three
+  // cards something else on the page happened to have pulled in.
+  const handGrpIds = useMemo(
+    () => [...new Set((game.handsDrawn || []).flat())],
+    [game.handsDrawn]
+  );
+  useCards(handGrpIds);
 
   const dispatch = useDispatch();
 

@@ -3,8 +3,9 @@
 
 import { Fragment } from "react";
 
+import useAbility from "../hooks/useAbility";
+import useCard from "../hooks/useCard";
 import useHoverCard from "../hooks/useHoverCard";
-import database from "../utils/mtga/database";
 
 interface LogTextProps {
   children: string;
@@ -22,7 +23,7 @@ interface LogCardProps {
 
 function LogCard(props: LogCardProps): JSX.Element {
   const { children, grpId } = props;
-  const cardObj = database.card(grpId);
+  const cardObj = useCard(grpId);
   const cardName = cardObj?.Name;
 
   const [hoverIn, hoverOut] = useHoverCard(grpId);
@@ -44,7 +45,7 @@ interface LogAbilityProps {
 
 function LogAbility(props: LogAbilityProps): JSX.Element {
   const { children, abId } = props;
-  const desc = database.ability(abId);
+  const desc = useAbility(abId);
 
   return (
     <>

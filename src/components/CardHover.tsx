@@ -5,11 +5,11 @@ import { useSelector } from "react-redux";
 
 import NoCard from "../assets/images/nocard.png";
 import { CARD_SIZE_RATIO } from "../common/static";
+import useCard from "../hooks/useCard";
 import { AppState } from "../redux/stores/rendererStore";
 import getBackUrl from "../utils/getBackUrl";
 import { getCardImage } from "../utils/getCardArtCrop";
 import isCardDfc from "../utils/isCardDfc";
-import database from "../utils/mtga/database";
 import OwnershipStars from "./OwnershipStars";
 
 export default function CardHover(): JSX.Element {
@@ -20,7 +20,7 @@ export default function CardHover(): JSX.Element {
   const hoverSize = useSelector(
     (state: AppState) => state.settings.cardsSizeHoverCard
   );
-  const card = database.card(grpId);
+  const card = useCard(grpId);
   const [frontLoaded, setFrontLoaded] = useState(0);
   const [backLoaded, setBackLoaded] = useState(0);
   const [frontUrl, setFrontUrl] = useState("");
@@ -56,8 +56,9 @@ export default function CardHover(): JSX.Element {
 
   useEffect(() => {
     // Reset the image, begin new loading and clear state
-    const front = getCardImage(grpId, quality);
-    const back = getBackUrl(grpId, quality);
+    if (!card) return undefined;
+    const front = getCardImage(card, quality);
+    const back = getBackUrl(card, quality);
     const img = new Image();
     img.src = front;
     img.onload = (): void => {
@@ -76,7 +77,7 @@ export default function CardHover(): JSX.Element {
       img.onload = (): void => {};
       imgb.onload = (): void => {};
     };
-  }, [grpId, quality]);
+  }, [grpId, card, quality]);
 
   return (
     <>
