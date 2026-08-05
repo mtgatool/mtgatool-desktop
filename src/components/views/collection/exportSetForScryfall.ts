@@ -10,12 +10,22 @@ interface JsonCardData {
   arena_grpid: number;
 }
 
+/**
+ * Install the window.exportSetForScryfall console helper.
+ *
+ * Takes a provider rather than an array because on the SQLite path the view
+ * does not hold every row — it holds one page. Pulling the whole collection
+ * costs about a second, which is fine to pay when someone actually invokes
+ * this from the console, and not fine to pay on every render.
+ */
 export default function makeExportSetForScryfallFn(
-  collectionData: CardsData[]
+  getRows: () => Promise<CardsData[]>
 ) {
-  (window as any).exportSetForScryfall = (setCode: string) => {
+  (window as any).exportSetForScryfall = async (setCode: string) => {
     const jsonData: JsonCardData[] = [];
-    collectionData.forEach((c) => {
+    const rows = await getRows();
+
+    rows.forEach((c) => {
       const cardObj = database.card(c.id);
 
       if (

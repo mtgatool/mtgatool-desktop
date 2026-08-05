@@ -224,7 +224,7 @@ stubClient({
   suspended: [...suspended.entries()],
 });
 
-const { buildCollectionQuery, rowsToCardsData } = require(
+const { buildCollectionQuery, buildCollectionIdsQuery, rowsToCardsData } = require(
   path.join(OUT, "components/views/collection/collectionSql.js")
 );
 const getFiltersFromQuery = require(
@@ -335,8 +335,62 @@ for (const sort of SORTS) {
     if (rowDiff) {
       console.log(`MISMATCH ${label}\n  ${rowDiff}`);
       failures += 1;
+      continue;
+    }
+
+    // The ids query drives the pager total and the per-set stats.
+    const idsQuery = buildCollectionIdsQuery(filters);
+    const idRows = query(idsQuery.sql, idsQuery.params).values.map((r) => r[0]);
+    if (idRows.length !== legacy.length) {
+      console.log(
+        `MISMATCH ${label}\n  ids count: ${idRows.length} vs ${legacy.length}`
+      );
+      failures += 1;
+      continue;
+    }
+    const idSet = new Set(idRows);
+    const idMissing = legacy.find((r) => !idSet.has(r.id));
+    if (idMissing) {
+      console.log(`MISMATCH ${label}\n  ids missing grpid ${idMissing.id}`);
+      failures += 1;
+      continue;
+    }
+
+    // Paged reads must line up with the corresponding slice of the full list.
+    const PAGE = 24;
+    let pageDiff = null;
+    for (const pageIndex of [0, 3, Math.floor(legacy.length / PAGE)]) {
+      const offset = pageIndex * PAGE;
+      if (offset >= legacy.length && legacy.length > 0) continue;
+      const paged = buildCollectionQuery(filters, sort, {
+        limit: PAGE,
+        offset,
+      });
+      const pageRows = rowsToCardsData(query(paged.sql, paged.params).values);
+      const expected = legacy.slice(offset, offset + PAGE);
+      if (pageRows.length !== expected.length) {
+        pageDiff = `page ${pageIndex}: ${pageRows.length} rows vs ${expected.length}`;
+        break;
+      }
+      for (let i = 0; i < expected.length; i += 1) {
+        if (expected[i].id !== pageRows[i].id) {
+          pageDiff = `page ${pageIndex} position ${i}: ${expected[i].id} vs ${pageRows[i].id}`;
+          break;
+        }
+        const d = diffRow(expected[i], pageRows[i]);
+        if (d) {
+          pageDiff = `page ${pageIndex} grpid ${expected[i].id}: ${d}`;
+          break;
+        }
+      }
+      if (pageDiff) break;
+    }
+
+    if (pageDiff) {
+      console.log(`MISMATCH ${label}\n  ${pageDiff}`);
+      failures += 1;
     } else {
-      console.log(`ok  ${label.padEnd(52)} ${legacy.length} rows`);
+      console.log(`ok  ${label.padEnd(52)} ${legacy.length} rows (+ids, +pages)`);
     }
   }
 }

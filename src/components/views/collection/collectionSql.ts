@@ -312,14 +312,52 @@ function buildOrderBy(sort: Sort<CardsData>): string {
   return `\n ORDER BY ${column} ${direction} NULLS LAST, c.grpid ASC`;
 }
 
+export interface Page {
+  limit: number;
+  offset: number;
+}
+
+/**
+ * The rows for one page of the collection.
+ *
+ * The limit is what makes this cheap. Selecting every matching row costs about
+ * 1.1s for an unfiltered collection — not because SQLite is slow (the same
+ * query returning only grpid takes 56ms) but because ~470k cells have to cross
+ * the wasm boundary and 25k tuples have to be cloned back. A page of 60 is
+ * 18ms. Nothing above this ever needs more than a page, so nothing above this
+ * ever asks for more.
+ */
 export function buildCollectionQuery(
   filters: Filters<CardsData>,
-  sort: Sort<CardsData>
+  sort: Sort<CardsData>,
+  page?: Page
+): BuiltQuery {
+  const params: unknown[] = [];
+  const where = buildWhere(filters, params);
+  let sql = `${SELECT}\n   WHERE ${where}${buildOrderBy(sort)}`;
+  if (page) {
+    sql += `\n   LIMIT ? OFFSET ?`;
+    params.push(page.limit, page.offset);
+  }
+  return { sql, params };
+}
+
+/**
+ * Just the ids of every matching row, for the things that genuinely need the
+ * whole set: the total for the pager, and the per-set completion stats. One
+ * column instead of twenty, and no ORDER BY, because neither caller cares
+ * about order.
+ */
+export function buildCollectionIdsQuery(
+  filters: Filters<CardsData>
 ): BuiltQuery {
   const params: unknown[] = [];
   const where = buildWhere(filters, params);
   return {
-    sql: `${SELECT}\n   WHERE ${where}${buildOrderBy(sort)}`,
+    sql: `SELECT c.grpid
+    FROM cards c
+    LEFT JOIN collection col ON col.grpid = c.grpid
+   WHERE ${where}`,
     params,
   };
 }
