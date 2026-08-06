@@ -56,6 +56,7 @@
     "follow-redirects": "^1.14.3",
     "google-protobuf": "^3.15.6",
     "history": "^4.10.1",
+    "html-to-image": "^1.11.13",
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.0",
     "mathjs": "^9.3.0",

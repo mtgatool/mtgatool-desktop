@@ -354,3 +354,64 @@
   color: var(--color-text-dark);
   padding: 12px 0;
 }
+
+// --- deck popup: save as image ---------------------------------------------
+
+// A row above the deck, aligned to the same column, so the button sits on the
+// popup's own surface rather than over the deck banner art — where an icon on
+// its own was easy to miss.
+.deck-popup-actions {
+  width: 480px;
+  max-width: 480px;
+  margin: 16px auto 12px auto;
+  display: flex;
+  justify-content: center;
+}
+
+.deck-popup-save {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px 7px 12px;
+  border: 1px solid var(--color-line-sep);
+  border-radius: 6px;
+  background: var(--color-section);
+  color: var(--color-text);
+  font-family: var(--sub-font-name);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease-out, color 0.15s ease-out;
+
+  &:hover:not(:disabled) {
+    background: var(--color-section-hover);
+    color: var(--color-text-hover);
+  }
+
+  &:disabled {
+    cursor: default;
+    color: var(--color-text-dark);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// Rendered into the image, not just shown on screen — a deck list that gets
+// shared should say where it came from.
+.deck-popup-credit {
+  margin: 10px 0 2px 0;
+  text-align: center;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--color-text-dark);
+}
+
+.deck-popup-status {
+  width: 480px;
+  margin: 0 auto 12px auto;
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-r);
+}
