@@ -3,6 +3,17 @@ name: "Release"
 on:
   push:
     tags: "v*"
+  # Re-run a release without deleting and re-pushing its tag. Pick the tag in
+  # the "Use workflow from" dropdown on the Actions tab; the version is read
+  # from the checked-out package.json rather than the tag name, so a tag ref
+  # produces exactly the same build a tag push would.
+  #
+  # Worth having because a run can be lost to things that have nothing to do
+  # with the tag: an Actions outage swallowed v7.1.0's jobs ("not acquired by
+  # Runner of type hosted"), and this job's runner image has twice been retired
+  # out from under it. Re-tagging to retry is the wrong tool for either — it
+  # only risks duplicate runs racing for the same runners.
+  workflow_dispatch:
 
 jobs:
   build-job:

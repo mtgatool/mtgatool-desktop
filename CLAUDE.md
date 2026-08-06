@@ -35,23 +35,58 @@ don't rely on it to bump or tag anything.
 To cut a release:
 
 ```bash
-# 1. bump
-#    edit package.json version, then:
-node generateInfo.js
-git commit -am "Bump version to X.Y.Z"
-
-# 2. tag — MUST be annotated
-git tag -a vX.Y.Z -m "vX.Y.Z"
-git push origin dev --follow-tags
+npm run release:tag -- patch     # or minor / major, or omit to be asked
+npm run release:tag -- minor --dry-run   # see what it would do, change nothing
 ```
+
+`scripts/release-tag.js` does the whole thing: refuses to start unless you are
+on `dev` with a clean tree, in sync, and the tag is free; runs tsc, eslint and
+jest; bumps `package.json`, `package-lock.json` and `src/info.json` together;
+shows you the diff and asks before pushing; tags **annotated**; then waits for
+the workflow run. If it stops before pushing, the bump is undone. Its header
+comment documents every flag.
+
+Before it existed this was done by hand, and each part of it has failed at least
+once — the notes below are why the script checks what it checks.
 
 `--follow-tags` **only pushes annotated tags**. A lightweight `git tag vX.Y.Z`
 is silently skipped and the release never fires; push it explicitly if you make
 that mistake.
 
+**A run that never appears is usually not the tag's fault.** When v7.1.0 was
+tagged, no workflow run showed up for several minutes, the runs before it had
+been cancelled, and jobs sat queued for hours — all of which looked like the
+tag had been missed. It was a **GitHub Actions outage**; the run did arrive
+late, and the tag had been fine the whole time.
+
+Check <https://www.githubstatus.com> before concluding anything:
+
+```bash
+curl -s https://www.githubstatus.com/api/v2/summary.json | jq '.components[] | select(.name=="Actions")'
+```
+
+Do **not** reach for delete-and-re-push as a retry. It creates a second run
+racing the first for the same runners, which is worse when runners are the
+scarce thing:
+
+```bash
+# only if the tag is genuinely absent from the remote
+git push origin :refs/tags/vX.Y.Z && git push origin vX.Y.Z
+```
+
+To retry properly, use "Re-run all jobs" on the existing run, or the
+`workflow_dispatch` trigger on `release.yml` — pick the tag in the ref
+dropdown. The version comes from the checked-out `package.json`, not the tag
+name, so a dispatch on a tag builds exactly what a tag push would.
+
 `release.yml` fires on `v*` and publishes a GitHub release. electron-updater is
 wired to it (`publish: github`), so existing users auto-update — treat a tag push
 as shipping to production.
+
+**Add anything users will notice to `NEW_IN_THIS_VERSION` in
+`src/components/WhatsNewPopup.tsx` as you go**, not at release time. That popup
+fires on a version change, so whatever is in it when you tag is what everyone
+reads.
 
 ### A release trap that fails silently
 
