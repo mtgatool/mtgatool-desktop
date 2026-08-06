@@ -6,12 +6,15 @@ on:
 
 jobs:
   build-job:
-    runs-on: ${{ matrix.os }}
-    name: "Build and test ${{ matrix.os }}"
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ubuntu-latest
+    name: "Build and test"
 
+    # Linux only. This used to package the whole app on ubuntu, windows and
+    # macos for every commit — three full electron-builder runs a push, with
+    # the macos one alone taking over two hours — which left releases queueing
+    # behind ordinary commits for the same scarce runners. Cross-platform
+    # packaging is what release.yml is for; this is here to catch a broken
+    # commit quickly.
     steps:
       - name: "Setup node"
         uses: actions/setup-node@v1
@@ -26,18 +29,19 @@ jobs:
           python-version: "3.10"
           cache: "pip"
 
-      - name: Install Python setup tools
-        run: |
-          pip install setuptools
+      - name: "Install Python setup tools"
+        run: "pip install setuptools"
 
       - name: "Install modules"
         run: "npm run install:ci"
 
+      # Separate steps rather than one lumped "build", so a failure says which
+      # of the three went wrong without opening the log.
+      - name: "Lint"
+        run: "npm run test:eslint"
+
       - name: "Test"
         run: "npm run jest:ci"
 
-      - name: "Install distutils"
-        run: "pip install setuptools"
-
-      - name: "Build (npm)"
+      - name: "Build"
         run: "npm run build"
