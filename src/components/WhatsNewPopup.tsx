@@ -11,6 +11,36 @@ interface WhatsNewItem {
   body: string;
 }
 
+/**
+ * What changed in the release being shipped.
+ *
+ * Keep this current: the popup fires whenever `whatsNewSeen` no longer matches
+ * the version, so a release goes out with whatever is written here. Anything
+ * users would notice — a feature, or a bug that was visibly getting their data
+ * wrong — belongs in it, described by what they will see rather than by what
+ * was changed in the code. Clear it out and start again on the next release, so
+ * it never becomes a running changelog.
+ */
+const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
+  {
+    title: "Post-match overview",
+    body: "Resurrected post match overview popup when a match ends: life totals through each game, cards cast, mana spent, and a turn-by-turn timeline of how it played out.",
+  },
+  {
+    title: "Faster card database",
+    body: "Card data is now quicker to start, and much lighter on memory.",
+  },
+  {
+    title: "Rebuilt deck view",
+    body: "New mana curve, colour and rarity panels, sample hands, and deck list image view you can save for sharing. Fixed some issues with the lands panel and colours.",
+  },
+  {
+    title: "More accurate match tracking",
+    body: "Fixed issues with opening hands going missing, games in a best-of-three sharing each other's card counts, and carry-over issues between matches.",
+  },
+];
+
+/** Shown to anyone arriving from v6, alongside the migration notice. */
 const NEW_IN_V7: WhatsNewItem[] = [
   {
     title: "Home dashboard",
@@ -25,6 +55,35 @@ const NEW_IN_V7: WhatsNewItem[] = [
     body: "Your in-game saved decks show up automatically (even those you don't play), and Explore is back — the best decks for each event, aggregated across all players by decklist.",
   },
 ];
+
+function ItemList({ items }: { items: WhatsNewItem[] }): JSX.Element {
+  return (
+    <>
+      {items.map((item) => (
+        <div key={item.title} style={{ marginBottom: "16px" }}>
+          <div
+            style={{
+              color: "var(--color-text-hover)",
+              fontSize: "16px",
+              marginBottom: "4px",
+            }}
+          >
+            {item.title}
+          </div>
+          <div style={{ color: "var(--color-text)", lineHeight: "20px" }}>
+            {item.body}
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
+const headingStyle = {
+  color: "var(--color-text-dark)",
+  fontSize: "13px",
+  marginBottom: "16px",
+};
 
 export default function WhatsNewPopup({
   onClose,
@@ -46,23 +105,41 @@ export default function WhatsNewPopup({
       </h1>
 
       <div style={{ flex: 1, overflowY: "auto", paddingRight: "8px" }}>
-        <div
+        <div style={headingStyle}>New in v{info.version}:</div>
+        <ItemList items={NEW_IN_THIS_VERSION} />
+
+        {/* Everything below only concerns someone arriving from v6 — by now
+            most people updating are already on v7 and have read it. Collapsed
+            rather than dropped, because the account and history warnings are
+            still the first thing a v6 user needs. <details> keeps that a
+            plain-HTML disclosure with no state to manage. */}
+        <details
           style={{
             border: "1px solid var(--color-line-sep)",
             borderRadius: "6px",
-            padding: "14px 16px",
-            marginBottom: "20px",
+            padding: "12px 16px",
+            marginTop: "24px",
             background: "var(--color-section-hover)",
           }}
         >
+          <summary
+            style={{
+              cursor: "pointer",
+              color: "var(--color-text-hover)",
+              fontSize: "15px",
+            }}
+          >
+            Coming from v6? Read this first
+          </summary>
+
           <div
             style={{
               color: "var(--color-text-hover)",
               fontSize: "16px",
-              marginBottom: "6px",
+              margin: "14px 0 6px",
             }}
           >
-            Please note — this version has breaking changes.
+            This version has breaking changes.
           </div>
           <ul
             style={{
@@ -89,33 +166,12 @@ export default function WhatsNewPopup({
               past matches, and we can&apos;t guarantee it works correctly.
             </li>
           </ul>
-        </div>
 
-        <div
-          style={{
-            color: "var(--color-text-dark)",
-            fontSize: "13px",
-            marginBottom: "16px",
-          }}
-        >
-          Notable changes in v{info.version}:
-        </div>
-        {NEW_IN_V7.map((item) => (
-          <div key={item.title} style={{ marginBottom: "16px" }}>
-            <div
-              style={{
-                color: "var(--color-text-hover)",
-                fontSize: "16px",
-                marginBottom: "4px",
-              }}
-            >
-              {item.title}
-            </div>
-            <div style={{ color: "var(--color-text)", lineHeight: "20px" }}>
-              {item.body}
-            </div>
+          <div style={{ ...headingStyle, margin: "20px 0 16px" }}>
+            Also new since v6:
           </div>
-        ))}
+          <ItemList items={NEW_IN_V7} />
+        </details>
       </div>
 
       <div
