@@ -35,6 +35,29 @@ export function releaseHasSqlite(latest: LatestInfo): boolean {
   return !!latest.formats && latest.formats.indexOf("sqlite") >= 0;
 }
 
+/** Every SQLite file starts with this, followed by a NUL. */
+const SQLITE_HEADER = "SQLite format 3";
+
+/**
+ * Whether these bytes are actually a SQLite database.
+ *
+ * An HTTP 200 is not enough to know. A single-page host answers a request for
+ * a file it does not have with index.html and a 200, so a missing database
+ * arrives looking like a successful download and only fails later, deep in the
+ * worker, as "file is not a database". Checking the header catches it at the
+ * source — and catches a truncated or half-inflated payload with it.
+ *
+ * Node Buffers are Uint8Arrays, so this covers the desktop path too.
+ */
+export function isSqliteBytes(bytes: ArrayBuffer | Uint8Array): boolean {
+  const head = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  if (head.length < SQLITE_HEADER.length) return false;
+  for (let i = 0; i < SQLITE_HEADER.length; i += 1) {
+    if (head[i] !== SQLITE_HEADER.charCodeAt(i)) return false;
+  }
+  return true;
+}
+
 /* --------------------------------------------------------------- electron */
 
 /**
@@ -168,6 +191,12 @@ export async function ensureDatabaseFile(
     const buf = await fetchReleaseBuffer(
       `${RELEASE_BASE}/${lang}-database.sqlite`
     );
+    // Checked before it is written, not after: the cache is keyed by version,
+    // so writing a bad payload would name it as the newest good copy and every
+    // later run would skip the download and load the same broken file.
+    if (!isSqliteBytes(buf)) {
+      throw new Error("downloaded file is not a SQLite database");
+    }
     // Write then rename, so an interrupted download never leaves a truncated
     // file behind under a name that says it is complete.
     fs.writeFileSync(tmp, buf);
@@ -232,7 +261,12 @@ export async function fetchDatabaseWeb(
       console.log(`[cards-db] mirror returned HTTP ${res.status}`);
       return null;
     }
-    return await gunzipToArrayBuffer(await res.arrayBuffer());
+    const bytes = await gunzipToArrayBuffer(await res.arrayBuffer());
+    if (!isSqliteBytes(bytes)) {
+      console.log("[cards-db] mirror did not return a SQLite database");
+      return null;
+    }
+    return bytes;
   } catch (e) {
     console.log("[cards-db] web database fetch failed", e);
     return null;

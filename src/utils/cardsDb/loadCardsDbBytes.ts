@@ -11,7 +11,11 @@
 import electron from "../electron/electronWrapper";
 import remote from "../electron/remoteWrapper";
 import getLocalSetting from "../getLocalSetting";
-import { ensureDatabaseFile, fetchDatabaseWeb } from "./fetchCardsDb";
+import {
+  ensureDatabaseFile,
+  fetchDatabaseWeb,
+  isSqliteBytes,
+} from "./fetchCardsDb";
 
 export interface CardsDbBytes {
   wasmBinary: ArrayBuffer;
@@ -118,15 +122,27 @@ async function loadWeb(lang: string): Promise<CardsDbBytes | null> {
 
     // A database served from our own origin takes precedence, so the dev
     // server can be pointed at a local build.
+    //
+    // `ok` cannot be trusted on its own here: a single-page host rewrites any
+    // unknown path to index.html and answers 200, so on a deployment that
+    // carries no local database this returns a page rather than a file. The
+    // header check is what tells them apart — without it the HTML reached the
+    // worker and surfaced as "file is not a database".
     const local = await fetch(`${base}/${lang}-database.sqlite`).catch(
       () => null
     );
     if (local && local.ok) {
-      return {
-        wasmBinary,
-        dbBytes: await local.arrayBuffer(),
-        source: `${base}/${lang}-database.sqlite`,
-      };
+      const localBytes = await local.arrayBuffer();
+      if (isSqliteBytes(localBytes)) {
+        return {
+          wasmBinary,
+          dbBytes: localBytes,
+          source: `${base}/${lang}-database.sqlite`,
+        };
+      }
+      console.log(
+        "[cards-db] same-origin database is not a SQLite file, ignoring it"
+      );
     }
 
     const dbBytes = await fetchDatabaseWeb(lang);
