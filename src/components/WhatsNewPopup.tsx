@@ -100,9 +100,7 @@ export default function WhatsNewPopup({
         boxSizing: "border-box",
       }}
     >
-      <h1 style={{ margin: "0 0 16px" }}>
-        Welcome to MTG Arena Tool v{info.version}
-      </h1>
+      <h1 style={{ margin: "0 0 16px" }}>v{info.version} Release Notes</h1>
 
       <div style={{ flex: 1, overflowY: "auto", paddingRight: "8px" }}>
         <div style={headingStyle}>New in v{info.version}:</div>
