@@ -31,10 +31,9 @@
  * If it stops before step 5 the bump is undone. If the push itself fails, the
  * commit and tag stay put and it prints the command to unwind them.
  *
- * If no workflow run appears, the tag is almost certainly fine — check
- * githubstatus.com first, then re-run from the Actions tab (Release -> Run
- * workflow -> pick the tag). Re-tagging is not a retry: it starts a second run
- * competing with the first for the same runners.
+ * If no workflow run appears, the tag is almost certainly fine. Re-run it from
+ * the Actions tab (Release -> Run workflow -> pick the tag). Re-tagging is not
+ * a retry: it starts a second run competing with the first for the runners.
  *
  * Every step here has drawn blood at least once, which is why it is a script
  * rather than a list of commands in a readme:
@@ -46,10 +45,9 @@
  *    the version by hand leaves the lockfile behind; `npm version` moves both.
  *  - src/info.json has to be regenerated or the app reports the old version,
  *    and the What's New popup — which fires on a version change — never shows.
- *  - A run can simply not appear, and it usually is not the tag's fault. An
- *    Actions outage swallowed v7.1.0's, which looked exactly like a missed tag
- *    push. This waits and tells you where to look, so the reflex is to check
- *    rather than to re-tag and end up with two runs racing each other.
+ *  - A run can simply not appear, and it usually is not the tag's fault. This
+ *    waits and says so, so the reflex is to go and look rather than to re-tag
+ *    and end up with two runs racing each other.
  *
  * A tag push ships: release.yml publishes a GitHub release and electron-updater
  * pulls existing users onto it. Nothing here is pushed without confirmation.
@@ -349,9 +347,8 @@ async function checkWorkflowStarted(tag) {
   console.log(`
 ! No workflow run appeared for ${tag} after two minutes.
 
-  The tag is pushed and is almost certainly fine. Check githubstatus.com — an
-  Actions outage looks exactly like this. Then re-run it from the Actions tab
-  (Release -> Run workflow -> pick ${tag}).
+  The tag is pushed and is almost certainly fine. Check the Actions tab, and
+  re-run it from there if needed (Release -> Run workflow -> pick ${tag}).
 
   Do not re-tag to retry; that just races a second run against the first.
 `);

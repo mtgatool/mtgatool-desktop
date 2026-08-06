@@ -8,11 +8,9 @@ on:
   # from the checked-out package.json rather than the tag name, so a tag ref
   # produces exactly the same build a tag push would.
   #
-  # Worth having because a run can be lost to things that have nothing to do
-  # with the tag: an Actions outage swallowed v7.1.0's jobs ("not acquired by
-  # Runner of type hosted"), and this job's runner image has twice been retired
-  # out from under it. Re-tagging to retry is the wrong tool for either — it
-  # only risks duplicate runs racing for the same runners.
+  # A run can be lost for reasons that have nothing to do with the tag, and
+  # re-tagging is not a retry: it starts a second run competing with the first
+  # for the same runners. Use this instead.
   workflow_dispatch:
 
 jobs:
