@@ -3,6 +3,7 @@ import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import { InternalMatch } from "../types";
 import { DbMatch } from "../types/dbTypes";
+import cardsDb from "../utils/cardsDb/cardsDbClient";
 import getLocalSetting from "../utils/getLocalSetting";
 import globalData from "../utils/globalData";
 import Deck from "../utils/mtga/deck";
@@ -26,13 +27,48 @@ export default async function setDbMatch(
     return;
   }
 
+  // A deck works out its colours by reading each of its cards, and reading a
+  // card only answers for one already fetched. Neither place these colours are
+  // derived could rely on that: the background window that saves a match never
+  // renders cards, so its cache is empty and the deck came out colourless,
+  // while here the cache holds whatever happened to have been viewed, so the
+  // colours came out partial. Both are stored, and the decks list reads them —
+  // which is why a deck could sit there with no mana symbols at all.
+  //
+  // Fetching the cards first is all it takes, and it belongs here because this
+  // is the one place both values are written and the only one that can await.
+  const playerDeck = new Deck(match.playerDeck);
+  const oppDeck = new Deck(match.oppDeck);
+
+  const deckCardIds = [playerDeck, oppDeck].flatMap((deck) => [
+    ...deck.getMainboard().get(),
+    ...deck.getSideboard().get(),
+  ]);
+
+  if (deckCardIds.length) {
+    // Never fatal: worst case the colours are as wrong as they were before.
+    await cardsDb
+      .cards([...new Set(deckCardIds.map((card) => card.id))])
+      .catch(() => []);
+  }
+
+  // Recomputed, not read: a deck works its colours out in its constructor, and
+  // both of these were built above — before the fetch, when the cache was
+  // still cold. `colors` would hand back that stale answer.
+  const playerDeckColors = playerDeck.getColors().getBits();
+  const oppDeckColors = oppDeck.getColors().getBits();
+
+  // The decks list reads the colours off the deck inside the match, not the
+  // ones beside it, so the stale value has to be corrected too.
+  if (match.playerDeck) match.playerDeck.colors = playerDeckColors;
+
   const newDbMatch: DbMatch = {
     matchId: match.id,
     playerId: getLocalSetting("playerId"),
     playerDeckId: match.playerDeck.id,
     playerDeckHash: match.playerDeckHash,
-    playerDeckColors: new Deck(match.playerDeck).colors.getBits(),
-    oppDeckColors: new Deck(match.oppDeck).colors.getBits(),
+    playerDeckColors,
+    oppDeckColors,
     playerName: match.player.name,
     playerWins: match.player.wins,
     playerLosses: match.opponent.wins,
