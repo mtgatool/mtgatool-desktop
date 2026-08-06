@@ -168,6 +168,7 @@ export default function PostMatch(): JSX.Element {
 
       <div className="postmatch-panel">
         {closeButton}
+        <div className="postmatch-logo" title="MTG Arena Tool" />
         {mvpGrpId ? (
           <div
             className="postmatch-mvp"
@@ -267,6 +268,8 @@ export default function PostMatch(): JSX.Element {
         ) : (
           <StatBar title="Cards Cast" player={playerCasts} opp={oppCasts} />
         )}
+
+        <div className="postmatch-footer">by MTG Arena Tool</div>
       </div>
     </div>
   );

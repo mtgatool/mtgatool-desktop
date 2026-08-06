@@ -18,6 +18,34 @@
   -webkit-app-region: drag;
 }
 
+// Mirrors the close button in the opposite corner: whose screen this is, next
+// to the button that dismisses it. Fixed for the same reason — it sits inside
+// the scrolling panel but belongs to the corner, not the content. Left as part
+// of the drag handle, since there is nothing to click here.
+.postmatch-logo {
+  position: fixed;
+  top: 14px;
+  left: 18px;
+  z-index: 5;
+  width: 26px;
+  height: 26px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url(../assets/icons/icon.png);
+  opacity: 0.85;
+  // The banner art behind it is arbitrary, so it needs to hold its own edge.
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
+}
+
+.postmatch-footer {
+  margin: 14px 0 2px 0;
+  text-align: center;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--color-text-dark);
+}
+
 .postmatch-close {
   // Fixed, not absolute: it sits inside the scrolling panel (it must be a
   // descendant of the drag region for no-drag to take effect) but should stay
