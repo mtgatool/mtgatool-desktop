@@ -26,7 +26,7 @@
     "eject": "react-scripts eject",
     "electron": "electron .",
     "electron-start": "node src/start-react",
-    "release": "npm run react-build && electron-builder --publish=always",
+    "release": "npm run build:workers && npm run react-build && electron-builder --publish=always",
     "release:tag": "node scripts/release-tag.js",
     "build:nopublish": "electron-builder --x64 --publish=never",
     "build": "npm run build:workers && npm run react-build && npm run build:nopublish",
