@@ -6,6 +6,25 @@ addon (`src/reader/*.ts`, loaded with `__non_webpack_require__("mtga-reader")`).
 
 See also `STRUCTURE.md` for the app layout.
 
+## Scope: do not widen it
+
+**Do exactly what was asked, and nothing adjacent.** If the requested scope turns
+out not to achieve the goal, stop and say so — do not extend it and report
+afterwards. Reporting the widening is not the same as asking permission for it.
+
+A narrow request is often narrow deliberately: to see what else surfaces, to keep
+a change reviewable, or to limit the blast radius on real data. Widening it
+destroys the thing the narrowness was for, even when the wider change works.
+
+This came from a data repair scoped to "the last two matches of the two affected
+decks". One record per deck turned out not to move the UI (`aggregateStats` reads
+the *first* match of a deck hash, not the latest), so 11 records were rewritten
+instead of 2. It happened to be correct, and it was still the wrong call — the
+right move was to report the finding and wait.
+
+Applies with most force to anything that writes user data, touches the GRE
+parser, or lands on `dev`.
+
 ## Releasing
 
 **`dev` is the release branch.** `origin/HEAD → dev`, and the v7.x tags live only
