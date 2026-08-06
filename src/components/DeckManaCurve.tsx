@@ -4,43 +4,30 @@ import { MANA_COLORS } from "../constants";
 import database from "../utils/mtga/database";
 import Deck from "../utils/mtga/deck";
 
-// Should proably be in constants
-const mana: Record<string, string> = {};
-mana["0"] = "mana-0";
-mana["1"] = "mana-1";
-mana["2"] = "mana-2";
-mana["3"] = "mana-3";
-mana["4"] = "mana-4";
-mana["5"] = "mana-5";
-mana["6"] = "mana-6";
-mana["7"] = "mana-7";
-mana["8"] = "mana-8";
-mana["9"] = "mana-9";
-mana["10"] = "mana-10";
-mana["11"] = "mana-11";
-mana["12"] = "mana-12";
-mana["13"] = "mana-13";
-mana["14"] = "mana-14";
-mana["15"] = "mana-15";
-mana["16"] = "mana-16";
-mana["17"] = "mana-17";
-mana["18"] = "mana-18";
-mana["19"] = "mana-19";
-mana["20"] = "mana-20";
-
 const MAX_CMC = 7; // cap at 7+ cmc bucket
 
-function add(a: number, b: number): number {
-  return a + b;
+/** Index into MANA_COLORS, in WUBRG order. */
+const COLOR_KEYS = ["w", "u", "b", "r", "g"] as const;
+
+interface Bucket {
+  /** Cards in this bucket. The bar's height. */
+  cards: number;
+  /** Coloured pip counts, WUBRG. Sizes the segments within the bar. */
+  pips: number[];
+  /** Cards here with no coloured pip at all — artifacts, generic costs. */
+  colorless: number;
 }
 
-function getDeckCurve(deck: Deck): number[][] {
-  const curve: number[][] = [];
-  for (let i = 0; i < MAX_CMC + 1; i += 1) {
-    curve[i] = [0, 0, 0, 0, 0, 0];
-  }
+function emptyBucket(): Bucket {
+  return { cards: 0, pips: [0, 0, 0, 0, 0], colorless: 0 };
+}
 
-  if (!deck.getMainboard()) return curve;
+function getDeckCurve(deck: Deck): { buckets: Bucket[]; avg: number } {
+  const buckets: Bucket[] = [];
+  for (let i = 0; i <= MAX_CMC; i += 1) buckets[i] = emptyBucket();
+
+  let spells = 0;
+  let cmcTotal = 0;
 
   deck
     .getMainboard()
@@ -48,90 +35,105 @@ function getDeckCurve(deck: Deck): number[][] {
     .forEach((card) => {
       const cardObj = database.card(card.id);
       if (!cardObj) return;
+      if (cardObj.Types.includes("Land")) return;
 
-      const cmc = Math.min(MAX_CMC, cardObj.Cmc);
-      if (!cardObj.Types.includes("Land")) {
-        cardObj.ManaCost.forEach((c: string): void => {
-          if (c.includes("w")) curve[cmc][1] += card.quantity;
-          if (c.includes("u")) curve[cmc][2] += card.quantity;
-          if (c.includes("b")) curve[cmc][3] += card.quantity;
-          if (c.includes("r")) curve[cmc][4] += card.quantity;
-          if (c.includes("g")) curve[cmc][5] += card.quantity;
+      const bucket = buckets[Math.min(MAX_CMC, cardObj.Cmc)];
+      bucket.cards += card.quantity;
+      spells += card.quantity;
+      cmcTotal += cardObj.Cmc * card.quantity;
+
+      let colored = false;
+      cardObj.ManaCost.forEach((symbol: string) => {
+        COLOR_KEYS.forEach((key, i) => {
+          if (symbol.includes(key)) {
+            bucket.pips[i] += card.quantity;
+            colored = true;
+          }
         });
-        curve[cmc][0] += card.quantity;
-      }
+      });
+      if (!colored) bucket.colorless += card.quantity;
     });
-  // debugLog(curve);
-  return curve;
+
+  return { buckets, avg: spells ? cmcTotal / spells : 0 };
 }
 
+/**
+ * The deck's spells by mana value, each bar split by the colours it costs.
+ *
+ * Bars are capped rather than filling their slot, and the count sits above the
+ * cap in ordinary text: it used to be printed inside the bar in the surface
+ * colour with a light outline, which is why it was hard to read against every
+ * fill it landed on.
+ */
 export default function DeckManaCurve(props: {
   className?: string;
   deck: Deck;
 }): JSX.Element {
   const { className, deck } = props;
-  const manaCounts = getDeckCurve(deck);
-  const curveMax = Math.max(...manaCounts.map((v) => v[0]));
-  // debugLog("deckManaCurve", manaCounts, curveMax);
+  const { buckets, avg } = getDeckCurve(deck);
+  const max = Math.max(...buckets.map((b) => b.cards), 1);
+  const spells = buckets.reduce((acc, b) => acc + b.cards, 0);
 
   return (
-    <div className={`${className} mana-curve-container`}>
+    <div className={`${className || ""} mana-curve-container`}>
       <div className="mana-curve">
-        {!!manaCounts &&
-          manaCounts.map((cost, i) => {
-            const total = cost[0];
-            const manaTotal = cost.reduce(add, 0) - total;
+        {buckets.map((bucket, cmc) => {
+          const pipTotal =
+            bucket.pips.reduce((a, b) => a + b, 0) + bucket.colorless;
 
-            return (
-              <div
-                className="mana-curve-column"
-                key={`mana-curve-column-${i}`}
-                style={{ height: `${(total * 100) / curveMax}%` }}
-              >
-                <div className="mana-curve-number">
-                  {total > 0 ? total : ""}
-                </div>
-                {MANA_COLORS.map((mc, ind) => {
-                  if (ind < 5 && cost[ind + 1] > 0) {
-                    return (
-                      <div
-                        className="mana_curve_column_color"
-                        key={`mana-curve-column-color-${i}-${ind}`}
-                        style={{
-                          height: `${Math.round(
-                            (cost[ind + 1] / manaTotal) * 100
-                          )}%`,
-                          backgroundColor: mc,
-                        }}
-                      />
-                    );
-                  }
-                  return <></>;
-                })}
-              </div>
+          // Segments in WUBRG order, then the colourless remainder. Anything
+          // with no pips at all still needs a body, so it reads as one bar.
+          const segments = COLOR_KEYS.map((key, i) => ({
+            key,
+            color: MANA_COLORS[i],
+            share: pipTotal ? bucket.pips[i] / pipTotal : 0,
+          }))
+            .filter((s) => s.share > 0)
+            .concat(
+              bucket.colorless > 0 || pipTotal === 0
+                ? [
+                    {
+                      key: "c" as any,
+                      color: MANA_COLORS[5],
+                      share: pipTotal ? bucket.colorless / pipTotal : 1,
+                    },
+                  ]
+                : []
             );
-          })}
+
+          const label = cmc === MAX_CMC ? `${MAX_CMC}+` : `${cmc}`;
+          const title = `${bucket.cards} card${
+            bucket.cards === 1 ? "" : "s"
+          } at mana value ${label}`;
+
+          return (
+            <div className="mana-curve-slot" key={`curve-${cmc}`} title={title}>
+              <div className="mana-curve-value">
+                {bucket.cards > 0 ? bucket.cards : ""}
+              </div>
+              <div
+                className="mana-curve-bar"
+                style={{ height: `${(bucket.cards / max) * 100}%` }}
+              >
+                {segments.map((segment) => (
+                  <div
+                    key={`curve-${cmc}-${segment.key}`}
+                    className="mana-curve-segment"
+                    style={{
+                      height: `${segment.share * 100}%`,
+                      backgroundColor: segment.color,
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="mana-curve-tick">{label}</div>
+            </div>
+          );
+        })}
       </div>
-      <div className="mana-curve-numbers">
-        {!!manaCounts &&
-          manaCounts.map((_cost, i) => {
-            return (
-              <div
-                className="mana-curve-column-number"
-                // eslint-disable-next-line react/no-array-index-key
-                key={`mana_curve_column_number_${i}`}
-              >
-                <div
-                  className={`${"mana-s16"} ${mana[`${i}`]}`}
-                  style={{ margin: "auto" }}
-                >
-                  {i === MAX_CMC && (
-                    <span style={{ paddingLeft: "20px" }}>+</span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+      <div className="mana-curve-summary">
+        {spells} spell{spells === 1 ? "" : "s"} · average mana value{" "}
+        {avg.toFixed(2)}
       </div>
     </div>
   );

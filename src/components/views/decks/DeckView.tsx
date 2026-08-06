@@ -2,40 +2,36 @@
 /* eslint-disable no-nested-ternary */
 
 import { useEffect, useState } from "react";
-import { PieChart } from "react-minimal-pie-chart";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
 
 import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
 import { ReactComponent as CameraIcon } from "../../../assets/images/svg/camera-solid.svg";
-import { DEFAULT_TILE, MANA_COLORS } from "../../../constants";
+import { DEFAULT_TILE } from "../../../constants";
 import { useCardArtCrop } from "../../../hooks/useCardImage";
 import useSavedDecks from "../../../hooks/useSavedDecks";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
-import { CardObject, DbCardDataV2 } from "../../../types";
+import { CardObject } from "../../../types";
 import { StatsDeck } from "../../../types/dbTypes";
 import compareCards from "../../../utils/compareCards";
 import copyToClipboard from "../../../utils/copyToClipboard";
-import getDeckColorsAmmount from "../../../utils/getDeckColorsAmmount";
-import getDeckLandsAmmount from "../../../utils/getDeckLandsAmmount";
-import getDeckRaritiesCount from "../../../utils/getDeckRaritiesCount";
-import getSampleHand from "../../../utils/getSampleHand";
 import Colors from "../../../utils/mtga/colors";
 import Deck from "../../../utils/mtga/deck";
 import savedDeckToStatsDeck from "../../../utils/mtga/savedDeckToStatsDeck";
-import CardTile from "../../CardTile";
 import CraftingCost from "../../CraftingCost";
 import DeckColorsBar from "../../DeckColorsBar";
+import DeckColorStats from "../../DeckColorStats";
 import DeckList from "../../DeckList";
 import DeckManaCurve from "../../DeckManaCurve";
+import DeckRarities from "../../DeckRarities";
+import DeckSampleHand from "../../DeckSampleHand";
 import DeckTypesStats from "../../DeckTypesStats";
 import ManaCost from "../../ManaCost";
 import Separator from "../../Separator";
 import SvgButton from "../../SvgButton";
 import Button from "../../ui/Button";
 import Section from "../../ui/Section";
-import WildcardsCostPreset from "../../WildcardsCostPreset";
 import CardsWinratesView from "./CardsWinrateView";
 import ChangesDeckView from "./ChangesDeckView";
 import VisualDeckView from "./VisualDeckView";
@@ -110,7 +106,6 @@ export default function DeckView(props: DeckViewProps): JSX.Element {
   deck.tile = dbDeck?.deckTileId || DEFAULT_TILE;
 
   const [deckView, setDeckView] = useState(VIEW_REGULAR);
-  const [shuffle, setShuffle] = useState([true]);
 
   const deckWinratesView = (): void => {
     setDeckView(VIEW_WINRATES);
@@ -126,10 +121,6 @@ export default function DeckView(props: DeckViewProps): JSX.Element {
 
   const regularView = (): void => {
     setDeckView(VIEW_REGULAR);
-  };
-
-  const traditionalShuffle = (): void => {
-    setShuffle([true]);
   };
 
   useEffect(() => {
@@ -150,25 +141,6 @@ export default function DeckView(props: DeckViewProps): JSX.Element {
       },
     });
   };
-
-  const colorCounts = getDeckColorsAmmount(deck);
-  const colorsPie = [
-    { title: "White", value: colorCounts.w, color: MANA_COLORS[0] },
-    { title: "Blue", value: colorCounts.u, color: MANA_COLORS[1] },
-    { title: "Black", value: colorCounts.b, color: MANA_COLORS[2] },
-    { title: "Red", value: colorCounts.r, color: MANA_COLORS[3] },
-    { title: "Green", value: colorCounts.g, color: MANA_COLORS[4] },
-  ];
-  const landCounts = getDeckLandsAmmount(deck);
-  const landsPie = [
-    { title: "White", value: landCounts.w, color: MANA_COLORS[0] },
-    { title: "Blue", value: landCounts.u, color: MANA_COLORS[1] },
-    { title: "Black", value: landCounts.b, color: MANA_COLORS[2] },
-    { title: "Red", value: landCounts.r, color: MANA_COLORS[3] },
-    { title: "Green", value: landCounts.g, color: MANA_COLORS[4] },
-  ];
-
-  const wildcardsCost = getDeckRaritiesCount(deck);
 
   return (
     <>
@@ -289,68 +261,19 @@ export default function DeckView(props: DeckViewProps): JSX.Element {
               <DeckManaCurve deck={deck} />
             </Section>
             <Section style={{ flexDirection: "column", gridArea: "pies" }}>
-              <Separator>Color Pie</Separator>
-              <div className="pie-container-outer">
-                <div className="pie-container">
-                  <span>Mana Symbols</span>
-                  <PieChart data={colorsPie} />
-                </div>
-                <div className="pie-container">
-                  <span>Mana Sources</span>
-                  <PieChart data={landsPie} />
-                </div>
-              </div>
+              <Separator>Colors</Separator>
+              <DeckColorStats deck={deck} />
             </Section>
             <Section style={{ flexDirection: "column", gridArea: "rarities" }}>
-              <Separator>Rarities</Separator>
-              <WildcardsCostPreset wildcards={wildcardsCost} showComplete />
-              <Separator>Wildcards Needed</Separator>
+              <Separator>Cards by rarity</Separator>
+              <DeckRarities deck={deck} />
+              <Separator>Wildcards to build it</Separator>
               <CraftingCost deck={deck} />
             </Section>
 
-            <Section
-              style={{
-                padding: "0 0 24px 24px",
-                flexDirection: "column",
-                gridArea: "hand",
-              }}
-            >
-              <Separator>
-                {shuffle[0]
-                  ? "Sample Hand (Traditional)"
-                  : "Sample Hand (Arena BO1)"}
-              </Separator>
-              <Button
-                text="Shuffle"
-                style={{ marginBottom: "16px" }}
-                onClick={traditionalShuffle}
-              />
-
-              {shuffle[0] &&
-                getSampleHand(deck)
-                  .sort((a: DbCardDataV2, b: DbCardDataV2) => {
-                    const sort = (_a: any, _b: any): number =>
-                      _a > _b ? 1 : _a < _b ? -1 : 0;
-                    return sort(a.Cmc, b.Cmc) || sort(a.Name, b.Name);
-                  })
-                  .map((c: DbCardDataV2, index: number) => {
-                    return (
-                      <CardTile
-                        indent="a"
-                        isHighlighted={false}
-                        isSideboard={false}
-                        showWildcards
-                        deck={deck}
-                        card={c}
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={index}
-                        quantity={{
-                          type: "NUMBER",
-                          quantity: 1,
-                        }}
-                      />
-                    );
-                  })}
+            <Section style={{ flexDirection: "column", gridArea: "hand" }}>
+              <Separator>Sample hand</Separator>
+              <DeckSampleHand deck={deck} />
             </Section>
           </div>
         )}

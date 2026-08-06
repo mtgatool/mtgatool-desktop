@@ -6,83 +6,81 @@
 }
 
 .mana-curve-container {
-  margin: 16px auto;
+  margin: 12px auto 4px auto;
   max-width: 630px;
-  padding-left: 12px;
-  padding-right: 12px;
+  padding: 0 12px;
   width: calc(100% - 24px);
 
   .mana-curve {
     display: flex;
     align-items: flex-end;
-    height: 96px;
-    padding-bottom: 4px;
-    border-bottom: 2px solid rgba(250, 229, 210, 0.8);
+    justify-content: space-between;
+    height: 132px;
     width: 100%;
+    // The baseline the bars stand on. One step off the surface and hairline —
+    // it orients the eye without competing with the data.
+    border-bottom: 1px solid var(--color-line-sep);
   }
 
-  .mana-curve-column {
-    color: var(--color-text);
-    justify-content: space-around;
-    width: 100%;
-    width: -moz-available;
-    width: -webkit-fill-available;
-    width: fill-available;
-    flex-direction: column;
-    margin: 0px 4px;
+  // A full-height column: value on top, bar growing off the baseline, tick
+  // below. The slot is wider than the bar on purpose — the leftover is air.
+  .mana-curve-slot {
+    flex: 1;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    background-color: rgba(250, 229, 210, 0.8);
-  }
-
-  .mana-curve-number {
-    opacity: 1;
+    justify-content: flex-end;
+    align-items: center;
+    min-width: 0;
     position: relative;
-    height: 0px;
-    top: calc(50% - 8px);
-    text-align: center;
-    font-size: 16px;
-    font-weight: bold;
-    color: var(--color-section);
-    text-shadow: -1px -1px 0px var(--color-text);
-    font-family: Beleren;
   }
 
-  .mana-curve-numbers {
-    display: flex;
-    align-items: flex-end;
-    height: 24px;
-    width: 100%;
-  }
-
-  .mana-curve-costs {
-    display: flex;
-    align-items: flex-start;
-    width: 100%;
-  }
-
-  .mana-curve-column-number {
-    font-size: 12px;
-    line-height: 20px;
-    text-align: center;
-    color: var(--color-text);
-    width: 100%;
-    font-family: "belerenbold";
-  }
-
-  .mana-curve-column span {
-    align-self: flex-end;
-  }
-
-  .mana-curve-tag {
-    margin: 8px auto;
-    writing-mode: tb-rl;
-    width: 20px;
-    padding: 12px 0px;
-    border-radius: 10px;
+  .mana-curve-value {
     font-size: 13px;
-    color: black;
+    line-height: 16px;
+    // Text tokens, never the data colour, and never sitting on the fill.
+    color: var(--color-text);
     font-family: var(--sub-font-name);
-    transform: rotate(180deg);
+    margin-bottom: 4px;
+  }
+
+  .mana-curve-bar {
+    width: 100%;
+    max-width: 24px;
+    display: flex;
+    flex-direction: column;
+    // Rounded at the data end, square where it meets the baseline.
+    border-radius: 4px 4px 0 0;
+    overflow: hidden;
+    // Separates touching segments with surface rather than a stroke.
+    gap: 2px;
+    min-height: 0;
+    transition: height 0.25s ease-out;
+  }
+
+  .mana-curve-segment {
+    width: 100%;
+    flex-shrink: 0;
+    min-height: 0;
+  }
+
+  .mana-curve-slot:hover .mana-curve-bar {
+    filter: brightness(1.12);
+  }
+
+  .mana-curve-tick {
+    position: absolute;
+    bottom: -22px;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--color-text-dark);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mana-curve-summary {
+    margin-top: 30px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--color-text-dark);
   }
 }

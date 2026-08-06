@@ -1,0 +1,356 @@
+// Colors, rarities and wildcard cost on the deck view.
+//
+// These replaced two pie charts and a row of bare numbers. The shape they share:
+// an icon carries identity, the number is the loud part in ordinary text, and a
+// meter shows the share — so nothing depends on matching a color to a legend.
+
+// --- colors ----------------------------------------------------------------
+
+.deck-colors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 8px;
+  padding: 4px 12px 0 12px;
+  width: calc(100% - 24px);
+  margin: 0 auto;
+}
+
+.deck-color-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 6px 14px 6px;
+  border-radius: 6px;
+  background: var(--color-section);
+  min-width: 0;
+}
+
+.deck-color-icon {
+  margin-bottom: 6px;
+}
+
+.deck-color-name {
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--color-text-dark);
+}
+
+.deck-color-figure {
+  font-family: var(--main-font-name);
+  // Proportional figures: this is a display number, not a column to align.
+  font-size: 26px;
+  line-height: 32px;
+  color: var(--color-text-hover);
+  // Air on both sides of the figure, so the label above and the count below
+  // read as three separate things rather than one dense block.
+  margin: 6px 0 4px 0;
+}
+
+.deck-color-sub {
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--color-text-dark);
+  text-align: center;
+}
+
+// The trailing sub-line sits under the meters, so it needs its own gap.
+.deck-color-meter + .deck-color-sub {
+  margin-top: 6px;
+}
+
+.deck-color-meter {
+  width: 100%;
+  height: 6px;
+  margin: 9px 0 0 0;
+  border-radius: 3px;
+  // A lighter step of the track, so an empty meter still reads as a meter.
+  background: var(--color-dark);
+  overflow: hidden;
+}
+
+.deck-color-meter + .deck-color-meter {
+  margin-top: 3px;
+}
+
+.deck-color-meter-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease-out;
+
+  // The mana base sits under the cost it has to pay for, one step back, so the
+  // pair reads as "what I need" over "what I have".
+  &.dim {
+    opacity: 0.55;
+  }
+}
+
+.deck-colors-note,
+.deck-colors-empty {
+  margin: 10px 16px 4px 16px;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--color-text-dark);
+  text-align: center;
+}
+
+// --- rarities --------------------------------------------------------------
+
+.deck-rarities {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 12px 0 12px;
+}
+
+.deck-rarity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 62px;
+  padding: 8px 4px 10px 4px;
+  border-radius: 6px;
+  background: var(--color-section);
+}
+
+.deck-rarity-icon {
+  width: 24px;
+  height: 24px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-bottom: 4px;
+}
+
+.deck-rarity-count {
+  font-family: var(--main-font-name);
+  font-size: 19px;
+  line-height: 24px;
+  color: var(--color-text-hover);
+}
+
+.deck-rarity-name {
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-text-dark);
+}
+
+.deck-rarity.total {
+  background: transparent;
+  border: 1px solid var(--color-line-sep);
+}
+
+.deck-rarity-cards {
+  background-image: url(../assets/images/card_icon.png);
+  // The wildcard art is wider than it is tall; the card icon is not, so it
+  // needs trimming to sit on the same optical line as the rarities beside it.
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  margin-bottom: 6px;
+  opacity: 0.75;
+}
+
+// --- wildcards -------------------------------------------------------------
+
+.wildcards-cost-block {
+  padding: 4px 12px 8px 12px;
+}
+
+.wildcards-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.wildcard-cost {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 62px;
+  padding: 8px 4px 10px 4px;
+  border-radius: 6px;
+  background: var(--color-section);
+}
+
+.wildcard-cost-icon {
+  width: 24px;
+  height: 24px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-bottom: 4px;
+}
+
+.wildcard-cost-need {
+  font-family: var(--main-font-name);
+  font-size: 19px;
+  line-height: 24px;
+  color: var(--color-text-hover);
+
+  // Only colored when it is actually a shortfall — otherwise the number is
+  // just a count and wearing a status color would overstate it.
+  &.short {
+    color: var(--color-r);
+  }
+}
+
+.wildcard-cost-have {
+  font-size: 10px;
+  color: var(--color-text-dark);
+}
+
+.wildcards-complete {
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-g);
+  margin-bottom: 8px;
+}
+
+.wildcards-note {
+  margin: 10px 4px 0 4px;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--color-text-dark);
+  text-align: center;
+
+  strong {
+    color: var(--color-text);
+    font-weight: normal;
+  }
+}
+
+// --- sample hand -----------------------------------------------------------
+
+.sample-hand {
+  // The bottom padding is the runway the deal travels through, and the clip
+  // keeps it there. A transform does not affect layout but it *does* extend
+  // the scrollable area, so without this the cards starting below their slots
+  // stretched the page for the length of the animation and the window jumped.
+  // Reserving the space instead means nothing moves.
+  padding: 10px 12px 56px 12px;
+  overflow: hidden;
+}
+
+.sample-hand-shuffle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto 14px auto;
+  padding: 7px 16px 7px 12px;
+  border: 1px solid var(--color-line-sep);
+  border-radius: 6px;
+  background: var(--color-section);
+  color: var(--color-text);
+  font-family: var(--sub-font-name);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease-out, color 0.15s ease-out;
+
+  &:hover {
+    background: var(--color-section-hover);
+    color: var(--color-text-hover);
+  }
+}
+
+.sample-hand-shuffle-icon {
+  width: 16px;
+  height: 16px;
+  background-image: var(--shuffle-svg, none);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  // Falls back to a mask so the icon takes the button's text colour on hover.
+  background-color: currentColor;
+  mask-image: url(../assets/images/svg/shuffle.svg);
+  mask-size: contain;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  -webkit-mask-image: url(../assets/images/svg/shuffle.svg);
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+}
+
+.sample-hand-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sample-hand-card {
+  // Four to a row at full width, dropping to three and two as it narrows.
+  flex: 0 0 calc(25% - 6px);
+  max-width: 128px;
+  min-width: 72px;
+  // Cards are 1 : 1.396 — the ratio the rest of the app uses for card faces.
+  aspect-ratio: 1 / 1.396;
+  perspective: 600px;
+  // Slight overshoot at the end, so the card settles into the slot rather than
+  // gliding to a stop — that snap is what reads as "dealt".
+  animation: sample-hand-deal 400ms cubic-bezier(0.18, 0.89, 0.32, 1.12)
+    backwards;
+}
+
+.sample-hand-card-face {
+  width: 100%;
+  height: 100%;
+  border-radius: 4.75% / 3.5%;
+  background-color: var(--color-section);
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  transition: transform 0.18s ease-out, box-shadow 0.18s ease-out;
+}
+
+.sample-hand-card:hover .sample-hand-card-face {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.6);
+}
+
+// Dealt from below, the way a hand is dealt across a table: each card comes up
+// from under the row, small and tilted as if seen edge-on, and turns upright as
+// it lands in its slot. The per-card delay is what makes it a deal rather than
+// seven cards appearing at once.
+@keyframes sample-hand-deal {
+  from {
+    opacity: 0;
+    // Matches the runway reserved on .sample-hand — travel further and the
+    // card is clipped on the way in.
+    transform: translateY(52px) rotate(-7deg) scale(0.86);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+// Someone who does not want the movement still gets the hand.
+@media (prefers-reduced-motion: reduce) {
+  .sample-hand-card {
+    animation: sample-hand-fade 200ms ease-out backwards;
+  }
+
+  @keyframes sample-hand-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+.sample-hand-empty {
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-text-dark);
+  padding: 12px 0;
+}
