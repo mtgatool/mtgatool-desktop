@@ -422,11 +422,47 @@ class CardsDbClient {
         ids
       );
       const found = new Set<number>();
-      result.values.forEach((row) => {
-        const card = rowToCard(row);
-        found.add(card.GrpId);
-        settle(card.GrpId, card);
+      const cards = result.values.map(rowToCard);
+      cards.forEach((card) => found.add(card.GrpId));
+
+      // Pull in the other face of anything double-faced, in the same flush.
+      //
+      // A back face is a separate row with its own grpid, and asking for a
+      // card has never brought it along — so every caller that wanted both
+      // sides had to notice it was a DFC, request the second id, and wait for
+      // it. Reading it straight from the cache instead found nothing and fell
+      // back to the default tile, which is how a two-faced card came to be
+      // hovered next to Evolving Wilds.
+      //
+      // Done here, before the waiters are settled, so both faces are in the
+      // cache the moment the requested card resolves. That is what lets the
+      // synchronous `database.card(id)` answer for a back face and keeps this
+      // out of the components entirely.
+      const linked = new Set<number>();
+      cards.forEach((card) => {
+        (card.LinkedFaceGrpIds || []).forEach((id) => {
+          if (id && !found.has(id) && !this.cardCache.has(id)) linked.add(id);
+        });
       });
+
+      if (linked.size > 0) {
+        const linkedIds = [...linked];
+        const linkedRows = await this.query(
+          `SELECT ${CARD_COLUMNS} FROM cards WHERE grpid IN (${linkedIds
+            .map(() => "?")
+            .join(",")})`,
+          linkedIds
+        );
+        // Cached directly rather than settled: nothing asked for these, so
+        // there are no waiters. A face that does not resolve is simply left
+        // alone — it will be fetched normally if something ever asks.
+        linkedRows.values.forEach((row) => {
+          const card = rowToCard(row);
+          this.cardCache.set(card.GrpId, card);
+        });
+      }
+
+      cards.forEach((card) => settle(card.GrpId, card));
       // Cache the misses too, so a bad grpId is not asked for repeatedly.
       ids.forEach((id) => {
         if (!found.has(id)) settle(id, null);
