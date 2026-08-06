@@ -63,7 +63,8 @@ function fsWatch(
     }
   }
 
-  // eslint-disable-next-line no-shadow
+  // Shadows the module-level start() deliberately; this one is fsWatch's own.
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   async function start(): Promise<void> {
     lastSize = await attemptSize();
     handle = global.setInterval(checkFile, interval);

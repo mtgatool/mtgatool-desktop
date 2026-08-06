@@ -15,6 +15,6 @@ interface Latest {
 it("is updated", async () => {
   const response = await request("https://mtgatool.com/api/database/latest");
   const latestDb: Latest | undefined = JSON.parse(response);
-  const version = latestDb ? parseInt(latestDb.latest) : 0;
+  const version = latestDb ? parseInt(latestDb.latest, 10) : 0;
   expect(database.version).toBeGreaterThan(version - 10);
 });

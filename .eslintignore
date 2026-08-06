@@ -6,3 +6,7 @@ node_modules*
 /src/info.json
 /src/background/greToClientInterpreter.ts
 /src/types/greTypes.ts
+# Vendored proto -> TypeScript generator (run by `npm run proto`). Third-party
+# code with its own README; the file it generates, src/types/greTypes.ts, is
+# already ignored above.
+/src/proto/proto2typescript/

@@ -6,12 +6,6 @@ import testSeedDatabase from "../testSeedDatabase";
 testSeedDatabase();
 
 describe("deck", () => {
-  describe("constructor", () => {});
-
-  describe("sort", () => {});
-
-  describe("clone", () => {});
-
   describe("hashing", () => {
     it("returns proper hash", () => {
       const mainA = [
