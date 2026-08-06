@@ -1233,14 +1233,42 @@ const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
   // Comparing against a high-water mark cannot separate them: it discards the
   // late events along with the repeats. So the ids actually processed are kept
   // for the duration of the game.
+  //
+  // They only mean anything for as long as that numbering lasts, and it starts
+  // over for every *game*, not every match — game two of a Bo3 begins at msgId
+  // 1 again. So the epoch has to be recognised before the duplicate test
+  // consults the set, never inside it: by then the previous epoch's ids fill
+  // the set, the new epoch's opening messages read as re-deliveries, and the
+  // reset that would have cleared them never runs. Everything up to the first
+  // id the previous epoch happened not to use is dropped — and since the
+  // opening hand is read from msgId 8-9, it goes with them.
+  //
+  // msgId === 1 cannot be the signal for the same reason: it is already in the
+  // set by the time it matters. Two things can be:
+  //
+  //  - the game number, which the GRE states outright. It also survives a
+  //    re-delivery correctly, where a raw "msgId === 1" could not: a late
+  //    message from the previous game carries the old number and is ignored,
+  //    which is what stops a repeat from wiping a game in progress. Only an
+  //    increase counts, so a message arriving out of order cannot rewind.
+  //  - a zeroed msgId, which is what resetCurrentMatch leaves behind at the
+  //    start of a match. Matches do not reliably start at msgId 1 either
+  //    (observed starting at 2 and at 4), so this is what catches them.
+  const gameNumber = msg.gameStateMessage?.gameInfo?.gameNumber || 0;
+  const newEpoch =
+    gameNumber > (currentMatch.gameInfo?.gameNumber || 0) ||
+    !currentMatch.msgId;
+
+  if (msg.msgId && newEpoch) {
+    processedMsgIds = new Set();
+  }
+
   const duplicate = !!msg.msgId && processedMsgIds.has(msg.msgId);
 
   if (msg.msgId && !duplicate) {
     console.log(`Message id > ${msg.msgId} (${currentMatch.msgId})`);
 
-    // A real new game restarts the numbering at 1 — checked before the id is
-    // recorded, so a re-delivered "1" cannot wipe a game in progress.
-    if (!currentMatch.msgId || msg.msgId === 1) {
+    if (newEpoch) {
       console.warn("Reset current game");
       resetCurrentGame();
       processedMsgIds = new Set();

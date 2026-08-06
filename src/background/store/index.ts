@@ -2,12 +2,15 @@ import { ActionLogV2 } from "../../components/action-log-v2/types";
 import { CombinedRankInfo } from "../onLabel/InEventGetCombinedRankInfo";
 import { Course } from "../onLabel/InEventGetCourses";
 import { draftStateObject } from "./currentDraftStore";
-import { matchStateObject } from "./currentMatchStore";
+import { createMatchState } from "./currentMatchStore";
 
 // Use this store only when redux struggles with the data (too complex, too deep)
 // Or when there is not need to use the redux/react selector wizardy.
 const globalStore = {
-  currentMatch: matchStateObject,
+  // A fresh state, never the defaults themselves — the setters write straight
+  // through this reference, so sharing it would mean the first match edits what
+  // every later match resets to.
+  currentMatch: createMatchState(),
   currentDraft: draftStateObject,
   currentActionLog: {
     lines: [],

@@ -28,13 +28,17 @@ export default function getMatchGameStats(): void {
     time: Math.round(time / 1000),
     onThePlay: currentMatch.onThePlay,
     winner: currentMatch.gameWinner,
-    handsDrawn: currentMatch.handsDrawn,
+    // Copies, not the live arrays. These are a snapshot of one finished game;
+    // handing out the arrays the parser keeps writing to meant every game of a
+    // match ended up sharing whichever one it wrote last — two games of a Bo3
+    // showing the same opening hand.
+    handsDrawn: _.cloneDeep(currentMatch.handsDrawn),
     cardsCast: _.cloneDeep(currentMatch.cardsCast),
     sideboardChanges: {
       added: [],
       removed: [],
     },
-    cardsSeen: currentMatch.opponent.cardsUsed,
+    cardsSeen: _.cloneDeep(currentMatch.opponent.cardsUsed),
     deck: {
       id: "",
       commandZoneGRPIds: [],

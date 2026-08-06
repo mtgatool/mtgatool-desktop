@@ -29,67 +29,88 @@ interface Heat {
   phase: Phase;
 }
 
-export const matchStateObject = {
-  matchStarted: false,
-  matchId: "",
-  eventId: "",
-  onThePlay: 0,
-  msgId: 0,
-  playerSeat: 0,
-  oppSeat: 0,
-  opponent: {} as InternalPlayer,
-  gameWinner: 0,
-  statsHeatMap: [] as Heat[],
-  totalTurns: 0,
-  logTime: new Date(),
-  playerStats: {
-    lifeGained: 0,
-    lifeLost: 0,
-    manaUsed: 0,
-    damage: {} as Record<string, number>,
-    lifeTotals: [] as number[],
-  },
-  oppStats: {
-    lifeGained: 0,
-    lifeLost: 0,
-    manaUsed: 0,
-    damage: {} as Record<string, number>,
-    lifeTotals: [] as number[],
-  },
-  // Decks
-  currentDeck: new Deck(),
-  originalDeck: new Deck(),
-  cardsLeft: new Deck(),
-  cardsFromSideboard: [] as number[],
-  cardsBottom: [] as number[],
-  // Info
-  player: {} as InternalPlayer,
-  players: [] as PlayerInfo[],
-  turnInfo: {} as TurnInfo,
-  gameInfo: {
-    results: [],
-  } as GameInfo,
-  // Time stuff
-  beginTime: new Date(),
-  priorityTimers: {
-    last: 0,
-    timers: [0, 0, 0, 0, 0] as number[],
-  } as PriorityTimers,
-  currentPriority: 0,
-  // Zones, objects, annotations, ids tracking
-  GREtoClient: [] as GREToClientMessage[],
-  zones: {} as Record<number, ZoneInfo>,
-  annotations: {} as Record<number, AnnotationInfo>,
-  processedAnnotations: [] as number[],
-  gameObjects: {} as Record<number, GameObjectInfo>,
-  initialLibraryInstanceIds: [] as number[],
-  instanceToCardIdMap: {} as Record<number, number>,
-  idChanges: {} as Record<number, number>,
-  cardsCast: [] as CardCast[],
-  handsDrawn: [] as number[][],
-  matchGameStats: [] as MatchGameStats[],
-  cardsOdds: new Chances(),
-} as MatchState;
+/**
+ * A brand new match state.
+ *
+ * A factory, not a shared object — and the difference is not cosmetic. This was
+ * once a single `matchStateObject` that `globalStore.currentMatch` was
+ * initialised *to*, rather than from. Every setter writes through
+ * `globalStore.currentMatch`, so until the first resetCurrentMatch ran, all of
+ * them were writing into the defaults themselves; resetCurrentMatch then spread
+ * that same object as the starting point for every match afterwards.
+ *
+ * Normally invisible, because the first MatchGameRoomStateType_Playing fires
+ * resetCurrentMatch before any GRE traffic and decouples the defaults while
+ * they are still clean. But a match that runs *before* that first reset — the
+ * app starting or reloading while a game is already in progress — writes its
+ * own msgId, opponent and seen cards into the defaults permanently, and every
+ * later match starts life with them. The symptom was an opponent's cards from a
+ * match already finished appearing in the next match's deck list, and a msgId
+ * that never came back to 0 (which is what a new match is recognised by).
+ */
+export function createMatchState(): MatchState {
+  return {
+    matchStarted: false,
+    matchId: "",
+    eventId: "",
+    onThePlay: 0,
+    msgId: 0,
+    playerSeat: 0,
+    oppSeat: 0,
+    opponent: {} as InternalPlayer,
+    gameWinner: 0,
+    statsHeatMap: [] as Heat[],
+    totalTurns: 0,
+    logTime: new Date(),
+    playerStats: {
+      lifeGained: 0,
+      lifeLost: 0,
+      manaUsed: 0,
+      damage: {} as Record<string, number>,
+      lifeTotals: [] as number[],
+    },
+    oppStats: {
+      lifeGained: 0,
+      lifeLost: 0,
+      manaUsed: 0,
+      damage: {} as Record<string, number>,
+      lifeTotals: [] as number[],
+    },
+    // Decks
+    currentDeck: new Deck(),
+    originalDeck: new Deck(),
+    cardsLeft: new Deck(),
+    cardsFromSideboard: [] as number[],
+    cardsBottom: [] as number[],
+    // Info
+    player: {} as InternalPlayer,
+    players: [] as PlayerInfo[],
+    turnInfo: {} as TurnInfo,
+    gameInfo: {
+      results: [],
+    } as GameInfo,
+    // Time stuff
+    beginTime: new Date(),
+    priorityTimers: {
+      last: 0,
+      timers: [0, 0, 0, 0, 0] as number[],
+    } as PriorityTimers,
+    currentPriority: 0,
+    // Zones, objects, annotations, ids tracking
+    GREtoClient: [] as GREToClientMessage[],
+    zones: {} as Record<number, ZoneInfo>,
+    annotations: {} as Record<number, AnnotationInfo>,
+    processedAnnotations: [] as number[],
+    gameObjects: {} as Record<number, GameObjectInfo>,
+    initialLibraryInstanceIds: [] as number[],
+    instanceToCardIdMap: {} as Record<number, number>,
+    idChanges: {} as Record<number, number>,
+    cardsCast: [] as CardCast[],
+    handsDrawn: [] as number[][],
+    matchGameStats: [] as MatchGameStats[],
+    cardsOdds: new Chances(),
+  } as MatchState;
+}
 
 export function setMatchId(arg: string): void {
   globalStore.currentMatch.matchId = arg;
@@ -148,28 +169,13 @@ export function resetCurrentMatch(): void {
   // already selected deck.
   const { currentDeck } = globalStore.currentMatch;
   const { originalDeck } = globalStore.currentMatch;
-  globalStore.currentMatch = { ...matchStateObject };
-  globalStore.currentMatch = {
-    ...globalStore.currentMatch,
-    currentDeck: currentDeck,
-    originalDeck: originalDeck,
-    playerStats: {
-      lifeLost: 0,
-      lifeGained: 0,
-      manaUsed: 0,
-      damage: {},
-      lifeTotals: [],
-    },
-    oppStats: {
-      lifeLost: 0,
-      lifeGained: 0,
-      manaUsed: 0,
-      damage: {},
-      lifeTotals: [],
-    },
-    statsHeatMap: [],
-    matchGameStats: [],
-  };
+  // Everything else comes back brand new. This used to spread a shared default
+  // object and then rebuild playerStats/oppStats/statsHeatMap/matchGameStats by
+  // hand — a patch for those four carrying over between matches, which is the
+  // same fault createMatchState now prevents for every field at once.
+  globalStore.currentMatch = createMatchState();
+  globalStore.currentMatch.currentDeck = currentDeck;
+  globalStore.currentMatch.originalDeck = originalDeck;
 }
 
 export function resetCurrentGame(): void {
