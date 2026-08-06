@@ -19,6 +19,24 @@ import getLocalSetting from "../utils/getLocalSetting";
  * - It is centred and not always-on-top, because the match is over and there
  *   is nothing underneath left to watch.
  */
+/**
+ * Bring the window to the front, including over a fullscreen game.
+ *
+ * `moveTop` alone only wins against ordinary windows. A fullscreen app on
+ * macOS owns its own Space, and a window that is not marked visible on all
+ * workspaces simply lives on a different one — it never appears, however often
+ * it is raised. This is the pair of calls the overlays already make, which is
+ * why they show over a fullscreen game and this window did not.
+ */
+function raise(win: any): void {
+  win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  // Above normal windows and above a fullscreen app's own level. Not
+  // `setFocusable(false)` as the overlays add — this window has a close button
+  // that has to be clickable.
+  win.setAlwaysOnTop(true, "pop-up-menu", 1);
+  win.moveTop();
+}
+
 export default function createPostMatchWindow(): void {
   if (!remote) return;
 
@@ -31,7 +49,7 @@ export default function createPostMatchWindow(): void {
   if (existing) {
     existing.reload();
     existing.show();
-    existing.moveTop();
+    raise(existing);
     return;
   }
 
@@ -60,7 +78,9 @@ export default function createPostMatchWindow(): void {
     // being readable at all, so the window refuses rather than degrading.
     minWidth: 320,
     minHeight: 380,
-    alwaysOnTop: false,
+    // Set here as well as in `raise`, so the window is already at the right
+    // level the moment it first paints rather than jumping a frame later.
+    alwaysOnTop: true,
     webPreferences: {
       webSecurity: false,
       nodeIntegration: true,
@@ -97,6 +117,6 @@ export default function createPostMatchWindow(): void {
 
   newWindow.webContents.once("dom-ready", () => {
     newWindow.show();
-    newWindow.moveTop();
+    raise(newWindow);
   });
 }
