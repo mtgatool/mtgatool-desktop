@@ -17,8 +17,13 @@ export default function getDeckLandsAmmount(deck: Deck): ColorsAmmount {
           card.Types.indexOf("Land") != -1 ||
           card.Types.indexOf("land") != -1
         ) {
-          if (card.FrameColors.length < 5) {
-            card.FrameColors.forEach(function (c: number) {
+          // Color identity, not frame colors. A fetchland's frame carries the
+          // colors it can *fetch* — Scalding Tarn reads as blue-red — so a
+          // fetch base counted as mana it cannot make, and the sources pie
+          // showed colors the deck could not produce. Its color identity is
+          // empty, which is what a land producing no mana should contribute.
+          if (card.ColorIdentity.length < 5) {
+            card.ColorIdentity.forEach(function (c: number) {
               if (c == 1) {
                 colors.w += quantity;
                 colors.total += quantity;

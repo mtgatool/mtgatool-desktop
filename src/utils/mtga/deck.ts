@@ -153,6 +153,42 @@ class Deck {
   }
 
   /**
+   * The colors this deck can actually produce mana for.
+   *
+   * A deck's identity is what its lands can cast, not what is written on the
+   * cards it happens to contain: counting every card's mana cost made Sneak &
+   * Show five-colored, because it runs an Atraxa it never casts — it puts it
+   * into play. So only lands are read, and only the mana they make.
+   *
+   * `ColorIdentity` rather than `FrameColors`, which is what the rest of the
+   * app reaches for. A fetchland's frame carries the colors it can *fetch* —
+   * Scalding Tarn is [u, r], Polluted Delta [u, b] — so a fetch base alone
+   * spans the whole wheel. Its color identity is empty, which is right: it
+   * produces no mana at all.
+   *
+   * It is still a proxy, not a produced-mana list, which the card data does
+   * not carry. It reads a land's colored mana symbols, so a colorless land
+   * like Ancient Tomb contributes nothing rather than colorless.
+   */
+  getManaSourceColors(countMainboard = true, countSideboard = false): Colors {
+    const colors = new Colors();
+
+    const addFrom = (list: CardsList): void => {
+      list.get().forEach((card) => {
+        const cardData = database.card(card.id);
+        if (!cardData) return;
+        if (cardData.Types.indexOf("Land") === -1) return;
+        colors.addFromArray(cardData.ColorIdentity || []);
+      });
+    };
+
+    if (countMainboard) addFrom(this.mainboard);
+    if (countSideboard) addFrom(this.sideboard);
+
+    return colors;
+  }
+
+  /**
    * Returns a Color class based on the colors of the cards within
    * the mainboard or, if specified, the sideboard.
    * By default it only counts the mainboard.
@@ -160,18 +196,7 @@ class Deck {
    * @param countSideboard weter or not to count the sideboard cards.
    */
   getColors(countMainboard = true, countSideboard = false): Colors {
-    this._colors = new Colors();
-
-    if (countMainboard) {
-      const mainboardColors = this.mainboard.getColors();
-      this._colors.addFromColor(mainboardColors);
-    }
-
-    if (countSideboard) {
-      const sideboardColors = this.sideboard.getColors();
-      this._colors.addFromColor(sideboardColors);
-    }
-
+    this._colors = this.getManaSourceColors(countMainboard, countSideboard);
     return this._colors;
   }
 

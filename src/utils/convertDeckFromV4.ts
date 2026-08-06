@@ -1,6 +1,5 @@
 import { ArenaV4DeckPayload, InternalDeck } from "../types";
 import convertV4ListToV2 from "./convertV4ListToV2";
-import CardsList from "./mtga/cardsList";
 import Deck from "./mtga/deck";
 
 /**
@@ -25,7 +24,8 @@ export default function convertDeckFromV4(json: ArenaV4DeckPayload): Deck {
     sideboard: side,
     commandZoneGRPIds: (json.Deck.CommandZone || []).map((c) => c.cardId),
     companionGRPId: (json.Deck.Companions || []).map((c) => c.cardId)[0],
-    colors: new CardsList(main).getColors().getBits(),
+    // No colors here: the deck works them out from its own lands, and doing it
+    // twice is how the two ended up able to disagree.
     type: "InternalDeck",
   };
 

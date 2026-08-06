@@ -11,7 +11,6 @@ import convertV4ListToV2 from "../../utils/convertV4ListToV2";
 import isElectron from "../../utils/electron/isElectron";
 import getLocalSetting from "../../utils/getLocalSetting";
 import isLimitedEventId from "../../utils/isLimitedEventId";
-import CardsList from "../../utils/mtga/cardsList";
 import Deck from "../../utils/mtga/deck";
 import actionLog from "../actionLog";
 import { isLiveLog } from "../logReadState";
@@ -116,7 +115,7 @@ export default async function onLabelMatchGameRoomStateChangedEvent(
         format: "",
         mainDeck: main,
         sideboard: side,
-        colors: new CardsList(main).getColors().getBits(),
+        // No colors here: the deck derives them from its own lands.
         type: "InternalDeck",
       };
 
