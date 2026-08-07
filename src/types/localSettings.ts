@@ -27,6 +27,7 @@ export const settingKeys = [
   "importLogHistory",
   "whatsNewSeen",
   "postMatchOverview",
+  "collectionSetBands",
 ] as const;
 
 export type SettingKey = typeof settingKeys[number];
@@ -61,4 +62,8 @@ export const defaultSettings: Record<SettingKey, string> = {
   // message went out, and would miss it. localStorage is shared across every
   // window of the app, so the overview reads this the moment it mounts.
   postMatchOverview: "",
+  // Which bands of the collection's set picker are open, by name. Only the ones
+  // deliberately closed or opened are stored; anything absent falls back to the
+  // component's own default, so a new band does not have to be added here too.
+  collectionSetBands: "{}",
 };

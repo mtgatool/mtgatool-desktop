@@ -149,17 +149,33 @@ export default function CompletionHeatMap({
   cardData?: CardData;
 }): JSX.Element {
   return (
-    <div className="completion-table">
-      {COLORS_LONG.map((code, color) => {
-        return (
-          <ColorColumn
-            key={color}
-            cardData={cardData}
-            colorCode={code}
-            color={color}
+    <>
+      <div className="completion-table">
+        {COLORS_LONG.map((code, color) => {
+          return (
+            <ColorColumn
+              key={color}
+              cardData={cardData}
+              colorCode={code}
+              color={color}
+            />
+          );
+        })}
+      </div>
+
+      {/* The cells carry their count as text, but the colour is what the eye
+          reads first, and a ramp says nothing without its ends named. */}
+      <div className="completion-table-legend">
+        <span>none</span>
+        {[0, 1, 2, 3, 4].map((owned) => (
+          <div
+            key={owned}
+            className={`completion-table-legend-swatch ${compCard[owned]}`}
+            title={`${owned} copies owned`}
           />
-        );
-      })}
-    </div>
+        ))}
+        <span>playset</span>
+      </div>
+    </>
   );
 }

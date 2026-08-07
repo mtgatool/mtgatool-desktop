@@ -1,19 +1,113 @@
+// The set picker: eighty-odd symbols, which is a lot to hand someone at once.
+// Grouping them under names and giving the groups room is most of what makes it
+// usable; the rest is that a symbol should say plainly whether it is on.
+
 .set-filter-container {
   display: flex;
-  flex-wrap: wrap;
-  margin-top: 16px;
-  justify-content: center;
   flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+  width: 100%;
+}
 
-  .set-division {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
+.set-division {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
 
-  .set-filter {
-    margin: 4px;
-    width: 24px;
-    height: 24px;
+// The label is the control that folds its band away, so it has to look like
+// something you can press.
+.set-division-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--color-text-dark);
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.12s ease-out, background-color 0.12s ease-out;
+
+  &:hover {
+    color: var(--color-text);
+    background-color: var(--color-section-hover);
   }
+}
+
+// A triangle rather than an image: it has to point two ways, and rotating a
+// glyph is cheaper than shipping a second icon.
+.set-division-caret {
+  width: 0;
+  height: 0;
+  border-left: 4px solid currentColor;
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+  transition: transform 0.15s ease-out;
+  transform-origin: 30% 50%;
+}
+
+.set-division-caret.open {
+  transform: rotate(90deg);
+}
+
+// How many sets in this band are filtering the list, when you cannot see them.
+.set-division-count {
+  min-width: 15px;
+  padding: 0 4px;
+  border-radius: 7px;
+  background: var(--color-section-active);
+  color: var(--color-text-hover);
+  font-size: 10px;
+  line-height: 15px;
+  text-align: center;
+  letter-spacing: 0;
+}
+
+.set-division-icons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  // Gap rather than margins on the icons: the rows stay evenly spaced when one
+  // wraps, which margins on a wrapping flex do not manage.
+  gap: 2px;
+}
+
+.set-filter {
+  width: 26px;
+  height: 26px;
+  // Padding is hit area — the glyph is small and was a 24px target with no
+  // slack around it.
+  padding: 3px;
+  border-radius: 4px;
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  background-position: center;
+  background-origin: content-box;
+  cursor: pointer;
+  // Unselected sets stand back so the chosen one is obvious, but not so far
+  // that the picker looks disabled before you have touched it.
+  opacity: 0.45;
+  transition: opacity 0.12s ease-out, background-color 0.12s ease-out;
+}
+
+.set-filter:hover {
+  // This used to do nothing: the dim rule was written after it and won, so
+  // hovering an unselected set gave no answer at all.
+  opacity: 0.85;
+  background-color: var(--color-section-hover);
+}
+
+.set-filter-selected {
+  opacity: 1;
+  background-color: var(--color-section-active);
+  box-shadow: inset 0 0 0 1px var(--color-line-sep);
+}
+
+.set-filter-selected:hover {
+  opacity: 1;
 }

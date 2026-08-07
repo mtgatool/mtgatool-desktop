@@ -28,6 +28,7 @@ import {
 } from "./collectionSql";
 import { getCollectionStats } from "./collectionStats";
 import makeExportSetForScryfallFn from "./exportSetForScryfall";
+import OwnershipLegend from "./OwnershipLegend";
 import SetsView from "./SetsView";
 
 interface ViewCollectionProps {
@@ -344,53 +345,41 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
   return (
     <>
+      {/* Everything in this row is about the CSV, including both toggles —
+          which read as filters on the collection below until the row says
+          otherwise. */}
       <Section style={{ marginTop: "16px" }}>
-        <div className="flex">
+        <div className="collection-export">
+          <div className="collection-export-label">Export</div>
           <Toggle
-            style={{ maxWidth: "240px", margin: "0 24px 0 8px" }}
-            text="Include unowned cards?"
+            style={{ maxWidth: "240px", margin: 0 }}
+            text="Include unowned cards"
             value={exportUnowned}
             callback={setExportUnowned}
           />
           <Toggle
-            style={{ maxWidth: "240px", margin: "0 24px 0 8px" }}
-            text="Include digital sets?"
+            style={{ maxWidth: "240px", margin: 0 }}
+            text="Include digital sets"
             value={exportDigital}
             callback={setExportDigital}
           />
-          <i
-            style={
-              {
-                lineHeight: "30px",
-                margin: "auto",
-                textWrap: "nowrap",
-                color: "var(--color-text-dark)",
-              } as any
-            }
-          >
-            Collection is saved in CSV format
-          </i>
           <Button
-            style={
-              {
-                margin: "16px",
-                textWrap: "nowrap",
-                padding: "0 8px",
-              } as any
-            }
+            style={{ margin: 0, padding: "0 12px", whiteSpace: "nowrap" }}
             className="button-simple"
-            text="Download Collection"
+            text="Download CSV"
             onClick={downloadTxtFile}
           />
         </div>
       </Section>
       <Section style={{ flexDirection: "column", marginTop: "16px" }}>
-        <h3 className="flex" style={{ margin: "0 auto 24px auto" }}>
-          Owned cards data was last updated on{" "}
+        {/* A timestamp, not a heading — it was an h3, which is why it sat there
+            announcing itself. */}
+        <div className="collection-updated">
+          Collection last updated{" "}
           {new Date(
             uuidData[currentUUID]?.cards?.updated || 0
           ).toLocaleString()}
-        </h3>
+        </div>
         <div style={{ display: "flex", width: "100%" }}>
           <Button
             onClick={openAdvancedCollectionSearch}
@@ -422,7 +411,10 @@ export default function ViewCollection(props: ViewCollectionProps) {
       )}
       {viewMode === "cards" && (
         <Section className="collection-sort-controls">
+          {/* Chips rather than a table header: what follows is a grid of card
+              images, not columns. Drop the variant to put the header back. */}
           <SortControls<CardsData>
+            variant="chips"
             defaultSort={sortValue}
             setSortCallback={setSortValue}
             columnKeys={["fullName", "rarityVal", "cmc", "cid", "setCode"]}
@@ -452,6 +444,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
               pageSizeOptions={[8, 16, 24, 32]}
             />
           </div>
+          <OwnershipLegend />
         </Section>
       )}
     </>

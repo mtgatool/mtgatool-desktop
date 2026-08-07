@@ -1,3 +1,12 @@
+// Completion heat map — one cell per card, holding how many copies are owned.
+//
+// The scale is sequential, because the thing it encodes is: none, one, two,
+// three, a playset. It used to run brown to orange to yellow to green, which is
+// a rainbow — five hues for five steps of one quantity, so nothing about the
+// colour told you which way was "more" and the eye had to read every number.
+// One hue, darkest at none and brightest at a full playset, means a set you
+// have finished reads as a solid field and the gaps in it are the cards you are
+// missing. Which is the question this table is here to answer.
 
 .completion-table {
   width: 100%;
@@ -5,24 +14,34 @@
   margin: 0 auto;
   text-align: center;
   display: grid;
-  line-height: 24px;
-  font-size: 14px;
+  line-height: 22px;
+  font-size: 13px;
   grid-template-columns: repeat(34, 1fr);
+  // 1px of the surface between cells, so a run of the same value still reads as
+  // separate cards rather than one bar.
+  gap: 1px;
   color: var(--color-light);
 }
 
 .completion-table-color-title {
-  height: 24px;
-  margin-right: 20%;
-  margin-bottom: 4px;
+  height: 22px;
+  margin-bottom: 6px;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
+  // The column spans five tracks — four rarities and the gutter that separates
+  // this colour from the next — so centring it in the span would leave it
+  // sitting a track to the right of the cells it heads. Discounting the gutter
+  // puts it over them.
+  margin-right: 20%;
+  opacity: 0.9;
 }
 
 .completion-table-rarity-title {
-  height: 8px;
-  margin-bottom: 2px;
+  height: 3px;
+  border-radius: 2px;
+  margin-bottom: 4px;
+  opacity: 0.85;
 }
 
 .completion-table-rarity-title-common {
@@ -40,34 +59,72 @@
 
 .completion-table-card {
   font-family: var(--sub-font-name-bold);
+  height: 22px;
+  line-height: 22px;
+  border-radius: 2px;
+  // The number is a fallback for the colour, not the main channel — it is there
+  // for the exact count and for anyone who cannot separate the steps by eye.
   color: var(--color-text-button);
-  height: 24px;
-  line-height: 24px;
+  cursor: default;
 }
 
+// A ring rather than a border, so the cell does not resize and shove the grid
+// sideways when the pointer crosses it.
 .completion-table-card:hover {
-  opacity: 0.8;
-  border: 1px white solid;
-  margin: -1px;
+  box-shadow: 0 0 0 2px var(--color-text-hover);
+  position: relative;
   z-index: 1;
 }
 
+// The ramp: dark plum -> magenta -> ember -> amber, the shape of the magma
+// scale. Several hues, but lightness climbs the whole way, which is what keeps
+// it ordered — the eye reads "brighter" as "more" without being told, and none
+// of the steps can be mistaken for a neighbour. A rainbow would not do this: it
+// varies hue with no direction, so nothing says which end is more.
+//
+// One hue was the safe version and it was dull; this keeps the ordering and
+// gives a finished set something to look like.
 .completion-table-card-n0 {
-  background-color: #af593c;
+  // Barely above the surface. Missing cards should read as holes.
+  background-color: #2a2433;
+  color: var(--color-text-dark);
 }
 .completion-table-card-n1 {
-  background-color: #dc8a6e;
+  background-color: #6e2a6b;
+  color: #f2d9ee;
 }
 .completion-table-card-n2 {
-  background-color: #ffdf9e;
+  background-color: #b8476b;
+  color: #ffffff;
 }
 .completion-table-card-n3 {
-  background-color: #e9ff92;
+  background-color: #ef7154;
+  color: var(--color-text-button);
 }
 .completion-table-card-n4 {
-  background-color: #d3ebb0;
+  background-color: #fdc46b;
+  color: var(--color-text-button);
 }
+
 .wanted {
   font-family: var(--sub-font-name-bold);
   color: var(--color-u);
+}
+
+// --- legend -----------------------------------------------------------------
+
+.completion-table-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 14px auto 0 auto;
+  font-size: 11px;
+  color: var(--color-text-dark);
+}
+
+.completion-table-legend-swatch {
+  width: 18px;
+  height: 10px;
+  border-radius: 2px;
 }

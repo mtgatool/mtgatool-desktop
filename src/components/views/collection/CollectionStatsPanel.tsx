@@ -124,36 +124,37 @@ export default function CollectionStatsPanel({
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          maxWidth: "400px",
-          width: "-webkit-fill-available",
-          margin: "0px auto 16px auto",
-          justifyContent: "space-between",
-        }}
-      >
-        <div className="economy-wc wc-common" />
-        <div>{formatNumber(userData.inventory.WildCardCommons)}</div>
-        <div className="economy-wc wc-uncommon" />
-        <div>{formatNumber(userData.inventory.WildCardUnCommons)}</div>
-        <div className="economy-wc wc-rare" />
-        <div>{formatNumber(userData.inventory.WildCardRares)}</div>
-        <div className="economy-wc wc-mythic" />
-        <div>{formatNumber(userData.inventory.WildCardMythics)}</div>
+      {/* Four numbers with four icons and nothing saying what they were. They
+          are wildcards, and each belongs beside its own symbol rather than
+          spread edge to edge by space-between. */}
+      <div className="wildcards-held">
+        <div className="wildcards-held-label">Wildcards</div>
+        <div className="wildcards-held-counts">
+          <div className="wildcards-held-item" title="Common wildcards">
+            <div className="economy-wc wc-common" />
+            <span>{formatNumber(userData.inventory.WildCardCommons)}</span>
+          </div>
+          <div className="wildcards-held-item" title="Uncommon wildcards">
+            <div className="economy-wc wc-uncommon" />
+            <span>{formatNumber(userData.inventory.WildCardUnCommons)}</span>
+          </div>
+          <div className="wildcards-held-item" title="Rare wildcards">
+            <div className="economy-wc wc-rare" />
+            <span>{formatNumber(userData.inventory.WildCardRares)}</span>
+          </div>
+          <div className="wildcards-held-item" title="Mythic wildcards">
+            <div className="economy-wc wc-mythic" />
+            <span>{formatNumber(userData.inventory.WildCardMythics)}</span>
+          </div>
+        </div>
       </div>
-      <i
-        style={{
-          color: "var(--color-text-dark)",
-          textAlign: "center",
-          fontSize: "14px",
-          marginBottom: "16px",
-          padding: "0px 16px",
-        }}
-      >
-        MTG Arena now displays set stats as &quot;In boosters&quot; and
-        &quot;Singleton (at least one)&quot;.
-      </i>
+      {/* A footnote about Arena's wording, set at 14px italic across two lines
+          directly under the headline numbers. It is an aside; it can look like
+          one. */}
+      <div className="collection-stats-note">
+        Arena reports set stats as &quot;In boosters&quot; and &quot;Singleton
+        (at least one)&quot;.
+      </div>
       <div style={{ textAlign: "center" }}>
         <Flex
           style={{
@@ -214,6 +215,7 @@ export default function CollectionStatsPanel({
                 countStats={countStats}
                 image={globalStyle.getPropertyValue(`--wc_${rarity}_png`)}
                 title={capitalizedRarity}
+                rarity={rarity}
               />
             );
           }

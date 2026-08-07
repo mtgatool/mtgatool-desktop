@@ -1,10 +1,12 @@
 import { isEqual } from "lodash";
-import { CSSProperties, useMemo } from "react";
+import { CSSProperties, useCallback, useMemo, useState } from "react";
 
 import allFormats from "../common/allFormats";
 import useCardsDbReady from "../hooks/useCardsDbReady";
 import { CardSet } from "../types";
+import getLocalSetting from "../utils/getLocalSetting";
 import database from "../utils/mtga/database";
+import setLocalSetting from "../utils/setLocalSetting";
 
 interface SetsFilterProps {
   singleSelection?: boolean;
@@ -84,38 +86,139 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
     return a.name.localeCompare(b.name);
   };
 
-  const otherSets: Set[] = [];
   const allSets: Set[] = filterSets
     .filter((s) => s?.code)
     .sort((a, b) => {
       return new Date(a.release).getTime() - new Date(b.release).getTime();
     });
 
+  // Grouped by what you can actually play them in, widest format last, so the
+  // bands run from the sets that matter to most players down to the leftovers.
+  //
+  // Arena has no Pioneer; Explorer is its equivalent and is what the format
+  // data actually carries. Each band excludes the ones above it, so a set
+  // appears once, in the narrowest format that admits it.
+  //
+  // This replaces a guess at the set codes — Historic used to mean "the code
+  // starts with AHA or EA", which picked out the Anthology releases and nothing
+  // else, so the band was both mislabelled and mostly empty.
+  const legalSets = (format: string): string[] =>
+    allFormats[format]?.legalSets ?? [];
+
+  const standard = legalSets("Standard");
+  const explorer = legalSets("Explorer");
+  const historic = legalSets("Historic");
+
+  // A set is listed under either code depending on the format.
+  const isLegalIn = (set: Set, codes: string[]): boolean =>
+    codes.includes(set.arenacode) || codes.includes(set.code);
+
+  // Alchemy releases sit in none of the three, and there are seventeen of them
+  // against two true leftovers — folding them into "Other" would make that
+  // label describe mostly Alchemy.
+  const isAlchemy = (set: Set): boolean =>
+    set.arenacode.startsWith("Y2") || set.code.startsWith("Y2");
+
   const standardSets: Set[] = [];
+  const explorerSets: Set[] = [];
   const historicSets: Set[] = [];
   const alchemySets: Set[] = [];
-
-  const standard = allFormats.Standard.legalSets;
-  // const _historic = allFormats.Historic.sets;
-  // const _alchemy = allFormats.Alchemy.sets;
-  // const _explorer = allFormats.Explorer.sets;
+  const otherSets: Set[] = [];
 
   allSets.forEach((s) => {
-    if (standard.includes(s.arenacode) || standard.includes(s.code)) {
-      standardSets.push(s);
-    } else if (s.arenacode.startsWith("Y2") || s.code.startsWith("Y2")) {
-      alchemySets.push(s);
-    } else if (
-      s.arenacode.startsWith("AHA") ||
-      s.code.startsWith("AHA") ||
-      s.code.startsWith("EA") ||
-      s.code.startsWith("EA")
-    ) {
-      historicSets.push(s);
-    } else {
-      otherSets.push(s);
+    if (isLegalIn(s, standard)) standardSets.push(s);
+    else if (isLegalIn(s, explorer)) explorerSets.push(s);
+    else if (isLegalIn(s, historic)) historicSets.push(s);
+    else if (isAlchemy(s)) alchemySets.push(s);
+    else otherSets.push(s);
+  });
+
+  // Standard and Explorer are what most people are picking from; the rest are
+  // long tails that made the picker three times taller than it needed to be.
+  const defaultOpenBands = ["Standard", "Explorer"];
+
+  const [bands, setBands] = useState<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(getLocalSetting("collectionSetBands")) || {};
+    } catch (e) {
+      return {};
     }
   });
+
+  const isOpen = (label: string): boolean =>
+    bands[label] ?? defaultOpenBands.includes(label);
+
+  const toggleBand = useCallback(
+    (label: string): void => {
+      setBands((current) => {
+        const open = current[label] ?? defaultOpenBands.includes(label);
+        const next = { ...current, [label]: !open };
+        setLocalSetting("collectionSetBands", JSON.stringify(next));
+        return next;
+      });
+    },
+    // defaultOpenBands is a literal defined above and never changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  /**
+   * One labelled band of set icons, which can be folded away.
+   *
+   * The bands were there already but unnamed, so the whole thing read as one
+   * undifferentiated wall of eighty glyphs with invisible seams between the
+   * groups. Naming them made it scannable; folding the older ones away means
+   * the picker opens at the size of what most people are looking for.
+   */
+  const division = (label: string, sets: Set[]): JSX.Element | null => {
+    if (!sets.length) return null;
+    const open = isOpen(label);
+    const selectedHere = sets.filter(
+      (s) => filtered.indexOf(s.code.toLowerCase()) !== -1
+    ).length;
+
+    return (
+      <div className="set-division" key={label}>
+        <div
+          className="set-division-label"
+          role="button"
+          tabIndex={0}
+          title={open ? `Hide ${label} sets` : `Show ${label} sets`}
+          onClick={(): void => toggleBand(label)}
+          onKeyPress={(): void => toggleBand(label)}
+        >
+          <div className={`set-division-caret ${open ? "open" : ""}`} />
+          {label}
+          {/* A closed band would otherwise hide the fact that something inside
+              it is filtering the list. */}
+          {!open && selectedHere > 0 ? (
+            <span className="set-division-count">{selectedHere}</span>
+          ) : null}
+        </div>
+        {open ? (
+          <div className="set-division-icons">
+            {sets.map((set) => {
+              const code = set.code.toLowerCase();
+              const selected = filtered.indexOf(code) !== -1;
+              return (
+                <div
+                  key={code}
+                  style={{
+                    backgroundImage: `url(data:image/svg+xml;base64,${set.svg})`,
+                  }}
+                  title={set.name}
+                  className={`set-filter ${
+                    selected ? "set-filter-selected" : ""
+                  }`}
+                  onClick={(): void => setFilteredSet(code)}
+                />
+              );
+            })}
+          </div>
+        ) : null}
+      </div>
+    );
+  };
 
   return (
     <div
@@ -124,90 +227,11 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
         ...style,
       }}
     >
-      <div className="set-division">
-        {standardSets.map((set) => {
-          const svgData = set.svg;
-          const setClass = `set-filter ${
-            filtered.indexOf(set.code.toLowerCase()) == -1
-              ? "set-filter-on"
-              : ""
-          }`;
-          return (
-            <div
-              key={set.code.toLowerCase()}
-              style={{
-                backgroundImage: `url(data:image/svg+xml;base64,${svgData})`,
-              }}
-              title={set.name}
-              className={setClass}
-              onClick={(): void => setFilteredSet(set.code.toLowerCase())}
-            />
-          );
-        })}
-      </div>
-      <div className="set-division">
-        {historicSets.sort(sortSetByName).map((set) => {
-          const svgData = set.svg;
-          const setClass = `set-filter ${
-            filtered.indexOf(set.code.toLowerCase()) == -1
-              ? "set-filter-on"
-              : ""
-          }`;
-          return (
-            <div
-              key={set.code.toLowerCase()}
-              style={{
-                backgroundImage: `url(data:image/svg+xml;base64,${svgData})`,
-              }}
-              title={set.name}
-              className={setClass}
-              onClick={(): void => setFilteredSet(set.code.toLowerCase())}
-            />
-          );
-        })}
-      </div>
-      <div className="set-division">
-        {alchemySets.sort(sortSetByName).map((set) => {
-          const svgData = set.svg;
-          const setClass = `set-filter ${
-            filtered.indexOf(set.code.toLowerCase()) == -1
-              ? "set-filter-on"
-              : ""
-          }`;
-          return (
-            <div
-              key={set.code.toLowerCase()}
-              style={{
-                backgroundImage: `url(data:image/svg+xml;base64,${svgData})`,
-              }}
-              title={set.name}
-              className={setClass}
-              onClick={(): void => setFilteredSet(set.code.toLowerCase())}
-            />
-          );
-        })}
-      </div>
-      <div className="set-division">
-        {otherSets.map((set) => {
-          const svgData = set.svg;
-          const setClass = `set-filter ${
-            filtered.indexOf(set.code.toLowerCase()) == -1
-              ? "set-filter-on"
-              : ""
-          }`;
-          return (
-            <div
-              key={set.code.toLowerCase()}
-              style={{
-                backgroundImage: `url(data:image/svg+xml;base64,${svgData})`,
-              }}
-              title={set.name}
-              className={setClass}
-              onClick={(): void => setFilteredSet(set.code.toLowerCase())}
-            />
-          );
-        })}
-      </div>
+      {division("Standard", standardSets)}
+      {division("Explorer", explorerSets)}
+      {division("Historic", historicSets.sort(sortSetByName))}
+      {division("Alchemy", alchemySets.sort(sortSetByName))}
+      {division("Other", otherSets.sort(sortSetByName))}
     </div>
   );
 }

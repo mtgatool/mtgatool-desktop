@@ -30,3 +30,135 @@
     }
   }
 }
+// --- collection toolbar -----------------------------------------------------
+
+// The export row. Both toggles only affect the CSV, which nothing said, so the
+// group is named and kept together on the left with the button that uses it.
+.collection-export {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+  padding: 12px 16px;
+}
+
+.collection-export-label {
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--color-text-dark);
+}
+
+// Pushes the button to the far end, so the row reads options-then-action.
+.collection-export > .button-simple {
+  margin-left: auto;
+}
+
+// A timestamp. It was marked up as a heading and looked like the title of the
+// page it sits above.
+.collection-updated {
+  margin: 0 auto 16px auto;
+  font-size: 12px;
+  color: var(--color-text-dark);
+}
+
+// --- sort chips -------------------------------------------------------------
+
+// The grid version of the sort controls. A table header above a wall of card
+// images reads as five mislabelled columns; these read as five buttons, which
+// is what they are. One click still sorts — the thing a dropdown would cost.
+.sort-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 16px;
+}
+
+.sort-chips-label {
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--color-text-dark);
+  margin-right: 2px;
+}
+
+.sort-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid var(--color-line-sep);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--color-text-dark);
+  font-family: var(--sub-font-name);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.12s ease-out, color 0.12s ease-out,
+    border-color 0.12s ease-out;
+
+  &:hover {
+    color: var(--color-text-hover);
+    border-color: var(--color-text-dark);
+  }
+}
+
+// Only the active one is filled, so the row reads at a glance as "sorted by
+// this" rather than as a set of equal headings.
+.sort-chip.active {
+  background: var(--color-section-active);
+  border-color: var(--color-button-shade-40);
+  color: var(--color-text-hover);
+}
+
+// Inside the chip, not floated off to the right of it: the direction belongs to
+// the field it describes.
+.sort-chip-arrow {
+  width: 0;
+  height: 0;
+  border-left: 3.5px solid transparent;
+  border-right: 3.5px solid transparent;
+}
+
+.sort-chip-arrow.asc {
+  border-bottom: 5px solid currentColor;
+}
+
+.sort-chip-arrow.desc {
+  border-top: 5px solid currentColor;
+}
+
+// --- ownership legend -------------------------------------------------------
+
+// Below the pager, where it explains the grid above without competing with it.
+.ownership-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  width: 100%;
+  margin-top: 4px;
+  padding: 12px 16px 4px 16px;
+  border-top: 1px solid var(--color-line-sep);
+  font-size: 11px;
+  color: var(--color-text-dark);
+}
+
+.ownership-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+// The marks are sized as a quarter of a card's width where they normally live,
+// so they need an explicit size out of that context.
+.ownership-legend-pip {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  background-size: contain;
+}

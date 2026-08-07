@@ -1,18 +1,164 @@
+// Set completion — one row per rarity, plus the total above them.
+//
+// The shape is the one the deck view's colour meters use: what it counts on the
+// left, the figures on the right, and the meter beneath spanning both. Before
+// this the label sat centred in the middle third of a three-column grid, the
+// count in the left third and the bar was two pixels tall underneath, so the
+// three parts of a single fact read as three unrelated ones.
+
+.set-completion {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 14px auto;
+}
+
+.set-completion-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.set-completion-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.set-completion-title {
+  font-size: 14px;
+  color: var(--color-text);
+  // The panel centres its contents; these read as a column of labels and want
+  // a common left edge.
+  text-align: left;
+  // Takes the slack, so the figures stay pinned to the right however long the
+  // set name is.
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.set-completion-figures {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.set-completion-count {
+  font-family: var(--main-font-name);
+  font-size: 15px;
+  color: var(--color-text-hover);
+  // Tabular figures: these sit in a column and jump about without it.
+  font-variant-numeric: tabular-nums;
+}
+
+// The divider is structure, not a number; letting it recede leaves the two
+// counts as the thing you read.
+.set-completion-of {
+  color: var(--color-text-dark);
+  margin: 0 1px;
+}
+
+.set-completion-percent {
+  font-size: 12px;
+  color: var(--color-text-dark);
+  font-variant-numeric: tabular-nums;
+  min-width: 34px;
+  text-align: right;
+}
+
+.set-completion-meter {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-dark);
+  overflow: hidden;
+}
+
+.set-completion-meter-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--color-button-hover);
+  transition: width 0.3s ease-out;
+}
+
+// --- the draft estimator block, shown per set -------------------------------
+
 .stats-set-completion {
-  width: -webkit-fill-available;
-  width: -moz-available;
-  width: fill-available;
+  width: 100%;
   max-width: 600px;
   margin: 8px auto;
   display: flex;
   flex-direction: column;
 }
 
+// Label, then a column per rarity. Equal thirds put the labels adrift of their
+// numbers on the left and left a gutter down the middle; the label only needs
+// what it needs, and the two rarities share what is left evenly.
 .stats-set-completion-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  height: 32px;
+  grid-template-columns: minmax(96px, auto) 1fr 1fr;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
   color: var(--color-text);
+}
+
+// A hairline between rows, so the eye tracks across one row rather than down a
+// column of unrelated numbers.
+.stats-set-completion-row + .stats-set-completion-row {
+  border-top: 1px solid var(--color-line-sep);
+}
+
+// The label column: quieter than the figures it introduces.
+.stats-set-completion-row > *:first-child {
+  font-size: 12px;
+  color: var(--color-text-dark);
+}
+
+// Numbers are the point of this table; give them the display face and stop them
+// shifting as the digits change.
+.stats-set-completion-row b {
+  font-family: var(--main-font-name);
+  font-weight: normal;
+  font-size: 15px;
+  color: var(--color-text-hover);
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-set-completion-routes {
+  padding: 6px 0;
+}
+
+// MetricText sets `display: flex` inline, so the two routes would sit side by
+// side; the direction is not set there, which leaves it to say so here.
+.stats-set-completion-routes > * {
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 22px;
+}
+
+// The two ways to finish a set, stacked and each carrying its own unit.
+.stats-set-route {
+  display: flex;
+  align-items: center;
+  // root.scss centres every span that lands in a flex container, which pushed
+  // these in from the column edge and out of line with the rows above.
+  align-self: flex-start;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-dark);
+  line-height: 22px;
+
+  div {
+    flex: 0 0 auto;
+  }
 }
 
 .stats-set-completion.stats-sidebar {
@@ -23,7 +169,6 @@
   display: inline-flex;
   justify-content: space-between;
   width: 100%;
-  -webkit-transition: all 0.2s ease-in;
 }
 
 .stats-set-details span {
@@ -31,29 +176,15 @@
   margin: 0 6px;
   font-size: 13px;
   color: var(--color-text);
-  -webkit-transition: all 0.2s ease-in;
-}
-
-.stats-set-bar {
-  background-color: var(--color-button-hover);
-  -webkit-transition: all 0.2s ease-in-out;
-}
-
-.stats-set-bar-container {
-  display: flex;
-  background-color: var(--color-dark);
-  width: 100%;
-  height: 2px;
 }
 
 .stats-set-icon {
   width: 24px;
   height: 24px;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   margin: 0 6px;
-  background-size: contain;
 
   span {
     display: flex;
@@ -64,4 +195,54 @@
     margin-left: 36px;
     color: var(--color-text);
   }
+}
+
+// --- wildcards held ---------------------------------------------------------
+
+.wildcards-held {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto 10px auto;
+}
+
+.wildcards-held-label {
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--color-text-dark);
+}
+
+.wildcards-held-counts {
+  display: flex;
+  align-items: center;
+  // Pushed to the right and spaced evenly among themselves, rather than
+  // stretched across the panel by space-between — which left each number
+  // stranded a long way from the symbol it belonged to.
+  margin-left: auto;
+  gap: 16px;
+}
+
+.wildcards-held-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  span {
+    font-family: var(--main-font-name);
+    font-size: 15px;
+    color: var(--color-text-hover);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.collection-stats-note {
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto 14px auto;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--color-text-dark);
 }

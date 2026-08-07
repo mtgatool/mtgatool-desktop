@@ -21,22 +21,6 @@
   }
 }
 
-.set-filter {
-  opacity: 1;
-  background-repeat: no-repeat;
-  width: 32px;
-  margin: 16px;
-  height: 32px;
-  cursor: pointer;
-  background-size: contain;
-  background-position: center;
-  -webkit-transition: all .15s ease-in-out;
-}
-
-.set-filter:hover {
-  opacity: 0.9;
-}
-
-.set-filter-on {
-  opacity: 0.4;
-}
+// The set picker is styled once, in setFilter.scss. A second copy lived here
+// and — being imported later — quietly won, so editing the real one appeared to
+// do nothing.

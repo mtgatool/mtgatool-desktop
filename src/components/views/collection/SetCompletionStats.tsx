@@ -198,29 +198,31 @@ export default function SetCompletionStats({
           </span>
         </MetricText>
       </div>
-      <div className="stats-set-completion-row">
-        <MetricText title="see estimation inputs on right">
-          Completion*:
+      {/* Two different ways of getting there, so they read as two lines with
+          their units named rather than "~158, or ~32" run together. */}
+      <div className="stats-set-completion-row stats-set-completion-routes">
+        <MetricText title="estimated from the inputs on the right">
+          Still needed
         </MetricText>
         <MetricText>
-          <span title="additional Arena boosters to complete">
+          <span className="stats-set-route" title="Arena boosters to open">
             <div className="bo-explore-cost" />
+            <b>~{completionBoosterRare}</b> boosters
           </span>
-          <span>~{completionBoosterRare}, or</span>
-          <span title="additional drafts to complete">
+          <span className="stats-set-route" title="drafts to play">
             <div className="economy-ticket" />
+            <b>~{completionDraftRare}</b> drafts
           </span>
-          <span>~{completionDraftRare}</span>
         </MetricText>
         <MetricText>
-          <span title="additional Arena boosters to complete">
+          <span className="stats-set-route" title="Arena boosters to open">
             <div className="bo-explore-cost" />
+            <b>~{completionBoosterMythic}</b> boosters
           </span>
-          <span>~{completionBoosterMythic}, or</span>
-          <span title="additional drafts to complete">
+          <span className="stats-set-route" title="drafts to play">
             <div className="economy-ticket" />
+            <b>~{completionDraftMythic}</b> drafts
           </span>
-          <span>~{completionDraftMythic}</span>
         </MetricText>
       </div>
     </div>
