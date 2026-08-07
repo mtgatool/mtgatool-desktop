@@ -38,6 +38,14 @@ const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
     title: "More accurate match tracking",
     body: "Fixed issues with opening hands going missing, games in a best-of-three sharing each other's card counts, and carry-over issues between matches.",
   },
+  {
+    title: "Opening the tracker mid-game",
+    body: "Starting during a game now picks that match up from its beginning, with both decklists, ranks and the real result — instead of saving a broken 0-0 you had to go and delete.",
+  },
+  {
+    title: "Draw odds are back",
+    body: "The overlay's odds were all reading zero. Hovering the lands row shows your chance of drawing each colour again, and the type counts beside it are right too.",
+  },
 ];
 
 /** Shown to anyone arriving from v6, alongside the migration notice. */
