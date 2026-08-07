@@ -68,7 +68,10 @@ function RarityColumn({
   color,
   rarityCode,
 }: {
-  colorData: ColorData;
+  // Optional, and already treated that way below: a colour with no cards in
+  // the set has no entry. Declaring it required only hid that from the
+  // compiler.
+  colorData?: ColorData;
   color: number;
   rarityCode: string;
 }): JSX.Element {
@@ -106,13 +109,17 @@ function ColorColumn({
   colorCode,
   color,
 }: {
-  cardData: CardData;
+  cardData?: CardData;
   colorCode: string;
   color: number;
 }): JSX.Element {
   // A little hacky to use "c + 1"..
   const colorIndex = color + 1;
-  const colorData = cardData[colorIndex];
+  // Defended rather than assumed: a set with no statistics has nothing here,
+  // and indexing it threw out of the whole collection view. The columns below
+  // already cope with a colour that has no cards, so an empty grid is the
+  // honest answer.
+  const colorData = cardData ? cardData[colorIndex] : undefined;
   return (
     <>
       <div
@@ -139,7 +146,7 @@ function ColorColumn({
 export default function CompletionHeatMap({
   cardData,
 }: {
-  cardData: CardData;
+  cardData?: CardData;
 }): JSX.Element {
   return (
     <div className="completion-table">

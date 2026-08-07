@@ -39,9 +39,24 @@ export default function SetsView(props: SetsViewProps): JSX.Element {
 
   const setsSelectedNum = setsFiltered.length;
 
-  const currentSetName = Object.keys(database.sets).filter(
-    (s) => database.sets[s].arenacode.toLowerCase() == firstSet
-  )[0];
+  // A set has two codes and they are not always the same one — Dominaria is
+  // DOM on paper and DAR to Arena. The filter carries the paper code (that is
+  // what the set icons set), while the collection stats are keyed by the Arena
+  // one, so matching on either is what connects the two. Comparing only against
+  // the Arena code left every mismatched set without a name, an icon or any
+  // statistics at all.
+  const currentSetName = Object.keys(database.sets).filter((s) => {
+    const set = database.sets[s];
+    return (
+      set.arenacode.toLowerCase() === firstSet ||
+      set.code.toLowerCase() === firstSet
+    );
+  })[0];
+
+  // Stats are keyed by the Arena code; see getCollectionStats.
+  const statsKey =
+    database.sets[currentSetName]?.arenacode.toLowerCase() ?? firstSet;
+  const setStats = stats[statsKey];
 
   const iconSvg = database.sets[currentSetName]?.svg ?? database.sets[""]?.svg;
 
@@ -58,7 +73,7 @@ export default function SetsView(props: SetsViewProps): JSX.Element {
       </Section>
 
       <Section
-        showIf={stats[firstSet] && setsSelectedNum === 1}
+        showIf={!!setStats && setsSelectedNum === 1}
         style={{
           flexDirection: "column",
           gridArea: "set",
@@ -74,7 +89,7 @@ export default function SetsView(props: SetsViewProps): JSX.Element {
         </Flex>
         {database.sets[currentSetName]?.collation !== -1 ? (
           <SetCompletionStats
-            setStats={stats[firstSet]}
+            setStats={setStats}
             boosterMath
             rareDraftFactor={rareDraftFactor}
             mythicDraftFactor={mythicDraftFactor}
@@ -87,14 +102,14 @@ export default function SetsView(props: SetsViewProps): JSX.Element {
       </Section>
 
       <Section
-        showIf={stats[firstSet] && setsSelectedNum === 1}
+        showIf={!!setStats && setsSelectedNum === 1}
         style={{
           flexDirection: "column",
           gridArea: "chart",
           padding: "16px",
         }}
       >
-        <CompletionHeatMap key={firstSet} cardData={stats[firstSet]?.cards} />
+        <CompletionHeatMap key={firstSet} cardData={setStats?.cards} />
       </Section>
 
       <Section showIf={setsSelectedNum == 0} style={{ gridArea: "set" }}>
