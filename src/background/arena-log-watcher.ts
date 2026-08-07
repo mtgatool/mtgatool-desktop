@@ -26,6 +26,11 @@ interface StartProps {
   // log without replaying its history (matches already live in the DB / cloud).
   // Live entries appended afterwards are still processed normally.
   skipInitialBackfill?: boolean;
+  // Where the first pass starts instead of the end, when the caller has worked
+  // out that something is worth replaying — a match already underway. Only
+  // consulted alongside skipInitialBackfill; the caller decides the policy,
+  // this just seeks where it is told.
+  initialPosition?: number;
 }
 
 async function readChunk(
@@ -92,6 +97,7 @@ function start({
   onError,
   onFinish,
   skipInitialBackfill = false,
+  initialPosition,
 }: StartProps): () => void {
   const q = queue({ concurrency: 1 });
   let position = 0;
@@ -119,11 +125,23 @@ function start({
     // current end and only process entries appended from here. Applies to the
     // first pass only — a mid-session log rotation (handled above) still reads
     // the fresh file normally.
+    //
+    // Unless the caller named somewhere to start, which it does when a match is
+    // already being played: then that match is read from its beginning and the
+    // rest of the history is still skipped.
     if (firstPass && skipInitialBackfill) {
       firstPass = false;
-      position = size;
-      onFinish();
-      return;
+      const from =
+        initialPosition !== undefined && initialPosition >= 0
+          ? Math.min(initialPosition, size)
+          : size;
+      position = from;
+      if (position >= size) {
+        onFinish();
+        return;
+      }
+    } else {
+      firstPass = false;
     }
     firstPass = false;
 
