@@ -204,10 +204,39 @@ export default function ViewCollection(props: ViewCollectionProps) {
     }
   }, []);
 
+  // getCollectionStats reads every one of these ids with `database.card()`,
+  // which only answers for cards already fetched — and the only cards fetched
+  // are the two dozen on the page being shown. Every other card in the set was
+  // read as undefined and dropped, so a set's statistics and its completion
+  // heat map came out empty however many cards were actually owned.
+  //
+  // Fetching them is asynchronous and the stats are not, so this counts
+  // completed fetches and lets the memo below recompute once they land.
+  const [cardsFetched, setCardsFetched] = useState(0);
+  useEffect(() => {
+    const wanted = sqlAvailable ? ids : legacyFiltered.map((r) => r.id);
+    if (!wanted.length) return undefined;
+
+    let cancelled = false;
+    cardsDb
+      .cards(wanted)
+      .then(() => {
+        if (!cancelled) setCardsFetched((n) => n + 1);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sqlAvailable, ids, legacyFiltered]);
+
   const stats = useMemo(
     () =>
       getCollectionStats(sqlAvailable ? ids : legacyFiltered.map((r) => r.id)),
-    [sqlAvailable, ids, legacyFiltered]
+    // cardsFetched is not read here: it is the signal that the cards the stats
+    // are about have arrived, and the numbers change without any id changing.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sqlAvailable, ids, legacyFiltered, cardsFetched]
   );
 
   const setQuery = useCallback(
