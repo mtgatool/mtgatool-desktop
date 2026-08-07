@@ -185,7 +185,12 @@ function wrapNot(predicate: string, not: boolean): string {
 function buildWhere(filters: Filters<CardsData>, params: unknown[]): string {
   // `listable` is the LinkedFaceType filter getCollectionData applies before it
   // maps anything — DFC backs, melds, adventures and the rest are never rows.
-  const clauses: string[] = ["c.listable = 1"];
+  //
+  // The nameless entries are the four wildcard placeholders Arena keeps in set
+  // WC, one per rarity. They are cards to the database and were sorting to the
+  // front of an unfiltered collection as four blanks. Nothing can be shown for
+  // a card with no name, so nothing should try.
+  const clauses: string[] = ["c.listable = 1", "c.name <> ''"];
 
   filters.forEach((filter) => {
     switch (filter.type) {
