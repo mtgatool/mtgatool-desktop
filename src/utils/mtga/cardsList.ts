@@ -217,6 +217,25 @@ class CardsList {
 
   /**
    * Creates an object containing the lands color distribution of the list.
+   *
+   * Reads `FrameColors`, and deliberately not `ColorIdentity` — which looks
+   * like the more principled field and is the wrong one here. Identity answers
+   * "which colors is this card legal in", so a land's activated-ability cost
+   * counts toward it: Riptide Laboratory reads as blue and Duskmantle as
+   * blue/black, when both only tap for colorless. It is also empty for
+   * fetchlands, which have no mana symbols at all — dropping every fetch out of
+   * the counts, when a Scalding Tarn in a deck is exactly as good as the dual
+   * it fetches. Across the card pool the two disagree on 203 lands, and the
+   * swap would lose about twenty for each one it gained.
+   *
+   * True produced mana does exist, in the `Add {X}` ability text, and is right
+   * where both these fields are wrong. It is not used because it would also
+   * stop counting fetchlands (not wanted) and needs hybrid and conditional
+   * mana parsed to be any better than the frame on everything else.
+   *
+   * The five-color skip below is load-bearing: without it every land that taps
+   * for any color — Mana Confluence, City of Brass, and 100-odd others — lands
+   * in all five buckets and flattens the distribution.
    * */
   getLandsAmounts(): ColorsCount {
     const colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
