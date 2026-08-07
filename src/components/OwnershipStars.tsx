@@ -1,5 +1,7 @@
 import { useSelector } from "react-redux";
 
+import useOwnedByTitle from "../hooks/useOwnedByTitle";
+
 import { AppState } from "../redux/stores/rendererStore";
 import { DbCardDataV2 } from "../types";
 import { defaultCardsData } from "../types/dbTypes";
@@ -9,6 +11,12 @@ interface OwnershipProps {
   owned: number;
   acquired: number;
   wanted: number;
+}
+
+/** Basics are infinite, so only the four-pip renderer counts other printings. */
+interface MultiOwnershipProps extends OwnershipProps {
+  /** Copies held on a different printing of the same card. */
+  elsewhere?: number;
 }
 
 function OwnershipInfinity(props: OwnershipProps): JSX.Element {
@@ -34,16 +42,18 @@ export const OwnershipSymbol = (props: {
   return <div className={className || ""} style={style} title={title} />;
 };
 
-interface OwnershipStarProps extends OwnershipProps {
+interface OwnershipStarProps extends MultiOwnershipProps {
   owned: number;
   acquired: number;
   wanted: number;
   copyIndex: number;
   title: string;
+  /** Copies held on a different printing of the same card. */
+  elsewhere: number;
 }
 
 function OwnershipStar(props: OwnershipStarProps): JSX.Element {
-  const { owned, acquired, wanted, copyIndex, title } = props;
+  const { owned, acquired, wanted, copyIndex, title, elsewhere } = props;
   let color = "inventory-card-quantity-gray"; // default unowned
   if (copyIndex < owned) {
     color = "inventory-card-quantity-green"; // owned copy
@@ -54,12 +64,21 @@ function OwnershipStar(props: OwnershipStarProps): JSX.Element {
   if (copyIndex >= owned && copyIndex < owned + wanted) {
     color = "inventory-card-quantity-blue"; // not owned and wanted copy
   }
+  // Held, but as another printing. Faded rather than a colour of its own: it is
+  // the same fact as a full pip, only somewhere else, and a fourth colour in a
+  // four-pip row would read as a fourth kind of thing.
+  if (copyIndex >= owned && copyIndex < owned + elsewhere) {
+    color = "inventory-card-quantity-green-dim";
+  }
   return <OwnershipSymbol className={color} title={title} />;
 }
 
-function MultiCardOwnership(props: OwnershipProps): JSX.Element {
-  const { owned, acquired, wanted } = props;
+function MultiCardOwnership(props: MultiOwnershipProps): JSX.Element {
+  const { owned, acquired, wanted, elsewhere = 0 } = props;
   let title = `${owned}/4 copies in collection`;
+  if (elsewhere > 0) {
+    title += `, ${elsewhere} more on another printing`;
+  }
   if (acquired !== 0) {
     title += ` (${acquired} recent)`;
   }
@@ -76,6 +95,7 @@ function MultiCardOwnership(props: OwnershipProps): JSX.Element {
           key={copyIndex}
           owned={owned}
           wanted={wanted}
+          elsewhere={elsewhere}
           title={title}
         />
       ))}
@@ -97,6 +117,7 @@ export default function OwnershipStars(props: {
 
   const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
   const cards = uuidData[currentUUID]?.cards || defaultCardsData;
+  const ownedByTitle = useOwnedByTitle();
 
   if (!card) {
     return <></>;
@@ -108,8 +129,18 @@ export default function OwnershipStars(props: {
 
   const infinitePlaysetCards = [69172, 67306, 76490];
 
+  // Copies of this same card held as some other printing. Capped at a playset,
+  // because that is all the pips can say and all a deck can use — someone with
+  // eight across three printings is not owed a fifth pip.
+  const acrossPrintings = Math.min(ownedByTitle[card.TitleId] ?? owned, 4);
+  const elsewhere = Math.max(0, acrossPrintings - owned);
+
   const isbasic = cardHasType(card, "Basic") || cardHasType(card, "Basic Snow");
-  let Renderer = isbasic ? OwnershipInfinity : MultiCardOwnership;
+  // OwnershipInfinity ignores `elsewhere`; a function taking fewer props is
+  // assignable to one taking more.
+  let Renderer: (props: MultiOwnershipProps) => JSX.Element = isbasic
+    ? OwnershipInfinity
+    : MultiCardOwnership;
 
   if (infinitePlaysetCards.includes(card.GrpId) && owned == 4) {
     Renderer = OwnershipInfinity;
@@ -118,5 +149,12 @@ export default function OwnershipStars(props: {
     owned = 4;
     Renderer = OwnershipInfinity;
   }
-  return <Renderer owned={owned} acquired={acquired} wanted={isWanted} />;
+  return (
+    <Renderer
+      owned={owned}
+      acquired={acquired}
+      wanted={isWanted}
+      elsewhere={elsewhere}
+    />
+  );
 }

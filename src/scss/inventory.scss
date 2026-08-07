@@ -239,3 +239,15 @@
   display: inline-block;
   background: center no-repeat url(../assets/images/quantity_inf_orange.png);
 }
+
+// A copy of this card held as a different printing. Same mark as an owned copy,
+// faded: Arena counts a playset however its printings are mixed, so a reprint
+// you already hold four of was showing as entirely unowned on every other
+// printing. Faded rather than a new colour — it is the same fact, elsewhere.
+.inventory-card-quantity-green-dim {
+  width: 25%;
+  height: 24px;
+  display: inline-block;
+  background: center no-repeat url(../assets/images/quantity_green.png);
+  opacity: 0.32;
+}
