@@ -133,6 +133,15 @@ async function getMembers(campaignId: string, token: string): Promise<PledgeRow[
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
 
+  // Service role only. Gateway JWT verification also admits the anon key —
+  // which ships inside the app — and this endpoint drives calls against the
+  // Patreon API, so "any valid JWT" is not good enough.
+  const auth = req.headers.get("Authorization") ?? "";
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  if (!serviceKey || auth !== `Bearer ${serviceKey}`) {
+    return json({ error: "service role required" }, 401);
+  }
+
   const token = Deno.env.get("PATREON_ACCESS_TOKEN");
   if (!token) return json({ error: "PATREON_ACCESS_TOKEN is not set" }, 500);
 
