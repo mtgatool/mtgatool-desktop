@@ -55,6 +55,10 @@ const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
     body: "Set view opens again, with completion heatmaps and statistics for every set with boosters in the game.",
   },
   {
+    title: "Dashboard",
+    body: "Top decks are ranked by record instead of games played, decks show their colours again, and there are now current and best win streaks. Vault progress reads correctly.",
+  },
+  {
     title: "Live overlay sharing on stream",
     body: "The shared overlay now fills your OBS browser source and hides the deck between matches. The share link has a copy button.",
   },

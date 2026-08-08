@@ -3,9 +3,9 @@ import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import { DEFAULT_TILE } from "../../../constants";
+import { useCards } from "../../../hooks/useCard";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { StatsDeck } from "../../../types/dbTypes";
-import getRankIndex from "../../../utils/getRankIndex";
 import Deck from "../../../utils/mtga/deck";
 import vodiFn from "../../../utils/voidfn";
 import DecksArtViewRow from "../../DecksArtViewRow";
@@ -27,65 +27,21 @@ function winStats(matches: MatchData[]) {
   };
 }
 
-// The real rank badge sprite (ranks_constructed_48.png via the `.rank` class),
-// offset to the player's rank + tier — same as the top-nav rank icon.
-function RankChip({
-  label,
-  rankClass,
-  tier,
-  step,
-  percentile,
-}: {
-  label: string;
-  rankClass?: string;
-  tier?: number;
-  step?: number;
-  percentile?: number;
-}): JSX.Element {
-  const cls = rankClass || "Unranked";
-  let detail = "";
-  if (cls === "Mythic") {
-    detail = percentile ? `Top ${percentile.toFixed(1)}%` : "Mythic";
-  } else if (cls !== "Unranked") {
-    detail = `Tier ${tier ?? "-"}${
-      step ? ` · ${step} pip${step > 1 ? "s" : ""}` : ""
-    }`;
-  }
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "8px",
-        padding: "8px 20px 8px 8px",
-        borderRadius: "6px",
-        background: "var(--color-section-hover)",
-        minWidth: "190px",
-      }}
-    >
-      <div
-        className="rank"
-        style={{
-          margin: 0,
-          flexShrink: 0,
-          backgroundPosition: `${getRankIndex(cls, tier || 1) * -48}px 0px`,
-        }}
-      />
-      <div>
-        <div style={{ fontSize: "12px", color: "var(--color-text-dark)" }}>
-          {label}
-        </div>
-        <div style={{ color: "var(--color-text)", fontSize: "16px" }}>
-          {cls}
-        </div>
-        {detail && (
-          <div style={{ fontSize: "12px", color: "var(--color-text-dark)" }}>
-            {detail}
-          </div>
-        )}
-      </div>
-    </div>
-  );
+/**
+ * Lower bound of the 95% Wilson interval on a win rate.
+ *
+ * Ranking on the raw rate makes "top decks" mean "whatever you last went 2-0
+ * with": a single good night outranks a deck with forty games behind it. This
+ * scores a record by the rate it can be trusted to be at least, so a small
+ * sample has to be extraordinary to beat a proven one.
+ */
+function winrateScore(wins: number, games: number): number {
+  if (!games) return 0;
+  const z = 1.96;
+  const p = wins / games;
+  const centre = p + (z * z) / (2 * games);
+  const margin = z * Math.sqrt((p * (1 - p) + (z * z) / (4 * games)) / games);
+  return (centre - margin) / (1 + (z * z) / games);
 }
 
 function Metric({
@@ -134,11 +90,12 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
   );
   const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
   const me = uuidData[currentUUID];
-  const rank = me?.rank;
   const inv = me?.inventory;
   const displayName = (me?.displayName || "Planeswalker").split("#")[0];
 
-  const data = useMemo(() => {
+  // Everything that does not need a card lookup. Split from the deck list
+  // below because that half has to wait on the database.
+  const stats = useMemo(() => {
     const matches = [...(matchesData || [])].sort(
       (a, b) => a.timestamp - b.timestamp
     );
@@ -157,8 +114,17 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
       } else break;
     }
 
-    // Top decks by games played, as StatsDecks so DecksArtViewRow can render
-    // them exactly like the played-decks list.
+    let bestWinStreak = 0;
+    let run = 0;
+    matches.forEach((m) => {
+      if (m.win) {
+        run += 1;
+        bestWinStreak = Math.max(bestWinStreak, run);
+      } else {
+        run = 0;
+      }
+    });
+
     const agg = new Map<
       string,
       { games: number; wins: number; lastTs: number; pd: any }
@@ -175,10 +141,36 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
       if (m.win) d.wins += 1;
       d.lastTs = Math.max(d.lastTs, m.timestamp);
     });
-    const topDecks: StatsDeck[] = [...agg.values()]
-      .sort((a, b) => b.games - a.games)
-      .slice(0, 5)
-      .map((d) => {
+
+    // Best record first, not most played.
+    const played = [...agg.values()]
+      .sort(
+        (a, b) => winrateScore(b.wins, b.games) - winrateScore(a.wins, a.games)
+      )
+      .slice(0, 5);
+
+    return { all, recent, streak, streakWin, bestWinStreak, played };
+  }, [matchesData]);
+
+  // A deck's colors are read off its lands, which means a card lookup — and
+  // those answer from a worker. Nothing had fetched them, so on a cold open
+  // every deck resolved to no colors and the tiles rendered blank. Ask for the
+  // cards the decks are built from, and rebuild once they land.
+  const grpIds = useMemo(() => {
+    const ids = new Set<number>();
+    stats.played.forEach((d) => {
+      (d.pd?.mainDeck || []).forEach((c: { id: number }) => {
+        if (c?.id) ids.add(c.id);
+      });
+    });
+    return [...ids];
+  }, [stats.played]);
+
+  const resolvedCards = useCards(grpIds);
+
+  const topDecks: StatsDeck[] = useMemo(
+    () =>
+      stats.played.map((d) => {
         const pd = d.pd || {};
         const deck = new Deck(pd);
         return {
@@ -202,45 +194,18 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
           cardWinrates: {},
           winrate: d.games ? (d.wins / d.games) * 100 : 0,
         };
-      });
-
-    return { all, recent, streak, streakWin, topDecks };
-  }, [matchesData]);
+      }),
+    // resolvedCards is the point: the colors above are only right once the
+    // lookups have come back.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [stats.played, resolvedCards]
+  );
 
   return (
     <div style={{ padding: "0 16px" }}>
       <Section style={{ margin: "16px 0", padding: "24px 20px" }}>
         <div style={{ fontSize: "24px", color: "var(--color-text)" }}>
           Welcome back, {displayName}
-        </div>
-      </Section>
-
-      <Section
-        style={{ margin: "16px 0", padding: "16px", flexDirection: "column" }}
-      >
-        <div className="separator-title">Rank</div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "12px",
-            marginTop: "10px",
-          }}
-        >
-          <RankChip
-            label="Constructed"
-            rankClass={rank?.constructedClass}
-            tier={rank?.constructedLevel}
-            step={rank?.constructedStep}
-            percentile={rank?.constructedPercentile}
-          />
-          <RankChip
-            label="Limited"
-            rankClass={rank?.limitedClass}
-            tier={rank?.limitedLevel}
-            step={rank?.limitedStep}
-            percentile={rank?.limitedPercentile}
-          />
         </div>
       </Section>
 
@@ -257,38 +222,41 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
             marginTop: "12px",
           }}
         >
-          <Metric value={`${data.all.total}`} label="Matches" />
+          <Metric value={`${stats.all.total}`} label="Matches" />
           <Metric
-            value={`${data.all.winrate.toFixed(1)}%`}
+            value={`${stats.all.winrate.toFixed(1)}%`}
             label="Win rate"
-            color={data.all.winrate >= 50 ? "var(--color-g)" : "var(--color-r)"}
-          />
-          <Metric
-            value={`${data.all.wins}-${data.all.losses}`}
-            label="Record"
-          />
-          <Metric
-            value={`${data.recent.winrate.toFixed(0)}%`}
-            label="Last 30"
             color={
-              data.recent.winrate >= 50 ? "var(--color-g)" : "var(--color-r)"
+              stats.all.winrate >= 50 ? "var(--color-g)" : "var(--color-r)"
             }
           />
           <Metric
-            value={`${data.streak}`}
-            label={data.streakWin ? "Win streak" : "Loss streak"}
-            color={data.streakWin ? "var(--color-g)" : "var(--color-r)"}
+            value={`${stats.all.wins}-${stats.all.losses}`}
+            label="Record"
           />
+          <Metric
+            value={`${stats.recent.winrate.toFixed(0)}%`}
+            label="Last 30"
+            color={
+              stats.recent.winrate >= 50 ? "var(--color-g)" : "var(--color-r)"
+            }
+          />
+          <Metric
+            value={`${stats.streak}${stats.streakWin ? "W" : "L"}`}
+            label="Current streak"
+            color={stats.streakWin ? "var(--color-g)" : "var(--color-r)"}
+          />
+          <Metric value={`${stats.bestWinStreak}`} label="Best win streak" />
         </div>
       </Section>
 
-      {data.topDecks.length > 0 && (
+      {topDecks.length > 0 && (
         <Section
           style={{ margin: "16px 0", padding: "16px", flexDirection: "column" }}
         >
           <div className="separator-title">Top decks</div>
           <div className="decks-table-wrapper" style={{ marginTop: "10px" }}>
-            {data.topDecks.map((deck) => (
+            {topDecks.map((deck) => (
               <DecksArtViewRow
                 key={deck.id}
                 deck={deck}
@@ -330,8 +298,11 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
             <WildcardIcon rarity="mythic" n={inv.WildCardMythics || 0} />
             <Metric value={`${inv.Gems || 0}`} label="Gems" />
             <Metric value={`${inv.Gold || 0}`} label="Gold" />
+            {/* Arena reports this scaled by ten — 679 is 67.9% — so it read
+                as a vault seven times over. Not clamped: it really can pass
+                100% before the vault opens. */}
             <Metric
-              value={`${Math.round(inv.TotalVaultProgress || 0)}%`}
+              value={`${((inv.TotalVaultProgress || 0) / 10).toFixed(1)}%`}
               label="Vault"
             />
           </div>
