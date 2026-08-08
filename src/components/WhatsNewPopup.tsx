@@ -55,6 +55,10 @@ const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
     body: "Set view opens again, with completion heatmaps and statistics for every set with boosters in the game.",
   },
   {
+    title: "Supporter badges",
+    body: "Patreon backers now get a tier badge next to their name and on their profile. Link automatically by verifying your Patreon email under Settings \u2192 My Account.",
+  },
+  {
     title: "Dashboard",
     body: "Top decks are ranked by record instead of games played, decks show their colours again, and there are now current and best win streaks. Vault progress reads correctly.",
   },

@@ -9,6 +9,7 @@ import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 import { LOGIN_AUTH } from "../../../constants";
 import { cloudLogout, cloudUpdatePassword } from "../../../data/cloudAuth";
 import { isCloudActive } from "../../../data/cloudSync";
+import { TIER_NAMES } from "../../../data/entitlement";
 import {
   setProfilePrivate,
   updateUsername,
@@ -22,11 +23,13 @@ import {
 import { getData, LOCAL_KEY, putData } from "../../../data/store";
 import useFetchAvatar from "../../../hooks/useFetchAvatar";
 import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
+import useSupporter from "../../../hooks/useSupporter";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
+import SupporterTierIcon, { TIERS } from "../../SupporterTierIcon";
 import Button from "../../ui/Button";
 import Toggle from "../../ui/Toggle";
 import { SettingsPanelProps } from "./ViewSettings";
@@ -66,6 +69,7 @@ export default function AccountSettingsPanel(
     (state: AppState) => state.settings.privateMode
   );
   const fetchAvatar = useFetchAvatar();
+  const supporter = useSupporter();
   const isLoggedIn = useIsLoggedIn();
 
   const { doClose } = props;
@@ -254,15 +258,35 @@ export default function AccountSettingsPanel(
   return (
     <>
       <div className="centered-setting-container">
-        <div
-          className="avatar-med"
-          style={{
-            backgroundImage: `url(${avatars[avatarKey]})`,
-          }}
-        />
-        <h2 style={{ marginLeft: "32px", marginRight: "auto" }}>
-          {getLocalSetting("username") || "???"}
-        </h2>
+        {/* The wrapper exists because .avatar-med clips to a circle
+            (overflow: hidden) — a badge inside it would be cut off. */}
+        <div className="avatar-badge-wrap">
+          <div
+            className="avatar-med"
+            style={{
+              backgroundImage: `url(${avatars[avatarKey]})`,
+            }}
+          />
+          {supporter.isSupporter && (
+            <div
+              className="avatar-tier-badge"
+              title={`${TIER_NAMES[supporter.tier]} supporter`}
+            >
+              <SupporterTierIcon tier={supporter.tier} />
+            </div>
+          )}
+        </div>
+        <div style={{ marginLeft: "32px", marginRight: "auto" }}>
+          <h2 style={{ margin: 0 }}>{getLocalSetting("username") || "???"}</h2>
+          {supporter.isSupporter && (
+            <div
+              className="account-tier-label"
+              style={{ color: TIERS[supporter.tier]?.top }}
+            >
+              {TIER_NAMES[supporter.tier]} tier
+            </div>
+          )}
+        </div>
         <label htmlFor="avatarInput" style={{ margin: "0" }}>
           <Button text="Edit Avatar" onClick={vodiFn} />
           <input

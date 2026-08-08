@@ -35,6 +35,7 @@ import {
 } from "./backgroundStore";
 import { fetchDeletedMatchIds, isCloudActive } from "./cloudSync";
 import { addDeletedMatchId, getDeletedMatchIds } from "./deletedMatches";
+import { refreshEntitlement } from "./entitlement";
 import { getData, LOCAL_KEY, putData } from "./store";
 import supabase from "./supabase";
 import { DbDecksData } from "./upsertDbDecks";
@@ -239,6 +240,10 @@ export default async function hydrateFromCloud(): Promise<void> {
     try {
       const uid = (await supabase.auth.getUser()).data.user?.id;
       if (uid) {
+        // Supporter status. Cheap single-row read, and doing it here means the
+        // badge is right by the time the UI first paints after login.
+        await refreshEntitlement();
+
         const prof = await supabase
           .from("profiles")
           .select("avatar_url, username, background")

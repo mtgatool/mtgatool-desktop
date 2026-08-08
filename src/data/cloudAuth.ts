@@ -11,6 +11,7 @@
  */
 
 import setLocalSetting from "../utils/setLocalSetting";
+import { clearEntitlement } from "./entitlement";
 import supabase from "./supabase";
 
 /** The pretty display name: trimmed, otherwise left as typed. */
@@ -128,6 +129,9 @@ export async function cloudUpdatePassword(newPassword: string): Promise<void> {
 }
 
 export async function cloudLogout(): Promise<void> {
+  // claimLocalStore handles an account *switch*; this covers signing out into
+  // local mode, where the next session must not inherit the badge.
+  await clearEntitlement();
   await supabase.auth.signOut();
 }
 

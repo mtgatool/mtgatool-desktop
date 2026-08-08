@@ -51,3 +51,7 @@ dist-verify/
 
 # Local SQLite build served by the web dev server
 public/*.sqlite
+
+# Local badge design lab (dev tool only; anything in public/ would otherwise
+# ship inside the packaged app)
+/public/badge-lab/

@@ -15,6 +15,7 @@ import getLocalSetting from "../utils/getLocalSetting";
 import getRankIndex from "../utils/getRankIndex";
 import vodiFn from "../utils/voidfn";
 import Alt from "./Alt";
+import SupporterBadge from "./SupporterBadge";
 import IconButton from "./ui/IconButton";
 
 interface TopNavItemProps {
@@ -264,6 +265,7 @@ export default function TopNav(props: TopNavProps): JSX.Element {
           <div className="userdata-container">
             <TopRankIcon type="constructed" {...contructedNav} />
             <TopRankIcon type="limited" {...limitedNav} />
+            <SupporterBadge />
             <div className="top-username" onClick={openArenaIdSelector}>
               {userName}
             </div>

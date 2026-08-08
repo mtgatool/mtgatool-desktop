@@ -54,7 +54,13 @@ export const initialRendererState = {
   loginState: LOGIN_AUTH,
   patreon: {
     patreon: false,
+    // -1 means "not looked up yet", which is not the same as tier 0 ("looked up,
+    // not a patron"). Only useSupporter is allowed to collapse the two.
     patreonTier: -1,
+    /** ms epoch the pledge lapses; 0 when current. */
+    patreonExpires: 0,
+    /** ms epoch of the last successful cloud read; 0 when never. */
+    patreonChecked: 0,
   },
   popup: null as Popup | null,
   formats: {} as Record<string, Format>,

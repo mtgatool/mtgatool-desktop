@@ -6,6 +6,35 @@
   background-color: var(--color-dark);
 }
 
+// Positioning context for the supporter badge riding the avatar's corner —
+// the avatar itself clips to a circle, so the badge cannot live inside it.
+.avatar-badge-wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.avatar-tier-badge {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 54px;
+  height: 54px;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.account-tier-label {
+  margin-top: 4px;
+  font-size: 16px;
+  font-family: var(--main-font-name-it);
+  font-style: italic;
+  // Colour comes inline from the tier palette, so it always matches the badge.
+}
+
 .avatar-small {
   width: 64px;
   height: 64px;

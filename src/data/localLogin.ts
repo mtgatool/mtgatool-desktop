@@ -10,6 +10,7 @@ import {
 import globalData from "../utils/globalData";
 import { sanitizeRank } from "../utils/mtga/rankClasses";
 import { loadLocalBackground } from "./backgroundStore";
+import { isEntitlementUsable, loadCachedEntitlement } from "./entitlement";
 import { getData, queryKeys } from "./store";
 import { getDbSeasons } from "./upsertDbSeason";
 
@@ -28,6 +29,23 @@ export default async function localLogin(): Promise<void> {
   const background = await loadLocalBackground();
   if (background) {
     reduxAction(dispatch, { type: "SET_CUSTOM_BACKGROUND", arg: background });
+  }
+
+  // Supporter status from the cache. This runs on both paths — after
+  // hydrateFromCloud on a cloud login (which has just refreshed the cache), and
+  // alone in local mode — so reading the cache is correct either way, and an
+  // offline supporter keeps their badge.
+  const entitlement = await loadCachedEntitlement();
+  if (entitlement && isEntitlementUsable(entitlement)) {
+    reduxAction(dispatch, {
+      type: "SET_PATREON",
+      arg: {
+        patreon: entitlement.supporter,
+        patreonTier: entitlement.tier,
+        patreonExpires: entitlement.expiresAt,
+        patreonChecked: entitlement.checkedAt,
+      },
+    });
   }
 
   const matches = (await queryKeys("matches-", true)) || [];
