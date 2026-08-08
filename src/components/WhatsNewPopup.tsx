@@ -56,7 +56,7 @@ const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
   },
   {
     title: "Clearer log settings",
-    body: "The Logs settings page now says in words whether the log is being read and whether the game's memory can be reached, with a live view of what the reader is doing. \"Resume reading log\" picks up from where the log is now instead of re-reading it.",
+    body: 'The Logs settings page now says in words whether the log is being read and whether the game\'s memory can be reached, with a live view of what the reader is doing. "Resume reading log" picks up from where the log is now instead of re-reading it.',
   },
 ];
 
