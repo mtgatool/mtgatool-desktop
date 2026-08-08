@@ -278,14 +278,18 @@ export default function AccountSettingsPanel(
         </div>
         <div style={{ marginLeft: "32px", marginRight: "auto" }}>
           <h2 style={{ margin: 0 }}>{getLocalSetting("username") || "???"}</h2>
-          {supporter.isSupporter && (
-            <div
-              className="account-tier-label"
-              style={{ color: TIERS[supporter.tier]?.top }}
-            >
-              {TIER_NAMES[supporter.tier]} tier
-            </div>
-          )}
+          <div
+            className="account-tier-label"
+            style={{
+              color: supporter.isSupporter
+                ? TIERS[supporter.tier]?.top
+                : "var(--color-text-dark)",
+            }}
+          >
+            {supporter.isSupporter
+              ? `${TIER_NAMES[supporter.tier]} tier`
+              : "Free tier"}
+          </div>
         </div>
         <label htmlFor="avatarInput" style={{ margin: "0" }}>
           <Button text="Edit Avatar" onClick={vodiFn} />
@@ -382,9 +386,11 @@ export default function AccountSettingsPanel(
             Your account signs in with your username, not an email, so there is
             no way to reach you if you lose your password. Add an address here
             and we can send you a reset code. We&apos;ll mail you a confirmation
-            code first — the address is only saved once you enter it. It is used
-            for nothing else: no newsletters, no sharing, and you can remove it
-            at any time.
+            code first — the address is only saved once you enter it. If you
+            back us on Patreon, use the same address as your Patreon account and
+            your supporter benefits link up automatically. It is used for
+            nothing beyond that: no newsletters, no sharing, and you can remove
+            it at any time.
           </p>
           {awaitingCode ? (
             <div className="form-input-container" style={{ height: "36px" }}>
