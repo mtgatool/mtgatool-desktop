@@ -130,15 +130,41 @@ async function getMembers(campaignId: string, token: string): Promise<PledgeRow[
   return out;
 }
 
+/**
+ * Service role only. Gateway JWT verification also admits the anon key — which
+ * ships inside the app — and this endpoint drives calls against the Patreon
+ * API, so "any valid JWT" is not good enough.
+ *
+ * Two accepted shapes, because the key the caller holds and the key in this
+ * function's env are not guaranteed to be the same format on a project using
+ * the new API keys: byte-equality with the injected env key, or a JWT whose
+ * role is service_role. Reading the role without re-verifying is safe here —
+ * the gateway (verify_jwt) has already validated the signature of any JWT
+ * that reaches this code, so a forged payload never arrives.
+ */
+function bearerIsServiceRole(auth: string): boolean {
+  if (!auth.startsWith("Bearer ")) return false;
+  const tok = auth.slice(7).trim();
+  const envKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  if (envKey && tok === envKey) return true;
+  const parts = tok.split(".");
+  if (parts.length === 3) {
+    try {
+      const payload = JSON.parse(
+        atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"))
+      );
+      return payload?.role === "service_role";
+    } catch {
+      // fall through
+    }
+  }
+  return false;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
 
-  // Service role only. Gateway JWT verification also admits the anon key —
-  // which ships inside the app — and this endpoint drives calls against the
-  // Patreon API, so "any valid JWT" is not good enough.
-  const auth = req.headers.get("Authorization") ?? "";
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-  if (!serviceKey || auth !== `Bearer ${serviceKey}`) {
+  if (!bearerIsServiceRole(req.headers.get("Authorization") ?? "")) {
     return json({ error: "service role required" }, 401);
   }
 
