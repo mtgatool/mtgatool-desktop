@@ -60,8 +60,12 @@ export default function SortControls<T>(props: SortControlsProps<T>) {
               className={`sort-chip ${active ? "active" : ""}`}
               title={
                 active
-                  ? `Sorted ${ascending ? "ascending" : "descending"} — click to reverse`
-                  : `Sort by ${(columnNames && columnNames[index]) || String(key)}`
+                  ? `Sorted ${
+                      ascending ? "ascending" : "descending"
+                    } — click to reverse`
+                  : `Sort by ${
+                      (columnNames && columnNames[index]) || String(key)
+                    }`
               }
               onClick={(): void =>
                 // Pressing the active one reverses it; pressing another starts

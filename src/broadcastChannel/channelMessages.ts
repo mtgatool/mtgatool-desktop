@@ -18,6 +18,7 @@ export type MessageType =
   | "STOP_LOG_READING"
   | "LOG_MESSAGE_RECV"
   | "LOG_READ_FINISHED"
+  | "READER_READ"
   | "ACTION_LOG"
   | "SET_UUID"
   | "SET_DETAILED_LOGS"
@@ -42,6 +43,20 @@ export type MessageType =
   | "DRAFT_END"
   | "UPDATE_ACTIVE_EVENTS"
   | "DAEMON_GET_PLAYER_ID";
+
+/** One timed memory read, from the background window to whoever is showing it. */
+export interface ReaderReadMessage {
+  type: "READER_READ";
+  value: {
+    kind: "memory" | "log";
+    name: string;
+    ms: number;
+    ok: boolean;
+    at: number;
+    error?: string;
+    count?: number;
+  };
+}
 
 export interface ChannelMessageBase {
   type: MessageType;
@@ -199,6 +214,7 @@ export interface DaemonGetPlayerId extends ChannelMessageBase {
 }
 
 export type ChannelMessage =
+  | ReaderReadMessage
   | PopupMessage
   | LogCheckMessage
   | StartLogReadingMessage

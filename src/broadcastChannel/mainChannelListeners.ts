@@ -22,6 +22,9 @@ import globalData from "../utils/globalData";
 import switchPlayerUUID from "../utils/switchPlayerUUID";
 import { ChannelMessage } from "./channelMessages";
 
+/** How many reads the rolling view keeps. Comfortably more than it draws. */
+const READER_READS_KEPT = 120;
+
 export default function mainChannelListeners() {
   const channel = bcConnect() as any;
 
@@ -108,6 +111,19 @@ export default function mainChannelListeners() {
 
     if (msg.data.type === "LOG_CHECK") {
       globalData.lastLogCheck = new Date().getTime();
+    }
+
+    // A memory read finished in the background window. Kept to a fixed tail:
+    // the settings page draws a rolling window of it, and holding more would be
+    // a leak in a process that stays open for hours.
+    if (msg.data.type === "READER_READ") {
+      globalData.readerReads.push(msg.data.value);
+      if (globalData.readerReads.length > READER_READS_KEPT) {
+        globalData.readerReads.splice(
+          0,
+          globalData.readerReads.length - READER_READS_KEPT
+        );
+      }
     }
 
     if (msg.data.type === "GAME_START") {

@@ -46,6 +46,18 @@ const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
     title: "Draw odds are back",
     body: "The overlay's odds were all reading zero. Hovering the lands row shows your chance of drawing each colour again, and the type counts beside it are right too.",
   },
+  {
+    title: "Reworked collection",
+    body: "Sets are grouped by the format they're legal in and can be collapsed to keep the list short. Cards can be sorted however you like, and each one shows whether you own it — including when you already have it as a different printing.",
+  },
+  {
+    title: "Set completion and stats",
+    body: "Set view opens again, and the completion heatmaps and set statistics are filled in for every set that has boosters in the game.",
+  },
+  {
+    title: "Clearer log settings",
+    body: "The Logs settings page now says in words whether the log is being read and whether the game's memory can be reached, with a live view of what the reader is doing. \"Resume reading log\" picks up from where the log is now instead of re-reading it.",
+  },
 ];
 
 /** Shown to anyone arriving from v6, alongside the migration notice. */

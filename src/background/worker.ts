@@ -7,6 +7,12 @@ import findInProgressMatch from "./findInProgressMatch";
 import logEntrySwitch from "./logEntrySwitch";
 import { isLiveLog, setLiveLog } from "./logReadState";
 
+/**
+ * Whether the watcher has run once in this session. The mid-match rewind below
+ * is a startup concern; a later start is someone resuming, not the app opening.
+ */
+let hasStartedBefore = false;
+
 export default function start(): undefined | (() => void) {
   // eslint-disable-next-line global-require
   const fs = require("fs");
@@ -28,9 +34,16 @@ export default function start(): undefined | (() => void) {
   // and save it with no decklists and a 0-0 scoreline. Start from that match's
   // beginning instead; null when nothing is being played, which is the usual
   // case and leaves startup exactly as it was.
-  const inProgress = skipInitialBackfill
-    ? findInProgressMatch(getLocalSetting("logPath"))
-    : null;
+  //
+  // Only when the tracker itself starts, which is what this is for. The watcher
+  // is also restarted by hand from the settings page, and doing it again there
+  // would replay the match from its beginning every press — megabytes of log,
+  // re-read for no reason, because nothing about the game changed.
+  const inProgress =
+    skipInitialBackfill && !hasStartedBefore
+      ? findInProgressMatch(getLocalSetting("logPath"))
+      : null;
+  hasStartedBefore = true;
 
   if (inProgress !== null) {
     // Everything about to be replayed belongs to the match being played right

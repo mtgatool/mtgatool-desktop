@@ -7,6 +7,7 @@ import { StringDecoder } from "string_decoder";
 import { promisify } from "util";
 
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
+import { reportLogRead } from "../reader/readerTelemetry";
 import ArenaLogDecoder from "./arena-log-decoder/arena-log-decoder";
 
 const fsAsync = {
@@ -146,6 +147,12 @@ function start({
     firstPass = false;
 
     while (position < size) {
+      // Timed and counted for the reader activity view in settings. The watcher
+      // only gets here when the log has actually grown, so these are real reads
+      // rather than the 250ms poll that finds nothing.
+      const readStarted = Date.now();
+      let entriesThisChunk = 0;
+
       // eslint-disable-next-line no-await-in-loop
       const buffer = await readChunk(
         path,
@@ -159,6 +166,7 @@ function start({
       // that byte, and every match after it is silently missed. Arena changes
       // its payload shapes without warning, so this has to be per-entry.
       logDecoder.append(text, (entry: any) => {
+        entriesThisChunk += 1;
         try {
           onLogEntry({ ...entry, size });
         } catch (e) {
@@ -167,6 +175,8 @@ function start({
       });
       // eslint-disable-next-line require-atomic-updates
       position += buffer.length;
+
+      reportLogRead(Date.now() - readStarted, buffer.length, entriesThisChunk);
     }
     onFinish();
   }

@@ -6,6 +6,7 @@ import globalStore from "../background/store";
 import isElectron from "../utils/electron/isElectron";
 import { isValidRankClass } from "../utils/mtga/rankClasses";
 import { ReaderRanks } from "../utils/mtgaReader";
+import timed from "./readerTelemetry";
 
 export default async function readRank(): Promise<
   CombinedRankInfo | undefined
@@ -19,8 +20,9 @@ export default async function readRank(): Promise<
     // mtga-reader 0.1.7: reads run on the native threadpool and return a
     // Promise, so they never block this renderer's event loop (the background
     // window also hosts the GRE parser).
-    const ranks: ReaderRanks & { error?: string } = await reader.readRanks(
-      "MTGA"
+    const ranks: ReaderRanks & { error?: string } = await timed(
+      "readRanks",
+      () => reader.readRanks("MTGA")
     );
 
     if (!ranks || ranks.error || !ranks.constructed || !ranks.limited) {

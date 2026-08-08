@@ -37,6 +37,13 @@
   --color-section-hover: #29292b;
   --color-section-active: #2E3136;
 
+  // Reader/log state. Not the mana colours above: --color-g and --color-w sit
+  // ~7 ΔE apart, which is under the point at which full colour vision can
+  // separate them, so "reading" and "waiting" looked like the same dot.
+  --color-status-ok: #5fbf85;
+  --color-status-warn: #f0a92e;
+  --color-status-err: #e06a5c;
+
   --color-icon: #CCCCCC;
 
   --color-text: #CCCCCC;

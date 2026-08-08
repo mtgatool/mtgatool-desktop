@@ -9,6 +9,8 @@ import globalData from "../../../utils/globalData";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import showOpenLogDialog from "../../../utils/showOpenLogDialog";
 import Button from "../../ui/Button";
+import StatusPill from "../../ui/StatusPill";
+import ReaderActivity from "./ReaderActivity";
 import ReaderStatus from "./ReaderStatus";
 
 function getLogExists(path: string) {
@@ -48,51 +50,68 @@ export default function LogsSettingsPanel(): JSX.Element {
 
   return (
     <>
-      <div className="log-status-text">
-        Status:{" "}
-        <div
-          title={isReading ? `Reading` : "Not reading"}
-          className={isReading ? `log-status-ok` : "log-status-err"}
-        />
-      </div>
-      <div className="input-container" style={{ height: "40px" }}>
-        <label className="label">Arena Log:</label>
-        <div
-          style={{
-            display: "flex",
-            width: "-webkit-fill-available",
-            justifyContent: "flex-end",
-          }}
-        >
-          <div className="open-button" onClick={openPathDialog} />
-          <div className="form-input-container">
-            <input autoComplete="off" readOnly value={path} />
+      <div className="panel-card">
+        <div className="panel-card-head">
+          <div className="panel-card-title">Arena log</div>
+          <StatusPill
+            state={isReading ? "ok" : "warn"}
+            label={isReading ? "Reading" : "Idle"}
+            title={
+              isReading
+                ? "The log is being watched for new entries"
+                : "Nothing is being read — start MTGA, or resume reading below"
+            }
+          />
+        </div>
+
+        <div className="panel-row">
+          <div className="panel-row-label">Log file</div>
+          <div className="panel-row-value">
+            <div
+              className="open-button"
+              onClick={openPathDialog}
+              title="Choose a different Player.log"
+            />
+            <div className="form-input-container">
+              {/* Long paths are cut off by the field, so the whole one is on
+                  hover rather than nowhere. */}
+              <input autoComplete="off" readOnly value={path} title={path} />
+            </div>
           </div>
         </div>
-        <div
-          title={logFileExists ? "File exists" : "File does not exist"}
-          className={logFileExists ? "log-status-ok" : "log-status-err"}
-          style={{ marginLeft: "16px" }}
-        />
+
+        <div className="panel-card-foot">
+          <StatusPill
+            state={logFileExists ? "ok" : "err"}
+            label={logFileExists ? "File found" : "File missing"}
+            title={
+              logFileExists
+                ? path
+                : `No file at ${path} — pick the Player.log with the folder button`
+            }
+          />
+          <Button
+            onClick={() => {
+              postChannelMessage({
+                type: isReading ? "STOP_LOG_READING" : "START_LOG_READING",
+              });
+              reduxAction(dispatch, {
+                type: "SET_READING_LOG",
+                arg: true,
+              });
+            }}
+            title={
+              isReading
+                ? "Stop watching the Arena log for new entries"
+                : "Pick the log back up from where it is now — this does not replay what has already been read"
+            }
+            text={isReading ? "Stop reading log" : "Resume reading log"}
+          />
+        </div>
       </div>
 
-      <Button
-        style={{
-          margin: "16px auto",
-        }}
-        onClick={() => {
-          postChannelMessage({
-            type: isReading ? "STOP_LOG_READING" : "START_LOG_READING",
-          });
-          reduxAction(dispatch, {
-            type: "SET_READING_LOG",
-            arg: true,
-          });
-        }}
-        text={isReading ? "Stop reading log" : "Re-read log"}
-      />
-
       <ReaderStatus />
+      <ReaderActivity />
     </>
   );
 }

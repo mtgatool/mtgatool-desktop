@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import readPlayerTest from "../../../reader/readPlayerTest";
+import StatusPill, { StatusState } from "../../ui/StatusPill";
 
 function findMTGA(): Promise<boolean> {
   // eslint-disable-next-line no-undef
@@ -33,10 +34,26 @@ const READER_ERROR_TEXT = IS_MAC
   ? "Reader error — see the macOS setup notes in the README"
   : "Reader error — try running the app as administrator";
 
-export default function ReaderStatus() {
-  const [readerStatus, setReaderStatus] = useState("warn");
+/**
+ * One object rather than a status and a loose string: every branch below sets
+ * both, and holding them apart let them disagree — a stale error line could sit
+ * under a green dot for a tick.
+ */
+interface Status {
+  state: StatusState;
+  /** A word or two, for the pill. */
+  label: string;
+  /** The part that needs a sentence, shown under the note. */
+  detail?: string;
+  /** Whether that sentence is something to act on. */
+  bad?: boolean;
+}
 
-  const [errorText, setErrorText] = useState("");
+export default function ReaderStatus() {
+  const [status, setStatus] = useState<Status>({
+    state: "warn",
+    label: "Checking…",
+  });
 
   useEffect(() => {
     // The probes are async (native threadpool); skip a tick if the previous
@@ -56,16 +73,25 @@ export default function ReaderStatus() {
         // attempt to probe the process or read memory in that case.
         if (!checkAdmin()) {
           if (alive) {
-            setReaderStatus("err");
-            setErrorText(NO_ACCESS_TEXT);
+            setStatus({
+              state: "err",
+              label: "No access",
+              detail: NO_ACCESS_TEXT,
+              bad: true,
+            });
           }
           return;
         }
 
         if (!(await findMTGA())) {
           if (alive) {
-            setReaderStatus("err");
-            setErrorText("MTGA process not found");
+            // Not an error on the tracker's part — the game simply is not open,
+            // which is the usual state of this screen.
+            setStatus({
+              state: "warn",
+              label: "Not running",
+              detail: "MTGA is not running — start the game to connect.",
+            });
           }
           return;
         }
@@ -73,20 +99,26 @@ export default function ReaderStatus() {
         // Access granted and MTGA is running — confirm we can really read.
         if (!(await readPlayerTest())) {
           if (alive) {
-            setReaderStatus("warn");
-            setErrorText("Waiting for MTGA data…");
+            setStatus({
+              state: "warn",
+              label: "Waiting",
+              detail: "Connected to MTGA, waiting for game data…",
+            });
           }
           return;
         }
 
         if (alive) {
-          setReaderStatus("ok");
-          setErrorText("");
+          setStatus({ state: "ok", label: "Connected" });
         }
       } catch {
         if (alive) {
-          setReaderStatus("err");
-          setErrorText(READER_ERROR_TEXT);
+          setStatus({
+            state: "err",
+            label: "Error",
+            detail: READER_ERROR_TEXT,
+            bad: true,
+          });
         }
       } finally {
         busy = false;
@@ -99,34 +131,29 @@ export default function ReaderStatus() {
   }, []);
 
   return (
-    <>
-      <div style={{ margin: "24px 0 12px 0" }}>
-        <p>
-          MTG Arena Tool reads the MTGA game process memory to get some of the
-          game data.{" "}
-          {IS_MAC
-            ? "If you have issues with it, make sure the app is not quarantined — see the macOS notes in the README."
-            : "If you have any issues with it try running the app with administrator privileges."}
+    <div className="panel-card">
+      <div className="panel-card-head">
+        <div className="panel-card-title">Game memory</div>
+        <StatusPill
+          state={status.state}
+          label={status.label}
+          title={status.detail}
+        />
+      </div>
+
+      <p className="panel-note">
+        MTG Arena Tool reads the MTGA game process memory to get some of the
+        game data.{" "}
+        {IS_MAC
+          ? "If you have issues with it, make sure the app is not quarantined — see the macOS notes in the README."
+          : "If you have any issues with it try running the app with administrator privileges."}
+      </p>
+
+      {status.detail ? (
+        <p className={`panel-note ${status.bad ? "err" : ""}`}>
+          {status.detail}
         </p>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          height: "40px",
-        }}
-      >
-        <label className="label">MTGA Process:</label>
-        <label
-          style={{
-            fontFamily: "var(--main-font-name-it)",
-            color: "var(--color-r)",
-            margin: "auto 16px auto auto",
-          }}
-        >
-          {errorText}
-        </label>
-        <div className={`log-status-${readerStatus}`} />
-      </div>
-    </>
+      ) : null}
+    </div>
   );
 }

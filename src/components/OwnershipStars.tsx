@@ -1,7 +1,6 @@
 import { useSelector } from "react-redux";
 
 import useOwnedByTitle from "../hooks/useOwnedByTitle";
-
 import { AppState } from "../redux/stores/rendererStore";
 import { DbCardDataV2 } from "../types";
 import { defaultCardsData } from "../types/dbTypes";

@@ -6,16 +6,19 @@ export interface ButtonProps {
   style?: React.CSSProperties;
   className?: string;
   disabled?: boolean;
+  /** Hover text. Some buttons do something worth explaining before it happens. */
+  title?: string;
 }
 
 export default function Button(
   props: PropsWithChildren<ButtonProps>
 ): JSX.Element {
-  const { disabled, style, onClick, className, text, children } = props;
+  const { disabled, style, onClick, className, text, children, title } = props;
 
   return (
     <div
       style={style || {}}
+      title={title}
       onClick={disabled == true ? undefined : onClick}
       className={
         disabled == true
