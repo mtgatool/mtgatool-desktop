@@ -47,6 +47,10 @@ const overlayCfg = {
   // Public viewer background. Empty = transparent (so OBS composites it over
   // your scene); an "#rrggbb(aa)" value paints a flat colour instead.
   shareBackColor: "",
+  // Whether the public viewer drops the deck back to the waiting screen between
+  // matches. Without it the last state of the finished match stays on the
+  // stream, indistinguishable from a live one, until the next game begins.
+  shareHideWhenIdle: true,
 };
 
 export type OverlaySettings = typeof overlayCfg;

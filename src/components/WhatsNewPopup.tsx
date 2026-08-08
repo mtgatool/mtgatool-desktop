@@ -40,27 +40,27 @@ const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
   },
   {
     title: "Opening the tracker mid-game",
-    body: "Starting during a game now picks that match up from its beginning, with both decklists, ranks and the real result — instead of saving a broken 0-0 you had to go and delete.",
+    body: "Starting during a game now picks that match up from its beginning, with both decklists, ranks and the real result.",
   },
   {
     title: "Draw odds are back",
-    body: "The overlay's odds were all reading zero. Hovering the lands row shows your chance of drawing each colour again, and the type counts beside it are right too.",
+    body: "Hovering the overlay's lands row shows your chance of drawing each colour again, and the type counts beside it are right too.",
   },
   {
     title: "Reworked collection",
-    body: "Sets are grouped by the format they're legal in and can be collapsed to keep the list short. Cards can be sorted however you like, and each one shows whether you own it — including when you already have it as a different printing.",
+    body: "Sets are grouped by format and can be collapsed. Cards can be sorted, and each shows whether you own it — including as another printing.",
   },
   {
     title: "Set completion and stats",
-    body: "Set view opens again, and the completion heatmaps and set statistics are filled in for every set that has boosters in the game.",
+    body: "Set view opens again, with completion heatmaps and statistics for every set with boosters in the game.",
   },
   {
     title: "Live overlay sharing on stream",
-    body: "The shared overlay page now fills the browser source you give it, so the card tiles stretch to the size you set in OBS instead of sitting in a narrow column. It also no longer shows the release notes over your stream.",
+    body: "The shared overlay now fills your OBS browser source and hides the deck between matches. The share link has a copy button.",
   },
   {
     title: "Clearer log settings",
-    body: 'The Logs settings page now says in words whether the log is being read and whether the game\'s memory can be reached, with a live view of what the reader is doing. "Resume reading log" picks up from where the log is now instead of re-reading it.',
+    body: "The Logs page now spells out whether the log and game memory are being read, with a live view of reader activity. Resuming the log picks up where it is instead of re-reading it.",
   },
 ];
 

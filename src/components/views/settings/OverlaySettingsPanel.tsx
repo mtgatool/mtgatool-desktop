@@ -25,6 +25,7 @@ import {
 import useColorPicker from "../../../hooks/useColorPicker";
 import reduxAction from "../../../redux/reduxAction";
 import store, { AppState } from "../../../redux/stores/rendererStore";
+import copyToClipboard from "../../../utils/copyToClipboard";
 import sha1 from "../../../utils/sha1";
 import textRandom from "../../../utils/textRandom";
 import vodiFn from "../../../utils/voidfn";
@@ -127,6 +128,8 @@ interface SectionProps {
 
 function OverlaySettingsSection(props: SectionProps): JSX.Element {
   const { settings, current, show } = props;
+  const dispatch = useDispatch();
+  const shareUrl = `https://app.mtgatool.com/live/${settings?.shareId || ""}`;
   const [overlayAlpha, setOverlayAlpha] = useState(0);
   const [overlayAlphaBack, setOverlayAlphaBack] = useState(0);
 
@@ -346,12 +349,51 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
         }}
       />
       {!!settings.shareEnabled && !!settings.shareId && (
-        <div
-          className="settings-note"
-          style={{ textAlign: "center", wordBreak: "break-all" }}
-        >
-          https://app.mtgatool.com/live/{settings.shareId}
-        </div>
+        <>
+          <div
+            className="settings-note"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "4px",
+            }}
+          >
+            <span
+              style={{
+                wordBreak: "break-all",
+                // The app disables text selection globally, so the link could
+                // be read off the screen and not much else — and it is a
+                // 40-char hash nobody is going to retype into OBS.
+                userSelect: "text",
+              }}
+            >
+              {shareUrl}
+            </span>
+            <div
+              className="copy-button"
+              title="Copy the live share link"
+              onClick={(): void => {
+                copyToClipboard(shareUrl);
+                reduxAction(dispatch, {
+                  type: "SET_POPUP",
+                  arg: {
+                    text: "Live share link copied to clipboard.",
+                    duration: 5000,
+                    time: new Date().getTime(),
+                  },
+                });
+              }}
+            />
+          </div>
+          <Toggle
+            text="Hide the deck between matches"
+            value={settings.shareHideWhenIdle !== false}
+            callback={(val: boolean): void =>
+              saveOverlaySettings(current, { shareHideWhenIdle: val })
+            }
+          />
+        </>
       )}
       <div className="centered-setting-container">
         <span>

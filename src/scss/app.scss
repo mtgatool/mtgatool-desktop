@@ -48,6 +48,75 @@ body.live-share-page .app-wrapper-back-no-frame:after {
   display: none !important;
 }
 
+// ---------------------------------------------------------------------------
+// Live share viewer (/live/<shareId>) — an OBS browser source, so everything
+// here is composited over someone's scene.
+// ---------------------------------------------------------------------------
+
+// Top of the source, horizontally centred. A browser source is normally much
+// taller than this block, and vertical centring pushed the branding into the
+// middle of the scene where it read as a stray watermark.
+.live-share-waiting {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+}
+
+// The page is transparent so OBS can composite it, which means this sits on
+// whatever the scene happens to be — often gameplay, often bright. Theme text
+// colours are chosen against the app's dark surface and vanish there, so the
+// block carries its own scrim and its own light-on-dark palette instead of
+// inheriting any.
+.live-share-waiting-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 24px 12px 24px;
+  border-radius: 8px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(3px);
+
+  img {
+    width: 100%;
+    // The wordmark is 600px of artwork; it is here to be recognised, not read
+    // from the back of the room.
+    max-width: 210px;
+    height: auto;
+  }
+}
+
+.live-share-waiting-text {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #e8e8e8;
+}
+
+.live-share-waiting-link {
+  margin-top: 2px;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  color: #b4b4b4;
+}
+
+.live-share-shell {
+  position: relative;
+}
+
+// Corner mark over the deck. Absolute so it takes no layout from an overlay
+// whose size the sharer has already fitted into their scene.
+.live-share-mark {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 2;
+}
+
 .wrapper {
   width: 100%;
   height: calc(100% - 49px);

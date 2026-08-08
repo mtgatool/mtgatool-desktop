@@ -19,6 +19,14 @@ import supabase from "./supabase";
 export interface OverlaySharePayload {
   matchState: unknown;
   settings: OverlaySettings;
+  /**
+   * Whether a game is being played right now.
+   *
+   * The viewer cannot infer this: the payload of a finished match looks exactly
+   * like the payload of a live one. Staleness alone does not cover it either,
+   * because an overlay set to show always keeps publishing between games.
+   */
+  matchInProgress?: boolean;
   actionLog?: unknown;
   draftState?: unknown;
   draftVotes?: unknown;

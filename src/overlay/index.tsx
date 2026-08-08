@@ -56,6 +56,13 @@ export default function Overlay() {
   const [draftVotes, setDraftVotes] = useState<Record<string, DbDraftVote>>({});
   const [actionLog, setActionLog] = useState<ActionLogV2 | null>(null);
   const [odds, setOdds] = useState<Chances>();
+  // Tracked here rather than read from redux: this is a separate renderer with
+  // its own store, and the match flags are only ever set from the broadcast
+  // messages below. OVERLAY_UPDATE counts as a match because deck updates are
+  // only sent during one — the window is created when a game starts, so it can
+  // mount after GAME_START has already gone out and would otherwise sit at
+  // false for the whole game.
+  const [matchInProgress, setMatchInProgress] = useState(false);
   const heightDivAdjustRef = useRef<HTMLDivElement>(null);
 
   const allSettings = JSON.parse(getLocalSetting("settings")) as Settings;
@@ -102,6 +109,15 @@ export default function Overlay() {
 
       if (msg.data.type === "OVERLAY_UPDATE") {
         setMatchState(msg.data.value);
+        setMatchInProgress(true);
+      }
+
+      if (msg.data.type === "GAME_START") {
+        setMatchInProgress(true);
+      }
+
+      if (msg.data.type === "GAME_STATS") {
+        setMatchInProgress(false);
       }
 
       if (msg.data.type === "DRAFT_VOTES") {
@@ -169,14 +185,25 @@ export default function Overlay() {
     if (!shareId || !settings?.shareEnabled) return;
     // Nothing to share yet.
     if (!matchState && !draftState && !actionLog) return;
-    const payload: OverlaySharePayload = { matchState, settings };
+    const payload: OverlaySharePayload = {
+      matchState,
+      settings,
+      matchInProgress,
+    };
     if (settings.mode === OVERLAY_LOG) payload.actionLog = actionLog;
     if (settings.mode === OVERLAY_DRAFT) {
       payload.draftState = draftState;
       payload.draftVotes = draftVotes;
     }
     publishOverlayShare(shareId, payload);
-  }, [settings, matchState, actionLog, draftState, draftVotes]);
+  }, [
+    settings,
+    matchState,
+    actionLog,
+    draftState,
+    draftVotes,
+    matchInProgress,
+  ]);
 
   // Stop sharing ONLY when the user explicitly disables it (shareEnabled ->
   // false). Deliberately no effect-cleanup teardown: React fires cleanups on

@@ -19,6 +19,7 @@ export interface OverlaySettingsData {
   shareId?: string;
   shareEnabled?: boolean;
   shareBackColor?: string;
+  shareHideWhenIdle?: boolean;
 }
 
 export type CardQuality = "small" | "normal" | "large";

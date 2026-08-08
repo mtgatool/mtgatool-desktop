@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
+import logoBig from "../assets/images/logo_big.png";
+import logoRound from "../assets/images/logo_round.png";
 import { OverlayUpdateMatchState } from "../background/store/types";
 import { OverlaySettings } from "../common/defaultConfig";
 import { OVERLAY_FULL, OVERLAY_SEEN } from "../constants";
@@ -12,7 +14,6 @@ import cardsDb from "../utils/cardsDb/cardsDbClient";
 import compareCards from "../utils/compareCards";
 import Deck from "../utils/mtga/deck";
 import { ActionLogV2 } from "./action-log-v2/types";
-import Section from "./ui/Section";
 
 interface SharePayload {
   matchState?: OverlayUpdateMatchState;
@@ -20,6 +21,37 @@ interface SharePayload {
   actionLog?: ActionLogV2 | null;
   draftState?: InternalDraftv2;
   draftVotes?: Record<string, DbDraftVote>;
+  matchInProgress?: boolean;
+}
+
+/**
+ * How long without a write before the publisher is assumed gone.
+ *
+ * liveShare.ts re-writes the row every 3s while the overlay window is alive, so
+ * silence means the window closed — which is what happens when a match ends.
+ * Generous on purpose: a few missed beats (Chromium suspends these always-on-top
+ * renderers aggressively) must not blank a deck mid-game. Lingering a few
+ * seconds after a match is much the cheaper mistake.
+ */
+const STALE_MS = 15000;
+
+/**
+ * Shown before the first payload arrives and, when the sharer asks for it,
+ * between matches.
+ *
+ * Anchored to the top rather than the middle: a browser source is usually far
+ * taller than this block, and centring left the mark floating in the scene.
+ */
+function WaitingScreen(): JSX.Element {
+  return (
+    <div className="live-share-waiting">
+      <div className="live-share-waiting-card">
+        <img src={logoBig} alt="MTG Arena Tool" />
+        <div className="live-share-waiting-text">Waiting for a deck…</div>
+        <div className="live-share-waiting-link">mtgatool.com</div>
+      </div>
+    </div>
+  );
 }
 
 /**
@@ -35,6 +67,11 @@ export default function LiveShareView(): JSX.Element {
   const params = useParams<{ id: string }>();
   const [dbReady, setDbReady] = useState(false);
   const [payload, setPayload] = useState<SharePayload | null>(null);
+  // When the row was last written, to notice the publisher going away.
+  const [updatedAt, setUpdatedAt] = useState<number>(0);
+  // Ticks so staleness is re-evaluated while nothing is arriving — the whole
+  // point is to react to updates *stopping*, which no other state change marks.
+  const [, tick] = useState(0);
 
   // Card names/art need the cards database; load it without any login.
   useEffect(() => {
@@ -59,7 +96,7 @@ export default function LiveShareView(): JSX.Element {
     const poll = (): void => {
       supabase
         .from("live_overlays")
-        .select("payload")
+        .select("payload, updated_at")
         .eq("share_id", params.id)
         .maybeSingle()
         .then(({ data, error }) => {
@@ -72,14 +109,21 @@ export default function LiveShareView(): JSX.Element {
             );
             return;
           }
-          if (data?.payload) setPayload(data.payload as SharePayload);
+          if (data?.payload) {
+            setPayload(data.payload as SharePayload);
+            setUpdatedAt(
+              data.updated_at ? new Date(data.updated_at).getTime() : 0
+            );
+          }
         });
     };
     poll();
     const iv = setInterval(poll, 1000);
+    const age = setInterval(() => tick((n) => n + 1), 1000);
     return () => {
       cancelled = true;
       clearInterval(iv);
+      clearInterval(age);
     };
   }, [params.id]);
 
@@ -113,32 +157,21 @@ export default function LiveShareView(): JSX.Element {
     };
   }, [matchState, settings]);
 
-  if (!payload || !settings || !dbReady) {
-    return (
-      <div
-        style={{
-          height: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Section
-          style={{
-            padding: "40px",
-            flexDirection: "column",
-            textAlign: "center",
-            maxWidth: "420px",
-          }}
-        >
-          <h2 style={{ marginBottom: "12px" }}>MTG Arena Tool — Live</h2>
-          <div style={{ color: "var(--color-text-dark)", lineHeight: "22px" }}>
-            Waiting for live data… This page updates automatically while the
-            sharer has overlay sharing enabled.
-          </div>
-        </Section>
-      </div>
-    );
+  // Between matches the last payload is still a perfectly valid deck, so it
+  // would otherwise sit on the stream looking live until the next game. Two
+  // signals, because neither covers the other: an overlay set to show always
+  // keeps publishing with no match on, and one that closes at the end of a
+  // match never gets to say so.
+  //
+  // Absent on configs written before this existed, and on payloads from an
+  // older desktop build — on by default so those get the fixed behaviour too.
+  // Only an explicit false turns it off, which is what the toggle writes.
+  const hideWhenIdle = settings?.shareHideWhenIdle !== false;
+  const stale = updatedAt > 0 && Date.now() - updatedAt > STALE_MS;
+  const idle = hideWhenIdle && (payload?.matchInProgress === false || stale);
+
+  if (!payload || !settings || !dbReady || idle) {
+    return <WaitingScreen />;
   }
 
   // The backdrop defaults to transparent so an OBS browser source composites
@@ -160,6 +193,7 @@ export default function LiveShareView(): JSX.Element {
           OBS source is sized by whoever adds it — pinning a width here left the
           tiles squeezed into a column with the rest of the capture empty. */}
       <div
+        className="live-share-shell"
         style={{
           width: "100%",
           backgroundColor: backColor,
@@ -167,6 +201,15 @@ export default function LiveShareView(): JSX.Element {
           height: "fit-content",
         }}
       >
+        {/* Sits over the deck's top-right corner. Absolute so it costs the
+            overlay no layout — the sharer sized their scene around the deck,
+            not around this. */}
+        <img
+          className="live-share-mark"
+          src={logoRound}
+          alt="MTG Arena Tool"
+          title="MTG Arena Tool"
+        />
         <OverlayContent
           settings={settings}
           deck={deck}
