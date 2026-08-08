@@ -55,6 +55,10 @@ const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
     body: "Set view opens again, and the completion heatmaps and set statistics are filled in for every set that has boosters in the game.",
   },
   {
+    title: "Live overlay sharing on stream",
+    body: "The shared overlay page now fills the browser source you give it, so the card tiles stretch to the size you set in OBS instead of sitting in a narrow column. It also no longer shows the release notes over your stream.",
+  },
+  {
     title: "Clearer log settings",
     body: 'The Logs settings page now says in words whether the log is being read and whether the game\'s memory can be reached, with a live view of what the reader is doing. "Resume reading log" picks up from where the log is now instead of re-reading it.',
   },

@@ -189,6 +189,14 @@ function App(props: AppProps) {
   // Show the "What's new" modal once per version, on app open — before login,
   // so returning users see the new-account / no-carryover notice up front.
   useEffect(() => {
+    // Not over the live-share viewer. That view is pointed at by the deck QR
+    // code and captured as an OBS browser source, where a modal nobody can
+    // reach sits on the stream until the scene is rebuilt.
+    //
+    // Returning before the flag is written, not after opening: marking the
+    // version seen here would spend the notice on a window the streamer is
+    // not looking at, and they would never be shown it in the app itself.
+    if (history.location.pathname.startsWith("/live/")) return;
     if (getLocalSetting("whatsNewSeen") !== info.version) {
       openWhatsNew.current();
       setLocalSetting("whatsNewSeen", info.version);

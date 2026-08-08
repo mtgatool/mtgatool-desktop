@@ -155,9 +155,13 @@ export default function LiveShareView(): JSX.Element {
         alignItems: "flex-start",
       }}
     >
+      {/* Fills the browser source rather than sitting at the overlay window's
+          320px. The card tiles lay out to whatever width they are given, and an
+          OBS source is sized by whoever adds it — pinning a width here left the
+          tiles squeezed into a column with the rest of the capture empty. */}
       <div
         style={{
-          width: "320px",
+          width: "100%",
           backgroundColor: backColor,
           borderRadius: "4px",
           height: "fit-content",
