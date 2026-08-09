@@ -42,7 +42,9 @@ export type MessageType =
   | "DRAFT_VOTES"
   | "DRAFT_END"
   | "UPDATE_ACTIVE_EVENTS"
-  | "DAEMON_GET_PLAYER_ID";
+  | "DAEMON_GET_PLAYER_ID"
+  | "CARDS_DB_REQUEST"
+  | "CARDS_DB_RESPONSE";
 
 /** One timed memory read, from the background window to whoever is showing it. */
 export interface ReaderReadMessage {
@@ -213,6 +215,39 @@ export interface DaemonGetPlayerId extends ChannelMessageBase {
   type: "DAEMON_GET_PLAYER_ID";
 }
 
+/** Shape of a card-db query result, mirrored here to avoid an import cycle. */
+export interface CardsDbQueryResult {
+  columns: string[];
+  values: unknown[][];
+}
+
+/**
+ * A card-db query from a proxy window (overlay / hover / post-match) to the
+ * window that owns the SQLite worker. `from` names the requester so the single
+ * broadcast reply reaches only it; `rid` is unique within that window.
+ */
+export interface CardsDbRequestMessage extends ChannelMessageBase {
+  type: "CARDS_DB_REQUEST";
+  value: {
+    from: string;
+    rid: number;
+    sql: string;
+    params: unknown[];
+  };
+}
+
+/** The answer to a CARDS_DB_REQUEST, addressed back to `to` (the requester). */
+export interface CardsDbResponseMessage extends ChannelMessageBase {
+  type: "CARDS_DB_RESPONSE";
+  value: {
+    to: string;
+    rid: number;
+    ok: boolean;
+    result?: CardsDbQueryResult;
+    error?: string;
+  };
+}
+
 export type ChannelMessage =
   | ReaderReadMessage
   | PopupMessage
@@ -244,4 +279,6 @@ export type ChannelMessage =
   | DraftVotesMessage
   | DraftEndMessage
   | UpdateActiveEventsMessage
-  | DaemonGetPlayerId;
+  | DaemonGetPlayerId
+  | CardsDbRequestMessage
+  | CardsDbResponseMessage;
