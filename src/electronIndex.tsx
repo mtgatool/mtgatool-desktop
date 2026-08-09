@@ -11,6 +11,7 @@ import { Router } from "react-router-dom";
 import backgroundChannelListeners from "./broadcastChannel/backgroundChannelListeners";
 import mainChannelListeners from "./broadcastChannel/mainChannelListeners";
 import App from "./components/App";
+import serveLiveShareRequests from "./data/liveShareServer";
 import Hover from "./hover";
 import Overlay from "./overlay";
 import PostMatch from "./postmatch";
@@ -63,6 +64,9 @@ if (title == WINDOW_UPDATER) {
   // This window owns the SQLite worker; answer proxy windows (overlays, hover,
   // post-match) so they don't each load their own 17MB copy of the database.
   cardsDb.serveRemoteRequests();
+  // Overlays post their live-share state here rather than writing to Supabase
+  // themselves; this window keeps a valid session, so its write satisfies RLS.
+  serveLiveShareRequests();
 } else if (title == WINDOW_HOVER) {
   defaultLocalSettings();
   ReactDOM.render(

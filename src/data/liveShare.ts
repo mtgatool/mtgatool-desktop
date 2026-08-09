@@ -1,43 +1,32 @@
 /**
- * Live overlay sharing via HTTP upsert/poll (no realtime socket).
+ * Live overlay sharing — overlay-window side.
  *
- * Each sharing-enabled overlay WINDOW upserts its current state into the
- * `live_overlays` table keyed by shareId; the public web viewer
- * (app.mtgatool.com/live/<shareId>) polls that row and renders it. This is a
- * plain REST PUT/GET — stateless, so it survives the aggressive renderer
- * suspension our always-on-top overlay windows get from Chromium (a suspended
- * window just resumes on its next timer tick) with none of the WebSocket
- * heartbeat/reconnect fragility.
+ * Each sharing-enabled overlay WINDOW publishes its current state so the public
+ * web viewer (app.mtgatool.com/live/<shareId>) can render it. The overlay does
+ * NOT write to Supabase itself: these always-on-top renderers are aggressively
+ * suspended by Chromium and each hold their own Supabase client, so their auth
+ * token routinely goes stale (or loses the refresh-token rotation race against
+ * the other windows) and the write lands as `anon` — which RLS rejects with a
+ * 42501 (surfaced as HTTP 401). Instead it posts the payload over the broadcast
+ * channel; the always-alive background window, which keeps a valid session,
+ * performs the authenticated upsert (see `liveShareServer.ts`).
  *
- * RLS: authenticated desktop users write only their own rows (user_id defaults
- * to auth.uid()); anyone may read (the shareId is an unguessable capability).
+ * This module keeps the publish cadence (throttle + keepalive), so the *rate*
+ * of writes is unchanged and, crucially, the row's lifetime still tracks the
+ * window's: when the overlay closes its JS context is torn down, the keepalive
+ * interval dies, the background stops hearing from it, and the row goes stale on
+ * its own — exactly as when the overlay wrote directly.
  */
-import { OverlaySettings } from "../common/defaultConfig";
-import supabase from "./supabase";
+import postChannelMessage from "../broadcastChannel/postChannelMessage";
+import { OverlaySharePayload } from "./liveShareTypes";
 
-// The full payload a viewer needs to render OverlayContent for any mode.
-export interface OverlaySharePayload {
-  matchState: unknown;
-  settings: OverlaySettings;
-  /**
-   * Whether a game is being played right now.
-   *
-   * The viewer cannot infer this: the payload of a finished match looks exactly
-   * like the payload of a live one. Staleness alone does not cover it either,
-   * because an overlay set to show always keeps publishing between games.
-   */
-  matchInProgress?: boolean;
-  actionLog?: unknown;
-  draftState?: unknown;
-  draftVotes?: unknown;
-}
+export type { OverlaySharePayload } from "./liveShareTypes";
 
 interface PerShare {
   latest: OverlaySharePayload | null;
   lastPublish: number;
   trailing: ReturnType<typeof setTimeout> | null;
   keepalive: ReturnType<typeof setInterval> | null;
-  inflight: boolean;
 }
 
 // Publish cadence. Throttle collapses a burst of match updates to one write per
@@ -48,28 +37,13 @@ const KEEPALIVE_MS = 3000;
 
 const shares = new Map<string, PerShare>();
 
-function upsertNow(shareId: string): void {
+function sendNow(shareId: string): void {
   const s = shares.get(shareId);
-  if (!s || !s.latest || s.inflight) return;
-  s.inflight = true;
-  supabase
-    .from("live_overlays")
-    .upsert(
-      {
-        share_id: shareId,
-        payload: s.latest as never,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "share_id" }
-    )
-    .then(({ error }) => {
-      const cur = shares.get(shareId);
-      if (cur) cur.inflight = false;
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`[liveShare] upsert ${shareId} failed:`, error.message);
-      }
-    });
+  if (!s || !s.latest) return;
+  postChannelMessage({
+    type: "LIVE_SHARE_PUBLISH",
+    value: { shareId, payload: s.latest },
+  });
 }
 
 /**
@@ -89,19 +63,18 @@ export function publishOverlayShare(
         lastPublish: 0,
         trailing: null,
         keepalive: null,
-        inflight: false,
       };
       shares.set(shareId, s);
     }
     s.latest = payload;
     if (!s.keepalive) {
-      s.keepalive = setInterval(() => upsertNow(shareId), KEEPALIVE_MS);
+      s.keepalive = setInterval(() => sendNow(shareId), KEEPALIVE_MS);
     }
 
     const now = new Date().getTime();
     if (now - s.lastPublish >= THROTTLE_MS) {
       s.lastPublish = now;
-      upsertNow(shareId);
+      sendNow(shareId);
     } else if (!s.trailing) {
       const wait = THROTTLE_MS - (now - s.lastPublish);
       s.trailing = setTimeout(() => {
@@ -110,7 +83,7 @@ export function publishOverlayShare(
           cur.trailing = null;
           cur.lastPublish = new Date().getTime();
         }
-        upsertNow(shareId);
+        sendNow(shareId);
       }, wait);
     }
   } catch (e) {
@@ -119,7 +92,7 @@ export function publishOverlayShare(
   }
 }
 
-/** Stop sharing this overlay: clear timers and remove the row. */
+/** Stop sharing this overlay: clear timers and ask the background to remove the row. */
 export function stopOverlayShare(shareId: string): void {
   const s = shares.get(shareId);
   if (s) {
@@ -127,14 +100,5 @@ export function stopOverlayShare(shareId: string): void {
     if (s.keepalive) clearInterval(s.keepalive);
     shares.delete(shareId);
   }
-  supabase
-    .from("live_overlays")
-    .delete()
-    .eq("share_id", shareId)
-    .then(({ error }) => {
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`[liveShare] delete ${shareId} failed:`, error.message);
-      }
-    });
+  postChannelMessage({ type: "LIVE_SHARE_STOP", value: { shareId } });
 }

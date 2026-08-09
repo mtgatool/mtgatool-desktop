@@ -2,6 +2,7 @@ import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankIn
 import { OverlayUpdateMatchState } from "../background/store/types";
 import { OverlaySettings } from "../common/defaultConfig";
 import { ActionLogV2 } from "../components/action-log-v2/types";
+import { OverlaySharePayload } from "../data/liveShareTypes";
 import {
   Cards,
   InternalDraftv2,
@@ -44,7 +45,9 @@ export type MessageType =
   | "UPDATE_ACTIVE_EVENTS"
   | "DAEMON_GET_PLAYER_ID"
   | "CARDS_DB_REQUEST"
-  | "CARDS_DB_RESPONSE";
+  | "CARDS_DB_RESPONSE"
+  | "LIVE_SHARE_PUBLISH"
+  | "LIVE_SHARE_STOP";
 
 /** One timed memory read, from the background window to whoever is showing it. */
 export interface ReaderReadMessage {
@@ -248,6 +251,26 @@ export interface CardsDbResponseMessage extends ChannelMessageBase {
   };
 }
 
+/**
+ * An overlay window's current share state, sent to the background window which
+ * performs the authenticated Supabase upsert (see data/liveShare*.ts).
+ */
+export interface LiveSharePublishMessage extends ChannelMessageBase {
+  type: "LIVE_SHARE_PUBLISH";
+  value: {
+    shareId: string;
+    payload: OverlaySharePayload;
+  };
+}
+
+/** Ask the background window to remove a shared overlay's row. */
+export interface LiveShareStopMessage extends ChannelMessageBase {
+  type: "LIVE_SHARE_STOP";
+  value: {
+    shareId: string;
+  };
+}
+
 export type ChannelMessage =
   | ReaderReadMessage
   | PopupMessage
@@ -281,4 +304,6 @@ export type ChannelMessage =
   | UpdateActiveEventsMessage
   | DaemonGetPlayerId
   | CardsDbRequestMessage
-  | CardsDbResponseMessage;
+  | CardsDbResponseMessage
+  | LiveSharePublishMessage
+  | LiveShareStopMessage;
