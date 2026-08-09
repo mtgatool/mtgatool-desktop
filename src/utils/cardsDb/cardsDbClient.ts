@@ -211,6 +211,15 @@ class CardsDbClient {
       this.remoteChannel = channel;
       channel.addEventListener("message", this.handleRemoteResponse);
 
+      // The owner (background window) may not be answering yet: it loads the
+      // full app bundle and a 17MB database, while these proxy windows boot
+      // from a slim bundle and get here first. A lookup query fired now would
+      // hit a channel no one is listening on, time out, and — because init()
+      // memoises its result — leave the proxy permanently broken. So ping until
+      // the owner answers before doing anything that has to succeed.
+      const ownerUp = await this.waitForOwner();
+      if (!ownerUp) throw new Error("cards-db owner never answered");
+
       await this.loadLookups();
 
       this.ready = true;
@@ -221,11 +230,33 @@ class CardsDbClient {
       return true;
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.log("[cards-db] proxy init failed", e);
+      console.log("[cards-db] proxy init failed, will retry on demand", e);
       this.ready = false;
+      // Do not cache the failure: a later card() call re-runs init(), by which
+      // time the owner is up. Without this the first miss is forever.
+      this.readyPromise = null;
       this.readyListeners.forEach((fn) => fn());
       return false;
     }
+  }
+
+  /**
+   * Poll the owner with a cheap query until it answers. Each ping has a short
+   * timeout so a not-yet-listening owner is detected quickly and retried,
+   * rather than waiting out the full query timeout once.
+   */
+  private async waitForOwner(): Promise<boolean> {
+    const attempts = 60;
+    for (let i = 0; i < attempts; i += 1) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await this.remoteQuery("SELECT 1", [], 1000);
+        return true;
+      } catch {
+        // Not answering yet — the loop is the wait.
+      }
+    }
+    return false;
   }
 
   private handleRemoteResponse = (e: MessageEvent): void => {
@@ -241,7 +272,11 @@ class CardsDbClient {
     else entry.reject(new Error(error));
   };
 
-  private remoteQuery(sql: string, params: unknown[]): Promise<QueryResult> {
+  private remoteQuery(
+    sql: string,
+    params: unknown[],
+    timeoutMs = 15000
+  ): Promise<QueryResult> {
     const channel = this.remoteChannel;
     if (!channel) {
       return Promise.reject(new Error("cards-db proxy channel not ready"));
@@ -253,7 +288,7 @@ class CardsDbClient {
         if (this.pending.delete(rid)) {
           reject(new Error("cards-db proxy query timed out"));
         }
-      }, 15000);
+      }, timeoutMs);
       this.pending.set(rid, {
         resolve: (value) => {
           clearTimeout(timeout);
