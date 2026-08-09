@@ -68,6 +68,8 @@ export default function createOverlay(
   });
 
   const proc: any = process;
+  // The slim overlay bundle (src/overlayIndex.tsx), not the full app — see
+  // craco.config.js. Keeps the main-app graph out of this renderer's memory.
   newWindow.loadURL(
     remote.app.isPackaged
       ? url.format({
@@ -75,12 +77,12 @@ export default function createOverlay(
             proc.resourcesPath,
             "app.asar",
             "build",
-            "index.html"
+            "overlay.html"
           ),
           protocol: "file:",
           slashes: true,
         })
-      : "http://localhost:3001"
+      : "http://localhost:3001/overlay.html"
   );
 
   remote.require("@electron/remote/main").enable(newWindow.webContents);

@@ -21,7 +21,6 @@ let tray = null;
 
 app.disableHardwareAcceleration();
 app.setAppUserModelId("com.mtgatool.desktop");
-app.allowRendererProcessReuse = false;
 
 // The hidden "mtgatool-background" window hosts the log watcher AND the
 // Supabase Realtime socket for live overlay sharing. Chromium aggressively
@@ -144,13 +143,16 @@ function createCardHoverWindow() {
   );
 
   mainGlobals.cardHoverWindow.removeMenu();
+  // The slim overlay bundle (src/overlayIndex.tsx), not the full app — see
+  // craco.config.js. The hover window only ever shows a card image.
   mainGlobals.cardHoverWindow.loadURL(
-    process.env.ELECTRON_START_URL ||
-      url.format({
-        pathname: path.join(__dirname, "..", "build", "index.html"),
-        protocol: "file:",
-        slashes: true,
-      })
+    process.env.ELECTRON_START_URL
+      ? `${process.env.ELECTRON_START_URL}/overlay.html`
+      : url.format({
+          pathname: path.join(__dirname, "..", "build", "overlay.html"),
+          protocol: "file:",
+          slashes: true,
+        })
   );
 
   mainGlobals.cardHoverWindow.once("dom-ready", () => {

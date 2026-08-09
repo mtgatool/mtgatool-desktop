@@ -98,6 +98,8 @@ export default function createPostMatchWindow(): void {
   });
 
   const proc: any = process;
+  // The slim overlay bundle (src/overlayIndex.tsx), not the full app — see
+  // craco.config.js.
   newWindow.loadURL(
     remote.app.isPackaged
       ? url.format({
@@ -105,12 +107,12 @@ export default function createPostMatchWindow(): void {
             proc.resourcesPath,
             "app.asar",
             "build",
-            "index.html"
+            "overlay.html"
           ),
           protocol: "file:",
           slashes: true,
         })
-      : "http://localhost:3001"
+      : "http://localhost:3001/overlay.html"
   );
 
   remote.require("@electron/remote/main").enable(newWindow.webContents);
