@@ -60,6 +60,9 @@ if (title == WINDOW_UPDATER) {
     module.hot.accept();
   }
   backgroundChannelListeners();
+  // This window owns the SQLite worker; answer proxy windows (overlays, hover,
+  // post-match) so they don't each load their own 17MB copy of the database.
+  cardsDb.serveRemoteRequests();
 } else if (title == WINDOW_HOVER) {
   defaultLocalSettings();
   ReactDOM.render(

@@ -12,7 +12,19 @@
  * background window later, or swapping in a native driver under Electron, is a
  * change to this file and nothing above it.
  */
+import {
+  CardsDbRequestMessage,
+  CardsDbResponseMessage,
+  ChannelMessage,
+} from "../../broadcastChannel/channelMessages";
 import { CardSet, DbCardDataV2 } from "../../types";
+import {
+  WINDOW_BACKGROUND,
+  WINDOW_MAIN,
+  WINDOW_UPDATER,
+} from "../../types/app";
+import bcConnect from "../bcConnect";
+import getWindowTitle from "../electron/getWindowTitle";
 import loadCardsDbBytes from "./loadCardsDbBytes";
 import rowToCard, { CARD_COLUMNS } from "./rowToCard";
 
@@ -39,6 +51,23 @@ class CardsDbClient {
   private pending = new Map<number, Pending>();
 
   private nextId = 1;
+
+  /**
+   * Proxy mode. Overlay, hover and post-match windows do not own a worker:
+   * loading a second ~17MB SQLite image into each of them is what made every
+   * overlay cost as much RAM as the main window. Instead they forward queries
+   * over the broadcast channel to the window that does own one (the background
+   * window, which is always alive), and this whole client behaves as a thin
+   * RPC — `query()` is the only method that touches the worker, so everything
+   * built on it (cards, abilities, lookups) rides along unchanged.
+   */
+  private remote = false;
+
+  private remoteChannel: BroadcastChannel | null = null;
+
+  private remoteClientId = "";
+
+  private serving = false;
 
   private readyPromise: Promise<boolean> | null = null;
 
@@ -160,7 +189,131 @@ class CardsDbClient {
   public init(): Promise<boolean> {
     if (this.readyPromise) return this.readyPromise;
 
-    this.readyPromise = (async () => {
+    const title = getWindowTitle();
+    this.remote =
+      title !== WINDOW_MAIN &&
+      title !== WINDOW_BACKGROUND &&
+      title !== WINDOW_UPDATER;
+
+    this.readyPromise = this.remote ? this.initRemote() : this.initLocal();
+    return this.readyPromise;
+  }
+
+  /**
+   * Proxy init: no worker, no 17MB image. Wire the channel first, then pull the
+   * same small lookup tables the local path does — they go through `query()`,
+   * which is now an RPC, so the owner answers them.
+   */
+  private async initRemote(): Promise<boolean> {
+    try {
+      this.remoteClientId = getWindowTitle();
+      const channel = bcConnect() as BroadcastChannel;
+      this.remoteChannel = channel;
+      channel.addEventListener("message", this.handleRemoteResponse);
+
+      await this.loadLookups();
+
+      this.ready = true;
+      this.source = "remote";
+      // eslint-disable-next-line no-console
+      console.log("[cards-db] ready (proxy) via broadcast channel");
+      this.readyListeners.forEach((fn) => fn());
+      return true;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log("[cards-db] proxy init failed", e);
+      this.ready = false;
+      this.readyListeners.forEach((fn) => fn());
+      return false;
+    }
+  }
+
+  private handleRemoteResponse = (e: MessageEvent): void => {
+    const data = e.data as ChannelMessage | undefined;
+    if (!data || data.type !== "CARDS_DB_RESPONSE") return;
+    const { to, rid, ok, result, error } = (data as CardsDbResponseMessage)
+      .value;
+    if (to !== this.remoteClientId) return;
+    const entry = this.pending.get(rid);
+    if (!entry) return;
+    this.pending.delete(rid);
+    if (ok) entry.resolve(result);
+    else entry.reject(new Error(error));
+  };
+
+  private remoteQuery(sql: string, params: unknown[]): Promise<QueryResult> {
+    const channel = this.remoteChannel;
+    if (!channel) {
+      return Promise.reject(new Error("cards-db proxy channel not ready"));
+    }
+    const rid = this.nextId;
+    this.nextId += 1;
+    return new Promise<QueryResult>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        if (this.pending.delete(rid)) {
+          reject(new Error("cards-db proxy query timed out"));
+        }
+      }, 15000);
+      this.pending.set(rid, {
+        resolve: (value) => {
+          clearTimeout(timeout);
+          resolve(value);
+        },
+        reject: (err) => {
+          clearTimeout(timeout);
+          reject(err);
+        },
+      });
+      const msg: CardsDbRequestMessage = {
+        type: "CARDS_DB_REQUEST",
+        value: { from: this.remoteClientId, rid, sql, params },
+      };
+      channel.postMessage(msg);
+    });
+  }
+
+  /**
+   * Answer proxy windows' queries against this window's worker. Called once in
+   * the background window (the owner), it listens on the same channel the rest
+   * of the app uses — `addEventListener`, so it coexists with the window's
+   * existing `onmessage` handler rather than replacing it.
+   */
+  public serveRemoteRequests(): void {
+    if (this.serving) return;
+    this.serving = true;
+    const channel = bcConnect() as BroadcastChannel;
+    channel.addEventListener("message", async (e: MessageEvent) => {
+      const data = e.data as ChannelMessage | undefined;
+      if (!data || data.type !== "CARDS_DB_REQUEST") return;
+      const { from, rid, sql, params } = (data as CardsDbRequestMessage).value;
+      let response: CardsDbResponseMessage;
+      try {
+        // Idempotent, and guarantees the worker is up before the first query
+        // an overlay fires on open.
+        await this.init();
+        const result = await this.query(sql, params);
+        response = {
+          type: "CARDS_DB_RESPONSE",
+          value: { to: from, rid, ok: true, result },
+        };
+      } catch (err: any) {
+        response = {
+          type: "CARDS_DB_RESPONSE",
+          value: {
+            to: from,
+            rid,
+            ok: false,
+            error: String(err && err.message ? err.message : err),
+          },
+        };
+      }
+      channel.postMessage(response);
+    });
+  }
+
+  /** Worker init: owns the SQLite image. Used by the main and background windows. */
+  private initLocal(): Promise<boolean> {
+    return (async () => {
       const bytes = await loadCardsDbBytes();
       if (!bytes) return false;
 
@@ -214,8 +367,6 @@ class CardsDbClient {
         return false;
       }
     })();
-
-    return this.readyPromise;
   }
 
   /**
@@ -258,6 +409,7 @@ class CardsDbClient {
   }
 
   public query(sql: string, params: unknown[] = []): Promise<QueryResult> {
+    if (this.remote) return this.remoteQuery(sql, params);
     return this.post({ type: "query", sql, params });
   }
 
@@ -269,6 +421,10 @@ class CardsDbClient {
     cards: Record<string, number>,
     prevCards: Record<string, number>
   ): Promise<number> {
+    // Proxy windows don't own the collection table and never display owned /
+    // acquired counts, so there is nothing to set — the owner holds it. Only
+    // the main window (ContentWrapper) calls this in practice.
+    if (this.remote) return Promise.resolve(0);
     return this.post({ type: "setCollection", cards, prevCards });
   }
 
