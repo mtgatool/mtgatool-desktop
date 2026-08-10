@@ -23,7 +23,12 @@ export default function onLabelOutPlayerDraftMakePick(entry: Entry): void {
   const { DraftId, Pack, Pick } = json;
   const grpIds = json.GrpIds ?? (json.GrpId ? [json.GrpId] : []);
 
-  setDraftId(DraftId);
+  // Only when nothing identified the draft yet: EventJoin keys the record by
+  // CourseId, and overwriting it with the (different) DraftId here forked the
+  // same draft into two records.
+  if (!globalStore.currentDraft.id) {
+    setDraftId(DraftId);
+  }
   grpIds.forEach((grpId) => {
     addDraftPick(
       grpId,
