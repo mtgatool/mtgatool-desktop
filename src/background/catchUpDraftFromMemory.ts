@@ -23,6 +23,10 @@ import {
 export default async function catchUpDraftFromMemory(): Promise<void> {
   const memory = await readDraftMemory();
   if (!memory || memory.draftState !== 2) return;
+  // Registry pods outlive their draft with draftState still 2 — seeding from
+  // one resurrects a finished draft. Only the draft screen itself proves the
+  // draft is live; with the screen closed, catch-up simply waits for it.
+  if (memory.source !== "screen") return;
 
   const draft = globalStore.currentDraft;
   const eventName = memory.eventName || draft.eventId;
@@ -41,7 +45,9 @@ export default async function catchUpDraftFromMemory(): Promise<void> {
   // comes from the course (EventJoin / courses refresh) instead.
   if (!globalStore.currentDraft.id) {
     const course = globalStore.currentCourses[eventName];
-    const id = memory.draftId || (course && course.CourseId) || undefined;
+    // Course id first — it is what the log-driven handlers key records by;
+    // the pod's DraftId is a different GUID and would fork the record.
+    const id = (course && course.CourseId) || memory.draftId || undefined;
     if (id) setDraftId(id);
   }
 

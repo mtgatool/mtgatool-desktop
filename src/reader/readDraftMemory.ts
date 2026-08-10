@@ -20,6 +20,12 @@ export interface MemoryDraft {
   /** Human drafts only; null on bot drafts. */
   pickSecondsTotal?: number | null;
   passDirection?: number | null;
+  /**
+   * "screen" when the draft screen itself held the pod (a live read);
+   * "registry" when it came from the event registry, where a finished
+   * draft's pod lingers with draftState still 2.
+   */
+  source?: "screen" | "registry";
 }
 
 /**
