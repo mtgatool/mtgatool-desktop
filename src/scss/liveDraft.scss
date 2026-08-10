@@ -3,6 +3,20 @@
   text-align: left;
 }
 
+// Aggregate winrate over the drafts the filters left visible.
+.drafts-stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin: 8px 16px 12px;
+  color: var(--color-text-dark);
+
+  span {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+}
+
 .draft-view-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
