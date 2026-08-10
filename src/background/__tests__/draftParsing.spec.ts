@@ -249,3 +249,64 @@ describe("bot draft in the 2026 log format", () => {
     expect(course.CurrentLosses).toBe(1);
   });
 });
+
+describe("human draft in the 2026 log format", () => {
+  const HUMAN_EVENT = "PremierDraft_TST_20990101";
+  const HUMAN_DRAFT_ID = "cccccccc-0000-4000-8000-0000000000c1";
+
+  const HUMAN_FIXTURE = [
+    req("EventJoin", { EventName: HUMAN_EVENT }),
+    res("EventJoin", {
+      Course: {
+        CourseId: HUMAN_DRAFT_ID,
+        InternalEventName: HUMAN_EVENT,
+        CurrentModule: "PairSealed",
+        ModulePayload: "",
+        CourseDeckSummary: { Attributes: [] },
+        CardPool: [],
+        CardStyles: [],
+      },
+      InventoryInfo: {},
+    }),
+    // Packs arrive as notifications (1-indexed, comma-joined string)...
+    `[UnityCrossThreadLogger]Draft.Notify {"draftId":"${HUMAN_DRAFT_ID}","SelfPick":1,"SelfPack":1,"PackCards":"910001,910002,910003"}\n`,
+    // ...and picks as EventPlayerDraftMakePick with a GrpIds array.
+    req("EventPlayerDraftMakePick", {
+      DraftId: HUMAN_DRAFT_ID,
+      GrpIds: [910002],
+      Pack: 1,
+      Pick: 1,
+    }),
+    res("EventPlayerDraftMakePick", { IsPickSuccessful: true }),
+    `[UnityCrossThreadLogger]Draft.Notify {"draftId":"${HUMAN_DRAFT_ID}","SelfPick":2,"SelfPack":1,"PackCards":"910004,910005"}\n`,
+    req("EventPlayerDraftMakePick", {
+      DraftId: HUMAN_DRAFT_ID,
+      GrpIds: [910005],
+      Pack: 1,
+      Pick: 2,
+    }),
+    res("EventPlayerDraftMakePick", { IsPickSuccessful: true }),
+  ].join("");
+
+  beforeAll(async () => {
+    await replay(HUMAN_FIXTURE);
+  });
+
+  it("tracks packs from Draft.Notify (1-indexed to 0-indexed)", () => {
+    expect(globalStore.currentDraft.packs[0][0]).toEqual([
+      910001, 910002, 910003,
+    ]);
+    expect(globalStore.currentDraft.packs[0][1]).toEqual([910004, 910005]);
+  });
+
+  it("tracks picks from the GrpIds array", () => {
+    expect(globalStore.currentDraft.picks[0][0]).toBe(910002);
+    expect(globalStore.currentDraft.picks[0][1]).toBe(910005);
+    expect(globalStore.currentDraft.pickedCards).toEqual([910002, 910005]);
+  });
+
+  it("identifies the draft by DraftId and event", () => {
+    expect(globalStore.currentDraft.id).toBe(HUMAN_DRAFT_ID);
+    expect(globalStore.currentDraft.eventId).toBe(HUMAN_EVENT);
+  });
+});

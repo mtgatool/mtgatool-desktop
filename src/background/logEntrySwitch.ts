@@ -68,6 +68,7 @@ export default function logEntrySwitch(entry: LogEntry): void {
       break;
 
     case "Event_PlayerDraftMakePick":
+    case "EventPlayerDraftMakePick":
       if (entry.arrow == "==>") {
         Labels.OutPlayerDraftMakePick(entry);
       } else if (entry.arrow == "<==") {
@@ -206,6 +207,7 @@ export default function logEntrySwitch(entry: LogEntry): void {
       break;
 
     case "Draft_CompleteDraft":
+    case "DraftCompleteDraft":
       if (entry.arrow == "<==") {
         Labels.InDraftCompleteDraft(entry);
       }

@@ -3,6 +3,7 @@ import readCards from "../reader/readCards";
 import readDecks from "../reader/readDecks";
 import getLocalSetting from "../utils/getLocalSetting";
 import ArenaLogWatcher from "./arena-log-watcher";
+import catchUpDraftFromMemory from "./catchUpDraftFromMemory";
 import findInProgressMatch from "./findInProgressMatch";
 import logEntrySwitch from "./logEntrySwitch";
 import { isLiveLog, setLiveLog } from "./logReadState";
@@ -85,6 +86,9 @@ export default function start(): undefined | (() => void) {
           try {
             readDecks();
             readCards();
+            // A draft in progress that predates this session exists nowhere
+            // in the tailed log — memory is the only catch-up source.
+            catchUpDraftFromMemory().catch(() => undefined);
           } catch (e) {
             console.error(e);
           }
