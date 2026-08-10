@@ -429,6 +429,56 @@ function DeckPanel({ deck }: { deck?: DeckStat }): JSX.Element {
   );
 }
 
+type TimelineFormat = "constructed" | "limited";
+
+// Constructed | Limited segmented switch — the two ladders share nothing, so
+// the whole tab shows one format at a time.
+function FormatToggle({
+  format,
+  onChange,
+}: {
+  format: TimelineFormat;
+  onChange: (format: TimelineFormat) => void;
+}): JSX.Element {
+  const options: [TimelineFormat, string][] = [
+    ["constructed", "Constructed"],
+    ["limited", "Limited"],
+  ];
+  return (
+    <div
+      style={{
+        display: "flex",
+        margin: "0 auto",
+        background: "var(--color-base)",
+        borderRadius: "16px",
+        padding: "3px",
+        gap: "2px",
+      }}
+    >
+      {options.map(([key, label]) => (
+        <div
+          key={key}
+          onClick={() => onChange(key)}
+          style={{
+            padding: "4px 18px",
+            borderRadius: "13px",
+            cursor: "pointer",
+            userSelect: "none",
+            fontSize: "14px",
+            background:
+              format === key ? "var(--color-section-active)" : "transparent",
+            color:
+              format === key ? "var(--color-text)" : "var(--color-text-dark)",
+            transition: "background 0.15s ease-in-out",
+          }}
+        >
+          {label}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 interface ViewTimelineProps {
   matchesData: MatchData[];
 }
@@ -436,12 +486,19 @@ interface ViewTimelineProps {
 export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
   const { matchesData } = props;
   const [hoveredDeck, setHoveredDeck] = useState<string | null>(null);
+  const [format, setFormat] = useState<TimelineFormat>("constructed");
   const seasons = useSelector((state: AppState) => state.mainData.seasons);
 
+  const switchFormat = (next: TimelineFormat): void => {
+    setFormat(next);
+    // The hovered deck belongs to the format we're leaving.
+    setHoveredDeck(null);
+  };
+
   const data = useMemo(() => {
-    const matches = [...(matchesData || [])].sort(
-      (a, b) => a.timestamp - b.timestamp
-    );
+    const matches = (matchesData || [])
+      .filter((m) => (format === "limited") === isLimitedEventId(m.eventId))
+      .sort((a, b) => a.timestamp - b.timestamp);
 
     const total = matches.length;
     const wins = matches.filter((m) => m.win).length;
@@ -519,8 +576,8 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
 
     // Rank ladder over the matches that carry a rank, plus a badge each time
     // the rank class advances, plus deck bands and season dividers in
-    // rank-series index space. Built per format: Constructed and Limited are
-    // separate ladders, so their matches must never share a line.
+    // rank-series index space. The tab is already scoped to one format, so
+    // this never mixes the Constructed and Limited ladders.
     const buildRankChart = (ms: MatchData[]) => {
       const series: Pt[] = [];
       const deckNames: string[] = [];
@@ -588,12 +645,7 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
       return { series, ups, bands: bandsFor(deckNames), dividers };
     };
 
-    const constructedRank = buildRankChart(
-      matches.filter((m) => !isLimitedEventId(m.eventId))
-    );
-    const limitedRank = buildRankChart(
-      matches.filter((m) => isLimitedEventId(m.eventId))
-    );
+    const rank = buildRankChart(matches);
 
     // Current streak (from most recent).
     let streak = 0;
@@ -633,8 +685,7 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
       losses,
       winrate: total ? (wins / total) * 100 : 0,
       winrateSeries,
-      constructedRank,
-      limitedRank,
+      rank,
       deckBands,
       seasonDividers,
       decks,
@@ -642,9 +693,9 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
       streak,
       streakWin,
     };
-  }, [matchesData, seasons]);
+  }, [matchesData, seasons, format]);
 
-  if (data.total === 0) {
+  if ((matchesData || []).length === 0) {
     return (
       <Section style={{ margin: "24px 16px", justifyContent: "center" }}>
         <div style={{ padding: "48px", color: "var(--color-text-dark)" }}>
@@ -660,109 +711,115 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
 
   return (
     <div style={{ padding: "0 16px" }}>
-      {/* Full-width summary header */}
+      {/* Full-width summary header, scoped (like everything below it) to the
+          selected format. */}
       <Section
         style={{
           margin: "16px 0",
           padding: "20px",
-          justifyContent: "space-around",
-          flexWrap: "wrap",
+          flexDirection: "column",
           gap: "16px",
         }}
       >
-        <Stat label="Matches" value={`${data.total}`} />
-        <Stat
-          label="Win rate"
-          value={`${data.winrate.toFixed(1)}%`}
-          color={data.winrate >= 50 ? "var(--color-g)" : "var(--color-r)"}
-        />
-        <Stat label="Record" value={`${data.wins}-${data.losses}`} />
-        <Stat
-          label={data.streakWin ? "Win streak" : "Loss streak"}
-          value={`${data.streak}`}
-          color={data.streakWin ? "var(--color-g)" : "var(--color-r)"}
-        />
+        <FormatToggle format={format} onChange={switchFormat} />
+        {data.total > 0 ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-around",
+              flexWrap: "wrap",
+              gap: "16px",
+              width: "100%",
+            }}
+          >
+            <Stat label="Matches" value={`${data.total}`} />
+            <Stat
+              label="Win rate"
+              value={`${data.winrate.toFixed(1)}%`}
+              color={data.winrate >= 50 ? "var(--color-g)" : "var(--color-r)"}
+            />
+            <Stat label="Record" value={`${data.wins}-${data.losses}`} />
+            <Stat
+              label={data.streakWin ? "Win streak" : "Loss streak"}
+              value={`${data.streak}`}
+              color={data.streakWin ? "var(--color-g)" : "var(--color-r)"}
+            />
+          </div>
+        ) : (
+          <div
+            style={{
+              padding: "16px",
+              textAlign: "center",
+              color: "var(--color-text-dark)",
+            }}
+          >
+            {`No ${
+              format === "limited" ? "Limited" : "Constructed"
+            } matches yet.`}
+          </div>
+        )}
       </Section>
 
       {/* Graphs (left) + deck detail (right) */}
-      <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <Section
-            style={{
-              margin: "0 0 16px",
-              padding: "16px",
-              flexDirection: "column",
-            }}
-          >
-            <div className="separator-title">Win rate over time</div>
-            <div style={{ fontSize: "12px", color: "var(--color-text-dark)" }}>
-              Background bands show the deck played across each stretch — hover
-              for its stats.
-            </div>
-            <LineChart
-              points={data.winrateSeries}
-              color="var(--color-g)"
-              min={0}
-              max={100}
-              bands={data.deckBands}
-              dividers={data.seasonDividers}
-              activeDeck={hoveredDeck}
-              onBandHover={setHoveredDeck}
-              yTicks={[
-                { v: 0, label: "0%" },
-                { v: 50, label: "50%" },
-                { v: 100, label: "100%" },
-              ]}
-            />
-          </Section>
-
-          {/* Constructed and Limited are separate ladders with separate
-              ranks, so each gets its own chart. */}
-          {[
-            {
-              title: "Rank progression — Constructed",
-              rank: data.constructedRank,
-            },
-            { title: "Rank progression — Limited", rank: data.limitedRank },
-          ]
-            .filter(({ rank }) => rank.series.length > 0)
-            .map(({ title, rank }) => (
-              <Section
-                key={title}
-                style={{
-                  margin: "0 0 16px",
-                  padding: "16px",
-                  flexDirection: "column",
-                }}
+      {data.total > 0 && (
+        <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <Section
+              style={{
+                margin: "0 0 16px",
+                padding: "16px",
+                flexDirection: "column",
+              }}
+            >
+              <div className="separator-title">Win rate over time</div>
+              <div
+                style={{ fontSize: "12px", color: "var(--color-text-dark)" }}
               >
-                <div className="separator-title">{title}</div>
+                Background bands show the deck played across each stretch —
+                hover for its stats.
+              </div>
+              <LineChart
+                points={data.winrateSeries}
+                color="var(--color-g)"
+                min={0}
+                max={100}
+                bands={data.deckBands}
+                dividers={data.seasonDividers}
+                activeDeck={hoveredDeck}
+                onBandHover={setHoveredDeck}
+                yTicks={[
+                  { v: 0, label: "0%" },
+                  { v: 50, label: "50%" },
+                  { v: 100, label: "100%" },
+                ]}
+              />
+            </Section>
+
+            <Section
+              style={{
+                margin: "0 0 16px",
+                padding: "16px",
+                flexDirection: "column",
+              }}
+            >
+              <div className="separator-title">Rank progression</div>
+              {data.rank.series.length > 0 ? (
                 <LineChart
-                  points={rank.series}
+                  points={data.rank.series}
                   color="var(--color-text-link)"
                   min={0}
                   max={rankMax}
-                  bands={rank.bands}
-                  dividers={rank.dividers}
+                  bands={data.rank.bands}
+                  dividers={data.rank.dividers}
                   activeDeck={hoveredDeck}
                   onBandHover={setHoveredDeck}
                   yTicks={[1, 2, 3, 4, 5, 6].map((cls) => ({
                     v: cls * 24,
                     label: RANK_META[cls].name,
                   }))}
-                  markers={rank.ups}
+                  markers={data.rank.ups}
                 />
-              </Section>
-            ))}
-          {data.constructedRank.series.length === 0 &&
-            data.limitedRank.series.length === 0 && (
-              <Section
-                style={{
-                  margin: "0 0 16px",
-                  padding: "16px",
-                  flexDirection: "column",
-                }}
-              >
-                <div className="separator-title">Rank progression</div>
+              ) : (
                 <div
                   style={{
                     padding: "24px",
@@ -774,89 +831,90 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
                   each time you advance a rank. (Rank is captured per match
                   going forward.)
                 </div>
-              </Section>
-            )}
+              )}
+            </Section>
 
-          {data.decks.length > 0 && (
-            <Section
-              style={{
-                margin: "0 0 24px",
-                padding: "16px",
-                flexDirection: "column",
-              }}
-            >
-              <div className="separator-title">Decks played</div>
-              <div
+            {data.decks.length > 0 && (
+              <Section
                 style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "8px 20px",
-                  marginTop: "10px",
+                  margin: "0 0 24px",
+                  padding: "16px",
+                  flexDirection: "column",
                 }}
               >
-                {data.decks.map((d) => {
-                  const wr = d.games ? (d.wins / d.games) * 100 : 0;
-                  return (
-                    <div
-                      key={d.name}
-                      onMouseEnter={() => setHoveredDeck(d.name)}
-                      onMouseLeave={() => setHoveredDeck(null)}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        cursor: "pointer",
-                        opacity:
-                          hoveredDeck && hoveredDeck !== d.name ? 0.5 : 1,
-                      }}
-                    >
-                      <span
+                <div className="separator-title">Decks played</div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "8px 20px",
+                    marginTop: "10px",
+                  }}
+                >
+                  {data.decks.map((d) => {
+                    const wr = d.games ? (d.wins / d.games) * 100 : 0;
+                    return (
+                      <div
+                        key={d.name}
+                        onMouseEnter={() => setHoveredDeck(d.name)}
+                        onMouseLeave={() => setHoveredDeck(null)}
                         style={{
-                          width: "12px",
-                          height: "12px",
-                          borderRadius: "3px",
-                          background: d.color,
-                          flexShrink: 0,
-                        }}
-                      />
-                      <span style={{ color: "var(--color-text)" }}>
-                        {d.name}
-                      </span>
-                      <span
-                        style={{
-                          color: "var(--color-text-dark)",
-                          fontSize: "13px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          cursor: "pointer",
+                          opacity:
+                            hoveredDeck && hoveredDeck !== d.name ? 0.5 : 1,
                         }}
                       >
-                        {d.wins}-{d.games - d.wins} ({wr.toFixed(0)}%)
-                      </span>
-                    </div>
-                  );
-                })}
+                        <span
+                          style={{
+                            width: "12px",
+                            height: "12px",
+                            borderRadius: "3px",
+                            background: d.color,
+                            flexShrink: 0,
+                          }}
+                        />
+                        <span style={{ color: "var(--color-text)" }}>
+                          {d.name}
+                        </span>
+                        <span
+                          style={{
+                            color: "var(--color-text-dark)",
+                            fontSize: "13px",
+                          }}
+                        >
+                          {d.wins}-{d.games - d.wins} ({wr.toFixed(0)}%)
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </Section>
+            )}
+          </div>
+
+          <div style={{ width: "260px", flexShrink: 0 }}>
+            <Section
+              style={{
+                margin: 0,
+                padding: "16px",
+                flexDirection: "column",
+                position: "sticky",
+                top: "16px",
+              }}
+            >
+              <div className="separator-title">
+                {hoveredDeck ? "Deck" : "Top deck"}
+              </div>
+              <div style={{ marginTop: "10px" }}>
+                <DeckPanel deck={panelDeck} />
               </div>
             </Section>
-          )}
+          </div>
         </div>
-
-        <div style={{ width: "260px", flexShrink: 0 }}>
-          <Section
-            style={{
-              margin: 0,
-              padding: "16px",
-              flexDirection: "column",
-              position: "sticky",
-              top: "16px",
-            }}
-          >
-            <div className="separator-title">
-              {hoveredDeck ? "Deck" : "Top deck"}
-            </div>
-            <div style={{ marginTop: "10px" }}>
-              <DeckPanel deck={panelDeck} />
-            </div>
-          </Section>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
