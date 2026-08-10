@@ -286,6 +286,16 @@ describe("human draft in the 2026 log format", () => {
       Pick: 2,
     }),
     res("EventPlayerDraftMakePick", { IsPickSuccessful: true }),
+    // The 2026 completion response is the updated course, and it is the only
+    // end signal a human draft gets.
+    req("DraftCompleteDraft", { DraftId: HUMAN_DRAFT_ID }),
+    res("DraftCompleteDraft", {
+      CourseId: HUMAN_DRAFT_ID,
+      InternalEventName: HUMAN_EVENT,
+      CurrentModule: "DeckSelect",
+      ModulePayload: "{}",
+      CourseDeckSummary: { Attributes: [] },
+    }),
   ].join("");
 
   beforeAll(async () => {
@@ -308,5 +318,11 @@ describe("human draft in the 2026 log format", () => {
   it("identifies the draft by DraftId and event", () => {
     expect(globalStore.currentDraft.id).toBe(HUMAN_DRAFT_ID);
     expect(globalStore.currentDraft.eventId).toBe(HUMAN_EVENT);
+  });
+
+  it("emits DRAFT_END from DraftCompleteDraft", () => {
+    // One from the bot fixture's Completed status, one from here.
+    const ends = postedMessages.filter((m) => m.type === "DRAFT_END");
+    expect(ends.length).toBeGreaterThanOrEqual(2);
   });
 });
