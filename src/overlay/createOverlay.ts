@@ -31,6 +31,20 @@ export default function createOverlay(
 
   console.warn("allSettings", id, allSettings);
 
+  // Stored bounds can come from a monitor layout that no longer exists, which
+  // opens the overlay entirely off-screen — enabled, running, and invisible.
+  // Clamp the position into the nearest display's work area.
+  const { bounds } = settings;
+  const area = remote.screen.getDisplayMatching(bounds).workArea;
+  const clampedX = Math.min(
+    Math.max(bounds.x, area.x),
+    area.x + area.width - Math.min(bounds.width, 120)
+  );
+  const clampedY = Math.min(
+    Math.max(bounds.y, area.y),
+    area.y + area.height - 48
+  );
+
   const newWindow = new remote.BrowserWindow({
     transparent: allSettings.overlaysTransparency,
     // resizable: allSettings.overlayResizable,
@@ -42,8 +56,8 @@ export default function createOverlay(
     frame: allSettings.overlayFrame,
     width: settings.bounds.width,
     height: settings.bounds.height,
-    x: settings.bounds.x,
-    y: settings.bounds.y,
+    x: clampedX,
+    y: clampedY,
     alwaysOnTop: true,
     acceptFirstMouse: allSettings.overlayAcceptFirstMouse,
     webPreferences: {

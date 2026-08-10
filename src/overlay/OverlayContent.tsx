@@ -4,7 +4,7 @@ import ActionLog from "../components/action-log-v2";
 import { ActionLogV2 } from "../components/action-log-v2/types";
 import OverlayDeckList from "../components/OverlayDeckList";
 import { OVERLAY_DRAFT, OVERLAY_LOG } from "../constants";
-import { InternalDraftv2 } from "../types";
+import { DraftRatings, InternalDraftv2 } from "../types";
 import Chances from "../types/chances";
 import { DbDraftVote } from "../types/dbTypes";
 import getPlayerNameWithoutSuffix from "../utils/getPlayerNameWithoutSuffix";
@@ -21,6 +21,7 @@ interface OverlayContentProps {
   actionLog?: ActionLogV2 | null;
   draftState?: InternalDraftv2;
   draftVotes?: Record<string, DbDraftVote>;
+  draftRatings?: DraftRatings;
   // The overlay window shows the QR share toggle; the public live viewer must
   // not (it can't re-share, and has no window to toggle).
   shareControls?: boolean;
@@ -45,13 +46,19 @@ export default function OverlayContent(
     actionLog,
     draftState,
     draftVotes,
+    draftRatings,
     shareControls = true,
   } = props;
 
   return (
     <>
       {settings.mode === OVERLAY_DRAFT && draftState && (
-        <DraftOverlay state={draftState} votes={draftVotes || {}} />
+        <DraftOverlay
+          state={draftState}
+          votes={draftVotes || {}}
+          ratings={draftRatings}
+          showStats={settings.draftStats !== false}
+        />
       )}
       {deck && settings.mode !== OVERLAY_LOG && (
         <OverlayDeckList

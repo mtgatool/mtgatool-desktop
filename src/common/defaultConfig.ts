@@ -38,6 +38,8 @@ const overlayCfg = {
   typeCounts: false,
   autosize: false,
   collapsed: false,
+  // Draft overlay: color share of the cards picked so far, at the top.
+  draftStats: true,
   // Live-share: a persistent unguessable token per overlay. While shareEnabled
   // this overlay's live state is broadcast (Supabase Realtime) to the public
   // viewer at app.mtgatool.com/live/<shareId> — the URL the overlay QR encodes.

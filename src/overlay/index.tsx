@@ -20,7 +20,7 @@ import {
   stopOverlayShare,
 } from "../data/liveShare";
 import useDebounce from "../hooks/useDebounce";
-import { InternalDraftv2 } from "../types";
+import { DraftRatings, InternalDraftv2 } from "../types";
 import Chances from "../types/chances";
 import { DbDraftVote } from "../types/dbTypes";
 import bcConnect from "../utils/bcConnect";
@@ -54,6 +54,7 @@ export default function Overlay() {
   const [matchState, setMatchState] = useState<OverlayUpdateMatchState>();
   const [draftState, setDraftState] = useState<InternalDraftv2>();
   const [draftVotes, setDraftVotes] = useState<Record<string, DbDraftVote>>({});
+  const [draftRatings, setDraftRatings] = useState<DraftRatings>();
   const [actionLog, setActionLog] = useState<ActionLogV2 | null>(null);
   const [odds, setOdds] = useState<Chances>();
   // Tracked here rather than read from redux: this is a separate renderer with
@@ -128,6 +129,10 @@ export default function Overlay() {
         setDraftState(msg.data.value);
       }
 
+      if (msg.data.type === "DRAFT_RATINGS") {
+        setDraftRatings(msg.data.value);
+      }
+
       if (msg.data.type === "ACTION_LOG") {
         setActionLog(msg.data.value);
       }
@@ -143,6 +148,11 @@ export default function Overlay() {
 
     const channel = bcConnect() as any;
     channel.onmessage = channelMessageHandler;
+
+    // This window opens BECAUSE a draft started, but it boots too late to have
+    // seen that broadcast — ask the background to repeat it. Harmless when no
+    // draft is running: the background simply does not answer.
+    postChannelMessage({ type: "DRAFT_STATUS_REQUEST" });
 
     if (remote) {
       remote.getCurrentWindow().removeAllListeners();
@@ -273,6 +283,7 @@ export default function Overlay() {
               actionLog={actionLog}
               draftState={draftState}
               draftVotes={draftVotes}
+              draftRatings={draftRatings}
             />
           )}
         </div>

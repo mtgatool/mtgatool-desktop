@@ -16,6 +16,7 @@ import {
   requestPasswordReset,
   resetPasswordWithCode,
 } from "../data/passwordReset";
+import syncDrafts from "../data/syncDrafts";
 import syncMatches from "../data/syncMatches";
 import UICheckAdmin from "../reader/uiCheckAdmin";
 import reduxAction from "../redux/reduxAction";
@@ -190,6 +191,7 @@ export default function Auth(props: AuthProps) {
         // waits on the log read — so a fresh login showed every match with the
         // "not uploaded" arrow until then, and a restart appeared to fix it.
         syncMatches().catch(() => undefined);
+        syncDrafts().catch(() => undefined);
 
         if (electron) {
           postChannelMessage({

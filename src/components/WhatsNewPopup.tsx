@@ -23,6 +23,10 @@ interface WhatsNewItem {
  */
 const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
   {
+    title: "Draft tracking is back (Quick Draft)",
+    body: "The draft overlay works again for bot drafts: it follows your packs as you pick, ranks the cards with live 17lands data, and the draft is saved with its event so results can be tracked. The Drafts tab now lists your past drafts, and opening one replays it pick by pick — including the card pool and the deck you submitted. Drafts sync to your account like matches do. Premier and Traditional draft support is coming next.",
+  },
+  {
     title: "Post-match overview",
     body: "Resurrected post match overview popup when a match ends: life totals through each game, cards cast, mana spent, and a turn-by-turn timeline of how it played out.",
   },
