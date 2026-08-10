@@ -233,6 +233,68 @@ export type Database = {
           }
         ];
       };
+      deleted_drafts: {
+        Row: {
+          deleted_at: string;
+          draft_id: string;
+          user_id: string;
+        };
+        Insert: {
+          deleted_at?: string;
+          draft_id: string;
+          user_id: string;
+        };
+        Update: {
+          deleted_at?: string;
+          draft_id?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      drafts: {
+        Row: {
+          arena_id: string;
+          created_at: string;
+          deck_id: string | null;
+          draft_id: string;
+          draft_set: string | null;
+          event_id: string | null;
+          internal_draft: Json;
+          played_at: string | null;
+          user_id: string;
+        };
+        Insert: {
+          arena_id: string;
+          created_at?: string;
+          deck_id?: string | null;
+          draft_id: string;
+          draft_set?: string | null;
+          event_id?: string | null;
+          internal_draft: Json;
+          played_at?: string | null;
+          user_id?: string;
+        };
+        Update: {
+          arena_id?: string;
+          created_at?: string;
+          deck_id?: string | null;
+          draft_id?: string;
+          draft_set?: string | null;
+          event_id?: string | null;
+          internal_draft?: Json;
+          played_at?: string | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "drafts_user_id_arena_id_fkey";
+            columns: ["user_id", "arena_id"];
+            isOneToOne: false;
+            referencedRelation: "arena_accounts";
+            referencedColumns: ["user_id", "arena_id"];
+          }
+        ];
+      };
       matches: {
         Row: {
           arena_id: string;

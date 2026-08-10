@@ -103,15 +103,16 @@ export default async function onLabelMatchGameRoomStateChangedEvent(
     // let oppId = "";
 
     const course = globalStore.currentCourses[eventId];
-    if (course) {
+    // A course stored at EventJoin time has no deck until one is submitted.
+    if (course && course.CourseDeck) {
       // Should make a standard function to conver these new format decks
       const main = convertV4ListToV2(course.CourseDeck.MainDeck);
       const side = convertV4ListToV2(course.CourseDeck.Sideboard);
       const deck: InternalDeck = {
-        id: course.CourseDeckSummary.DeckId,
-        name: course.CourseDeckSummary.Name || "",
+        id: course.CourseDeckSummary?.DeckId ?? "",
+        name: course.CourseDeckSummary?.Name || "",
         lastUpdated: "",
-        deckTileId: course.CourseDeckSummary.DeckTileId,
+        deckTileId: course.CourseDeckSummary?.DeckTileId ?? 0,
         format: "",
         mainDeck: main,
         sideboard: side,

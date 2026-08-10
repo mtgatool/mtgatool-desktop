@@ -196,6 +196,15 @@ const mainDataSlice = createSlice({
     ): void => {
       state.draftsIndex = _.uniq([...state.draftsIndex, ...action.payload]);
     },
+    // setDraftsIndex merges, so removal needs its own action — same split as
+    // the matches index.
+    removeDraftsFromIndex: (
+      state: MainState,
+      action: PayloadAction<string[]>
+    ): void => {
+      const removed = new Set(action.payload);
+      state.draftsIndex = state.draftsIndex.filter((k) => !removed.has(k));
+    },
     setHiddenDecks: (
       state: MainState,
       action: PayloadAction<string[]>
@@ -220,6 +229,7 @@ export const {
   setDecksIndex,
   setRemoteMatchesIndex,
   setLocalMatchesIndex,
+  removeDraftsFromIndex,
   removeMatchesFromIndex,
   setSeasons,
   setDraftsIndex,

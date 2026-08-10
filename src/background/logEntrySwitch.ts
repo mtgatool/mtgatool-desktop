@@ -90,7 +90,6 @@ export default function logEntrySwitch(entry: LogEntry): void {
       break;
 
     case "Event.GetPlayerCoursesV2":
-    case "EventGetCoursesV2":
       if (entry.arrow == "<==") {
         Labels.InEventGetPlayerCoursesV2(entry);
       }
@@ -175,6 +174,7 @@ export default function logEntrySwitch(entry: LogEntry): void {
       break;
 
     case "BotDraft_DraftStatus":
+    case "BotDraftDraftStatus":
       if (entry.arrow == "==>") {
         Labels.outBotDraftDraftStatus(entry);
       }
@@ -184,10 +184,18 @@ export default function logEntrySwitch(entry: LogEntry): void {
       break;
 
     case "BotDraft_DraftPick":
+    case "BotDraftDraftPick":
       if (entry.arrow == "<==") {
         Labels.InDraftMakePick(entry);
       } else {
         Labels.OutDraftMakePick(entry);
+      }
+      break;
+
+    case "Event_Join":
+    case "EventJoin":
+      if (entry.arrow == "<==") {
+        Labels.InEventJoin(entry);
       }
       break;
 
@@ -234,6 +242,7 @@ export default function logEntrySwitch(entry: LogEntry): void {
       break;
 
     case "Event_GetCourses":
+    case "EventGetCoursesV2":
       if (entry.arrow == "<==") {
         Labels.InEventGetCourses(entry);
       }

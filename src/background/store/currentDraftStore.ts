@@ -1,29 +1,31 @@
 import { InternalDraftv2 } from "../../types";
 import globalStore from ".";
 
-export const draftStateObject = {
-  archived: false,
-  type: "draft",
-  owner: "",
-  arenaId: "",
-  date: "",
-  eventId: "",
-  id: undefined,
-  draftSet: "",
-  currentPack: 0,
-  currentPick: 0,
-  pickedCards: [] as number[],
-  packs: [
-    Array(16).fill([]) as number[][],
-    Array(16).fill([]) as number[][],
-    Array(16).fill([]) as number[][],
-  ],
-  picks: [
-    Array(16).fill(0) as number[],
-    Array(16).fill(0) as number[],
-    Array(16).fill(0) as number[],
-  ],
-} as InternalDraftv2;
+export function createDraftState(): InternalDraftv2 {
+  return {
+    archived: false,
+    type: "draft",
+    owner: "",
+    arenaId: "",
+    date: "",
+    eventId: "",
+    id: undefined,
+    draftSet: "",
+    currentPack: 0,
+    currentPick: 0,
+    pickedCards: [],
+    packs: [
+      Array(16).fill([]) as number[][],
+      Array(16).fill([]) as number[][],
+      Array(16).fill([]) as number[][],
+    ],
+    picks: [
+      Array(16).fill(0) as number[],
+      Array(16).fill(0) as number[],
+      Array(16).fill(0) as number[],
+    ],
+  };
+}
 
 export function setDraftId(arg: string): void {
   globalStore.currentDraft.id = arg;
@@ -34,18 +36,7 @@ export function setDraftData(arg: Partial<InternalDraftv2>): void {
 }
 
 export function resetCurrentDraft(): void {
-  globalStore.currentDraft = { ...draftStateObject };
-  globalStore.currentDraft.pickedCards = [];
-  globalStore.currentDraft.packs = [
-    Array(16).fill([]) as number[][],
-    Array(16).fill([]) as number[][],
-    Array(16).fill([]) as number[][],
-  ];
-  globalStore.currentDraft.picks = [
-    Array(16).fill([]) as number[],
-    Array(16).fill([]) as number[],
-    Array(16).fill([]) as number[],
-  ];
+  globalStore.currentDraft = createDraftState();
 }
 
 function setDraftPackPick(pack: number, pick: number): void {

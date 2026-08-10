@@ -33,7 +33,12 @@ import {
   materialize,
   saveLocalBackground,
 } from "./backgroundStore";
-import { fetchDeletedMatchIds, isCloudActive } from "./cloudSync";
+import {
+  fetchDeletedDraftIds,
+  fetchDeletedMatchIds,
+  isCloudActive,
+} from "./cloudSync";
+import { addDeletedDraftId, getDeletedDraftIds } from "./deletedDrafts";
 import { addDeletedMatchId, getDeletedMatchIds } from "./deletedMatches";
 import { refreshEntitlement } from "./entitlement";
 import { getData, LOCAL_KEY, putData } from "./store";
@@ -75,6 +80,7 @@ export default async function hydrateFromCloud(): Promise<void> {
     const inventoryP = supabase.from("arena_inventory").select("*");
     const ranksP = supabase.from("arena_ranks").select("*");
     const decksP = supabase.from("decks").select("*");
+    const draftsP = supabase.from("drafts").select("*");
 
     const accounts = await accountsP;
     const matches = await matchesP;
@@ -82,6 +88,7 @@ export default async function hydrateFromCloud(): Promise<void> {
     const inventory = await inventoryP;
     const ranks = await ranksP;
     const decks = await decksP;
+    const drafts = await draftsP;
 
     // Arena personas -> userids map (merged with local) + display names.
     const userids: DbUserids =
@@ -132,6 +139,27 @@ export default async function hydrateFromCloud(): Promise<void> {
         };
         await putData(key, dbMatch, true);
         if (!userids[r.arena_id]) userids[r.arena_id] = ms(r.played_at);
+      })
+    );
+
+    // Drafts — same add-only rule as matches, and the same tombstone merge:
+    // without it a fresh device would restore every draft the account has
+    // ever deleted.
+    const cloudDeletedDrafts = await fetchDeletedDraftIds();
+    const knownDeletedDrafts = await getDeletedDraftIds();
+    await Promise.all(
+      [...cloudDeletedDrafts]
+        .filter((id) => !knownDeletedDrafts.has(id))
+        .map((id) => addDeletedDraftId(id))
+    );
+    const deletedDrafts = await getDeletedDraftIds();
+
+    await Promise.all(
+      (drafts.data ?? []).map(async (r) => {
+        if (deletedDrafts.has(r.draft_id)) return;
+        const key = `draft-${r.draft_id}`;
+        if (await getData(key, true)) return;
+        await putData(key, r.internal_draft, true);
       })
     );
 

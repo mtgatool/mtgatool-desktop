@@ -13,7 +13,7 @@
  * first (`upsertArenaAccount`) before any dependent row.
  */
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
-import { Cards } from "../types";
+import { Cards, InternalDraftv2 } from "../types";
 import { DbInventoryInfo, DbMatch } from "../types/dbTypes";
 import { ReaderDeck } from "../utils/mtgaReader";
 import { Database, Json } from "./database.types";
@@ -154,6 +154,40 @@ export async function pushMatch(arenaId: string, m: DbMatch): Promise<boolean> {
   }
 }
 
+/** Mirror a finished draft to Supabase. Same contract as pushMatch. */
+export async function pushDraft(
+  arenaId: string,
+  draft: InternalDraftv2
+): Promise<boolean> {
+  try {
+    const userId = await getActiveUserId();
+    if (!userId || !arenaId || !draft?.id) return false;
+    if (!(await upsertArenaAccount(userId, arenaId))) return false;
+
+    const row: Tables["drafts"]["Insert"] = {
+      user_id: userId,
+      arena_id: arenaId,
+      draft_id: draft.id,
+      event_id: draft.eventId || null,
+      draft_set: draft.draftSet || null,
+      played_at: draft.date ? new Date(draft.date).toISOString() : null,
+      deck_id: draft.deckId ?? null,
+      internal_draft: asJson(draft),
+    };
+    const { error } = await supabase
+      .from("drafts")
+      .upsert(row, { onConflict: "user_id,draft_id" });
+    if (error) {
+      console.error("[cloudSync] pushDraft:", error.message);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error("[cloudSync] pushDraft threw:", e);
+    return false;
+  }
+}
+
 /**
  * Remove a match from Supabase. RLS already scopes `matches` to auth.uid(), so
  * matching on match_id alone can only ever hit the current user's own row.
@@ -203,6 +237,70 @@ export async function pushDeletedMatch(matchId: string): Promise<boolean> {
   } catch (e) {
     console.error("[cloudSync] pushDeletedMatch threw:", e);
     return false;
+  }
+}
+
+/**
+ * Remove a draft from Supabase. RLS scopes `drafts` to auth.uid(), so matching
+ * on draft_id alone can only hit the current user's own row.
+ */
+export async function deleteRemoteDraft(draftId: string): Promise<boolean> {
+  try {
+    const userId = await getActiveUserId();
+    if (!userId || !draftId) return false;
+    const { error } = await supabase
+      .from("drafts")
+      .delete()
+      .eq("draft_id", draftId);
+    if (error) {
+      console.error("[cloudSync] deleteRemoteDraft:", error.message);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error("[cloudSync] deleteRemoteDraft threw:", e);
+    return false;
+  }
+}
+
+/** Record a draft deletion for other devices — same contract as pushDeletedMatch. */
+export async function pushDeletedDraft(draftId: string): Promise<boolean> {
+  try {
+    const userId = await getActiveUserId();
+    if (!userId || !draftId) return false;
+    const { error } = await supabase
+      .from("deleted_drafts")
+      .upsert(
+        { user_id: userId, draft_id: draftId },
+        { onConflict: "user_id,draft_id" }
+      );
+    if (error) {
+      console.error("[cloudSync] pushDeletedDraft:", error.message);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error("[cloudSync] pushDeletedDraft threw:", e);
+    return false;
+  }
+}
+
+/** Draft ids this account has deleted anywhere. Empty offline or on error. */
+export async function fetchDeletedDraftIds(): Promise<Set<string>> {
+  try {
+    const userId = await getActiveUserId();
+    if (!userId) return new Set();
+    const { data, error } = await supabase
+      .from("deleted_drafts")
+      .select("draft_id");
+    if (error) {
+      console.error("[cloudSync] fetchDeletedDraftIds:", error.message);
+      return new Set();
+    }
+    return new Set((data ?? []).map((r) => r.draft_id));
+  } catch (e) {
+    console.error("[cloudSync] fetchDeletedDraftIds threw:", e);
+    return new Set();
   }
 }
 

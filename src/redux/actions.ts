@@ -31,6 +31,7 @@ export const actions = {
   REMOVE_MATCHES_FROM_INDEX: MainDataSlice.removeMatchesFromIndex,
   SET_SEASONS: MainDataSlice.setSeasons,
   SET_DRAFTS_INDEX: MainDataSlice.setDraftsIndex,
+  REMOVE_DRAFTS_FROM_INDEX: MainDataSlice.removeDraftsFromIndex,
   SET_HIDDEN_DECKS: MainDataSlice.setHiddenDecks,
   SET_MY_USERNAME: RendererSlice.setMyUsername,
   SET_READING_LOG: RendererSlice.setReadingLog,
