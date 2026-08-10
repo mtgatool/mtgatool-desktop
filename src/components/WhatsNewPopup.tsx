@@ -84,7 +84,7 @@ const NEW_IN_V7: WhatsNewItem[] = [
   },
   {
     title: "Timeline",
-    body: "Win rate and rank progression over time, with bands showing which deck you played across each stretch and a badge each time you rank up.",
+    body: "Win rate and rank progression over time — Constructed and Limited ranks charted separately — with bands showing which deck you played across each stretch and a badge each time you rank up.",
   },
   {
     title: "Saved decks & Explore",

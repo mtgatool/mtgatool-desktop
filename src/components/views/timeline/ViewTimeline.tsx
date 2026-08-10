@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 
 import { useCardArtCrop } from "../../../hooks/useCardImage";
 import { AppState } from "../../../redux/stores/rendererStore";
+import isLimitedEventId from "../../../utils/isLimitedEventId";
 import Section from "../../ui/Section";
 import { MatchData } from "../history/convertDbMatchData";
 
@@ -512,55 +513,87 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
 
     const deckBands = bandsFor(matches.map(deckNameOf));
 
+    const seasonList = Object.values(seasons)
+      .filter((s) => s.start > 0)
+      .sort((a, b) => a.start - b.start);
+
     // Rank ladder over the matches that carry a rank, plus a badge each time
-    // the rank class advances, plus deck bands in rank-series index space.
-    const rankSeries: Pt[] = [];
-    const rankDeckNames: string[] = [];
-    const rankUps: Marker[] = [];
-    let prevCls: number | null = null;
-    let prevTierIdx: number | null = null;
-    matches.forEach((m) => {
-      const player = m.internalMatch?.player;
-      const s = rankScore(player);
-      const cls = matchClass(player);
-      if (s === null || cls === null) return;
-      // Tier is 4..1 (1 = highest); index it so bigger = better. Mythic has no
-      // tiers — treat it as above every tier.
-      const tier =
-        typeof (player as any)?.tier === "number"
-          ? ((player as any).tier as number)
-          : null;
-      const tierIdx = cls >= 6 ? 99 : 4 - (tier ?? 4);
+    // the rank class advances, plus deck bands and season dividers in
+    // rank-series index space. Built per format: Constructed and Limited are
+    // separate ladders, so their matches must never share a line.
+    const buildRankChart = (ms: MatchData[]) => {
+      const series: Pt[] = [];
+      const deckNames: string[] = [];
+      const timestamps: number[] = [];
+      const ups: Marker[] = [];
+      let prevCls: number | null = null;
+      let prevTierIdx: number | null = null;
+      ms.forEach((m) => {
+        const player = m.internalMatch?.player;
+        const s = rankScore(player);
+        const cls = matchClass(player);
+        if (s === null || cls === null) return;
+        // Tier is 4..1 (1 = highest); index it so bigger = better. Mythic has
+        // no tiers — treat it as above every tier.
+        const tier =
+          typeof (player as any)?.tier === "number"
+            ? ((player as any).tier as number)
+            : null;
+        const tierIdx = cls >= 6 ? 99 : 4 - (tier ?? 4);
 
-      const idx = rankSeries.length;
-      rankSeries.push({ x: idx, y: s });
-      rankDeckNames.push(deckNameOf(m));
+        const idx = series.length;
+        series.push({ x: idx, y: s });
+        deckNames.push(deckNameOf(m));
+        timestamps.push(m.timestamp);
 
-      // Badge every advance: a new class (Bronze -> Silver) or a new tier
-      // within the class (Bronze 2 -> Bronze 1). Rank is captured at match
-      // start, so the badge lands on the first match played AT the new rank.
-      const classUp = prevCls !== null && cls > prevCls;
-      const tierUp =
-        prevCls !== null &&
-        cls === prevCls &&
-        prevTierIdx !== null &&
-        tierIdx > prevTierIdx;
-      if (classUp || tierUp) {
-        const name = RANK_META[cls]?.name || "?";
-        const tierLabel = cls >= 6 || tier === null ? "" : ` ${tier}`;
-        rankUps.push({
+        // Badge every advance: a new class (Bronze -> Silver) or a new tier
+        // within the class (Bronze 2 -> Bronze 1). Rank is captured at match
+        // start, so the badge lands on the first match played AT the new rank.
+        const classUp = prevCls !== null && cls > prevCls;
+        const tierUp =
+          prevCls !== null &&
+          cls === prevCls &&
+          prevTierIdx !== null &&
+          tierIdx > prevTierIdx;
+        if (classUp || tierUp) {
+          const name = RANK_META[cls]?.name || "?";
+          const tierLabel = cls >= 6 || tier === null ? "" : ` ${tier}`;
+          ups.push({
+            i: idx,
+            v: s,
+            node: <RankBadge cls={cls} tier={tier ?? undefined} />,
+            title: `Ranked up to ${name}${tierLabel} · ${new Date(
+              m.timestamp
+            ).toLocaleDateString()}`,
+          });
+        }
+        prevCls = cls;
+        prevTierIdx = tierIdx;
+      });
+
+      const dividers: Divider[] = seasonList
+        .map((season) => ({
+          season,
+          idx: timestamps.findIndex((t) => t >= season.start),
+        }))
+        .filter(({ idx }) => idx > 0)
+        .map(({ season, idx }) => ({
           i: idx,
-          v: s,
-          node: <RankBadge cls={cls} tier={tier ?? undefined} />,
-          title: `Ranked up to ${name}${tierLabel} · ${new Date(
-            m.timestamp
-          ).toLocaleDateString()}`,
-        });
-      }
-      prevCls = cls;
-      prevTierIdx = tierIdx;
-    });
-    const rankBands = bandsFor(rankDeckNames);
+          label: `Season ${season.ordinal}`,
+          title: `Season ${season.ordinal} started ${new Date(
+            season.start
+          ).toLocaleString()}`,
+        }));
+
+      return { series, ups, bands: bandsFor(deckNames), dividers };
+    };
+
+    const constructedRank = buildRankChart(
+      matches.filter((m) => !isLimitedEventId(m.eventId))
+    );
+    const limitedRank = buildRankChart(
+      matches.filter((m) => isLimitedEventId(m.eventId))
+    );
 
     // Current streak (from most recent).
     let streak = 0;
@@ -579,9 +612,7 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
     // to key off, and a rank drop can't be used either (losing a tier looks the
     // same). Seasons only appear here once the client has reported them, so
     // older boundaries are simply absent rather than guessed at.
-    const seasonDividers: Divider[] = Object.values(seasons)
-      .filter((s) => s.start > 0)
-      .sort((a, b) => a.start - b.start)
+    const seasonDividers: Divider[] = seasonList
       .map((s) => {
         const idx = matches.findIndex((m) => m.timestamp >= s.start);
         return { season: s, idx };
@@ -602,10 +633,9 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
       losses,
       winrate: total ? (wins / total) * 100 : 0,
       winrateSeries,
-      rankSeries,
-      rankUps,
+      constructedRank,
+      limitedRank,
       deckBands,
-      rankBands,
       seasonDividers,
       decks,
       deckMap,
@@ -686,44 +716,66 @@ export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
             />
           </Section>
 
-          <Section
-            style={{
-              margin: "0 0 16px",
-              padding: "16px",
-              flexDirection: "column",
-            }}
-          >
-            <div className="separator-title">Rank progression</div>
-            {data.rankSeries.length > 0 ? (
-              <LineChart
-                points={data.rankSeries}
-                color="var(--color-text-link)"
-                min={0}
-                max={rankMax}
-                bands={data.rankBands}
-                dividers={data.seasonDividers}
-                activeDeck={hoveredDeck}
-                onBandHover={setHoveredDeck}
-                yTicks={[1, 2, 3, 4, 5, 6].map((cls) => ({
-                  v: cls * 24,
-                  label: RANK_META[cls].name,
-                }))}
-                markers={data.rankUps}
-              />
-            ) : (
-              <div
+          {/* Constructed and Limited are separate ladders with separate
+              ranks, so each gets its own chart. */}
+          {[
+            {
+              title: "Rank progression — Constructed",
+              rank: data.constructedRank,
+            },
+            { title: "Rank progression — Limited", rank: data.limitedRank },
+          ]
+            .filter(({ rank }) => rank.series.length > 0)
+            .map(({ title, rank }) => (
+              <Section
+                key={title}
                 style={{
-                  padding: "24px",
-                  textAlign: "center",
-                  color: "var(--color-text-dark)",
+                  margin: "0 0 16px",
+                  padding: "16px",
+                  flexDirection: "column",
                 }}
               >
-                Play ranked matches to see your rank climb here, with a badge
-                each time you advance a rank. (Rank is captured per match going
-                forward.)
-              </div>
+                <div className="separator-title">{title}</div>
+                <LineChart
+                  points={rank.series}
+                  color="var(--color-text-link)"
+                  min={0}
+                  max={rankMax}
+                  bands={rank.bands}
+                  dividers={rank.dividers}
+                  activeDeck={hoveredDeck}
+                  onBandHover={setHoveredDeck}
+                  yTicks={[1, 2, 3, 4, 5, 6].map((cls) => ({
+                    v: cls * 24,
+                    label: RANK_META[cls].name,
+                  }))}
+                  markers={rank.ups}
+                />
+              </Section>
+            ))}
+          {data.constructedRank.series.length === 0 &&
+            data.limitedRank.series.length === 0 && (
+              <Section
+                style={{
+                  margin: "0 0 16px",
+                  padding: "16px",
+                  flexDirection: "column",
+                }}
+              >
+                <div className="separator-title">Rank progression</div>
+                <div
+                  style={{
+                    padding: "24px",
+                    textAlign: "center",
+                    color: "var(--color-text-dark)",
+                  }}
+                >
+                  Play ranked matches to see your rank climb here, with a badge
+                  each time you advance a rank. (Rank is captured per match
+                  going forward.)
+                </div>
+              </Section>
             )}
-          </Section>
 
           {data.decks.length > 0 && (
             <Section
