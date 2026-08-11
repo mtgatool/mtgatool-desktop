@@ -1,42 +1,326 @@
-.live-draft-container {
-  display: flex;
-  flex-direction: column;
+.drafts-list {
+  margin: 0 16px;
+  text-align: left;
+}
 
-  .title {
-    width: 100%;
-    height: 64px;
+// Aggregate winrate over the drafts the filters left visible.
+.drafts-stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin: 8px 16px 12px;
+  color: var(--color-text-dark);
+
+  span {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+}
+
+.draft-view-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-areas:
+    "header header"
+    "pack picked";
+  gap: 16px;
+  margin-top: 16px;
+  width: 100%;
+  align-items: start;
+
+  .draft-view-header {
+    grid-area: header;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+
+    h2 {
+      margin: 0;
+    }
+
+    .draft-replay-date {
+      opacity: 0.6;
+      font-family: var(--main-font-name-it);
+      margin-left: 4px;
+    }
+
+    .draft-replay-deck-toggle {
+      margin-left: auto;
+    }
   }
 
-  .draft-container {
-    width: 100%;
+  .draft-view-pack {
+    grid-area: pack;
     display: flex;
+    flex-direction: column;
+    padding: 12px 16px 16px;
+  }
+
+  .draft-view-picked {
+    grid-area: picked;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 16px 16px;
+    text-align: left;
+
+    h3 {
+      margin: 0 0 8px;
+    }
+
+    .picks-list {
+      background: var(--color-dark);
+      border-radius: 4px;
+      padding: 4px;
+    }
+  }
+
+  .draft-replay-nav {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 8px;
+
+    h3 {
+      margin: 0;
+      flex-grow: 1;
+      text-align: center;
+    }
+
+    .button-simple,
+    .button-simple-disabled {
+      width: 56px;
+      margin: 0;
+      flex-shrink: 0;
+    }
+  }
+
+  .draft-replay-scrubber {
+    position: relative;
+    width: 100%;
+    margin: 4px 0 8px;
+
+    .track {
+      position: relative;
+      height: 6px;
+      background: var(--color-section-active);
+      border-radius: 3px;
+
+      .bar {
+        height: 100%;
+        background: var(--color-status-ok);
+        border-radius: 3px;
+        transition: width 0.15s ease;
+      }
+
+      .tick {
+        position: absolute;
+        top: -4px;
+        width: 2px;
+        height: 14px;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 1px;
+      }
+
+      .thumb {
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--color-status-ok);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+        pointer-events: none;
+        transition: left 0.15s ease;
+      }
+    }
+
+    // The real control: an invisible native range over the track, so click
+    // and drag scrubbing come for free (keyboard arrows included).
+    input[type="range"] {
+      position: absolute;
+      top: -8px;
+      left: 0;
+      width: 100%;
+      height: 22px;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+      -webkit-appearance: none;
+    }
+
+    .labels {
+      position: relative;
+      height: 18px;
+      margin-top: 6px;
+      font-size: 12px;
+      opacity: 0.6;
+      font-family: var(--main-font-name-it);
+
+      .label {
+        position: absolute;
+        transform: translateX(-50%);
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .draft-replay-deck {
+    max-width: 480px;
+    width: 100%;
+    margin: 8px auto;
+    text-align: left;
   }
 
   .pack-container {
-    width: calc(100% - 300px);
-    height: fit-content;
+    width: 100%;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    row-gap: 12px;
   }
+}
 
-  .picks-container {
-    width: 300px;
-  }
+// Color share of the picks so far, at the top of the draft overlay.
+.draft-color-stats {
+  padding: 2px 2px 6px;
 
-  .avatars-list {
+  .stats-bar {
     display: flex;
-    width: 100%;
-    height: 32px;
-    align-items: center;
-    justify-content: center;
+    height: 8px;
+    overflow: hidden;
+    background: var(--color-section-active);
 
-    .vote-avatar {
-      width: 24px;
-      height: 24px;
-      border-radius: 64px;
-      box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 7px 0px;
-      background-size: contain;
+    .seg {
+      height: 100%;
+      transition: width 0.25s ease;
     }
+  }
+
+  .stats-legend {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--color-text);
+    font-family: var(--main-font-name);
+
+    .entry {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    // Flat (unshadowed) mana symbol sized for the legend. Deliberately NOT
+    // mana-16 — that class doubles as the {16} generic-cost symbol.
+    .draft-legend-mana {
+      pointer-events: none;
+      background-size: contain;
+      background-repeat: no-repeat;
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
+// The deck view's mana curve, shrunk to the draft overlay's form factor.
+.mana-curve-container.draft-curve-compact {
+  margin: 2px auto 8px;
+  padding: 0 2px;
+  width: 100%;
+
+  .mana-curve {
+    height: 64px;
+  }
+
+  .mana-curve-value {
+    font-size: 10px;
+    line-height: 12px;
+    margin-bottom: 2px;
+  }
+
+  .mana-curve-bar {
+    max-width: 14px;
+    border-radius: 0;
+    gap: 1px;
+  }
+
+  .mana-curve-tick {
+    font-size: 10px;
+    line-height: 14px;
+    bottom: -16px;
+  }
+
+  // Must clear the ticks hanging below the curve box (bottom: -16px above).
+  .mana-curve-summary {
+    font-size: 10px;
+    margin-top: 22px;
+  }
+}
+
+// A sibling of the CardTile in the row's flex container must not push it past
+// the overlay's edge — the tile shrinks (its base style insists on width:100%).
+.draft-card-tile-container {
+  .card-tile-container-outer {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+  }
+}
+
+// Owned-copy pips, rendered INSIDE the rank cell so they share the tile's
+// hover state. Absolute at the cell's left edge; the rank letter stays
+// centered on its own.
+.card-tile-odds-flat.with-owned-pips {
+  position: relative;
+  // Breathing room between the pip column and the centered rank letter.
+  padding-left: 4px;
+}
+
+.draft-owned-pips {
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-right: 2px;
+  pointer-events: none;
+
+  .pip {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-section-active);
+  }
+
+  .pip.owned {
+    background: var(--color-button);
+  }
+}
+
+.draft-pick-selected {
+  position: relative;
+  outline: 3px solid var(--color-status-ok);
+  border-radius: 6px;
+  box-shadow: 0 0 16px rgba(95, 191, 133, 0.45);
+
+  .draft-pick-selected-badge {
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    background: var(--color-status-ok);
+    color: var(--color-dark);
+    font-family: var(--main-font-name-bold);
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 1px 8px;
+    border-radius: 8px;
+    pointer-events: none;
   }
 }

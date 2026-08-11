@@ -1,4 +1,4 @@
-import { InternalDeck } from "./deck";
+import { InternalDeck, v2cardsList } from "./deck";
 import { ModuleInstanceData } from "./event";
 
 export interface DraftStatus {
@@ -40,6 +40,10 @@ export interface InternalDraftv2 {
   packs: [number[][], number[][], number[][]];
   picks: [number[], number[], number[]];
   type: "draft";
+  // The deck submitted for the event once the draft ended, when we saw it.
+  deckId?: string;
+  deckMain?: v2cardsList;
+  deckSide?: v2cardsList;
 }
 
 export interface InternalDraftPackPick {
@@ -74,6 +78,18 @@ export interface InternalDraft {
   CurrentModule?: string;
   PreviousOpponents?: string[];
 }
+
+/** One card's 17lands rating for the set being drafted. */
+export interface DraftRating {
+  /** Letter grade derived from the win rate's z-score within the set. */
+  grade: string;
+  /** "Games in hand" win rate, 0..1 — the headline 17lands number. */
+  gihwr: number;
+  /** Average last seen at — how late the card wheels. */
+  alsa: number;
+}
+
+export type DraftRatings = Record<number, DraftRating>;
 
 export interface DraftNotify {
   draftId: string;

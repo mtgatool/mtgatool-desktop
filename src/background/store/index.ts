@@ -1,7 +1,7 @@
 import { ActionLogV2 } from "../../components/action-log-v2/types";
 import { CombinedRankInfo } from "../onLabel/InEventGetCombinedRankInfo";
 import { Course } from "../onLabel/InEventGetCourses";
-import { draftStateObject } from "./currentDraftStore";
+import { createDraftState } from "./currentDraftStore";
 import { createMatchState } from "./currentMatchStore";
 
 // Use this store only when redux struggles with the data (too complex, too deep)
@@ -11,7 +11,7 @@ const globalStore = {
   // through this reference, so sharing it would mean the first match edits what
   // every later match resets to.
   currentMatch: createMatchState(),
-  currentDraft: draftStateObject,
+  currentDraft: createDraftState(),
   currentActionLog: {
     lines: [],
     players: [],

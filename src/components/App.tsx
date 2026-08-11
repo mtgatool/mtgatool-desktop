@@ -61,6 +61,7 @@ function App(props: AppProps) {
     backgroundGrpid,
     customBackground,
     matchInProgress,
+    draftInProgress,
   } = useSelector((state: AppState) => state.renderer);
 
   const os = forceOs || (isElectron() ? process.platform : "");
@@ -78,11 +79,13 @@ function App(props: AppProps) {
       .catch(() => undefined);
   }, [dispatch]);
 
+  // Overlays open and close on these flags — a draft overlay that only
+  // re-evaluated on settings changes would never appear when a draft starts.
   useEffect(() => {
     if (overlayHandler) {
       overlayHandler.settingsUpdated();
     }
-  }, [matchInProgress]);
+  }, [matchInProgress, draftInProgress]);
 
   useEffect(() => {
     // The public live-share viewer (/live/<token>) must work with no account —

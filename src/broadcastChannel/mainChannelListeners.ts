@@ -2,8 +2,11 @@ import _ from "lodash";
 
 import { overlayTitleToId } from "../common/maps";
 import { LOGIN_OK } from "../constants";
+import { pushDraft } from "../data/cloudSync";
+import { isDraftDeleted } from "../data/deletedDrafts";
 import setDbMatch from "../data/setDbMatch";
-import { putData } from "../data/store";
+import { getUserNamespacedKey, putData } from "../data/store";
+import syncDrafts from "../data/syncDrafts";
 import syncMatches from "../data/syncMatches";
 import upsertDbCards from "../data/upsertDbCards";
 import upsertDbInventory from "../data/upsertDbInventory";
@@ -18,6 +21,7 @@ import store from "../redux/stores/rendererStore";
 import { InternalDraftv2 } from "../types";
 import LogEntry from "../types/logDecoder";
 import bcConnect from "../utils/bcConnect";
+import getLocalSetting from "../utils/getLocalSetting";
 import globalData from "../utils/globalData";
 import switchPlayerUUID from "../utils/switchPlayerUUID";
 import { ChannelMessage } from "./channelMessages";
@@ -30,6 +34,32 @@ export default function mainChannelListeners() {
 
   let last = Date.now();
 
+  // Debounces the IndexedDB upsert across DRAFT_STATUS bursts (one message per
+  // pick); must outlive a single onmessage call to actually debounce.
+  let draftUpsertTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  const upsertDraft = async (draft: InternalDraftv2) => {
+    if (!draft.id || draft.id === "") return;
+    // The user deleted this one on purpose; a full log re-import must not
+    // bring it back.
+    if (await isDraftDeleted(draft.id)) return;
+    reduxAction(store.dispatch, {
+      type: "SET_CURRENT_DRAFT",
+      arg: draft,
+    });
+    putData<InternalDraftv2>(`draft-${draft.id}`, draft, true);
+    // Keep the index current so a draft finished this session shows up in the
+    // list without a relog.
+    const fullKey = getUserNamespacedKey(`draft-${draft.id}`);
+    if (!globalData.draftsIndex.includes(fullKey)) {
+      globalData.draftsIndex = [...globalData.draftsIndex, fullKey];
+      reduxAction(store.dispatch, {
+        type: "SET_DRAFTS_INDEX",
+        arg: globalData.draftsIndex,
+      });
+    }
+  };
+
   // Reconcile matches to the cloud once we actually know the persona (arena_id).
   // Matches saved during the catch-up read before this point have no persona,
   // so syncMatches at login pushed nothing; re-run it when the persona lands.
@@ -38,6 +68,7 @@ export default function mainChannelListeners() {
     if (uuid && uuid !== syncedPersona) {
       syncedPersona = uuid;
       syncMatches().catch(() => undefined);
+      syncDrafts().catch(() => undefined);
     }
   };
 
@@ -160,30 +191,28 @@ export default function mainChannelListeners() {
         type: "SET_DRAFT_IN_PROGRESS",
         arg: true,
       });
+
+      const draft = msg.data.value;
+      if (draftUpsertTimeout !== null) {
+        clearTimeout(draftUpsertTimeout);
+      }
+      draftUpsertTimeout = setTimeout(() => {
+        draftUpsertTimeout = null;
+        upsertDraft(draft);
+      }, 250);
     }
 
-    let draftUpsertTImeout = null;
-    if (msg.data.type === "DRAFT_STATUS") {
-      if (draftUpsertTImeout !== null) {
-        clearTimeout(draftUpsertTImeout);
+    // Same upsert as DRAFT_STATUS but without marking a draft as in progress —
+    // used for post-draft additions like the submitted decklist. This is also
+    // the "draft is complete" moment, so it mirrors to the cloud.
+    if (msg.data.type === "DRAFT_SAVE") {
+      const draft = msg.data.value;
+      upsertDraft(draft);
+      if (draft.id) {
+        pushDraft(draft.arenaId || getLocalSetting("playerId"), draft).catch(
+          () => undefined
+        );
       }
-      draftUpsertTImeout = setTimeout(() => {
-        if (
-          msg.data.type === "DRAFT_STATUS" &&
-          msg.data.value.id &&
-          msg.data.value.id !== ""
-        ) {
-          reduxAction(store.dispatch, {
-            type: "SET_CURRENT_DRAFT",
-            arg: msg.data.value,
-          });
-          putData<InternalDraftv2>(
-            `draft-${msg.data.value.id}`,
-            msg.data.value,
-            true
-          );
-        }
-      }, 250);
     }
 
     if (msg.data.type === "DRAFT_END") {
@@ -191,6 +220,15 @@ export default function mainChannelListeners() {
         type: "SET_DRAFT_IN_PROGRESS",
         arg: false,
       });
+      // Leaving the draft scene is the other completion signal — the deck
+      // submit (DRAFT_SAVE) may come much later or never, so mirror what we
+      // have now.
+      const draft = store.getState().renderer.currentDraft;
+      if (draft && draft.id) {
+        pushDraft(draft.arenaId || getLocalSetting("playerId"), draft).catch(
+          () => undefined
+        );
+      }
     }
 
     if (msg.data.type == "OVERLAY_UPDATE_BOUNDS") {

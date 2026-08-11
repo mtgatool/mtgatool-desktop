@@ -5,6 +5,7 @@ import { ActionLogV2 } from "../components/action-log-v2/types";
 import { OverlaySharePayload } from "../data/liveShareTypes";
 import {
   Cards,
+  DraftRatings,
   InternalDraftv2,
   InternalMatch,
   InventoryUpdate,
@@ -40,6 +41,9 @@ export type MessageType =
   | "HOVER_IN"
   | "HOVER_OUT"
   | "DRAFT_STATUS"
+  | "DRAFT_STATUS_REQUEST"
+  | "DRAFT_SAVE"
+  | "DRAFT_RATINGS"
   | "DRAFT_VOTES"
   | "DRAFT_END"
   | "UPDATE_ACTIVE_EVENTS"
@@ -200,6 +204,32 @@ export interface DraftStatusMessage extends ChannelMessageBase {
   value: InternalDraftv2;
 }
 
+/**
+ * An overlay window asking the background for the current draft state. The
+ * overlay opens BECAUSE of a DRAFT_STATUS broadcast, so by the time it has
+ * booted and wired its listener that broadcast is long gone — without this it
+ * would sit empty until the next pick.
+ */
+export interface DraftStatusRequestMessage extends ChannelMessageBase {
+  type: "DRAFT_STATUS_REQUEST";
+}
+
+/**
+ * Persist a draft record without implying a draft is running — DRAFT_STATUS
+ * flips draftInProgress (opening overlays), which a post-draft save like the
+ * decklist submission must not do.
+ */
+export interface DraftSaveMessage extends ChannelMessageBase {
+  type: "DRAFT_SAVE";
+  value: InternalDraftv2;
+}
+
+/** 17lands ratings for the set being drafted, for the overlay to rank with. */
+export interface DraftRatingsMessage extends ChannelMessageBase {
+  type: "DRAFT_RATINGS";
+  value: DraftRatings;
+}
+
 export interface DraftVotesMessage extends ChannelMessageBase {
   type: "DRAFT_VOTES";
   value: Record<string, DbDraftVote>;
@@ -299,6 +329,9 @@ export type ChannelMessage =
   | HoverOutMessage
   | OverlaySettingsMessage
   | DraftStatusMessage
+  | DraftStatusRequestMessage
+  | DraftSaveMessage
+  | DraftRatingsMessage
   | DraftVotesMessage
   | DraftEndMessage
   | UpdateActiveEventsMessage

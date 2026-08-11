@@ -278,6 +278,14 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
         disabled={OVERLAY_DRAFT_MODES.includes(settings.mode)}
       />
       <Toggle
+        text="Show draft stats"
+        value={settings.draftStats}
+        callback={(val: boolean): void =>
+          saveOverlaySettings(current, { draftStats: val })
+        }
+        disabled={!OVERLAY_DRAFT_MODES.includes(settings.mode)}
+      />
+      <Toggle
         text="Show odds"
         value={settings.drawOdds}
         callback={(val: boolean): void =>

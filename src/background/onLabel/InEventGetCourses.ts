@@ -5,29 +5,31 @@ import globalStore from "../store";
 export interface Course {
   CourseId: string;
   InternalEventName: string;
-  CurrentModule: number;
+  CurrentModule: number | string;
   ModulePayload: string;
-  CourseDeckSummary: {
-    DeckId: string;
+  // A course fresh from EventJoin has no deck yet (drafts get one only after
+  // deck submission), and its summary carries no DeckId either.
+  CourseDeckSummary?: {
+    DeckId?: string;
     Name?: string;
     Description?: string;
     Attributes: {
       name: string;
       value: string;
     }[];
-    DeckTileId: number;
-    FormatLegalities: Record<string, string>;
-    DeckValidationSummaries: [];
-    UnownedCards: Record<string, string>;
+    DeckTileId?: number;
+    FormatLegalities?: Record<string, string>;
+    DeckValidationSummaries?: [];
+    UnownedCards?: Record<string, string>;
   };
-  CourseDeck: {
+  CourseDeck?: {
     MainDeck: v4cardsList;
-    ReducedSideboard: v4cardsList;
+    ReducedSideboard?: v4cardsList;
     Sideboard: v4cardsList;
-    CommandZone: v4cardsList;
-    Companions: v4cardsList;
-    CardSkins: v4cardsList;
-  };
+    CommandZone?: v4cardsList;
+    Companions?: v4cardsList;
+    CardSkins?: v4cardsList;
+  } | null;
   CardPool?: number[];
   JumpStart?: {
     CurrentChoices: [];

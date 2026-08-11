@@ -9,7 +9,10 @@ interface Entry extends LogEntry {
     EventName: string;
     PickInfo: {
       EventName: string;
-      CardId: string;
+      // Old logs sent a single CardId; current logs send CardIds (an array,
+      // even for single-card picks).
+      CardId?: string;
+      CardIds?: string[];
       PackNumber: number;
       PickNumber: number;
     };
@@ -18,12 +21,17 @@ interface Entry extends LogEntry {
 
 export default function onLabelOutDraftMakePick(entry: Entry): void {
   const { json } = entry;
-  if (!json || !json) return;
+  if (!json || !json.PickInfo) return;
 
-  const grpId = parseInt(json.PickInfo.CardId);
+  const cardIds = json.PickInfo.CardIds ?? [json.PickInfo.CardId ?? ""];
   const pack = json.PickInfo.PackNumber;
   const pick = json.PickInfo.PickNumber;
 
-  addDraftPick(grpId, pack, pick);
+  cardIds.forEach((cardId) => {
+    const grpId = parseInt(cardId);
+    if (!Number.isNaN(grpId)) {
+      addDraftPick(grpId, pack, pick);
+    }
+  });
   postChannelMessage({ type: "DRAFT_STATUS", value: globalStore.currentDraft });
 }

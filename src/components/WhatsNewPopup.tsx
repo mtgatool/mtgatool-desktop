@@ -23,6 +23,10 @@ interface WhatsNewItem {
  */
 const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
   {
+    title: "Draft tracking is back",
+    body: "The draft overlay works again — Quick, Premier and Traditional: it follows your packs as you pick, ranks the cards with live 17lands data, and the draft is saved with its event so results can be tracked. The Drafts tab lists your past drafts with date and event filters (all Quick Drafts, all drafts of a set...), shows your win rate for whatever is filtered, and opening a draft replays it pick by pick — including the card pool and the deck you submitted. Drafts sync to your account like matches do.",
+  },
+  {
     title: "Post-match overview",
     body: "Resurrected post match overview popup when a match ends: life totals through each game, cards cast, mana spent, and a turn-by-turn timeline of how it played out.",
   },
@@ -80,7 +84,7 @@ const NEW_IN_V7: WhatsNewItem[] = [
   },
   {
     title: "Timeline",
-    body: "Win rate and rank progression over time, with bands showing which deck you played across each stretch and a badge each time you rank up.",
+    body: "Win rate and rank progression over time, switchable between Constructed and Limited (their ladders and ranks are separate), with bands showing which deck you played across each stretch and a badge each time you rank up.",
   },
   {
     title: "Saved decks & Explore",

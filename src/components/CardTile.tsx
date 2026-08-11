@@ -94,6 +94,8 @@ export interface QuantityNumber extends CardTileQuantityBase {
 export interface QuantityRank extends CardTileQuantityBase {
   type: "RANK";
   quantity: string;
+  /** Copies already in the collection (0-4); renders as pips beside the rank. */
+  owned?: number;
 }
 
 export interface QuantityText extends CardTileQuantityBase {
@@ -205,8 +207,29 @@ function CardQuantityDisplay(props: {
   if (quantity.type == "RANK") {
     // Text quantity, presumably rank
     const rankClass = getRankColorClass(quantity.quantity);
+    const { owned } = quantity;
     return (
-      <div className={`card-tile-odds-flat ${rankClass}`}>
+      <div
+        className={`card-tile-odds-flat ${rankClass}${
+          owned !== undefined ? " with-owned-pips" : ""
+        }`}
+        title={
+          owned !== undefined
+            ? `You own ${owned >= 4 ? "4+" : owned}`
+            : undefined
+        }
+      >
+        {owned !== undefined && (
+          <div className="draft-owned-pips">
+            {[0, 1, 2, 3].map((i) => (
+              <div
+                // eslint-disable-next-line react/no-array-index-key
+                key={`owned-pip-${i}`}
+                className={`pip${i < owned ? " owned" : ""}`}
+              />
+            ))}
+          </div>
+        )}
         {quantity.quantity}
       </div>
     );
