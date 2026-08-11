@@ -22,6 +22,8 @@ import Select from "./Select";
 interface FilterSectionProps {
   openHistoryStatsPopup: () => void;
   datePickerDoShow: () => void;
+  /** Rendered at the left edge, inside the same section as the filters. */
+  children?: React.ReactNode;
 }
 
 export default function FilterSection(props: FilterSectionProps) {
@@ -37,7 +39,7 @@ export default function FilterSection(props: FilterSectionProps) {
   );
   const dispatch = useDispatch();
 
-  const { openHistoryStatsPopup, datePickerDoShow } = props;
+  const { openHistoryStatsPopup, datePickerDoShow, children } = props;
 
   const containerRef: MutableRefObject<HTMLInputElement | null> = useRef(null);
 
@@ -105,6 +107,7 @@ export default function FilterSection(props: FilterSectionProps) {
     <>
       <div className="FilterSection">
         <Section style={{ marginTop: "16px", marginBottom: "16px" }}>
+          {children}
           <Select
             style={{ width: "280px" }}
             options={transformedEvents}

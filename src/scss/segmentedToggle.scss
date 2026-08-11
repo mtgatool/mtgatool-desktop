@@ -1,8 +1,9 @@
 @import "./misc.scss";
 
-// Constructed | Limited switch (components/ui/FormatToggle). Styled like the
-// app's buttons/selects; the thumb slides under the chosen side.
-.format-toggle {
+// Segmented switch (components/ui/SegmentedToggle). Styled like the app's
+// buttons/selects; the thumb slides under the chosen side. The thumb's width
+// and offset are set inline — they depend on how many options there are.
+.segmented-toggle {
   position: relative;
   display: flex;
   margin: 0 auto;
@@ -13,22 +14,17 @@
   border: 1px solid var(--color-dark);
   @include disable-select;
 
-  .format-toggle-thumb {
+  .segmented-toggle-thumb {
     position: absolute;
     top: 2px;
     bottom: 2px;
     left: 2px;
-    width: calc(50% - 2px);
     border-radius: 2px;
     background-color: var(--color-button);
     transition: transform 0.2s ease-in-out;
-
-    &.limited {
-      transform: translateX(100%);
-    }
   }
 
-  .format-toggle-option {
+  .segmented-toggle-option {
     position: relative;
     z-index: 1;
     width: 130px;

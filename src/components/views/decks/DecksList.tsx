@@ -33,6 +33,8 @@ import Toggle from "../../ui/Toggle";
 interface DeckListProps {
   openHistoryStatsPopup: () => void;
   datePickerDoShow: () => void;
+  /** Played/Saved switch, merged into the filter section. */
+  tabsToggle?: React.ReactNode;
 }
 
 export default function DecksList(props: DeckListProps) {
@@ -47,7 +49,7 @@ export default function DecksList(props: DeckListProps) {
     (state: AppState) => state.mainData.hiddenDecks
   );
 
-  const { openHistoryStatsPopup, datePickerDoShow } = props;
+  const { openHistoryStatsPopup, datePickerDoShow, tabsToggle } = props;
 
   const [showHidden, setShowHidden] = useState(
     getLocalSetting("showHiddenDecks")
@@ -199,7 +201,9 @@ export default function DecksList(props: DeckListProps) {
       <FilterSection
         openHistoryStatsPopup={openHistoryStatsPopup}
         datePickerDoShow={datePickerDoShow}
-      />
+      >
+        {tabsToggle}
+      </FilterSection>
       <Section style={{ flexDirection: "column" }}>
         <Flex style={{ width: "100%" }}>
           <InputContainer>

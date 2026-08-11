@@ -5,8 +5,8 @@ import { Route, Switch, useRouteMatch } from "react-router-dom";
 import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import { AppState } from "../../../redux/stores/rendererStore";
 import Deck from "../../../utils/mtga/deck";
-import Button from "../../ui/Button";
 import Section from "../../ui/Section";
+import SegmentedToggle from "../../ui/SegmentedToggle";
 import DecksList from "./DecksList";
 import DeckView from "./DeckView";
 import SavedDecksList from "./SavedDecksList";
@@ -18,6 +18,28 @@ interface ViewDecksProps {
 }
 
 type DecksTab = "played" | "saved";
+
+function DecksTabToggle({
+  tab,
+  setTab,
+  margin,
+}: {
+  tab: DecksTab;
+  setTab: (tab: DecksTab) => void;
+  margin: string;
+}): JSX.Element {
+  return (
+    <SegmentedToggle
+      options={[
+        ["played", "Played decks"],
+        ["saved", "Saved decks"],
+      ]}
+      value={tab}
+      onChange={setTab}
+      style={{ margin }}
+    />
+  );
+}
 
 export default function ViewDecks(props: ViewDecksProps) {
   const { url } = useRouteMatch();
@@ -39,27 +61,24 @@ export default function ViewDecks(props: ViewDecksProps) {
         <DeckView openDeckView={openDeckView} />
       </Route>
       <Route exact path={`${url}/`}>
-        <>
-          <Section style={{ marginTop: "16px", gap: "8px" }}>
-            {(["played", "saved"] as DecksTab[]).map((t) => (
-              <Button
-                key={t}
-                text={t === "played" ? "Played decks" : "Saved decks"}
-                onClick={() => setTab(t)}
-                className={tab === t ? "button-simple" : "button-simple-dark"}
-                style={{ width: "160px", margin: "0" }}
-              />
-            ))}
-          </Section>
-          {tab === "played" ? (
-            <DecksList
-              datePickerDoShow={datePickerDoShow}
-              openHistoryStatsPopup={openHistoryStatsPopup}
-            />
-          ) : (
+        {/* Played decks merges this into the filter section; Saved decks has
+            no filters, so the toggle gets a slim section of its own. */}
+        {tab === "played" ? (
+          <DecksList
+            datePickerDoShow={datePickerDoShow}
+            openHistoryStatsPopup={openHistoryStatsPopup}
+            tabsToggle={
+              <DecksTabToggle tab={tab} setTab={setTab} margin="auto 0" />
+            }
+          />
+        ) : (
+          <>
+            <Section style={{ marginTop: "16px" }}>
+              <DecksTabToggle tab={tab} setTab={setTab} margin="0" />
+            </Section>
             <SavedDecksList active />
-          )}
-        </>
+          </>
+        )}
       </Route>
     </Switch>
   );
