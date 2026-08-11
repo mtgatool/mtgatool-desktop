@@ -45,10 +45,13 @@ const VIEW_WINRATES = 3;
 
 interface DeckViewProps {
   openDeckView: (deck: Deck) => void;
+  /** Opens the share popup, which lives up in ContentWrapper — rendering it
+   * here would trap it inside this view's positioned container. */
+  shareDeckCallback?: (deck: StatsDeck) => void;
 }
 
 export default function DeckView(props: DeckViewProps): JSX.Element {
-  const { openDeckView } = props;
+  const { openDeckView, shareDeckCallback } = props;
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -241,6 +244,14 @@ export default function DeckView(props: DeckViewProps): JSX.Element {
                 text="Export to Arena"
                 onClick={arenaExport}
               />
+              {shareDeckCallback && (
+                <Button
+                  style={{ margin: "16px" }}
+                  className="button-simple"
+                  text="Share"
+                  onClick={() => dbDeck && shareDeckCallback(dbDeck)}
+                />
+              )}
             </Section>
             <Section
               style={{

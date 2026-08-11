@@ -14,7 +14,7 @@ import {
 } from "../redux/slices/FilterSlice";
 import { AppState } from "../redux/stores/rendererStore";
 import { CardsData } from "../types/collectionTypes";
-import { defaultCardsData } from "../types/dbTypes";
+import { defaultCardsData, StatsDeck } from "../types/dbTypes";
 import aggregateStats from "../utils/aggregateStats";
 import cardsDb from "../utils/cardsDb/cardsDbClient";
 import isElectron from "../utils/electron/isElectron";
@@ -31,6 +31,7 @@ import ConfirmDialog from "./popups/ConfirmDialog";
 import DeckViewPopup from "./popups/DeckViewPopup";
 import AdvancedSearch from "./views/collection/advancedSearch";
 import ViewCollection from "./views/collection/ViewCollection";
+import ShareDeckPopup from "./views/decks/ShareDeckPopup";
 import ViewDecks from "./views/decks/ViewDecks";
 import ViewDrafts from "./views/drafts/ViewDrafts";
 import ViewExplore from "./views/explore/ViewExplore";
@@ -210,6 +211,18 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
     if (matchToDelete) deleteMatch(matchToDelete.matchId);
   }, [matchToDelete]);
 
+  // Deck sharing confirm. Same reason it lives up here: PopupComponent
+  // positions against the nearest positioned ancestor, so rendering it down
+  // in the deck view pinned it to the bottom of the page.
+  const openShareDeck = useRef<() => void>(vodiFn);
+  const closeShareDeck = useRef<() => void>(vodiFn);
+  const [deckToShare, setDeckToShare] = useState<StatsDeck | null>(null);
+
+  const askShareDeck = useCallback((deck: StatsDeck) => {
+    setDeckToShare(deck);
+    openShareDeck.current();
+  }, []);
+
   const CurrentPage = Object.values(views)[viewIndex];
 
   const datePickerCallbackRef = useRef((_d: Date) => {
@@ -314,6 +327,12 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
         />
       </PopupComponent>
 
+      <ShareDeckPopup
+        deck={deckToShare}
+        openFnRef={openShareDeck}
+        closeFnRef={closeShareDeck}
+      />
+
       <div className="wrapper">
         <div className="wrapper-inner">
           <div className="overflow-ux">
@@ -343,6 +362,7 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
                       datePickerDoShow={datePickerDoShow}
                       matchesData={matchesData}
                       deleteMatchCallback={askDeleteMatch}
+                      shareDeckCallback={askShareDeck}
                     />
                   </animated.div>
                 );
@@ -367,6 +387,7 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
                   datePickerDoShow={datePickerDoShow}
                   matchesData={matchesData}
                   deleteMatchCallback={askDeleteMatch}
+                  shareDeckCallback={askShareDeck}
                 />
               </div>
             )}
