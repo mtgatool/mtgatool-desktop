@@ -295,6 +295,27 @@ export type Database = {
           }
         ];
       };
+      formats_snapshots: {
+        Row: {
+          created_at: string;
+          formats: Json;
+          hash: string;
+          uploaded_by: string;
+        };
+        Insert: {
+          created_at?: string;
+          formats: Json;
+          hash: string;
+          uploaded_by?: string;
+        };
+        Update: {
+          created_at?: string;
+          formats?: Json;
+          hash?: string;
+          uploaded_by?: string;
+        };
+        Relationships: [];
+      };
       matches: {
         Row: {
           arena_id: string;

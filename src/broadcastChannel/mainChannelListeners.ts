@@ -2,7 +2,7 @@ import _ from "lodash";
 
 import { overlayTitleToId } from "../common/maps";
 import { LOGIN_OK } from "../constants";
-import { pushDraft } from "../data/cloudSync";
+import { pushDraft, pushFormatsSnapshot } from "../data/cloudSync";
 import { isDraftDeleted } from "../data/deletedDrafts";
 import setDbMatch from "../data/setDbMatch";
 import { getUserNamespacedKey, putData } from "../data/store";
@@ -213,6 +213,12 @@ export default function mainChannelListeners() {
           () => undefined
         );
       }
+    }
+
+    // Arena's formats table, fresh off the log. Versioned by hash inside the
+    // push — almost every boot this is a no-op.
+    if (msg.data.type === "FORMATS_SNAPSHOT") {
+      pushFormatsSnapshot(msg.data.value).catch(() => undefined);
     }
 
     if (msg.data.type === "DRAFT_END") {

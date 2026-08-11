@@ -28,6 +28,7 @@ export const settingKeys = [
   "whatsNewSeen",
   "postMatchOverview",
   "collectionSetBands",
+  "formatsSnapshotHash",
 ] as const;
 
 export type SettingKey = typeof settingKeys[number];
@@ -66,4 +67,7 @@ export const defaultSettings: Record<SettingKey, string> = {
   // deliberately closed or opened are stored; anything absent falls back to the
   // component's own default, so a new band does not have to be added here too.
   collectionSetBands: "{}",
+  // sha256 of the last GetFormats snapshot this client uploaded — the guard
+  // that keeps every boot from re-uploading the same formats table.
+  formatsSnapshotHash: "",
 };

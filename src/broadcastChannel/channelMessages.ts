@@ -12,6 +12,7 @@ import {
 } from "../types";
 import { DbDraftVote, DbInventoryInfo } from "../types/dbTypes";
 import { ClientSceneChange } from "../types/logDecoder";
+import { FormatsSnapshot } from "../utils/normalizeFormats";
 
 export type MessageType =
   | "POPUP"
@@ -46,6 +47,7 @@ export type MessageType =
   | "DRAFT_RATINGS"
   | "DRAFT_VOTES"
   | "DRAFT_END"
+  | "FORMATS_SNAPSHOT"
   | "UPDATE_ACTIVE_EVENTS"
   | "DAEMON_GET_PLAYER_ID"
   | "CARDS_DB_REQUEST"
@@ -239,6 +241,16 @@ export interface DraftEndMessage extends ChannelMessageBase {
   type: "DRAFT_END";
 }
 
+/**
+ * The normalized GetFormats table the background just parsed. The main window
+ * uploads it to the cloud when its hash is new — mtgatool-metadata keeps its
+ * formats.json fresh from those snapshots.
+ */
+export interface FormatsSnapshotMessage extends ChannelMessageBase {
+  type: "FORMATS_SNAPSHOT";
+  value: FormatsSnapshot;
+}
+
 export interface UpdateActiveEventsMessage extends ChannelMessageBase {
   type: "UPDATE_ACTIVE_EVENTS";
   value: string[];
@@ -334,6 +346,7 @@ export type ChannelMessage =
   | DraftRatingsMessage
   | DraftVotesMessage
   | DraftEndMessage
+  | FormatsSnapshotMessage
   | UpdateActiveEventsMessage
   | DaemonGetPlayerId
   | CardsDbRequestMessage
