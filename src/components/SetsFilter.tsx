@@ -1,10 +1,10 @@
 import { isEqual } from "lodash";
 import { CSSProperties, useCallback, useMemo, useState } from "react";
 
-import allFormats from "../common/allFormats";
 import useCardsDbReady from "../hooks/useCardsDbReady";
 import { CardSet } from "../types";
 import getLocalSetting from "../utils/getLocalSetting";
+import getSetFormatBand, { SetFormatBand } from "../utils/getSetFormatBand";
 import database from "../utils/mtga/database";
 import setLocalSetting from "../utils/setLocalSetting";
 
@@ -94,43 +94,28 @@ export default function SetsFilter(props: SetsFilterProps): JSX.Element {
 
   // Grouped by what you can actually play them in, widest format last, so the
   // bands run from the sets that matter to most players down to the leftovers.
+  // Each band excludes the ones above it, so a set appears once, in the
+  // narrowest format that admits it (see getSetFormatBand).
   //
-  // Arena has no Pioneer; Explorer is its equivalent and is what the format
-  // data actually carries. Each band excludes the ones above it, so a set
-  // appears once, in the narrowest format that admits it.
-  //
-  // This replaces a guess at the set codes — Historic used to mean "the code
-  // starts with AHA or EA", which picked out the Anthology releases and nothing
-  // else, so the band was both mislabelled and mostly empty.
-  const legalSets = (format: string): string[] =>
-    allFormats[format]?.legalSets ?? [];
-
-  const standard = legalSets("Standard");
-  const explorer = legalSets("Explorer");
-  const historic = legalSets("Historic");
-
-  // A set is listed under either code depending on the format.
-  const isLegalIn = (set: Set, codes: string[]): boolean =>
-    codes.includes(set.arenacode) || codes.includes(set.code);
-
-  // Alchemy releases sit in none of the three, and there are seventeen of them
-  // against two true leftovers — folding them into "Other" would make that
-  // label describe mostly Alchemy.
-  const isAlchemy = (set: Set): boolean =>
-    set.arenacode.startsWith("Y2") || set.code.startsWith("Y2");
-
+  // Alchemy releases sit in none of the three, and there are seventeen of
+  // them against two true leftovers — folding them into "Other" would make
+  // that label describe mostly Alchemy.
   const standardSets: Set[] = [];
   const explorerSets: Set[] = [];
   const historicSets: Set[] = [];
   const alchemySets: Set[] = [];
   const otherSets: Set[] = [];
 
+  const bandLists: Record<SetFormatBand, Set[]> = {
+    standard: standardSets,
+    explorer: explorerSets,
+    historic: historicSets,
+    alchemy: alchemySets,
+    other: otherSets,
+  };
+
   allSets.forEach((s) => {
-    if (isLegalIn(s, standard)) standardSets.push(s);
-    else if (isLegalIn(s, explorer)) explorerSets.push(s);
-    else if (isLegalIn(s, historic)) historicSets.push(s);
-    else if (isAlchemy(s)) alchemySets.push(s);
-    else otherSets.push(s);
+    bandLists[getSetFormatBand(s.code)].push(s);
   });
 
   // Standard and Explorer are what most people are picking from; the rest are

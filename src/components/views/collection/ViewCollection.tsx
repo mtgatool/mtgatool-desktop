@@ -10,6 +10,7 @@ import { AppState } from "../../../redux/stores/rendererStore";
 import { CardsData } from "../../../types/collectionTypes";
 import { Filters } from "../../../types/genericFilterTypes";
 import cardsDb from "../../../utils/cardsDb/cardsDbClient";
+import getSetFormatBand from "../../../utils/getSetFormatBand";
 import database from "../../../utils/mtga/database";
 import doCollectionFilter from "../../../utils/tables/doCollectionFilter";
 import InputContainer from "../../InputContainer";
@@ -20,7 +21,10 @@ import Button from "../../ui/Button";
 import Section from "../../ui/Section";
 import Toggle from "../../ui/Toggle";
 import CardCollection from "./CardCollection";
-import getFiltersFromQuery, { removeFilterFromQuery } from "./collectionQuery";
+import getFiltersFromQuery, {
+  parseFilterValue,
+  removeFilterFromQuery,
+} from "./collectionQuery";
 import {
   buildCollectionIdsQuery,
   buildCollectionQuery,
@@ -254,6 +258,18 @@ export default function ViewCollection(props: ViewCollectionProps) {
     (sets: string[]) => {
       let newQuery = removeFilterFromQuery(collectionQuery, ["s", "set"]);
       if (sets.length > 0) {
+        // A typed f:/format: filter from a different band would contradict
+        // the set just clicked (f:standard + a Historic set shows nothing;
+        // f:historic + a Standard set is not what the click meant either).
+        // The click wins: drop the format token on a band mismatch.
+        const formatToken = parseFilterValue(newQuery).find(([key]) => {
+          const nKey = key.startsWith("-") ? key.slice(1) : key;
+          return nKey === "f" || nKey === "format";
+        });
+        const format = formatToken?.[2]?.replace(/"/g, "").toLowerCase();
+        if (format && sets.some((code) => getSetFormatBand(code) !== format)) {
+          newQuery = removeFilterFromQuery(newQuery, ["f", "format"]);
+        }
         newQuery += ` s:${sets.join(",")}`;
       }
       reduxAction(dispatch, {
