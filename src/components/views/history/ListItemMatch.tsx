@@ -1,10 +1,12 @@
 import _ from "lodash";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
 import { ReactComponent as IconUpload } from "../../../assets/images/svg/upload.svg";
 import { DEFAULT_TILE } from "../../../constants";
 import setDbMatch from "../../../data/setDbMatch";
 import { LOCAL_KEY } from "../../../data/store";
+import { useCards } from "../../../hooks/useCard";
 import { AppState } from "../../../redux/stores/rendererStore";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { toMMSS } from "../../../utils/dateTo";
@@ -61,6 +63,26 @@ export default function ListItemMatch({
 
   const isLimited = isLimitedEventId(match.eventId);
 
+  // Draft decks carry no tile art of their own — Arena stamps them with the
+  // stock tile (DEFAULT_TILE, not 0). Borrow the deck's first mythic — or
+  // failing that, first rare — instead of showing that default on every
+  // limited match.
+  const rawTileId = internalMatch.playerDeck.deckTileId;
+  const deckTileId = rawTileId === DEFAULT_TILE ? 0 : rawTileId;
+  const fallbackIds = useMemo(
+    () =>
+      deckTileId
+        ? []
+        : _.uniq((internalMatch.playerDeck.mainDeck ?? []).map((c) => c.id)),
+    [deckTileId, internalMatch]
+  );
+  const fallbackCards = useCards(fallbackIds);
+  const fallbackTile = useMemo(() => {
+    const mythic = fallbackCards.find((c) => c?.Rarity === "mythic");
+    const rare = fallbackCards.find((c) => c?.Rarity === "rare");
+    return (mythic ?? rare)?.GrpId;
+  }, [fallbackCards]);
+
   function uploadMatch(): void {
     setDbMatch(match.internalMatch);
   }
@@ -76,7 +98,7 @@ export default function ListItemMatch({
               : `var(--color-r)`,
         }}
       />
-      <HoverTile grpId={internalMatch.playerDeck.deckTileId || DEFAULT_TILE}>
+      <HoverTile grpId={deckTileId || fallbackTile || DEFAULT_TILE}>
         {!remoteMatchesIndex.includes(matchKey) ? (
           <IconUpload
             style={{
