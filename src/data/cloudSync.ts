@@ -158,11 +158,12 @@ export async function pushMatch(arenaId: string, m: DbMatch): Promise<boolean> {
 }
 
 /**
- * Upload a normalized GetFormats snapshot, versioned by content hash.
- * A localSetting remembers the last hash this client uploaded so ordinary
- * boots never touch the network, and the table's primary key collapses the
- * same snapshot arriving from any number of clients into one row —
- * mtgatool-metadata reads the newest row to keep its formats.json current.
+ * Upload a normalized GetFormats snapshot, versioned by content hash. One row
+ * is one account ATTESTING to one snapshot — mtgatool-metadata only adopts a
+ * table once enough distinct accounts have uploaded the same hash, so each
+ * row carries this account's own copy of the content for the consumer to
+ * verify against the hash. A localSetting remembers the last hash this
+ * client uploaded so ordinary boots never touch the network.
  */
 export async function pushFormatsSnapshot(
   snapshot: FormatsSnapshot
@@ -186,7 +187,7 @@ export async function pushFormatsSnapshot(
       .from("formats_snapshots")
       .upsert(
         { hash, formats: asJson(snapshot) },
-        { onConflict: "hash", ignoreDuplicates: true }
+        { onConflict: "hash,uploaded_by", ignoreDuplicates: true }
       );
     if (error) {
       console.error("[cloudSync] pushFormatsSnapshot:", error.message);
