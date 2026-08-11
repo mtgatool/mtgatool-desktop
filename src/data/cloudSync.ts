@@ -15,7 +15,10 @@
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import { Cards, InternalDraftv2 } from "../types";
 import { DbInventoryInfo, DbMatch } from "../types/dbTypes";
+import getLocalSetting from "../utils/getLocalSetting";
 import { ReaderDeck } from "../utils/mtgaReader";
+import { FormatsSnapshot } from "../utils/normalizeFormats";
+import setLocalSetting from "../utils/setLocalSetting";
 import { Database, Json } from "./database.types";
 import supabase from "./supabase";
 
@@ -150,6 +153,49 @@ export async function pushMatch(arenaId: string, m: DbMatch): Promise<boolean> {
     return true;
   } catch (e) {
     console.error("[cloudSync] pushMatch threw:", e);
+    return false;
+  }
+}
+
+/**
+ * Upload a normalized GetFormats snapshot, versioned by content hash.
+ * A localSetting remembers the last hash this client uploaded so ordinary
+ * boots never touch the network, and the table's primary key collapses the
+ * same snapshot arriving from any number of clients into one row —
+ * mtgatool-metadata reads the newest row to keep its formats.json current.
+ */
+export async function pushFormatsSnapshot(
+  snapshot: FormatsSnapshot
+): Promise<boolean> {
+  try {
+    const json = JSON.stringify(snapshot);
+    const digest = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(json)
+    );
+    const hash = [...new Uint8Array(digest)]
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+
+    if (getLocalSetting("formatsSnapshotHash") === hash) return true;
+
+    const userId = await getActiveUserId();
+    if (!userId) return false;
+
+    const { error } = await supabase
+      .from("formats_snapshots")
+      .upsert(
+        { hash, formats: asJson(snapshot) },
+        { onConflict: "hash", ignoreDuplicates: true }
+      );
+    if (error) {
+      console.error("[cloudSync] pushFormatsSnapshot:", error.message);
+      return false;
+    }
+    setLocalSetting("formatsSnapshotHash", hash);
+    return true;
+  } catch (e) {
+    console.error("[cloudSync] pushFormatsSnapshot threw:", e);
     return false;
   }
 }
