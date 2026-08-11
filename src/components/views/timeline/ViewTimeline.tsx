@@ -432,7 +432,8 @@ function DeckPanel({ deck }: { deck?: DeckStat }): JSX.Element {
 type TimelineFormat = "constructed" | "limited";
 
 // Constructed | Limited segmented switch — the two ladders share nothing, so
-// the whole tab shows one format at a time.
+// the whole tab shows one format at a time. The thumb slides to the chosen
+// side; styles live in scss/timeline.scss.
 function FormatToggle({
   format,
   onChange,
@@ -445,32 +446,13 @@ function FormatToggle({
     ["limited", "Limited"],
   ];
   return (
-    <div
-      style={{
-        display: "flex",
-        margin: "0 auto",
-        background: "var(--color-base)",
-        borderRadius: "16px",
-        padding: "3px",
-        gap: "2px",
-      }}
-    >
+    <div className="format-toggle">
+      <div className={`format-toggle-thumb ${format}`} />
       {options.map(([key, label]) => (
         <div
           key={key}
           onClick={() => onChange(key)}
-          style={{
-            padding: "4px 18px",
-            borderRadius: "13px",
-            cursor: "pointer",
-            userSelect: "none",
-            fontSize: "14px",
-            background:
-              format === key ? "var(--color-section-active)" : "transparent",
-            color:
-              format === key ? "var(--color-text)" : "var(--color-text-dark)",
-            transition: "background 0.15s ease-in-out",
-          }}
+          className={`format-toggle-option ${format === key ? "active" : ""}`}
         >
           {label}
         </div>
