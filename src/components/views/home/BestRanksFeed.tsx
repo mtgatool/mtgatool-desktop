@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import { useEffect, useRef, useState } from "react";
 
 import { DEFAULT_AVATAR } from "../../../constants";
@@ -7,8 +8,9 @@ import RankIcon from "../../RankIcon";
 import DbRankInfo from "./DbRankInfo";
 import { sortConstructedRanks, sortLimitedRanks } from "./sortRanks";
 
-function DrawConstructedRank(props: DbRankInfo) {
+function DrawConstructedRank(props: DbRankInfo & { pos: number }) {
   const {
+    pos,
     name,
     avatar,
     constructedClass,
@@ -25,6 +27,7 @@ function DrawConstructedRank(props: DbRankInfo) {
 
   return (
     <div className="list-item-container-nohover feed-rank-listitem">
+      <div className="rank-pos">{pos}</div>
       <div
         className="rank-avatar"
         style={{
@@ -52,8 +55,9 @@ function DrawConstructedRank(props: DbRankInfo) {
   );
 }
 
-function DrawLimitedRank(props: DbRankInfo) {
+function DrawLimitedRank(props: DbRankInfo & { pos: number }) {
   const {
+    pos,
     name,
     avatar,
     limitedClass,
@@ -70,6 +74,7 @@ function DrawLimitedRank(props: DbRankInfo) {
 
   return (
     <div className="list-item-container-nohover feed-rank-listitem">
+      <div className="rank-pos">{pos}</div>
       <div
         className="rank-avatar"
         style={{
@@ -129,27 +134,25 @@ export default function BestRanksFeed() {
         <h3>Constructed</h3>
         {allRanks.length === 0
           ? emptyList.map(DrawLoadingRank)
-          : bestConstructed
-              .map((r) => {
-                return {
-                  ...r,
-                  key: `constructed-best-${r.uuid}`,
-                };
-              })
-              .map(DrawConstructedRank)}
+          : bestConstructed.map((r, i) => (
+              <DrawConstructedRank
+                key={`constructed-best-${r.uuid}`}
+                pos={i + 1}
+                {...r}
+              />
+            ))}
       </div>
       <div className="ranks-feed-column">
         <h3>Limited</h3>
         {allRanks.length === 0
           ? emptyList.map(DrawLoadingRank)
-          : bestLimited
-              .map((r) => {
-                return {
-                  ...r,
-                  key: `limited-best-${r.uuid}`,
-                };
-              })
-              .map(DrawLimitedRank)}
+          : bestLimited.map((r, i) => (
+              <DrawLimitedRank
+                key={`limited-best-${r.uuid}`}
+                pos={i + 1}
+                {...r}
+              />
+            ))}
       </div>
     </div>
   );

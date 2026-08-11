@@ -55,16 +55,27 @@
     }
 
     h3 {
-      margin: 8px 0 16px 0;
+      margin: 6px 0 10px 0;
     }
 
     .feed-rank-listitem {
       display: flex;
-      height: 48px;
-      line-height: 48px;
-      margin-bottom: 4px;
-      padding: 4px 12px;
+      height: 34px;
+      line-height: 34px;
+      margin-bottom: 2px;
+      padding: 2px 10px 2px 4px;
+      border-radius: 4px;
       cursor: normal;
+
+      .rank-pos {
+        min-width: 16px;
+        margin: auto 0;
+        text-align: right;
+        font-size: 13px;
+        line-height: 34px;
+        color: var(--color-text-disabled);
+        font-family: var(--main-font-name-it);
+      }
 
       &.loading {
         animation-duration: 2s;
@@ -77,13 +88,13 @@
       }
 
       .rank-avatar {
-        min-width: 32px;
-        min-height: 32px;
-        width: 32px;
-        height: 32px;
-        border-radius: 32px;
+        min-width: 26px;
+        min-height: 26px;
+        width: 26px;
+        height: 26px;
+        border-radius: 26px;
         background-size: contain;
-        margin: auto 0;
+        margin: auto 0 auto 10px;
       }
 
       .rank-name-container {
@@ -93,8 +104,8 @@
         margin: auto 0;
         width: 100%;
         text-align: left;
-        text-indent: 16px;
-        font-size: 16px !important;
+        text-indent: 10px;
+        font-size: 14px !important;
         overflow: hidden;
 
         .rank-name {
@@ -117,20 +128,20 @@
         }
       }
 
-      @media screen and (max-width: 750px) {
-        .constructed-rank {
-          scale: 0.75;
-        }
-        .limited-rank {
-          scale: 0.75;
-        }
+      .constructed-rank,
+      .limited-rank {
+        scale: 0.75;
       }
 
       .rank-icon {
         display: flex;
+        height: 34px;
+        align-items: center;
 
         .rank-position {
-          margin: 0 8px;
+          margin: 0 6px;
+          font-size: 13px;
+          line-height: 34px;
           color: var(--color-text-dark);
                   
           @media screen and (max-width: 600px) {
