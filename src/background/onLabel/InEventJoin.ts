@@ -31,6 +31,17 @@ interface Entry extends LogEntry {
   };
 }
 
+/**
+ * Course joins fire for EVERY queue — ranked ladders included — and a ladder
+ * join carries no deck either (it arrives via EventSetDeckV2 afterwards), so
+ * "joined with no deck" alone is not proof of a draft. Without this gate every
+ * ranked session seeded a picks-less draft stub named after the ladder.
+ * "Draft" covers all of Arena's draft flavours (Quick/Premier/Trad/PickTwo/
+ * Comp); Sealed stays out deliberately — it has no picks to record.
+ */
+const isDraftEvent = (eventName: string): boolean =>
+  eventName.indexOf("Draft") !== -1;
+
 function beginDraft(eventName: string, courseId: string | undefined): void {
   resetCurrentDraft();
   setDraftData({
@@ -53,13 +64,14 @@ export default function InEventJoin(entry: Entry): void {
   const course = json.Course;
   if (course) {
     globalStore.currentCourses[course.InternalEventName] = course;
-    // A freshly joined course with no deck yet means a draft is starting. Deck
-    // selection for constructed events flows through EventSetDeckV3 instead.
+    // A freshly joined draft course with no deck yet means the draft is
+    // starting. Deck selection for constructed events flows through
+    // EventSetDeckV3 instead.
     const hasDeck =
       course.CourseDeck &&
       course.CourseDeck.MainDeck &&
       course.CourseDeck.MainDeck.length > 0;
-    if (!hasDeck) {
+    if (!hasDeck && isDraftEvent(course.InternalEventName)) {
       beginDraft(course.InternalEventName, course.CourseId);
     }
     return;
@@ -68,8 +80,7 @@ export default function InEventJoin(entry: Entry): void {
   if (json.CourseDeck) {
     const deck = new Deck(json.CourseDeck);
     selectDeck(deck);
-  } else if (json.InternalEventName) {
-    // Most likely a draft
+  } else if (json.InternalEventName && isDraftEvent(json.InternalEventName)) {
     beginDraft(json.InternalEventName, json.Id);
   }
 }

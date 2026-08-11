@@ -326,3 +326,42 @@ describe("human draft in the 2026 log format", () => {
     expect(ends.length).toBeGreaterThanOrEqual(2);
   });
 });
+
+describe("joining a non-draft event", () => {
+  // Course joins fire for every queue. A ladder join has no deck attached
+  // either (it arrives via the deck submit afterwards), so it must not seed
+  // a draft record — this used to leave "Timeless Ranked" stubs with zero
+  // picks on the drafts tab.
+  const LADDER_FIXTURE = [
+    req("EventJoin", { EventName: "Timeless_Ladder" }),
+    res("EventJoin", {
+      Course: {
+        CourseId: "cccccccc-0000-0000-0000-00000000000c",
+        InternalEventName: "Timeless_Ladder",
+        CurrentModule: "PairingQueue",
+        ModulePayload: "",
+        CourseDeckSummary: { Attributes: [] },
+        CardPool: [],
+        CardStyles: [],
+      },
+      InventoryInfo: {},
+    }),
+  ].join("");
+
+  beforeAll(async () => {
+    await replay(LADDER_FIXTURE);
+  });
+
+  it("does not seed a draft record", () => {
+    expect(globalStore.currentDraft.eventId).not.toBe("Timeless_Ladder");
+    expect(globalStore.currentDraft.id).not.toBe(
+      "cccccccc-0000-0000-0000-00000000000c"
+    );
+  });
+
+  it("still remembers the course for other handlers", () => {
+    expect(globalStore.currentCourses.Timeless_Ladder?.CourseId).toBe(
+      "cccccccc-0000-0000-0000-00000000000c"
+    );
+  });
+});
