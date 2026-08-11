@@ -29,10 +29,15 @@ import FilterSection from "../../ui/FilterSection";
 import FormatToggle, { MatchFormat } from "../../ui/FormatToggle";
 import Section from "../../ui/Section";
 import Toggle from "../../ui/Toggle";
+import SavedDecksList from "./SavedDecksList";
+
+export type DecksTab = "played" | "saved";
 
 interface DeckListProps {
   openHistoryStatsPopup: () => void;
   datePickerDoShow: () => void;
+  /** Which deck pool to show. The filter chrome stays either way. */
+  tab: DecksTab;
   /** Played/Saved switch, merged into the filter section. */
   tabsToggle?: React.ReactNode;
 }
@@ -49,7 +54,7 @@ export default function DecksList(props: DeckListProps) {
     (state: AppState) => state.mainData.hiddenDecks
   );
 
-  const { openHistoryStatsPopup, datePickerDoShow, tabsToggle } = props;
+  const { openHistoryStatsPopup, datePickerDoShow, tab, tabsToggle } = props;
 
   const [showHidden, setShowHidden] = useState(
     getLocalSetting("showHiddenDecks")
@@ -198,9 +203,12 @@ export default function DecksList(props: DeckListProps) {
 
   return (
     <>
+      {/* Date/event filters shape played-deck stats only — greyed out (not
+          hidden) on the saved tab so the layout never jumps. */}
       <FilterSection
         openHistoryStatsPopup={openHistoryStatsPopup}
         datePickerDoShow={datePickerDoShow}
+        disabled={tab === "saved"}
       >
         {tabsToggle}
       </FilterSection>
@@ -235,50 +243,59 @@ export default function DecksList(props: DeckListProps) {
           />
         </Flex>
       </Section>
-      <Section className="decks-table-controls">
-        <SortControls<StatsDeck>
-          setSortCallback={(s: Sort<StatsDeck>) => dispatch(setDeckSort(s))}
-          defaultSort={sortValue}
-          columnKeys={["lastUsed", "name", "winrate", "totalGames", "colors"]}
-          columnNames={[
-            "Last Used",
-            "Name",
-            "Winrate",
-            "Games played",
-            "Colors",
-          ]}
+      {tab === "saved" ? (
+        <SavedDecksList
+          active
+          nameFilter={deckNameFilterState}
+          colorBits={colorFilterState}
+          format={format}
         />
-        <div className="decks-table-wrapper">
-          {filteredData
-            .slice(
-              pagingControlProps.pageIndex * pagingControlProps.pageSize,
-              (pagingControlProps.pageIndex + 1) * pagingControlProps.pageSize
-            )
-            .map((deck) => {
-              const fullDeck = getDeckWithStats(deck?.id || "");
-              if (fullDeck) {
-                return (
-                  <DecksArtViewRow
-                    clickDeck={openDeck}
-                    hidden={globalData.hiddenDecks.includes(deck?.id)}
-                    unhide={unhideDeck}
-                    hide={hideDeck}
-                    key={deck.id}
-                    deck={fullDeck}
-                  />
-                );
-              }
-              return <Fragment key={`${new Date().getTime()}-decklist`} />;
-            })}
-        </div>
-
-        <div style={{ marginTop: "10px" }}>
-          <PagingControls
-            {...pagingControlProps}
-            pageSizeOptions={[10, 25, 50, 100]}
+      ) : (
+        <Section className="decks-table-controls">
+          <SortControls<StatsDeck>
+            setSortCallback={(s: Sort<StatsDeck>) => dispatch(setDeckSort(s))}
+            defaultSort={sortValue}
+            columnKeys={["lastUsed", "name", "winrate", "totalGames", "colors"]}
+            columnNames={[
+              "Last Used",
+              "Name",
+              "Winrate",
+              "Games played",
+              "Colors",
+            ]}
           />
-        </div>
-      </Section>
+          <div className="decks-table-wrapper">
+            {filteredData
+              .slice(
+                pagingControlProps.pageIndex * pagingControlProps.pageSize,
+                (pagingControlProps.pageIndex + 1) * pagingControlProps.pageSize
+              )
+              .map((deck) => {
+                const fullDeck = getDeckWithStats(deck?.id || "");
+                if (fullDeck) {
+                  return (
+                    <DecksArtViewRow
+                      clickDeck={openDeck}
+                      hidden={globalData.hiddenDecks.includes(deck?.id)}
+                      unhide={unhideDeck}
+                      hide={hideDeck}
+                      key={deck.id}
+                      deck={fullDeck}
+                    />
+                  );
+                }
+                return <Fragment key={`${new Date().getTime()}-decklist`} />;
+              })}
+          </div>
+
+          <div style={{ marginTop: "10px" }}>
+            <PagingControls
+              {...pagingControlProps}
+              pageSizeOptions={[10, 25, 50, 100]}
+            />
+          </div>
+        </Section>
+      )}
     </>
   );
 }

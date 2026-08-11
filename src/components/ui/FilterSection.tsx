@@ -24,6 +24,8 @@ interface FilterSectionProps {
   datePickerDoShow: () => void;
   /** Rendered at the left edge, inside the same section as the filters. */
   children?: React.ReactNode;
+  /** Grey out and ignore the filter controls (children stay active). */
+  disabled?: boolean;
 }
 
 export default function FilterSection(props: FilterSectionProps) {
@@ -39,7 +41,7 @@ export default function FilterSection(props: FilterSectionProps) {
   );
   const dispatch = useDispatch();
 
-  const { openHistoryStatsPopup, datePickerDoShow, children } = props;
+  const { openHistoryStatsPopup, datePickerDoShow, children, disabled } = props;
 
   const containerRef: MutableRefObject<HTMLInputElement | null> = useRef(null);
 
@@ -108,56 +110,68 @@ export default function FilterSection(props: FilterSectionProps) {
       <div className="FilterSection">
         <Section style={{ marginTop: "16px", marginBottom: "16px" }}>
           {children}
-          <Select
-            style={{ width: "280px" }}
-            options={transformedEvents}
-            optionFormatter={(e) => (e === "" ? "All" : getEventPrettyName(e))}
-            current={eventFilter}
-            callback={setEventFilter}
-          />
-          <div style={{ lineHeight: "32px", marginLeft: "16px" }}>From:</div>
-          <InputContainer style={{ width: "auto" }} title="">
-            <input
-              onClick={datePickerDoShow}
-              ref={containerRef}
-              style={{
-                backgroundColor: "var(--color-base)",
-                width: "140px",
-                cursor: "pointer",
-              }}
-              readOnly
-              type="date"
-              value={datePickerDate.toISOString().substring(0, 10)}
+          <div
+            style={{
+              display: "flex",
+              flexGrow: 1,
+              opacity: disabled ? 0.4 : 1,
+              pointerEvents: disabled ? "none" : undefined,
+              transition: "opacity 0.2s ease-in-out",
+            }}
+          >
+            <Select
+              style={{ width: "280px" }}
+              options={transformedEvents}
+              optionFormatter={(e) =>
+                e === "" ? "All" : getEventPrettyName(e)
+              }
+              current={eventFilter}
+              callback={setEventFilter}
             />
-          </InputContainer>
-          <Select
-            options={dateOptions}
-            current={fromDateOption}
-            callback={(opt: DateOption) => {
-              dispatch(setDateOption(opt));
-            }}
-          />
+            <div style={{ lineHeight: "32px", marginLeft: "16px" }}>From:</div>
+            <InputContainer style={{ width: "auto" }} title="">
+              <input
+                onClick={datePickerDoShow}
+                ref={containerRef}
+                style={{
+                  backgroundColor: "var(--color-base)",
+                  width: "140px",
+                  cursor: "pointer",
+                }}
+                readOnly
+                type="date"
+                value={datePickerDate.toISOString().substring(0, 10)}
+              />
+            </InputContainer>
+            <Select
+              options={dateOptions}
+              current={fromDateOption}
+              callback={(opt: DateOption) => {
+                dispatch(setDateOption(opt));
+              }}
+            />
 
-          <SvgButton
-            svg={SyncIcon}
-            style={{
-              height: "24px",
-              width: "24px",
-              margin: "auto 0 auto auto",
-              padding: "4px",
-            }}
-            onClick={refreshMatches}
-          />
-          <SvgButton
-            svg={StatsIcon}
-            style={{
-              height: "24px",
-              width: "24px",
-              margin: "auto 0 auto 16px",
-              padding: "4px",
-            }}
-            onClick={openHistoryStatsPopup}
-          />
+            <SvgButton
+              svg={SyncIcon}
+              style={{
+                height: "24px",
+                width: "24px",
+                margin: "auto 0 auto auto",
+                padding: "4px",
+              }}
+              onClick={refreshMatches}
+            />
+            <SvgButton
+              svg={StatsIcon}
+              style={{
+                height: "24px",
+                width: "24px",
+                margin: "auto 0 auto 16px",
+                padding: "4px",
+              }}
+              onClick={openHistoryStatsPopup}
+            />
+          </div>
         </Section>
       </div>
     </>
