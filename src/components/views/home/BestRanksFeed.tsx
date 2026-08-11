@@ -3,14 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import { DEFAULT_AVATAR } from "../../../constants";
 import { getLatestRanks } from "../../../data/publicProfiles";
 import cleanUsername from "../../../utils/cleanUsername";
-import timeAgo from "../../../utils/timeAgo";
 import RankIcon from "../../RankIcon";
 import DbRankInfo from "./DbRankInfo";
 import { sortConstructedRanks, sortLimitedRanks } from "./sortRanks";
 
 function DrawConstructedRank(props: DbRankInfo) {
   const {
-    updated,
     name,
     avatar,
     constructedClass,
@@ -35,7 +33,6 @@ function DrawConstructedRank(props: DbRankInfo) {
       />
       <div className="rank-name-container">
         <div className="rank-name">{cleanUsername(name || "-")}</div>
-        <div className="rank-time">{timeAgo(updated)}</div>
       </div>
       <div className="rank-icon">
         <div className="rank-position">
@@ -57,7 +54,6 @@ function DrawConstructedRank(props: DbRankInfo) {
 
 function DrawLimitedRank(props: DbRankInfo) {
   const {
-    updated,
     name,
     avatar,
     limitedClass,
@@ -81,8 +77,7 @@ function DrawLimitedRank(props: DbRankInfo) {
         }}
       />
       <div className="rank-name-container">
-        <div className="rank-name">{name || "-"}</div>
-        <div className="rank-time">{timeAgo(updated)}</div>
+        <div className="rank-name">{cleanUsername(name || "-")}</div>
       </div>
       <div className="rank-icon">
         <div className="rank-position">
@@ -108,7 +103,7 @@ function DrawLoadingRank() {
   );
 }
 
-const emptyList = new Array(8).fill(0);
+const emptyList = new Array(10).fill(0);
 
 export default function BestRanksFeed() {
   const [allRanks, setAllRanks] = useState<DbRankInfo[]>([]);
@@ -124,9 +119,9 @@ export default function BestRanksFeed() {
     getLatestRanks(200).then((ranks) => setAllRanks(ranks));
   }, [isLoadingRef]);
 
-  const bestConstructed = allRanks.sort(sortConstructedRanks).slice(0, 8);
+  const bestConstructed = [...allRanks].sort(sortConstructedRanks).slice(0, 10);
 
-  const bestLimited = allRanks.sort(sortLimitedRanks).slice(0, 8);
+  const bestLimited = [...allRanks].sort(sortLimitedRanks).slice(0, 10);
 
   return (
     <div className="ranks-feed-container">

@@ -11,6 +11,7 @@ import vodiFn from "../../../utils/voidfn";
 import DecksArtViewRow from "../../DecksArtViewRow";
 import Section from "../../ui/Section";
 import { MatchData } from "../history/convertDbMatchData";
+import BestRanksFeed from "./BestRanksFeed";
 
 interface ViewHomeProps {
   matchesData?: MatchData[];
@@ -207,6 +208,13 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
         <div style={{ fontSize: "24px", color: "var(--color-text)" }}>
           Welcome back, {displayName}
         </div>
+      </Section>
+
+      <Section
+        style={{ margin: "16px 0", padding: "20px", flexDirection: "column" }}
+      >
+        <div className="separator-title">Top ranked players</div>
+        <BestRanksFeed />
       </Section>
 
       <Section

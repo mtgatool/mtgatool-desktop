@@ -23,6 +23,10 @@ interface WhatsNewItem {
  */
 const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
   {
+    title: "Top ranked players",
+    body: "The Home tab shows the top 10 ranked players on Constructed and Limited, with their avatars and current rank.",
+  },
+  {
     title: "Draft tracking is back",
     body: "The draft overlay works again — Quick, Premier and Traditional: it follows your packs as you pick, ranks the cards with live 17lands data, and the draft is saved with its event so results can be tracked. The Drafts tab lists your past drafts with date and event filters (all Quick Drafts, all drafts of a set...), shows your win rate for whatever is filtered, and opening a draft replays it pick by pick — including the card pool and the deck you submitted. Drafts sync to your account like matches do.",
   },
