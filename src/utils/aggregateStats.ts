@@ -3,6 +3,7 @@
 import { MatchData } from "../components/views/history/convertDbMatchData";
 import { CardWinrateData, StatsDeck } from "../types/dbTypes";
 import { Filters } from "../types/genericFilterTypes";
+import isLimitedEventId from "./isLimitedEventId";
 import Colors from "./mtga/colors";
 import database from "./mtga/database";
 import doHistoryFilter from "./tables/doHistoryFilter";
@@ -217,6 +218,7 @@ export default function aggregateStats(
           [match.matchId]: hasWon,
         },
         lastUsed: match.timestamp,
+        limited: isLimitedEventId(match.eventId),
         stats: {
           gameWins: match.playerWins,
           gameLosses: match.playerLosses,
@@ -238,6 +240,8 @@ export default function aggregateStats(
       }
     } else {
       const deckToUpdate = stats.deckIndex[deckHash];
+      deckToUpdate.limited =
+        deckToUpdate.limited || isLimitedEventId(match.eventId);
       deckToUpdate.lastUsed =
         match.timestamp > deckToUpdate.lastUsed
           ? match.timestamp

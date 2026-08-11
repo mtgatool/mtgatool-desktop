@@ -55,6 +55,9 @@ export interface StatsDeck {
   matches: Record<string, boolean>;
   colors: number;
   lastUsed: number;
+  // True when any of the deck's matches was in a limited event (draft decks
+  // never leave their event, so this cleanly separates the two pools).
+  limited?: boolean;
   stats: {
     gameWins: number;
     gameLosses: number;

@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { useCardArtCrop } from "../../../hooks/useCardImage";
 import { AppState } from "../../../redux/stores/rendererStore";
 import isLimitedEventId from "../../../utils/isLimitedEventId";
+import FormatToggle, { MatchFormat } from "../../ui/FormatToggle";
 import Section from "../../ui/Section";
 import { MatchData } from "../history/convertDbMatchData";
 
@@ -429,38 +430,6 @@ function DeckPanel({ deck }: { deck?: DeckStat }): JSX.Element {
   );
 }
 
-type TimelineFormat = "constructed" | "limited";
-
-// Constructed | Limited segmented switch — the two ladders share nothing, so
-// the whole tab shows one format at a time. The thumb slides to the chosen
-// side; styles live in scss/timeline.scss.
-function FormatToggle({
-  format,
-  onChange,
-}: {
-  format: TimelineFormat;
-  onChange: (format: TimelineFormat) => void;
-}): JSX.Element {
-  const options: [TimelineFormat, string][] = [
-    ["constructed", "Constructed"],
-    ["limited", "Limited"],
-  ];
-  return (
-    <div className="format-toggle">
-      <div className={`format-toggle-thumb ${format}`} />
-      {options.map(([key, label]) => (
-        <div
-          key={key}
-          onClick={() => onChange(key)}
-          className={`format-toggle-option ${format === key ? "active" : ""}`}
-        >
-          {label}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 interface ViewTimelineProps {
   matchesData: MatchData[];
 }
@@ -468,10 +437,10 @@ interface ViewTimelineProps {
 export default function ViewTimeline(props: ViewTimelineProps): JSX.Element {
   const { matchesData } = props;
   const [hoveredDeck, setHoveredDeck] = useState<string | null>(null);
-  const [format, setFormat] = useState<TimelineFormat>("constructed");
+  const [format, setFormat] = useState<MatchFormat>("constructed");
   const seasons = useSelector((state: AppState) => state.mainData.seasons);
 
-  const switchFormat = (next: TimelineFormat): void => {
+  const switchFormat = (next: MatchFormat): void => {
     setFormat(next);
     // The hovered deck belongs to the format we're leaving.
     setHoveredDeck(null);

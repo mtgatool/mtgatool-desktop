@@ -1,7 +1,7 @@
 @import "./misc.scss";
 
-// Constructed | Limited switch on the Timeline tab. Styled like the app's
-// buttons/selects; the thumb slides under the chosen side.
+// Constructed | Limited switch (components/ui/FormatToggle). Styled like the
+// app's buttons/selects; the thumb slides under the chosen side.
 .format-toggle {
   position: relative;
   display: flex;

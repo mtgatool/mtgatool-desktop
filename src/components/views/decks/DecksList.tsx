@@ -26,6 +26,7 @@ import ManaFilter from "../../ManaFilter";
 import PagingControls from "../../PagingControls";
 import SortControls, { Sort } from "../../SortControls";
 import FilterSection from "../../ui/FilterSection";
+import FormatToggle, { MatchFormat } from "../../ui/FormatToggle";
 import Section from "../../ui/Section";
 import Toggle from "../../ui/Toggle";
 
@@ -51,6 +52,7 @@ export default function DecksList(props: DeckListProps) {
   const [showHidden, setShowHidden] = useState(
     getLocalSetting("showHiddenDecks")
   );
+  const [format, setFormat] = useState<MatchFormat>("constructed");
 
   const getDeckWithStats = useCallback(
     (id: string): StatsDeck | undefined => {
@@ -105,7 +107,9 @@ export default function DecksList(props: DeckListProps) {
       .map((id) => {
         return getDeckWithStats(id);
       })
-      .filter(isDefined);
+      .filter(isDefined)
+      // Constructed and Limited pools are disjoint; show one at a time.
+      .filter((deck) => !!deck.limited === (format === "limited"));
 
     let newFilters = unsetFilter(filters, "inarraystring");
     if (showHidden !== "true") {
@@ -120,7 +124,7 @@ export default function DecksList(props: DeckListProps) {
     }
 
     return doDecksFilter(decksForFiltering, newFilters, sortValue);
-  }, [fullStats, showHidden, hiddenDecks, filters, sortValue]);
+  }, [fullStats, showHidden, hiddenDecks, filters, sortValue, format]);
 
   const pagingControlProps = usePagingControls(filteredData.length, 25);
 
@@ -205,6 +209,11 @@ export default function DecksList(props: DeckListProps) {
               onChange={onDeckNameFilterChange}
             />
           </InputContainer>
+          <FormatToggle
+            format={format}
+            onChange={setFormat}
+            style={{ margin: "auto 16px" }}
+          />
           <ManaFilter
             initialState={colorFilterState}
             callback={setColorFilter}
