@@ -39,6 +39,7 @@ import { MatchData } from "./views/history/convertDbMatchData";
 import HistoryStats from "./views/history/HistoryStats";
 import ViewHistory from "./views/history/ViewHistory";
 import ViewHome from "./views/home/ViewHome";
+import ViewProfile from "./views/profile/ViewProfile";
 import ViewTimeline from "./views/timeline/ViewTimeline";
 
 const views = {
@@ -49,6 +50,8 @@ const views = {
   drafts: ViewDrafts,
   explore: ViewExplore,
   collection: ViewCollection,
+  // Not in the top nav; reached by clicking a player anywhere.
+  profile: ViewProfile,
 };
 
 function delay(transition: any, timeout: number): any {

@@ -23,6 +23,10 @@ interface WhatsNewItem {
  */
 const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
   {
+    title: "Player profiles",
+    body: "Click any player on the Home top-ranked feed to open their public profile: current ranks with their record over the last 30 days, the formats they play, and their latest matches — each opening a public match page with the deck they ran and the action log. Standard-tier Patreon supporters can browse anyone's full match history and their top decks with win rates. Private mode keeps you out of all of it, and Settings lets you choose which Arena account your profile shows.",
+  },
+  {
     title: "Share your decks",
     body: "Decks have a Share button now: it copies a public link anyone can open — no account needed — showing the decklist, mana curve, types, colors and sample hands, plus your win rate with the deck if you choose to show it (and your Patreon badge, supporters). Stop sharing any time and the link dies.",
   },
