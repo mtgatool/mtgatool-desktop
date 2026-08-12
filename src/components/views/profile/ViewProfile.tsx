@@ -4,12 +4,9 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 import { DEFAULT_AVATAR } from "../../../constants";
 import {
   getPlayerDecks,
-  getPlayerMatches,
   getPlayerProfile,
   PlayerDeckRow,
   PlayerDecksPage,
-  PlayerMatchesPage,
-  PlayerMatchRow,
   PlayerProfile,
   ProfileAccount,
   ProfileRankSide,
@@ -25,15 +22,10 @@ import RankIcon from "../../RankIcon";
 import SupporterBadge from "../../SupporterBadge";
 import Button from "../../ui/Button";
 import Section from "../../ui/Section";
+import PlayerMatchesSection from "./PlayerMatchesSection";
 import ProfileDeckRow from "./ProfileDeckRow";
-import ProfileListItemMatch from "./ProfileListItemMatch";
 import PublicDeckView from "./PublicDeckView";
 import PublicMatchView from "./PublicMatchView";
-
-/** How many matches everyone can see; the server enforces the same number. */
-const PUBLIC_MATCHES = 5;
-/** Page size for supporters browsing past the public window. */
-const HISTORY_PAGE = 25;
 
 function RankBlock({
   title,
@@ -150,96 +142,6 @@ function FormatsSummary({
   );
 }
 
-function RecentMatches({ id }: { id: string }): JSX.Element | null {
-  const history = useHistory();
-  const [page, setPage] = useState<PlayerMatchesPage | null>(null);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [showPatreonPopup, setShowPatreonPopup] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    setPage(null);
-    getPlayerMatches({ arenaId: id }, PUBLIC_MATCHES)
-      .then((p) => p ?? getPlayerMatches({ username: id }, PUBLIC_MATCHES))
-      .then((p) => {
-        if (!cancelled && p) setPage(p);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
-
-  const loadMore = useCallback(() => {
-    if (!page || loadingMore) return;
-    setLoadingMore(true);
-    getPlayerMatches({ arenaId: id }, HISTORY_PAGE, page.matches.length)
-      .then(
-        (p) =>
-          p ??
-          getPlayerMatches({ username: id }, HISTORY_PAGE, page.matches.length)
-      )
-      .then((p) => {
-        setLoadingMore(false);
-        if (p && p.matches.length > 0) {
-          setPage({
-            ...p,
-            matches: [...page.matches, ...p.matches],
-          });
-        }
-      });
-  }, [id, page, loadingMore]);
-
-  const openMatch = useCallback(
-    (row: PlayerMatchRow) => {
-      history.push(
-        `/profile/${encodeURIComponent(id)}/match/${encodeURIComponent(
-          row.match_id
-        )}`
-      );
-    },
-    [history, id]
-  );
-
-  if (!page || page.total === 0) return null;
-
-  const hasMore = page.matches.length < page.total;
-
-  return (
-    <Section
-      style={{ flexDirection: "column", padding: "16px", margin: "16px 0 0" }}
-    >
-      <div className="profile-section-title">Recent matches</div>
-      {page.matches.map((row) => (
-        <ProfileListItemMatch
-          row={row}
-          key={`profile-match-${row.match_id}`}
-          openMatchCallback={openMatch}
-        />
-      ))}
-      {hasMore ? (
-        <Button
-          style={{ margin: "16px auto 0" }}
-          text={
-            loadingMore
-              ? "Loading..."
-              : `Show more (${page.matches.length} of ${page.total})`
-          }
-          // Full history is a Standard-tier perk; everyone else gets the
-          // upgrade pitch instead of another page.
-          onClick={
-            page.full_access ? loadMore : (): void => setShowPatreonPopup(true)
-          }
-          disabled={loadingMore}
-        />
-      ) : null}
-      {showPatreonPopup ? (
-        <PatreonInfo closeCallback={(): void => setShowPatreonPopup(false)} />
-      ) : null}
-    </Section>
-  );
-}
-
-/* eslint-disable no-nested-ternary */
 /**
  * The player's decks with their records — a Standard-tier perk. Non-patrons
  * see the section with the upgrade pitch instead of the list.
@@ -307,6 +209,7 @@ function DecksSection({ id }: { id: string }): JSX.Element | null {
   );
 }
 
+/* eslint-disable no-nested-ternary */
 function ProfileContent({ id }: { id: string }): JSX.Element {
   const [profile, setProfile] = useState<PlayerProfile | null>(null);
   const [missing, setMissing] = useState(false);
@@ -408,7 +311,7 @@ function ProfileContent({ id }: { id: string }): JSX.Element {
           </div>
 
           <DecksSection id={id} />
-          <RecentMatches id={id} />
+          <PlayerMatchesSection id={id} />
         </>
       )}
     </div>

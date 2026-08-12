@@ -191,6 +191,23 @@
 // page does not have), and .app-wrapper-back's ::after overlay both covers
 // unpositioned content and eats its pointer events — cards were unhoverable
 // until this stacked above it.
+// Same shell for the signed-out profile page.
+.public-profile-page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 24px;
+
+  .profile-view {
+    padding-bottom: 48px;
+  }
+}
+
 .shared-deck-page {
   position: absolute;
   top: 0;
@@ -256,34 +273,21 @@
       line-height: 24px;
     }
 
-    .shared-deck-owner {
+    .shared-deck-owner.has-profile {
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .shared-deck-owner {
       display: flex;
       align-items: center;
       gap: 6px;
       color: var(--color-text);
       font-size: 13px;
       font-family: var(--main-font-name-it);
-    }
-  }
-
-  .shared-deck-record {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin: auto 16px;
-
-    .record {
-      font-size: 22px;
-      color: var(--color-text);
-    }
-
-    .percent {
-      font-size: 16px;
-    }
-
-    .record-label {
-      font-size: 12px;
-      color: var(--color-text-dark);
     }
   }
 
@@ -316,5 +320,27 @@
   .shared-deck-cta {
     color: var(--color-text-link);
     cursor: pointer;
+  }
+}
+
+// Used inside .shared-deck-page AND on the profile deck view.
+.shared-deck-record {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: auto 16px;
+
+  .record {
+    font-size: 22px;
+    color: var(--color-text);
+  }
+
+  .percent {
+    font-size: 16px;
+  }
+
+  .record-label {
+    font-size: 12px;
+    color: var(--color-text-dark);
   }
 }

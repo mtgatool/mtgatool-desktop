@@ -1,35 +1,30 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg";
-import {
-  getPlayerDecks,
-  getPlayerMatches,
-  PlayerDeckRow,
-  PlayerMatchesPage,
-  PlayerMatchRow,
-} from "../../../data/publicProfiles";
+import { DEFAULT_TILE } from "../../../constants";
+import { getPlayerDecks, PlayerDeckRow } from "../../../data/publicProfiles";
+import { useCards } from "../../../hooks/useCard";
 import { useCardArtCrop } from "../../../hooks/useCardImage";
-import formatPercent from "../../../utils/formatPercent";
-import getWinrateClass from "../../../utils/getWinrateClass";
-import Colors from "../../../utils/mtga/colors";
+import Deck from "../../../utils/mtga/deck";
 import timeAgo from "../../../utils/timeAgo";
+import DeckColorsBar from "../../DeckColorsBar";
 import ManaCost from "../../ManaCost";
+import PublicDeckDetails from "../../PublicDeckDetails";
 import SvgButton from "../../SvgButton";
 import Section from "../../ui/Section";
-import ProfileListItemMatch from "./ProfileListItemMatch";
+import PlayerMatchesSection from "./PlayerMatchesSection";
 
 interface PublicDeckViewProps {
   profileId: string;
   deckId: string;
 }
 
-const PAGE_SIZE = 25;
-
 /**
- * One of a profile's decks: its record and the matches played with it.
- * Reached from the profile's deck list, which is patron-gated — so is the
- * match lookup underneath this view.
+ * One of a profile's decks: the same presentation as the shared-deck page
+ * (list, charts, visual view) plus its aggregate record and the matches
+ * played with it. Reached from the profile's deck list, which is
+ * patron-gated — so is the match lookup underneath this view.
  */
 export default function PublicDeckView({
   profileId,
@@ -37,85 +32,53 @@ export default function PublicDeckView({
 }: PublicDeckViewProps): JSX.Element {
   const history = useHistory();
 
-  const [deck, setDeck] = useState<PlayerDeckRow | null>(null);
-  const [page, setPage] = useState<PlayerMatchesPage | null>(null);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [row, setRow] = useState<PlayerDeckRow | null>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    setDeck(null);
-    setPage(null);
+    setRow(null);
+    setLoaded(false);
     getPlayerDecks({ arenaId: profileId })
       .then((p) =>
         p?.decks.length ? p : getPlayerDecks({ username: profileId })
       )
       .then((p) => {
         if (cancelled) return;
-        setDeck(p?.decks.find((d) => d.id === deckId) ?? null);
-      });
-    getPlayerMatches({ arenaId: profileId }, PAGE_SIZE, 0, deckId)
-      .then(
-        (p) =>
-          p ?? getPlayerMatches({ username: profileId }, PAGE_SIZE, 0, deckId)
-      )
-      .then((p) => {
-        if (!cancelled && p) setPage(p);
+        setRow(p?.decks.find((d) => d.id === deckId) ?? null);
+        setLoaded(true);
       });
     return () => {
       cancelled = true;
     };
   }, [profileId, deckId]);
 
-  const loadMore = useCallback(() => {
-    if (!page || loadingMore) return;
-    setLoadingMore(true);
-    getPlayerMatches(
-      { arenaId: profileId },
-      PAGE_SIZE,
-      page.matches.length,
-      deckId
-    )
-      .then(
-        (p) =>
-          p ??
-          getPlayerMatches(
-            { username: profileId },
-            PAGE_SIZE,
-            page.matches.length,
-            deckId
-          )
-      )
-      .then((p) => {
-        setLoadingMore(false);
-        if (p && p.matches.length > 0) {
-          setPage({ ...p, matches: [...page.matches, ...p.matches] });
-        }
-      });
-  }, [profileId, deckId, page, loadingMore]);
+  const snapshot = row?.deck;
 
-  const openMatch = useCallback(
-    (row: PlayerMatchRow) => {
-      history.push(
-        `/profile/${encodeURIComponent(profileId)}/match/${encodeURIComponent(
-          row.match_id
-        )}`
-      );
-    },
-    [history, profileId]
-  );
+  // The list and charts read cards synchronously from the lookup cache,
+  // which is empty on a cold public page. Prefetch and rebuild once they
+  // land (same fix as the shared-deck page).
+  const allIds = useMemo(() => {
+    const ids = new Set<number>();
+    (snapshot?.mainDeck || []).forEach((c) => ids.add(c.id));
+    (snapshot?.sideboard || []).forEach((c) => ids.add(c.id));
+    return [...ids];
+  }, [snapshot]);
+  const resolvedCards = useCards(allIds);
 
-  const deckArt = useCardArtCrop(deck?.deck?.deckTileId || 0);
+  const deck = useMemo(() => {
+    const d = new Deck({}, snapshot?.mainDeck || [], snapshot?.sideboard || []);
+    d.setName(snapshot?.name || "Deck");
+    d.tile = snapshot?.deckTileId || DEFAULT_TILE;
+    return d;
+    // resolvedCards is the point: the charts read from the card cache,
+    // which is only warm once these lookups come back.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [snapshot, resolvedCards]);
 
-  const colors = useMemo(
-    () => new Colors().addFromBits(deck?.deck?.colors || 0).get(),
-    [deck]
-  );
+  const deckArt = useCardArtCrop(snapshot?.deckTileId || DEFAULT_TILE);
 
-  const wins = deck?.wins ?? 0;
-  const games = deck?.games ?? 0;
-  const winrate = games > 0 ? wins / games : 0;
-
-  if (!page && !deck) {
+  if (!loaded) {
     return (
       <div className="profile-view">
         <Section style={{ marginTop: "16px", padding: "48px" }}>
@@ -125,14 +88,13 @@ export default function PublicDeckView({
     );
   }
 
+  const wins = row?.wins ?? 0;
+  const games = row?.games ?? 0;
+
   return (
     <div className="profile-view">
-      <div
-        className="matches-top"
-        style={{
-          backgroundImage: deckArt ? `url("${deckArt}")` : undefined,
-        }}
-      >
+      <div className="decks-top" style={{ backgroundImage: `url(${deckArt})` }}>
+        <DeckColorsBar deck={deck} />
         <div className="top-inner">
           <div className="flex-item">
             <SvgButton
@@ -150,67 +112,65 @@ export default function PublicDeckView({
                 textShadow: "3px 3px 6px #000000",
               }}
             >
-              {deck?.deck?.name || "Deck"}
+              {deck.getName()}
             </div>
           </div>
           <div className="flex-item">
-            <ManaCost className="manaS20" colors={colors} />
+            <ManaCost className="mana-s20" colors={deck.getColors().get()} />
           </div>
         </div>
       </div>
 
-      {deck ? (
+      {row ? (
+        <>
+          <PublicDeckDetails
+            deck={deck}
+            showWildcards
+            recordSlot={
+              games > 0 ? (
+                <div
+                  className="shared-deck-record"
+                  title={`Last played ${timeAgo(
+                    new Date(row.last_played).getTime()
+                  )}`}
+                >
+                  <span className="record">{`${wins}-${games - wins}`}</span>
+                  <span
+                    className="percent"
+                    style={{
+                      color:
+                        wins / games >= 0.5
+                          ? "var(--color-g)"
+                          : "var(--color-r)",
+                    }}
+                  >
+                    {`${((wins / games) * 100).toFixed(0)}%`}
+                  </span>
+                  <span className="record-label">win rate</span>
+                </div>
+              ) : undefined
+            }
+          />
+          <PlayerMatchesSection
+            id={profileId}
+            deckId={deckId}
+            title="Matches with this deck"
+          />
+        </>
+      ) : (
         <Section
           style={{
-            lineHeight: "36px",
-            padding: "16px",
-            margin: "16px 0 0",
-            justifyContent: "space-around",
+            marginTop: "16px",
+            padding: "48px",
+            flexDirection: "column",
+            textAlign: "center",
           }}
         >
-          <div>
-            Record:{" "}
-            <span style={{ color: "var(--color-text-hover)" }}>
-              {wins}-{games - wins}
-            </span>
-          </div>
-          <div>
-            Winrate:{" "}
-            <span className={getWinrateClass(winrate, true)}>
-              {formatPercent(winrate)}
-            </span>
-          </div>
-          <div>
-            Last played:{" "}
-            <span style={{ color: "var(--color-text-hover)" }}>
-              {timeAgo(new Date(deck.last_played).getTime())}
-            </span>
+          <div style={{ color: "var(--color-text-dark)" }}>
+            This deck is not available.
           </div>
         </Section>
-      ) : null}
-
-      <Section
-        style={{ flexDirection: "column", padding: "16px", margin: "16px 0" }}
-      >
-        <div className="profile-section-title">Matches with this deck</div>
-        {(page?.matches ?? []).map((row) => (
-          <ProfileListItemMatch
-            row={row}
-            key={`deck-match-${row.match_id}`}
-            openMatchCallback={openMatch}
-          />
-        ))}
-        {page && page.matches.length < page.total ? (
-          <div
-            className="profile-matches-more"
-            onClick={loadingMore ? undefined : loadMore}
-          >
-            {loadingMore
-              ? "Loading..."
-              : `Show more (${page.matches.length} of ${page.total})`}
-          </div>
-        ) : null}
-      </Section>
+      )}
     </div>
   );
 }

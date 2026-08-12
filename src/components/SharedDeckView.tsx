@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
 import logoBig from "../assets/images/logo_big.png";
 import { DEFAULT_AVATAR, DEFAULT_TILE } from "../constants";
@@ -7,24 +7,14 @@ import { fetchSharedDeck, SharedDeckPayload } from "../data/sharedDecks";
 import { useCards } from "../hooks/useCard";
 import { useCardArtCrop } from "../hooks/useCardImage";
 import cardsDb from "../utils/cardsDb/cardsDbClient";
-import compareCards from "../utils/compareCards";
-import copyToClipboard from "../utils/copyToClipboard";
 import Colors from "../utils/mtga/colors";
 import Deck from "../utils/mtga/deck";
 import openExternal from "../utils/openExternal";
 import DeckColorsBar from "./DeckColorsBar";
-import DeckColorStats from "./DeckColorStats";
-import DeckList from "./DeckList";
-import DeckManaCurve from "./DeckManaCurve";
-import DeckRarities from "./DeckRarities";
-import DeckSampleHand from "./DeckSampleHand";
-import DeckTypesStats from "./DeckTypesStats";
 import ManaCost from "./ManaCost";
-import Separator from "./Separator";
+import PublicDeckDetails from "./PublicDeckDetails";
 import SupporterBadge from "./SupporterBadge";
-import Button from "./ui/Button";
-import Section from "./ui/Section";
-import VisualDeckView from "./views/decks/VisualDeckView";
+import PlayerMatchesSection from "./views/profile/PlayerMatchesSection";
 
 /**
  * Public shared-deck page (app.mtgatool.com/share/deck/<token>) — what a
@@ -35,11 +25,11 @@ import VisualDeckView from "./views/decks/VisualDeckView";
  */
 export default function SharedDeckView(): JSX.Element {
   const params = useParams<{ id: string }>();
+  const history = useHistory();
   const [dbReady, setDbReady] = useState(false);
   const [dbFailed, setDbFailed] = useState(false);
   const [payload, setPayload] = useState<SharedDeckPayload | null>(null);
   const [missing, setMissing] = useState(false);
-  const [visual, setVisual] = useState(false);
 
   // Card names/art need the cards database; load it without any login. A
   // failure must surface — otherwise the page sits on "Loading" forever.
@@ -100,19 +90,6 @@ export default function SharedDeckView(): JSX.Element {
 
   const deckArt = useCardArtCrop(snapshot?.deckTileId || DEFAULT_TILE);
 
-  const arenaExport = (): void => {
-    // A fresh Deck: sorting in place would reorder the memoized one the page
-    // is rendering.
-    const exportDeck = new Deck(
-      {},
-      snapshot?.mainDeck || [],
-      snapshot?.sideboard || []
-    );
-    exportDeck.sortMainboard(compareCards);
-    exportDeck.sortSideboard(compareCards);
-    copyToClipboard(exportDeck.getExportArena());
-  };
-
   if (missing) {
     return (
       <div className="shared-deck-missing">
@@ -142,6 +119,7 @@ export default function SharedDeckView(): JSX.Element {
   }
 
   const { owner } = payload;
+  const ownerProfile = owner?.username || null;
   const ownerName = owner?.username || "A Planeswalker";
   const wr = payload.winrate;
   const games = wr ? wr.wins + wr.losses : 0;
@@ -167,7 +145,19 @@ export default function SharedDeckView(): JSX.Element {
               />
               <div className="shared-deck-title">
                 <div className="shared-deck-name">{snapshot.name}</div>
-                <div className="shared-deck-owner">
+                <div
+                  className={`shared-deck-owner${
+                    ownerProfile ? " has-profile" : ""
+                  }`}
+                  onClick={
+                    ownerProfile
+                      ? (): void =>
+                          history.push(
+                            `/profile/${encodeURIComponent(ownerProfile)}`
+                          )
+                      : undefined
+                  }
+                >
                   by {ownerName}
                   {owner && owner.supporter_tier > 0 ? (
                     <SupporterBadge tier={owner.supporter_tier} />
@@ -184,85 +174,43 @@ export default function SharedDeckView(): JSX.Element {
           </div>
         </div>
 
-        {visual ? (
-          <VisualDeckView deck={deck} setRegularView={() => setVisual(false)} />
-        ) : (
-          <div className="regular-view-grid">
-            <Section
-              style={{
-                // With no record shown there is nothing to spread apart —
-                // centered buttons instead of buttons shoved to the right.
-                justifyContent: showRecord ? "space-between" : "center",
-                gridArea: "controls",
-              }}
-            >
-              {showRecord && wr ? (
-                <div
-                  className="shared-deck-record"
-                  title={`${wr.wins} wins, ${wr.losses} losses`}
+        <PublicDeckDetails
+          deck={deck}
+          showWildcards={false}
+          recordSlot={
+            showRecord && wr ? (
+              <div
+                className="shared-deck-record"
+                title={`${wr.wins} wins, ${wr.losses} losses`}
+              >
+                <span className="record">{`${wr.wins}-${wr.losses}`}</span>
+                <span
+                  className="percent"
+                  style={{
+                    color:
+                      wr.wins / games >= 0.5
+                        ? "var(--color-g)"
+                        : "var(--color-r)",
+                  }}
                 >
-                  <span className="record">{`${wr.wins}-${wr.losses}`}</span>
-                  <span
-                    className="percent"
-                    style={{
-                      color:
-                        wr.wins / games >= 0.5
-                          ? "var(--color-g)"
-                          : "var(--color-r)",
-                    }}
-                  >
-                    {`${((wr.wins / games) * 100).toFixed(0)}%`}
-                  </span>
-                  <span className="record-label">win rate</span>
-                </div>
-              ) : null}
-              <div style={{ display: "flex" }}>
-                <Button
-                  style={{ margin: "16px" }}
-                  className="button-simple"
-                  text="Visual View"
-                  onClick={() => setVisual(true)}
-                />
-                <Button
-                  style={{ margin: "16px" }}
-                  className="button-simple"
-                  text="Export to Arena"
-                  onClick={arenaExport}
-                />
+                  {`${((wr.wins / games) * 100).toFixed(0)}%`}
+                </span>
+                <span className="record-label">win rate</span>
               </div>
-            </Section>
-            <Section
-              style={{
-                flexDirection: "column",
-                gridArea: "deck",
-                paddingBottom: "16px",
-                paddingLeft: "24px",
-              }}
-            >
-              <DeckList deck={deck} showWildcards={false} />
-            </Section>
-            <Section style={{ flexDirection: "column", gridArea: "types" }}>
-              <Separator>Types</Separator>
-              <DeckTypesStats deck={deck} />
-            </Section>
-            <Section style={{ flexDirection: "column", gridArea: "curves" }}>
-              <Separator>Mana Curve</Separator>
-              <DeckManaCurve deck={deck} />
-            </Section>
-            <Section style={{ flexDirection: "column", gridArea: "pies" }}>
-              <Separator>Colors</Separator>
-              <DeckColorStats deck={deck} />
-            </Section>
-            <Section style={{ flexDirection: "column", gridArea: "rarities" }}>
-              <Separator>Cards by rarity</Separator>
-              <DeckRarities deck={deck} />
-            </Section>
-            <Section style={{ flexDirection: "column", gridArea: "hand" }}>
-              <Separator>Sample hand</Separator>
-              <DeckSampleHand deck={deck} />
-            </Section>
-          </div>
-        )}
+            ) : undefined
+          }
+        />
+
+        {/* The deck's latest matches, when the owner is public. Same
+            component as the profile pages: last five for everyone, the rest
+            behind the Patreon pitch. */}
+        {owner?.username && payload.deck_id ? (
+          <PlayerMatchesSection
+            id={owner.username}
+            deckId={payload.deck_id}
+            title="Recent matches with this deck"
+          />
+        ) : null}
 
         <div
           className="shared-deck-footer"

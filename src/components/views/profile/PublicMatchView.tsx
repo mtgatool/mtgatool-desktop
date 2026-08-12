@@ -260,7 +260,7 @@ export default function PublicMatchView({
             flexDirection: "column",
           }}
         >
-          <DeckList deck={deck} showWildcards={false} />
+          <DeckList deck={deck} showWildcards />
         </Section>
         {match.action_log ? (
           <Section
