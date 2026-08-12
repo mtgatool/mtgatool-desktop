@@ -145,6 +145,7 @@ export default function SharedDeckView(): JSX.Element {
   const ownerName = owner?.username || "A Planeswalker";
   const wr = payload.winrate;
   const games = wr ? wr.wins + wr.losses : 0;
+  const showRecord = !!wr && games > 0;
 
   return (
     <div className="shared-deck-page">
@@ -188,9 +189,14 @@ export default function SharedDeckView(): JSX.Element {
         ) : (
           <div className="regular-view-grid">
             <Section
-              style={{ justifyContent: "space-between", gridArea: "controls" }}
+              style={{
+                // With no record shown there is nothing to spread apart —
+                // centered buttons instead of buttons shoved to the right.
+                justifyContent: showRecord ? "space-between" : "center",
+                gridArea: "controls",
+              }}
             >
-              {wr && games > 0 ? (
+              {showRecord && wr ? (
                 <div
                   className="shared-deck-record"
                   title={`${wr.wins} wins, ${wr.losses} losses`}
@@ -209,9 +215,7 @@ export default function SharedDeckView(): JSX.Element {
                   </span>
                   <span className="record-label">win rate</span>
                 </div>
-              ) : (
-                <div />
-              )}
+              ) : null}
               <div style={{ display: "flex" }}>
                 <Button
                   style={{ margin: "16px" }}
