@@ -24,6 +24,7 @@ import Separator from "./Separator";
 import SupporterBadge from "./SupporterBadge";
 import Button from "./ui/Button";
 import Section from "./ui/Section";
+import VisualDeckView from "./views/decks/VisualDeckView";
 
 /**
  * Public shared-deck page (app.mtgatool.com/share/deck/<token>) — what a
@@ -38,6 +39,7 @@ export default function SharedDeckView(): JSX.Element {
   const [dbFailed, setDbFailed] = useState(false);
   const [payload, setPayload] = useState<SharedDeckPayload | null>(null);
   const [missing, setMissing] = useState(false);
+  const [visual, setVisual] = useState(false);
 
   // Card names/art need the cards database; load it without any login. A
   // failure must surface — otherwise the page sits on "Loading" forever.
@@ -181,70 +183,82 @@ export default function SharedDeckView(): JSX.Element {
           </div>
         </div>
 
-        <div className="regular-view-grid">
-          <Section
-            style={{ justifyContent: "space-between", gridArea: "controls" }}
-          >
-            {wr && games > 0 ? (
-              <div
-                className="shared-deck-record"
-                title={`${wr.wins} wins, ${wr.losses} losses`}
-              >
-                <span className="record">{`${wr.wins}-${wr.losses}`}</span>
-                <span
-                  className="percent"
-                  style={{
-                    color:
-                      wr.wins / games >= 0.5
-                        ? "var(--color-g)"
-                        : "var(--color-r)",
-                  }}
+        {visual ? (
+          <VisualDeckView deck={deck} setRegularView={() => setVisual(false)} />
+        ) : (
+          <div className="regular-view-grid">
+            <Section
+              style={{ justifyContent: "space-between", gridArea: "controls" }}
+            >
+              {wr && games > 0 ? (
+                <div
+                  className="shared-deck-record"
+                  title={`${wr.wins} wins, ${wr.losses} losses`}
                 >
-                  {`${((wr.wins / games) * 100).toFixed(0)}%`}
-                </span>
-                <span className="record-label">win rate</span>
+                  <span className="record">{`${wr.wins}-${wr.losses}`}</span>
+                  <span
+                    className="percent"
+                    style={{
+                      color:
+                        wr.wins / games >= 0.5
+                          ? "var(--color-g)"
+                          : "var(--color-r)",
+                    }}
+                  >
+                    {`${((wr.wins / games) * 100).toFixed(0)}%`}
+                  </span>
+                  <span className="record-label">win rate</span>
+                </div>
+              ) : (
+                <div />
+              )}
+              <div style={{ display: "flex" }}>
+                <Button
+                  style={{ margin: "16px" }}
+                  className="button-simple"
+                  text="Visual View"
+                  onClick={() => setVisual(true)}
+                />
+                <Button
+                  style={{ margin: "16px" }}
+                  className="button-simple"
+                  text="Export to Arena"
+                  onClick={arenaExport}
+                />
               </div>
-            ) : (
-              <div />
-            )}
-            <Button
-              style={{ margin: "16px" }}
-              className="button-simple"
-              text="Export to Arena"
-              onClick={arenaExport}
-            />
-          </Section>
-          <Section
-            style={{
-              flexDirection: "column",
-              gridArea: "deck",
-              paddingBottom: "16px",
-              paddingLeft: "24px",
-            }}
-          >
-            <DeckList deck={deck} showWildcards={false} />
-          </Section>
-          <Section style={{ flexDirection: "column", gridArea: "types" }}>
-            <Separator>Types</Separator>
-            <DeckTypesStats deck={deck} />
-          </Section>
-          <Section style={{ flexDirection: "column", gridArea: "curves" }}>
-            <Separator>Mana Curve</Separator>
-            <DeckManaCurve deck={deck} />
-          </Section>
-          <Section style={{ flexDirection: "column", gridArea: "pies" }}>
-            <Separator>Colors</Separator>
-            <DeckColorStats deck={deck} />
-          </Section>
-          <Section style={{ flexDirection: "column", gridArea: "rarities" }}>
-            <Separator>Cards by rarity</Separator>
-            <DeckRarities deck={deck} />
-          </Section>
-          <Section style={{ flexDirection: "column", gridArea: "hand" }}>
-            <Separator>Sample hand</Separator>
-            <DeckSampleHand deck={deck} />
-          </Section>
-        </div>
+            </Section>
+            <Section
+              style={{
+                flexDirection: "column",
+                gridArea: "deck",
+                paddingBottom: "16px",
+                paddingLeft: "24px",
+              }}
+            >
+              <DeckList deck={deck} showWildcards={false} />
+            </Section>
+            <Section style={{ flexDirection: "column", gridArea: "types" }}>
+              <Separator>Types</Separator>
+              <DeckTypesStats deck={deck} />
+            </Section>
+            <Section style={{ flexDirection: "column", gridArea: "curves" }}>
+              <Separator>Mana Curve</Separator>
+              <DeckManaCurve deck={deck} />
+            </Section>
+            <Section style={{ flexDirection: "column", gridArea: "pies" }}>
+              <Separator>Colors</Separator>
+              <DeckColorStats deck={deck} />
+            </Section>
+            <Section style={{ flexDirection: "column", gridArea: "rarities" }}>
+              <Separator>Cards by rarity</Separator>
+              <DeckRarities deck={deck} />
+            </Section>
+            <Section style={{ flexDirection: "column", gridArea: "hand" }}>
+              <Separator>Sample hand</Separator>
+              <DeckSampleHand deck={deck} />
+            </Section>
+          </div>
+        )}
 
         <div
           className="shared-deck-footer"
