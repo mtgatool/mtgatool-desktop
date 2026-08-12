@@ -103,11 +103,21 @@ export default function ShareDeckPopup(props: ShareDeckPopupProps) {
           list is a snapshot: share again after editing to refresh it.
         </p>
         {shareId ? (
-          <input
-            readOnly
-            value={sharedDeckUrl(shareId)}
-            onFocus={(e) => e.target.select()}
-          />
+          <div className="share-deck-link-row">
+            <input
+              readOnly
+              value={sharedDeckUrl(shareId)}
+              onFocus={(e) => e.target.select()}
+            />
+            <div
+              className="copy-button"
+              title="Copy link"
+              onClick={() => {
+                copyToClipboard(sharedDeckUrl(shareId));
+                toast("Public link copied to clipboard.");
+              }}
+            />
+          </div>
         ) : null}
         <Checkbox
           text="Show my win rate with this deck"

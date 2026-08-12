@@ -101,27 +101,45 @@ export default function SharedDeckView(): JSX.Element {
 
   return (
     <div className="shared-deck-page">
-      <div className="decks-top" style={{ backgroundImage: `url(${deckArt})` }}>
-        <DeckColorsBar deck={deck} />
-        <div className="top-inner">
-          <div className="flex-item">
-            <div
-              className="shared-deck-avatar"
-              style={{
-                backgroundImage: `url(${owner?.avatar_url || DEFAULT_AVATAR})`,
-              }}
-            />
-            <div className="shared-deck-title">
-              <div className="shared-deck-name">{snapshot.name}</div>
-              <div className="shared-deck-owner">
-                by {ownerName}
-                {owner && owner.supporter_tier > 0 ? (
-                  <SupporterBadge tier={owner.supporter_tier} />
-                ) : null}
+      <div className="shared-deck-content">
+        <div
+          className="decks-top"
+          style={{ backgroundImage: `url(${deckArt})` }}
+        >
+          <DeckColorsBar deck={deck} />
+          <div className="top-inner">
+            <div className="flex-item">
+              <div
+                className="shared-deck-avatar"
+                style={{
+                  backgroundImage: `url(${
+                    owner?.avatar_url || DEFAULT_AVATAR
+                  })`,
+                }}
+              />
+              <div className="shared-deck-title">
+                <div className="shared-deck-name">{snapshot.name}</div>
+                <div className="shared-deck-owner">
+                  by {ownerName}
+                  {owner && owner.supporter_tier > 0 ? (
+                    <SupporterBadge tier={owner.supporter_tier} />
+                  ) : null}
+                </div>
               </div>
             </div>
+            <div className="flex-item">
+              <ManaCost
+                className="mana-s20"
+                colors={new Colors().addFromBits(snapshot.colors || 0).get()}
+              />
+            </div>
           </div>
-          <div className="flex-item">
+        </div>
+
+        <div className="regular-view-grid">
+          <Section
+            style={{ justifyContent: "space-between", gridArea: "controls" }}
+          >
             {wr && games > 0 ? (
               <div
                 className="shared-deck-record"
@@ -139,64 +157,56 @@ export default function SharedDeckView(): JSX.Element {
                 >
                   {`${((wr.wins / games) * 100).toFixed(0)}%`}
                 </span>
+                <span className="record-label">win rate</span>
               </div>
-            ) : null}
-            <ManaCost
-              className="mana-s20"
-              colors={new Colors().addFromBits(snapshot.colors || 0).get()}
+            ) : (
+              <div />
+            )}
+            <Button
+              style={{ margin: "16px" }}
+              className="button-simple"
+              text="Export to Arena"
+              onClick={arenaExport}
             />
-          </div>
+          </Section>
+          <Section
+            style={{
+              flexDirection: "column",
+              gridArea: "deck",
+              paddingBottom: "16px",
+              paddingLeft: "24px",
+            }}
+          >
+            <DeckList deck={deck} showWildcards={false} />
+          </Section>
+          <Section style={{ flexDirection: "column", gridArea: "types" }}>
+            <Separator>Types</Separator>
+            <DeckTypesStats deck={deck} />
+          </Section>
+          <Section style={{ flexDirection: "column", gridArea: "curves" }}>
+            <Separator>Mana Curve</Separator>
+            <DeckManaCurve deck={deck} />
+          </Section>
+          <Section style={{ flexDirection: "column", gridArea: "pies" }}>
+            <Separator>Colors</Separator>
+            <DeckColorStats deck={deck} />
+          </Section>
+          <Section style={{ flexDirection: "column", gridArea: "rarities" }}>
+            <Separator>Cards by rarity</Separator>
+            <DeckRarities deck={deck} />
+          </Section>
+          <Section style={{ flexDirection: "column", gridArea: "hand" }}>
+            <Separator>Sample hand</Separator>
+            <DeckSampleHand deck={deck} />
+          </Section>
         </div>
-      </div>
 
-      <div className="regular-view-grid">
-        <Section
-          style={{ justifyContent: "space-between", gridArea: "controls" }}
+        <div
+          className="shared-deck-footer"
+          onClick={() => openExternal("https://mtgatool.com")}
         >
-          <Button
-            style={{ margin: "16px" }}
-            className="button-simple"
-            text="Export to Arena"
-            onClick={arenaExport}
-          />
-        </Section>
-        <Section
-          style={{
-            flexDirection: "column",
-            gridArea: "deck",
-            paddingBottom: "16px",
-            paddingLeft: "24px",
-          }}
-        >
-          <DeckList deck={deck} showWildcards={false} />
-        </Section>
-        <Section style={{ flexDirection: "column", gridArea: "types" }}>
-          <Separator>Types</Separator>
-          <DeckTypesStats deck={deck} />
-        </Section>
-        <Section style={{ flexDirection: "column", gridArea: "curves" }}>
-          <Separator>Mana Curve</Separator>
-          <DeckManaCurve deck={deck} />
-        </Section>
-        <Section style={{ flexDirection: "column", gridArea: "pies" }}>
-          <Separator>Colors</Separator>
-          <DeckColorStats deck={deck} />
-        </Section>
-        <Section style={{ flexDirection: "column", gridArea: "rarities" }}>
-          <Separator>Cards by rarity</Separator>
-          <DeckRarities deck={deck} />
-        </Section>
-        <Section style={{ flexDirection: "column", gridArea: "hand" }}>
-          <Separator>Sample hand</Separator>
-          <DeckSampleHand deck={deck} />
-        </Section>
-      </div>
-
-      <div
-        className="shared-deck-footer"
-        onClick={() => openExternal("https://mtgatool.com")}
-      >
-        Tracked with <b>MTG Arena Tool</b> — free deck tracker for MTG Arena
+          Tracked with <b>MTG Arena Tool</b> — free deck tracker for MTG Arena
+        </div>
       </div>
     </div>
   );

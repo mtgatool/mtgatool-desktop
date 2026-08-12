@@ -165,6 +165,16 @@
     width: 100%;
   }
 
+  .share-deck-link-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    input {
+      flex: 1 1 auto;
+    }
+  }
+
   .share-deck-buttons {
     display: flex;
     justify-content: center;
@@ -175,10 +185,53 @@
 
 // The public /share/deck/<token> page. Reuses the deck view grid; only the
 // header identity strip and footer are its own.
+//
+// Its own scroll container, positioned above the wrapper: the app body has
+// overflow hidden (in-app views scroll inside ContentWrapper, which this
+// page does not have), and .app-wrapper-back's ::after overlay both covers
+// unpositioned content and eats its pointer events — cards were unhoverable
+// until this stacked above it.
 .shared-deck-page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-bottom: 24px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  .shared-deck-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 24px;
+  }
+
+  // Same trick as the post-match MVP banner: a dark gradient rising from the
+  // bottom so the name and owner stay readable over any card art.
+  .decks-top {
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        to top,
+        rgba(10, 10, 11, 0.9) 0%,
+        rgba(10, 10, 11, 0.55) 55%,
+        rgba(10, 10, 11, 0.15) 100%
+      );
+      pointer-events: none;
+    }
+
+    > * {
+      position: relative;
+    }
+  }
 
   .shared-deck-avatar {
     width: 40px;
@@ -217,16 +270,20 @@
     display: flex;
     align-items: baseline;
     gap: 8px;
-    margin-right: 16px;
-    text-shadow: 3px 3px 6px #000000;
+    margin: auto 16px;
 
     .record {
       font-size: 22px;
-      color: var(--color-text-hover);
+      color: var(--color-text);
     }
 
     .percent {
       font-size: 16px;
+    }
+
+    .record-label {
+      font-size: 12px;
+      color: var(--color-text-dark);
     }
   }
 
