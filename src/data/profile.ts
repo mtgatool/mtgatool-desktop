@@ -57,6 +57,7 @@ export async function updateUsername(username: string): Promise<boolean> {
     const { error } = await supabase.from("profiles").upsert({
       id: uid,
       username,
+      display_name: username,
       updated_at: new Date().toISOString(),
     });
     if (error) {
@@ -130,5 +131,74 @@ export async function fetchOwnAvatarUrl(): Promise<string | null> {
     return (data?.avatar_url as string) ?? null;
   } catch {
     return null;
+  }
+}
+
+/** An Arena account linked to the current login, for the settings selector. */
+export interface OwnArenaAccount {
+  arenaId: string;
+  displayName: string | null;
+  lastSeenAt: string | null;
+}
+
+/**
+ * The login's linked Arena accounts, most recently played first. Own rows
+ * only (RLS); used to pick which account the public profile shows.
+ */
+export async function fetchOwnArenaAccounts(): Promise<OwnArenaAccount[]> {
+  try {
+    const uid = await currentUserId();
+    if (!uid) return [];
+    const { data, error } = await supabase
+      .from("arena_accounts")
+      .select("*")
+      .eq("user_id", uid)
+      .order("last_seen_at", { ascending: false });
+    if (error || !data) return [];
+    return data.map((row) => ({
+      arenaId: row.arena_id,
+      displayName: row.display_name,
+      lastSeenAt: row.last_seen_at,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/** The account the login has pinned to its public profile, or null. */
+export async function fetchOwnVisibleArenaId(): Promise<string | null> {
+  try {
+    const uid = await currentUserId();
+    if (!uid) return null;
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", uid)
+      .maybeSingle();
+    if (error) return null;
+    return data?.visible_arena_id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Pin which Arena account the public profile shows, or null to go back to
+ * "most recently played". Best-effort; never throws.
+ */
+export async function setVisibleArenaAccount(
+  arenaId: string | null
+): Promise<void> {
+  try {
+    const uid = await currentUserId();
+    if (!uid) return;
+    await supabase.from("profiles").upsert({
+      id: uid,
+      visible_arena_id: arenaId,
+      updated_at: new Date().toISOString(),
+    });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn("[profile] setVisibleArenaAccount failed:", e);
   }
 }
