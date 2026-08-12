@@ -44,6 +44,13 @@ export interface AggregatedStats {
   matchesWinrate: Winrate;
   onThePlayWinrate: Winrate;
   onTheDrawWinrate: Winrate;
+  /** Match record against each opponent rank class (Bronze..Mythic). */
+  rankWinrates: Record<string, Winrate>;
+  /** Best-of-three-and-up only: game 1 record vs post-sideboard record. */
+  gameOneWinrate: Winrate;
+  sidedWinrate: Winrate;
+  bestWinStreak: number;
+  currentStreak: { length: number; wins: boolean };
 }
 
 export default function aggregateStats(
@@ -74,6 +81,11 @@ export default function aggregateStats(
       wins: 0,
       losses: 0,
     },
+    rankWinrates: {},
+    gameOneWinrate: { wins: 0, losses: 0 },
+    sidedWinrate: { wins: 0, losses: 0 },
+    bestWinStreak: 0,
+    currentStreak: { length: 0, wins: false },
   };
 
   // Aggregate all matches
@@ -104,6 +116,13 @@ export default function aggregateStats(
     } else {
       stats.matchesWinrate.losses += 1;
     }
+
+    const oppRank = match.internalMatch.opponent?.rank || "Unranked";
+    if (!stats.rankWinrates[oppRank]) {
+      stats.rankWinrates[oppRank] = { wins: 0, losses: 0 };
+    }
+    if (hasWon) stats.rankWinrates[oppRank].wins += 1;
+    else stats.rankWinrates[oppRank].losses += 1;
     // stats.gamesWinrate.wins += match.playerWins;
     // stats.gamesWinrate.losses += match.playerLosses;
 
@@ -116,7 +135,17 @@ export default function aggregateStats(
     if (typeof pDecKColors === "number") playerColors.addFromBits(pDecKColors);
     else playerColors.addFromArray(pDecKColors);
 
-    const oDecKColors = match.internalMatch.oppDeck.colors as number[] | number;
+    // Matches saved before the oppDeck colour write-back fix carry a stale 0
+    // (or empty array) inside the match; the row's own oppDeckColors was
+    // computed correctly, so fall back to it rather than filing those under
+    // colourless.
+    const rawOppColors = match.internalMatch.oppDeck.colors as
+      | number[]
+      | number;
+    const oppHasColors = Array.isArray(rawOppColors)
+      ? rawOppColors.length > 0
+      : !!rawOppColors;
+    const oDecKColors = oppHasColors ? rawOppColors : match.oppDeckColors || 0;
     const oppColors = new Colors();
     if (typeof oDecKColors === "number") oppColors.addFromBits(oDecKColors);
     else oppColors.addFromArray(oDecKColors);
@@ -155,6 +184,13 @@ export default function aggregateStats(
       const game = match.internalMatch.gameStats[parseInt(gameNum)];
 
       if (game) {
+        // Game 1 vs post-sideboard, where sideboarding exists at all.
+        if (match.internalMatch.bestOf > 1) {
+          const sideBucket =
+            parseInt(gameNum) === 0 ? stats.gameOneWinrate : stats.sidedWinrate;
+          if (game.winner === playerSeat) sideBucket.wins += 1;
+          else sideBucket.losses += 1;
+        }
         if (game.winner === playerSeat) {
           stats.myColorWinrates[pColorBits].wins += 1;
           stats.vsColorWinrates[oColorBits].wins += 1;
@@ -348,6 +384,26 @@ export default function aggregateStats(
     });
   });
 
-  // ..
+  // Streaks over the filtered stretch, in play order.
+  const ordered = [...filtered].sort((a, b) => a.timestamp - b.timestamp);
+  let run = 0;
+  ordered.forEach((m) => {
+    if (m.playerWins > m.playerLosses) {
+      run += 1;
+      stats.bestWinStreak = Math.max(stats.bestWinStreak, run);
+    } else {
+      run = 0;
+    }
+  });
+  for (let i = ordered.length - 1; i >= 0; i -= 1) {
+    const won = ordered[i].playerWins > ordered[i].playerLosses;
+    if (i === ordered.length - 1) {
+      stats.currentStreak = { length: 1, wins: won };
+    } else if (won === stats.currentStreak.wins) {
+      stats.currentStreak.length += 1;
+    } else break;
+  }
+  if (!ordered.length) stats.currentStreak = { length: 0, wins: false };
+
   return stats;
 }

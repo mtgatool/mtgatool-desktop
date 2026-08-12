@@ -5,8 +5,8 @@
   height: calc(100% - 48px);
   width: calc(100% - 48px);
   grid-template-columns: 50% 50%;
-  grid-template-rows: 50% 50%;
-  grid-template-areas: "stats stats" "byColor vsColor";
+  grid-template-rows: 38% 24% 38%;
+  grid-template-areas: "stats stats" "ranks sided" "byColor vsColor";
   grid-gap: 16px;
 
   .stats-panel {

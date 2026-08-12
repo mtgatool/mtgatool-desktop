@@ -255,7 +255,7 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
         open={false}
         className={getPopupClass(os)}
         width="1000px"
-        height="600px"
+        height="720px"
         openFnRef={openHistoryStatsPopup}
         closeFnRef={closeHistoryStatsPopup}
       >
