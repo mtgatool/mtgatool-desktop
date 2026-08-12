@@ -90,15 +90,18 @@ function App(props: AppProps) {
   }, [matchInProgress, draftInProgress]);
 
   useEffect(() => {
-    // The public pages (/live/<token>, /share/deck/<token>, /profile/<id>)
-    // must work with no account — never bounce them to /auth or run the
-    // login flow for them.
+    // The token pages (/live/<token>, /share/deck/<token>) must work with no
+    // account — never bounce them to /auth or run the login flow for them.
     if (
       history.location.pathname.startsWith("/live/") ||
-      history.location.pathname.startsWith("/share/") ||
-      history.location.pathname.startsWith("/profile/")
+      history.location.pathname.startsWith("/share/")
     )
       return;
+    // Profiles are public too, but a signed-in visitor should get the full
+    // app around them (and their collection, for crafting costs on deck
+    // lists) — so the login flow RUNS here; only the /auth bounce is
+    // skipped, leaving the signed-out standalone shell to render instead.
+    const onPublicProfile = history.location.pathname.startsWith("/profile/");
     if (canLogin) {
       const autoLogin = getLocalSetting("autoLogin");
 
@@ -114,7 +117,7 @@ function App(props: AppProps) {
       checkSession
         .then((ok) => {
           if (!ok) {
-            history.push("/auth");
+            if (!onPublicProfile) history.push("/auth");
             return undefined;
           }
           // Claim the local store BEFORE hydrating: if it belongs to another
@@ -333,21 +336,13 @@ function App(props: AppProps) {
             {/* Public (no login): shared deck page, see SharedDeckView */}
             <Route exact path="/share/deck/:id" component={SharedDeckView} />
             {/* Player profiles work signed out too (anon-readable RPCs, like
-                shared decks) — signed in they render inside the normal app
-                shell, signed out in a standalone page. */}
-            <Route path="/profile/:id">
-              {loginState == LOGIN_OK ? (
-                <>
-                  <TopNav
-                    openArenaIdSelector={openArenaIdSelector.current}
-                    openSettings={openSettings.current}
-                  />
-                  <ContentWrapper forceOs={forceOs} />
-                </>
-              ) : (
-                <PublicProfilePage />
-              )}
-            </Route>
+                shared decks): with no session this standalone page takes the
+                route; signed in it is absent from the Switch, so /profile
+                falls through to the normal app shell below — whose
+                ContentWrapper needs the /:page param this route lacks. */}
+            {loginState != LOGIN_OK ? (
+              <Route path="/profile/:id" component={PublicProfilePage} />
+            ) : null}
             <Route path="/:page">
               <>
                 <TopNav
