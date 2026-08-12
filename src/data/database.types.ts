@@ -413,31 +413,37 @@ export type Database = {
           avatar_url: string | null;
           background: Json | null;
           created_at: string;
+          display_name: string | null;
           id: string;
           is_private: boolean;
           supporter_tier: number;
           updated_at: string;
           username: string | null;
+          visible_arena_id: string | null;
         };
         Insert: {
           avatar_url?: string | null;
           background?: Json | null;
           created_at?: string;
+          display_name?: string | null;
           id: string;
           is_private?: boolean;
           supporter_tier?: number;
           updated_at?: string;
           username?: string | null;
+          visible_arena_id?: string | null;
         };
         Update: {
           avatar_url?: string | null;
           background?: Json | null;
           created_at?: string;
+          display_name?: string | null;
           id?: string;
           is_private?: boolean;
           supporter_tier?: number;
           updated_at?: string;
           username?: string | null;
+          visible_arena_id?: string | null;
         };
         Relationships: [];
       };
@@ -458,6 +464,32 @@ export type Database = {
       };
       get_shared_deck: {
         Args: { p_share_id: string };
+        Returns: Json;
+      };
+      get_player_profile: {
+        Args: { p_arena_id?: string; p_username?: string };
+        Returns: Json;
+      };
+      get_player_matches: {
+        Args: {
+          p_arena_id?: string;
+          p_username?: string;
+          p_limit?: number;
+          p_offset?: number;
+          p_deck_id?: string;
+        };
+        Returns: Json;
+      };
+      get_player_decks: {
+        Args: { p_arena_id?: string; p_username?: string };
+        Returns: Json;
+      };
+      get_public_match: {
+        Args: {
+          p_match_id: string;
+          p_arena_id?: string;
+          p_username?: string;
+        };
         Returns: Json;
       };
       get_public_profiles: {
