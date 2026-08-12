@@ -415,6 +415,7 @@ export type Database = {
           created_at: string;
           id: string;
           is_private: boolean;
+          supporter_tier: number;
           updated_at: string;
           username: string | null;
         };
@@ -424,6 +425,7 @@ export type Database = {
           created_at?: string;
           id: string;
           is_private?: boolean;
+          supporter_tier?: number;
           updated_at?: string;
           username?: string | null;
         };
@@ -433,6 +435,7 @@ export type Database = {
           created_at?: string;
           id?: string;
           is_private?: boolean;
+          supporter_tier?: number;
           updated_at?: string;
           username?: string | null;
         };

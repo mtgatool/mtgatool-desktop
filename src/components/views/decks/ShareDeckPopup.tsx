@@ -40,12 +40,21 @@ export default function ShareDeckPopup(props: ShareDeckPopupProps) {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!deck?.id) return;
+    if (!deck?.id) return undefined;
+    // Fully reset for the new deck — nothing of the previous share (link or
+    // checkbox) may leak into it — and drop a stale answer if the deck
+    // changes mid-fetch.
     setShareId(null);
+    setIncludeWinrate(true);
+    let cancelled = false;
     getMyDeckShare(deck.id).then((existing) => {
-      setShareId(existing?.shareId ?? null);
-      if (existing) setIncludeWinrate(existing.includeWinrate);
+      if (cancelled || !existing) return;
+      setShareId(existing.shareId);
+      setIncludeWinrate(existing.includeWinrate);
     });
+    return () => {
+      cancelled = true;
+    };
   }, [deck?.id]);
 
   const toast = useCallback(

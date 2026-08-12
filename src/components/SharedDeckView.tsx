@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import logoBig from "../assets/images/logo_big.png";
 import { DEFAULT_AVATAR, DEFAULT_TILE } from "../constants";
 import { fetchSharedDeck, SharedDeckPayload } from "../data/sharedDecks";
+import { useCards } from "../hooks/useCard";
 import { useCardArtCrop } from "../hooks/useCardImage";
 import cardsDb from "../utils/cardsDb/cardsDbClient";
 import compareCards from "../utils/compareCards";
@@ -34,25 +35,50 @@ import Section from "./ui/Section";
 export default function SharedDeckView(): JSX.Element {
   const params = useParams<{ id: string }>();
   const [dbReady, setDbReady] = useState(false);
+  const [dbFailed, setDbFailed] = useState(false);
   const [payload, setPayload] = useState<SharedDeckPayload | null>(null);
   const [missing, setMissing] = useState(false);
 
-  // Card names/art need the cards database; load it without any login.
+  // Card names/art need the cards database; load it without any login. A
+  // failure must surface — otherwise the page sits on "Loading" forever.
   useEffect(() => {
     cardsDb
       .init()
-      .then(() => setDbReady(true))
-      .catch(() => undefined);
+      .then((ready) => (ready ? setDbReady(true) : setDbFailed(true)))
+      .catch(() => setDbFailed(true));
   }, []);
 
   useEffect(() => {
+    // Reset for the new token, and ignore a slow answer for the previous one.
+    setPayload(null);
+    setMissing(false);
+    let cancelled = false;
     fetchSharedDeck(params.id).then((data) => {
+      if (cancelled) return;
       if (data) setPayload(data);
       else setMissing(true);
     });
+    return () => {
+      cancelled = true;
+    };
   }, [params.id]);
 
   const snapshot = payload?.deck;
+
+  // The curve/types/colors charts read cards synchronously from the lookup
+  // cache, which is empty on a cold public page — they rendered blank until
+  // something else happened to fetch the cards. Prefetch every id and rebuild
+  // the deck once they land (same fix as the Home top decks).
+  const allIds = useMemo(() => {
+    const ids = new Set<number>();
+    (snapshot?.mainDeck || []).forEach((c) => ids.add(c.id));
+    (snapshot?.sideboard || []).forEach((c) => ids.add(c.id));
+    (snapshot?.commanders || []).forEach((c) => ids.add(c.id));
+    (snapshot?.companions || []).forEach((c) => ids.add(c.id));
+    return [...ids];
+  }, [snapshot]);
+  const resolvedCards = useCards(allIds);
+
   const deck = useMemo(() => {
     const d = new Deck(
       {
@@ -65,14 +91,24 @@ export default function SharedDeckView(): JSX.Element {
     d.setName(snapshot?.name || "Deck");
     d.tile = snapshot?.deckTileId || DEFAULT_TILE;
     return d;
-  }, [snapshot]);
+    // resolvedCards is the point: the charts below read from the card cache,
+    // which is only warm once these lookups come back.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [snapshot, resolvedCards]);
 
   const deckArt = useCardArtCrop(snapshot?.deckTileId || DEFAULT_TILE);
 
   const arenaExport = (): void => {
-    deck.sortMainboard(compareCards);
-    deck.sortSideboard(compareCards);
-    copyToClipboard(deck.getExportArena());
+    // A fresh Deck: sorting in place would reorder the memoized one the page
+    // is rendering.
+    const exportDeck = new Deck(
+      {},
+      snapshot?.mainDeck || [],
+      snapshot?.sideboard || []
+    );
+    exportDeck.sortMainboard(compareCards);
+    exportDeck.sortSideboard(compareCards);
+    copyToClipboard(exportDeck.getExportArena());
   };
 
   if (missing) {
@@ -86,6 +122,15 @@ export default function SharedDeckView(): JSX.Element {
         >
           mtgatool.com
         </div>
+      </div>
+    );
+  }
+
+  if (dbFailed) {
+    return (
+      <div className="shared-deck-missing">
+        <img src={logoBig} alt="MTG Arena Tool" />
+        <div>Could not load the card database — try reloading the page.</div>
       </div>
     );
   }

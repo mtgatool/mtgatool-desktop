@@ -8,8 +8,6 @@
  */
 import { StatsDeck } from "../types/dbTypes";
 import { v2cardsList } from "../types/deck";
-import sha1 from "../utils/sha1";
-import textRandom from "../utils/textRandom";
 import { getActiveUserId } from "./cloudSync";
 import { Json } from "./database.types";
 import supabase from "./supabase";
@@ -40,6 +38,15 @@ export interface SharedDeckPayload {
   winrate: { wins: number; losses: number } | null;
 }
 /* eslint-enable camelcase */
+
+/** 160 bits from the platform CSPRNG, hex — an unguessable capability. */
+function newShareToken(): string {
+  const bytes = new Uint8Array(20);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
 
 function snapshotOf(deck: StatsDeck): SharedDeckSnapshot {
   return {
@@ -89,26 +96,37 @@ export async function shareDeck(
     const userId = await getActiveUserId();
     if (!userId || !deck.id) return null;
 
-    const existing = await getMyDeckShare(deck.id);
-    const shareId =
-      existing?.shareId || sha1(`${textRandom(64)}-${new Date().getTime()}`);
-
-    const { error } = await supabase.from("shared_decks").upsert(
+    // Insert-then-update rather than a blind upsert: an upsert on
+    // (user_id, deck_id) would overwrite share_id — the primary key the
+    // public link is made of — killing an existing link on every re-share
+    // (and in any race). The insert only wins when no share exists; the
+    // update refreshes content without ever touching the token.
+    await supabase.from("shared_decks").upsert(
       {
-        share_id: shareId,
+        share_id: newShareToken(),
         user_id: userId,
         deck_id: deck.id,
         deck: snapshotOf(deck) as unknown as Json,
         include_winrate: includeWinrate,
-        updated_at: new Date().toISOString(),
       },
-      { onConflict: "user_id,deck_id" }
+      { onConflict: "user_id,deck_id", ignoreDuplicates: true }
     );
+    const { error } = await supabase
+      .from("shared_decks")
+      .update({
+        deck: snapshotOf(deck) as unknown as Json,
+        include_winrate: includeWinrate,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("user_id", userId)
+      .eq("deck_id", deck.id);
     if (error) {
       console.error("[sharedDecks] shareDeck:", error.message);
       return null;
     }
-    return { shareId, includeWinrate };
+    const share = await getMyDeckShare(deck.id);
+    if (!share) return null;
+    return { shareId: share.shareId, includeWinrate };
   } catch (e) {
     console.error("[sharedDecks] shareDeck threw:", e);
     return null;
