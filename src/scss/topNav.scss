@@ -201,11 +201,19 @@
   }
 
   // The tier glyphs are drawn on a square 24 viewBox and fill the medallion,
-  // so they take the whole face and no nudge.
-  &[class*="tier-"] svg {
-    width: 100%;
-    height: 100%;
-    margin-left: 0;
+  // so they take the whole face and no nudge. The medallion itself runs
+  // bigger than the bar is tall — the negative margins let it overflow a
+  // little above and below without growing the top bar.
+  &[class*="tier-"] {
+    width: 32px;
+    height: 32px;
+    margin: -5px 8px;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      margin-left: 0;
+    }
   }
 
   &:hover {
