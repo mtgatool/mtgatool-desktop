@@ -4,6 +4,7 @@ import { Route, Switch, useRouteMatch } from "react-router-dom";
 
 import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import { AppState } from "../../../redux/stores/rendererStore";
+import { StatsDeck } from "../../../types/dbTypes";
 import Deck from "../../../utils/mtga/deck";
 import SegmentedToggle from "../../ui/SegmentedToggle";
 import DecksList from "./DecksList";
@@ -13,6 +14,7 @@ interface ViewDecksProps {
   openHistoryStatsPopup: () => void;
   datePickerDoShow: () => void;
   openDeckView: (deck: Deck) => void;
+  shareDeckCallback?: (deck: StatsDeck) => void;
 }
 
 type DecksTab = "played" | "saved";
@@ -43,7 +45,12 @@ export default function ViewDecks(props: ViewDecksProps) {
   const { url } = useRouteMatch();
   const loggedIn = useIsLoggedIn();
 
-  const { openHistoryStatsPopup, datePickerDoShow, openDeckView } = props;
+  const {
+    openHistoryStatsPopup,
+    datePickerDoShow,
+    openDeckView,
+    shareDeckCallback,
+  } = props;
 
   const decksIndex = useSelector(
     (state: AppState) => state.mainData.decksIndex
@@ -56,7 +63,10 @@ export default function ViewDecks(props: ViewDecksProps) {
   return (
     <Switch>
       <Route exact path={`${url}/:id`}>
-        <DeckView openDeckView={openDeckView} />
+        <DeckView
+          openDeckView={openDeckView}
+          shareDeckCallback={shareDeckCallback}
+        />
       </Route>
       <Route exact path={`${url}/`}>
         {/* One DecksList for both tabs: the filter chrome (and the toggle

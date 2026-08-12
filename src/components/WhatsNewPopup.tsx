@@ -23,6 +23,10 @@ interface WhatsNewItem {
  */
 const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
   {
+    title: "Share your decks",
+    body: "Decks have a Share button now: it copies a public link anyone can open — no account needed — showing the decklist, mana curve, types, colors and sample hands, plus your win rate with the deck if you choose to show it (and your Patreon badge, supporters). Stop sharing any time and the link dies.",
+  },
+  {
     title: "Top ranked players",
     body: "The Home tab shows the top 10 ranked players on Constructed and Limited, with their avatars and current rank.",
   },

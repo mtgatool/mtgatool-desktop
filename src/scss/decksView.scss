@@ -135,3 +135,186 @@
   grid-template-rows: auto auto;
   grid-template-areas: "controls controls" "deck changes";
 }
+
+// ------------------------------------------------------------- deck sharing
+.share-deck-popup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  color: var(--color-text);
+
+  .share-deck-title {
+    font-size: 18px;
+    font-family: var(--main-font-name-it);
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-text-dark);
+    font-size: 14px;
+  }
+
+  input {
+    background-color: var(--color-base);
+    border: 1px solid var(--color-dark);
+    border-radius: 3px;
+    color: var(--color-text);
+    padding: 6px 10px;
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .share-deck-link-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    input {
+      flex: 1 1 auto;
+    }
+  }
+
+  .share-deck-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+  }
+}
+
+// The public /share/deck/<token> page. Reuses the deck view grid; only the
+// header identity strip and footer are its own.
+//
+// Its own scroll container, positioned above the wrapper: the app body has
+// overflow hidden (in-app views scroll inside ContentWrapper, which this
+// page does not have), and .app-wrapper-back's ::after overlay both covers
+// unpositioned content and eats its pointer events — cards were unhoverable
+// until this stacked above it.
+.shared-deck-page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  .shared-deck-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px 24px;
+  }
+
+  // Same trick as the post-match MVP banner: a dark gradient rising from the
+  // bottom so the name and owner stay readable over any card art.
+  .decks-top {
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        to top,
+        rgba(10, 10, 11, 0.9) 0%,
+        rgba(10, 10, 11, 0.55) 55%,
+        rgba(10, 10, 11, 0.15) 100%
+      );
+      pointer-events: none;
+    }
+
+    > * {
+      position: relative;
+    }
+  }
+
+  .shared-deck-avatar {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 40px;
+    background-size: cover;
+    background-position: center;
+    margin: auto 12px auto 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .shared-deck-title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-shadow: 3px 3px 6px #000000;
+
+    .shared-deck-name {
+      color: var(--color-text-hover);
+      font-size: 20px;
+      line-height: 24px;
+    }
+
+    .shared-deck-owner {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--color-text);
+      font-size: 13px;
+      font-family: var(--main-font-name-it);
+    }
+  }
+
+  .shared-deck-record {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: auto 16px;
+
+    .record {
+      font-size: 22px;
+      color: var(--color-text);
+    }
+
+    .percent {
+      font-size: 16px;
+    }
+
+    .record-label {
+      font-size: 12px;
+      color: var(--color-text-dark);
+    }
+  }
+
+  .shared-deck-footer {
+    text-align: center;
+    margin-top: 24px;
+    padding: 12px;
+    color: var(--color-text-dark);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-text);
+    }
+  }
+}
+
+.shared-deck-missing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding-top: 15vh;
+  color: var(--color-text);
+
+  img {
+    width: 160px;
+    opacity: 0.9;
+  }
+
+  .shared-deck-cta {
+    color: var(--color-text-link);
+    cursor: pointer;
+  }
+}

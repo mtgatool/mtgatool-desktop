@@ -38,6 +38,7 @@ import Admin from "./popups/Admin";
 import ArenaIdSelector from "./popups/ArenaIdSelector";
 import DetailedLogs from "./popups/DetailedLogs";
 import SettingsPersistor from "./SettingsPersistor";
+import SharedDeckView from "./SharedDeckView";
 import TopBar from "./TopBar";
 import TopNav from "./TopNav";
 import ViewSettings from "./views/settings/ViewSettings";
@@ -88,9 +89,13 @@ function App(props: AppProps) {
   }, [matchInProgress, draftInProgress]);
 
   useEffect(() => {
-    // The public live-share viewer (/live/<token>) must work with no account —
-    // never bounce it to /auth or run the login flow for it.
-    if (history.location.pathname.startsWith("/live/")) return;
+    // The public pages (/live/<token>, /share/deck/<token>) must work with no
+    // account — never bounce them to /auth or run the login flow for them.
+    if (
+      history.location.pathname.startsWith("/live/") ||
+      history.location.pathname.startsWith("/share/")
+    )
+      return;
     if (canLogin) {
       const autoLogin = getLocalSetting("autoLogin");
 
@@ -192,14 +197,18 @@ function App(props: AppProps) {
   // Show the "What's new" modal once per version, on app open — before login,
   // so returning users see the new-account / no-carryover notice up front.
   useEffect(() => {
-    // Not over the live-share viewer. That view is pointed at by the deck QR
-    // code and captured as an OBS browser source, where a modal nobody can
-    // reach sits on the stream until the scene is rebuilt.
+    // Not over the public pages. The live viewer is captured as an OBS
+    // browser source, where a modal nobody can reach sits on the stream until
+    // the scene is rebuilt; a shared-deck visitor may have no account at all.
     //
     // Returning before the flag is written, not after opening: marking the
-    // version seen here would spend the notice on a window the streamer is
+    // version seen here would spend the notice on a window the person is
     // not looking at, and they would never be shown it in the app itself.
-    if (history.location.pathname.startsWith("/live/")) return;
+    if (
+      history.location.pathname.startsWith("/live/") ||
+      history.location.pathname.startsWith("/share/")
+    )
+      return;
     if (getLocalSetting("whatsNewSeen") !== info.version) {
       openWhatsNew.current();
       setLocalSetting("whatsNewSeen", info.version);
@@ -317,6 +326,8 @@ function App(props: AppProps) {
             <Route exact path="/auth" component={Auth} />
             {/* Public (no login): live overlay share viewer, see LiveShareView */}
             <Route exact path="/live/:id" component={LiveShareView} />
+            {/* Public (no login): shared deck page, see SharedDeckView */}
+            <Route exact path="/share/deck/:id" component={SharedDeckView} />
             <Route path="/:page">
               <>
                 <TopNav

@@ -378,6 +378,36 @@ export type Database = {
           }
         ];
       };
+      shared_decks: {
+        Row: {
+          created_at: string;
+          deck: Json;
+          deck_id: string;
+          include_winrate: boolean;
+          share_id: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          deck: Json;
+          deck_id: string;
+          include_winrate?: boolean;
+          share_id: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Update: {
+          created_at?: string;
+          deck?: Json;
+          deck_id?: string;
+          include_winrate?: boolean;
+          share_id?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           avatar_url: string | null;
@@ -385,6 +415,7 @@ export type Database = {
           created_at: string;
           id: string;
           is_private: boolean;
+          supporter_tier: number;
           updated_at: string;
           username: string | null;
         };
@@ -394,6 +425,7 @@ export type Database = {
           created_at?: string;
           id: string;
           is_private?: boolean;
+          supporter_tier?: number;
           updated_at?: string;
           username?: string | null;
         };
@@ -403,6 +435,7 @@ export type Database = {
           created_at?: string;
           id?: string;
           is_private?: boolean;
+          supporter_tier?: number;
           updated_at?: string;
           username?: string | null;
         };
@@ -422,6 +455,10 @@ export type Database = {
           limited: Json | null;
           updated_at: string;
         }[];
+      };
+      get_shared_deck: {
+        Args: { p_share_id: string };
+        Returns: Json;
       };
       get_public_profiles: {
         Args: { p_arena_ids: string[] };
