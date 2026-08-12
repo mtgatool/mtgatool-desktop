@@ -58,9 +58,12 @@ export default async function setDbMatch(
   const playerDeckColors = playerDeck.getColors().getBits();
   const oppDeckColors = oppDeck.getColors().getBits();
 
-  // The decks list reads the colours off the deck inside the match, not the
-  // ones beside it, so the stale value has to be corrected too.
+  // The decks list and the history rows read the colours off the decks
+  // inside the match, not the ones beside it, so the stale values have to be
+  // corrected too — BOTH of them: forgetting the opponent's was why history
+  // rows showed no opponent colours while the column beside them was right.
   if (match.playerDeck) match.playerDeck.colors = playerDeckColors;
+  if (match.oppDeck) match.oppDeck.colors = oppDeckColors;
 
   const newDbMatch: DbMatch = {
     matchId: match.id,

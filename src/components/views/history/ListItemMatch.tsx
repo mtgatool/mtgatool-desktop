@@ -194,8 +194,13 @@ export default function ListItemMatch({
         >
           <ManaCost
             className="mana-s20"
+            // Matches saved before the oppDeck colour write-back fix carry a
+            // stale 0 inside the match; the column beside it was computed
+            // correctly, so fall back to that.
             colors={new Colors()
-              .addFromBits(internalMatch.oppDeck.colors || 0)
+              .addFromBits(
+                internalMatch.oppDeck.colors || match.oppDeckColors || 0
+              )
               .get()}
           />
         </FlexBottom>
