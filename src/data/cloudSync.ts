@@ -92,6 +92,12 @@ async function upsertArenaAccount(
   arenaId: string,
   displayName?: string
 ): Promise<boolean> {
+  // "default" is the local placeholder used before MTGA's authenticateResponse
+  // has been parsed — it is not an Arena account, and 60 logins once claimed
+  // it in the cloud. Every push funnels through here, so this is the one
+  // gate: the placeholder stays local, its data uploads once the real
+  // playerId is known.
+  if (!arenaId || arenaId === "default") return false;
   const row: Tables["arena_accounts"]["Insert"] = {
     user_id: userId,
     arena_id: arenaId,
