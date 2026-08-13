@@ -69,6 +69,15 @@ export interface MatchState {
   handsDrawn: number[][];
   matchGameStats: MatchGameStats[];
   cardsOdds: Chances;
+  /** Cards deduced gone from the library unseen — see greToClientInterpreter. */
+  missingFromLibrary: number[];
+  /**
+   * Per warped grpId, how many copies are still missing. Set by a library
+   * search; decremented only when a copy of that card RETURNS from the exile
+   * zone into view. A new sighting from anywhere else (a draw, a fetch) is a
+   * different copy and leaves the count alone.
+   */
+  warpBase: Record<number, number>;
 }
 
 export interface OverlayUpdateMatchState

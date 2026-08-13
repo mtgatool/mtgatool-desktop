@@ -66,6 +66,7 @@ export default function OverlayContent(
           settings={settings}
           subTitle={subTitle}
           cardOdds={odds}
+          missingFromLibrary={matchState?.missingFromLibrary}
           setOddsCallback={(): void => {
             //
           }}

@@ -139,6 +139,20 @@ export interface MatchState {
   handsDrawn: number[][];
   matchGameStats: MatchGameStats[];
   cardsOdds: Chances;
+  /**
+   * Cards that must have left the library unseen (exiled face down, warped
+   * away): whenever a search shows us the library's true contents, whatever
+   * the computed cards-left still expects but the library lacks lands here.
+   * One grpId per missing copy.
+   */
+  missingFromLibrary: number[];
+  /**
+   * Per warped grpId, how many copies are still missing. Set by a library
+   * search; decremented only when a copy of that card RETURNS from the exile
+   * zone into view. A new sighting from anywhere else (a draw, a fetch) is a
+   * different copy and leaves the count alone.
+   */
+  warpBase: Record<number, number>;
 }
 
 interface ReservedPlayer {

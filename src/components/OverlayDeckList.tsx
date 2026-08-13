@@ -6,6 +6,7 @@ import QRCode from "qrcode";
 import { useCallback, useRef, useState } from "react";
 
 import { ReactComponent as QrCodeIcon } from "../assets/images/svg/qrcode.svg";
+import { ReactComponent as WarpIcon } from "../assets/images/svg/warp.svg";
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
 import { OverlaySettings } from "../common/defaultConfig";
 import {
@@ -47,6 +48,8 @@ interface DeckListProps {
   // False on the public live-share viewer: it renders this same component but
   // must not offer the share/QR controls.
   shareControls?: boolean;
+  /** Cards deduced gone from the library unseen (warped away). */
+  missingFromLibrary?: number[];
 }
 
 export default function OverlayDeckList(props: DeckListProps): JSX.Element {
@@ -58,6 +61,7 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
     cardOdds,
     setOddsCallback,
     shareControls = true,
+    missingFromLibrary,
   } = props;
 
   // Same reason as DeckList: everything below reads cards synchronously.
@@ -268,6 +272,30 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
     });
   }
 
+  const warpCardTiles: JSX.Element[] = [];
+  const warpCounts: Record<number, number> = {};
+  (missingFromLibrary || []).forEach((grpId) => {
+    warpCounts[grpId] = (warpCounts[grpId] || 0) + 1;
+  });
+  Object.entries(warpCounts).forEach(([grpIdStr, qty], index) => {
+    const grpId = Number(grpIdStr);
+    const fullCard = database.card(grpId);
+    if (!fullCard) return;
+    warpCardTiles.push(
+      <div className="warp-tile" key={`warpcardtile_${index}_${grpId}`}>
+        <CardTile
+          card={fullCard}
+          indent="a"
+          isSideboard={false}
+          quantity={{ type: "NUMBER", quantity: qty }}
+          showWildcards={false}
+          deck={deck}
+          isHighlighted={false}
+        />
+      </div>
+    );
+  });
+
   return (
     <div className="overlay-decklist click-on">
       {!!settings.title && (
@@ -284,6 +312,13 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
         style={{ display: `${showQrCode ? "block" : "none"}` }}
       />
       {!!settings.deck && mainCardTiles}
+      {!!settings.deck && warpCardTiles.length > 0 && (
+        <div className="decklist-title warp-title">
+          <WarpIcon className="warp-title-icon" />
+          Warped away ({(missingFromLibrary || []).length})
+        </div>
+      )}
+      {!!settings.deck && warpCardTiles.length > 0 && warpCardTiles}
       {!!settings.sideboard && sideboardCardTiles.length > 0 && (
         <div className="decklist-title">Sideboard ({sideboardCards} cards)</div>
       )}

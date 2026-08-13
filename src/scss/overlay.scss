@@ -603,3 +603,22 @@
   top: 0;
   left: 0;
 }
+
+// "Warped away" — cards deduced gone from the library unseen (exiled face
+// down). The spiral marks them apart from the regular decklist tiles.
+.warp-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .warp-title-icon {
+    width: 14px;
+    height: 14px;
+    color: #b78fe0;
+  }
+}
+
+.warp-tile {
+  position: relative;
+  opacity: 0.85;
+}

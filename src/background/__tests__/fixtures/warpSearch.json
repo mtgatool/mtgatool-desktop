@@ -1,0 +1,2377 @@
+{
+ "_source": "Real GRE log data, sanitized: no player names, account ids, match ids or timestamps. A Timeless game where the opponent warped cards away from the player's library face down, then the player cracked a fetchland.",
+ "playerSeat": 1,
+ "deckCards": [
+  38197,
+  38197,
+  38197,
+  38197,
+  75802,
+  75802,
+  75802,
+  75802,
+  81083,
+  81083,
+  81083,
+  81083,
+  84938,
+  84938,
+  58403,
+  58403,
+  58403,
+  58403,
+  70149,
+  70149,
+  70149,
+  70149,
+  70366,
+  70366,
+  70366,
+  20015,
+  20015,
+  20015,
+  93331,
+  93331,
+  93331,
+  57883,
+  57883,
+  100676,
+  100676,
+  100676,
+  100676,
+  82836,
+  82836,
+  82836,
+  82836,
+  82803,
+  82803,
+  77054,
+  77054,
+  77054,
+  67818,
+  67818,
+  95107,
+  95107,
+  95107,
+  95107,
+  69399,
+  69399,
+  69399,
+  69399,
+  77492,
+  77492,
+  77492,
+  77492
+ ],
+ "searchEvent": {
+  "transactionId": "fixture",
+  "requestId": 0,
+  "timestamp": "0",
+  "greToClientEvent": {
+   "greToClientMessages": [
+    {
+     "type": "GREMessageType_GameStateMessage",
+     "systemSeatIds": [
+      1
+     ],
+     "msgId": 237,
+     "gameStateId": 162,
+     "gameStateMessage": {
+      "type": "GameStateType_Diff",
+      "gameStateId": 162,
+      "players": [
+       {
+        "lifeTotal": 16,
+        "systemSeatNumber": 1,
+        "status": "PlayerStatus_InGame",
+        "maxHandSize": 7,
+        "turnNumber": 3,
+        "teamId": 1,
+        "timerIds": [
+         1,
+         2,
+         3,
+         4,
+         5,
+         6
+        ],
+        "controllerSeatId": 1,
+        "controllerType": "ControllerType_Player",
+        "pipCount": 2,
+        "startingLifeTotal": 20
+       }
+      ],
+      "zones": [
+       {
+        "zoneId": 27,
+        "type": "ZoneType_Stack",
+        "visibility": "Visibility_Public",
+        "objectInstanceIds": [
+         341
+        ]
+       },
+       {
+        "zoneId": 28,
+        "type": "ZoneType_Battlefield",
+        "visibility": "Visibility_Public",
+        "objectInstanceIds": [
+         334,
+         305,
+         290,
+         287,
+         286,
+         282,
+         281,
+         280,
+         279
+        ]
+       },
+       {
+        "zoneId": 30,
+        "type": "ZoneType_Limbo",
+        "visibility": "Visibility_Public",
+        "objectInstanceIds": [
+         336,
+         319,
+         172,
+         161,
+         333,
+         171,
+         231,
+         312,
+         322,
+         230,
+         229,
+         222,
+         317,
+         318,
+         170,
+         224,
+         306,
+         228,
+         304,
+         223,
+         227,
+         299,
+         297,
+         296,
+         294,
+         291,
+         295,
+         289,
+         169,
+         168,
+         167,
+         164,
+         159,
+         166
+        ]
+       },
+       {
+        "zoneId": 33,
+        "type": "ZoneType_Graveyard",
+        "visibility": "Visibility_Public",
+        "ownerSeatId": 1,
+        "objectInstanceIds": [
+         342,
+         340,
+         303,
+         298
+        ]
+       }
+      ],
+      "gameObjects": [
+       {
+        "instanceId": 336,
+        "grpId": 77054,
+        "type": "GameObjectType_Card",
+        "zoneId": 30,
+        "visibility": "Visibility_Public",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Land"
+        ],
+        "name": 38310,
+        "overlayGrpId": 77054,
+        "uniqueAbilities": [
+         {
+          "id": 249,
+          "grpId": 99182
+         }
+        ]
+       },
+       {
+        "instanceId": 341,
+        "grpId": 99182,
+        "type": "GameObjectType_Ability",
+        "zoneId": 27,
+        "visibility": "Visibility_Public",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "objectSourceGrpId": 77054,
+        "parentId": 336
+       },
+       {
+        "instanceId": 342,
+        "grpId": 77054,
+        "type": "GameObjectType_Card",
+        "zoneId": 33,
+        "visibility": "Visibility_Public",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Land"
+        ],
+        "name": 38310,
+        "overlayGrpId": 77054,
+        "uniqueAbilities": [
+         {
+          "id": 253,
+          "grpId": 99182
+         }
+        ]
+       }
+      ],
+      "annotations": [
+       {
+        "id": 453,
+        "affectorId": 336,
+        "affectedIds": [
+         341
+        ],
+        "type": [
+         "AnnotationType_AbilityInstanceCreated"
+        ],
+        "details": [
+         {
+          "key": "source_zone",
+          "type": "KeyValuePairValueType_int32",
+          "valueInt32": [
+           28
+          ]
+         }
+        ]
+       },
+       {
+        "id": 454,
+        "affectorId": 341,
+        "affectedIds": [
+         336
+        ],
+        "type": [
+         "AnnotationType_TappedUntappedPermanent"
+        ],
+        "details": [
+         {
+          "key": "tapped",
+          "type": "KeyValuePairValueType_int32",
+          "valueInt32": [
+           1
+          ]
+         }
+        ]
+       },
+       {
+        "id": 455,
+        "affectorId": 341,
+        "affectedIds": [
+         1
+        ],
+        "type": [
+         "AnnotationType_SyntheticEvent"
+        ],
+        "details": [
+         {
+          "key": "type",
+          "type": "KeyValuePairValueType_int32",
+          "valueInt32": [
+           1
+          ]
+         }
+        ]
+       },
+       {
+        "id": 456,
+        "affectorId": 341,
+        "affectedIds": [
+         1
+        ],
+        "type": [
+         "AnnotationType_ModifiedLife"
+        ],
+        "details": [
+         {
+          "key": "life",
+          "type": "KeyValuePairValueType_int32",
+          "valueInt32": [
+           -1
+          ]
+         }
+        ]
+       },
+       {
+        "id": 458,
+        "affectorId": 341,
+        "affectedIds": [
+         336
+        ],
+        "type": [
+         "AnnotationType_ObjectIdChanged"
+        ],
+        "details": [
+         {
+          "key": "orig_id",
+          "type": "KeyValuePairValueType_int32",
+          "valueInt32": [
+           336
+          ]
+         },
+         {
+          "key": "new_id",
+          "type": "KeyValuePairValueType_int32",
+          "valueInt32": [
+           342
+          ]
+         }
+        ]
+       },
+       {
+        "id": 459,
+        "affectorId": 341,
+        "affectedIds": [
+         342
+        ],
+        "type": [
+         "AnnotationType_ZoneTransfer"
+        ],
+        "details": [
+         {
+          "key": "zone_src",
+          "type": "KeyValuePairValueType_int32",
+          "valueInt32": [
+           28
+          ]
+         },
+         {
+          "key": "zone_dest",
+          "type": "KeyValuePairValueType_int32",
+          "valueInt32": [
+           33
+          ]
+         },
+         {
+          "key": "category",
+          "type": "KeyValuePairValueType_string",
+          "valueString": [
+           "Sacrifice"
+          ]
+         }
+        ]
+       },
+       {
+        "id": 460,
+        "affectorId": 1,
+        "affectedIds": [
+         341
+        ],
+        "type": [
+         "AnnotationType_UserActionTaken"
+        ],
+        "details": [
+         {
+          "key": "actionType",
+          "type": "KeyValuePairValueType_int32",
+          "valueInt32": [
+           2
+          ]
+         },
+         {
+          "key": "abilityGrpId",
+          "type": "KeyValuePairValueType_int32",
+          "valueInt32": [
+           99182
+          ]
+         }
+        ]
+       }
+      ],
+      "prevGameStateId": 161,
+      "timers": [
+       {
+        "timerId": 3,
+        "type": "TimerType_ActivePlayer",
+        "durationSec": 135,
+        "elapsedSec": 20,
+        "behavior": "TimerBehavior_TakeControl",
+        "warningThresholdSec": 30,
+        "elapsedMs": 20034
+       },
+       {
+        "timerId": 6,
+        "type": "TimerType_Inactivity",
+        "durationSec": 150,
+        "behavior": "TimerBehavior_Timeout",
+        "warningThresholdSec": 30
+       }
+      ],
+      "update": "GameStateUpdate_SendHiFi",
+      "actions": [
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Play",
+         "instanceId": 301
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Cast",
+         "instanceId": 302,
+         "manaCost": [
+          {
+           "color": [
+            "ManaColor_Blue"
+           ],
+           "count": 1
+          }
+         ]
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Activate_Mana",
+         "instanceId": 290,
+         "abilityGrpId": 1001
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Activate_Mana",
+         "instanceId": 279,
+         "abilityGrpId": 1002
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Activate_Mana",
+         "instanceId": 281,
+         "abilityGrpId": 129005
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Activate",
+         "instanceId": 334,
+         "abilityGrpId": 76519,
+         "manaCost": [
+          {
+           "color": [
+            "ManaColor_Red"
+           ],
+           "count": 1,
+           "abilityGrpId": 76519
+          }
+         ]
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Cast",
+         "instanceId": 293,
+         "manaCost": [
+          {
+           "color": [
+            "ManaColor_Generic"
+           ],
+           "count": 4
+          }
+         ]
+        }
+       },
+       {
+        "seatId": 2,
+        "action": {
+         "actionType": "ActionType_Activate_Mana",
+         "instanceId": 286,
+         "abilityGrpId": 1004
+        }
+       },
+       {
+        "seatId": 2,
+        "action": {
+         "actionType": "ActionType_Activate_Mana",
+         "instanceId": 305,
+         "abilityGrpId": 1004
+        }
+       }
+      ],
+      "persistentAnnotations": [
+       {
+        "id": 5,
+        "affectorId": 28,
+        "affectedIds": [
+         334
+        ],
+        "type": [
+         "AnnotationType_EnteredZoneThisTurn"
+        ]
+       },
+       {
+        "id": 11,
+        "affectorId": 33,
+        "affectedIds": [
+         342,
+         340
+        ],
+        "type": [
+         "AnnotationType_EnteredZoneThisTurn"
+        ]
+       },
+       {
+        "id": 457,
+        "affectorId": 341,
+        "affectedIds": [
+         336
+        ],
+        "type": [
+         "AnnotationType_LinkInfo"
+        ],
+        "details": [
+         {
+          "key": "LinkType",
+          "type": "KeyValuePairValueType_int32",
+          "valueInt32": [
+           2
+          ]
+         }
+        ]
+       }
+      ],
+      "diffDeletedPersistentAnnotationIds": [
+       426
+      ]
+     }
+    },
+    {
+     "type": "GREMessageType_GameStateMessage",
+     "systemSeatIds": [
+      1
+     ],
+     "msgId": 238,
+     "gameStateId": 163,
+     "gameStateMessage": {
+      "type": "GameStateType_Diff",
+      "gameStateId": 163,
+      "turnInfo": {
+       "phase": "Phase_Main2",
+       "turnNumber": 5,
+       "activePlayer": 1,
+       "priorityPlayer": 2,
+       "decisionPlayer": 1,
+       "nextPhase": "Phase_Ending",
+       "nextStep": "Step_End"
+      },
+      "prevGameStateId": 162,
+      "update": "GameStateUpdate_SendHiFi",
+      "actions": [
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Play",
+         "instanceId": 301
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Cast",
+         "instanceId": 302,
+         "manaCost": [
+          {
+           "color": [
+            "ManaColor_Blue"
+           ],
+           "count": 1
+          }
+         ]
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Activate_Mana",
+         "instanceId": 290,
+         "abilityGrpId": 1001
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Activate_Mana",
+         "instanceId": 279,
+         "abilityGrpId": 1002
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Activate_Mana",
+         "instanceId": 281,
+         "abilityGrpId": 129005
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Activate",
+         "instanceId": 334,
+         "abilityGrpId": 76519,
+         "manaCost": [
+          {
+           "color": [
+            "ManaColor_Red"
+           ],
+           "count": 1,
+           "abilityGrpId": 76519
+          }
+         ]
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Cast",
+         "instanceId": 293,
+         "manaCost": [
+          {
+           "color": [
+            "ManaColor_Generic"
+           ],
+           "count": 4
+          }
+         ]
+        }
+       },
+       {
+        "seatId": 2,
+        "action": {
+         "actionType": "ActionType_Activate_Mana",
+         "instanceId": 286,
+         "abilityGrpId": 1004
+        }
+       },
+       {
+        "seatId": 2,
+        "action": {
+         "actionType": "ActionType_Activate_Mana",
+         "instanceId": 305,
+         "abilityGrpId": 1004
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "GREMessageType_GameStateMessage",
+     "systemSeatIds": [
+      1
+     ],
+     "msgId": 239,
+     "gameStateId": 164,
+     "gameStateMessage": {
+      "type": "GameStateType_Diff",
+      "gameStateId": 164,
+      "turnInfo": {
+       "phase": "Phase_Main2",
+       "turnNumber": 5,
+       "activePlayer": 1,
+       "priorityPlayer": 1,
+       "decisionPlayer": 1,
+       "nextPhase": "Phase_Ending",
+       "nextStep": "Step_End"
+      },
+      "gameObjects": [
+       {
+        "instanceId": 173,
+        "grpId": 38197,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "superTypes": [
+         "SuperType_Legendary"
+        ],
+        "cardTypes": [
+         "CardType_Artifact"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 32526,
+        "overlayGrpId": 38197,
+        "uniqueAbilities": [
+         {
+          "id": 4,
+          "grpId": 129005
+         }
+        ]
+       },
+       {
+        "instanceId": 174,
+        "grpId": 100676,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Creature"
+        ],
+        "subtypes": [
+         "SubType_Beast"
+        ],
+        "power": {},
+        "toughness": {},
+        "viewers": [
+         1
+        ],
+        "name": 942,
+        "overlayGrpId": 100676,
+        "uniqueAbilities": [
+         {
+          "id": 69,
+          "grpId": 9850
+         },
+         {
+          "id": 70,
+          "grpId": 1358
+         }
+        ]
+       },
+       {
+        "instanceId": 175,
+        "grpId": 77054,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Land"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 38310,
+        "overlayGrpId": 77054,
+        "uniqueAbilities": [
+         {
+          "id": 77,
+          "grpId": 99182
+         }
+        ]
+       },
+       {
+        "instanceId": 176,
+        "grpId": 82836,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Creature"
+        ],
+        "subtypes": [
+         "SubType_Thopter"
+        ],
+        "power": {},
+        "toughness": {
+         "value": 2
+        },
+        "viewers": [
+         1
+        ],
+        "name": 2999,
+        "overlayGrpId": 82836,
+        "uniqueAbilities": [
+         {
+          "id": 73,
+          "grpId": 8
+         }
+        ]
+       },
+       {
+        "instanceId": 177,
+        "grpId": 38197,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "superTypes": [
+         "SuperType_Legendary"
+        ],
+        "cardTypes": [
+         "CardType_Artifact"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 32526,
+        "overlayGrpId": 38197,
+        "uniqueAbilities": [
+         {
+          "id": 7,
+          "grpId": 129005
+         }
+        ]
+       },
+       {
+        "instanceId": 178,
+        "grpId": 20015,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Land"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 24434,
+        "overlayGrpId": 20015,
+        "uniqueAbilities": [
+         {
+          "id": 54,
+          "grpId": 1001
+         }
+        ]
+       },
+       {
+        "instanceId": 179,
+        "grpId": 77492,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Instant"
+        ],
+        "color": [
+         "CardColor_Blue"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 10522,
+        "overlayGrpId": 77492,
+        "uniqueAbilities": [
+         {
+          "id": 105,
+          "grpId": 3683
+         }
+        ]
+       },
+       {
+        "instanceId": 180,
+        "grpId": 58403,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Land"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 24807,
+        "overlayGrpId": 58403,
+        "uniqueAbilities": [
+         {
+          "id": 32,
+          "grpId": 94951
+         }
+        ]
+       },
+       {
+        "instanceId": 181,
+        "grpId": 100676,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Creature"
+        ],
+        "subtypes": [
+         "SubType_Beast"
+        ],
+        "power": {},
+        "toughness": {},
+        "viewers": [
+         1
+        ],
+        "name": 942,
+        "overlayGrpId": 100676,
+        "uniqueAbilities": [
+         {
+          "id": 65,
+          "grpId": 9850
+         },
+         {
+          "id": 66,
+          "grpId": 1358
+         }
+        ]
+       },
+       {
+        "instanceId": 182,
+        "grpId": 70149,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Enchantment"
+        ],
+        "subtypes": [
+         "SubType_Aura"
+        ],
+        "color": [
+         "CardColor_White"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 413599,
+        "overlayGrpId": 70149,
+        "uniqueAbilities": [
+         {
+          "id": 38,
+          "grpId": 1027
+         },
+         {
+          "id": 39,
+          "grpId": 136335
+         }
+        ]
+       },
+       {
+        "instanceId": 183,
+        "grpId": 70149,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Enchantment"
+        ],
+        "subtypes": [
+         "SubType_Aura"
+        ],
+        "color": [
+         "CardColor_White"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 413599,
+        "overlayGrpId": 70149,
+        "uniqueAbilities": [
+         {
+          "id": 36,
+          "grpId": 1027
+         },
+         {
+          "id": 37,
+          "grpId": 136335
+         }
+        ]
+       },
+       {
+        "instanceId": 184,
+        "grpId": 70366,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Creature"
+        ],
+        "subtypes": [
+         "SubType_Food",
+         "SubType_Golem"
+        ],
+        "power": {
+         "value": 1
+        },
+        "toughness": {
+         "value": 1
+        },
+        "viewers": [
+         1
+        ],
+        "name": 414351,
+        "overlayGrpId": 70366,
+        "uniqueAbilities": [
+         {
+          "id": 47,
+          "grpId": 9
+         },
+         {
+          "id": 48,
+          "grpId": 136277
+         },
+         {
+          "id": 49,
+          "grpId": 197
+         }
+        ]
+       },
+       {
+        "instanceId": 185,
+        "grpId": 69399,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Land"
+        ],
+        "subtypes": [
+         "SubType_Plains",
+         "SubType_Island"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 12780,
+        "overlayGrpId": 69399,
+        "uniqueAbilities": [
+         {
+          "id": 92,
+          "grpId": 1002
+         },
+         {
+          "id": 93,
+          "grpId": 1001
+         },
+         {
+          "id": 94,
+          "grpId": 90846
+         }
+        ]
+       },
+       {
+        "instanceId": 186,
+        "grpId": 20015,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Land"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 24434,
+        "overlayGrpId": 20015,
+        "uniqueAbilities": [
+         {
+          "id": 53,
+          "grpId": 1001
+         }
+        ]
+       },
+       {
+        "instanceId": 187,
+        "grpId": 81083,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Instant"
+        ],
+        "color": [
+         "CardColor_White"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 595412,
+        "overlayGrpId": 81083,
+        "uniqueAbilities": [
+         {
+          "id": 22,
+          "grpId": 173729
+         }
+        ]
+       },
+       {
+        "instanceId": 188,
+        "grpId": 69399,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Land"
+        ],
+        "subtypes": [
+         "SubType_Plains",
+         "SubType_Island"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 12780,
+        "overlayGrpId": 69399,
+        "uniqueAbilities": [
+         {
+          "id": 95,
+          "grpId": 1002
+         },
+         {
+          "id": 96,
+          "grpId": 1001
+         },
+         {
+          "id": 97,
+          "grpId": 90846
+         }
+        ]
+       },
+       {
+        "instanceId": 189,
+        "grpId": 58403,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Land"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 24807,
+        "overlayGrpId": 58403,
+        "uniqueAbilities": [
+         {
+          "id": 35,
+          "grpId": 94951
+         }
+        ]
+       },
+       {
+        "instanceId": 190,
+        "grpId": 67818,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "superTypes": [
+         "SuperType_Legendary"
+        ],
+        "cardTypes": [
+         "CardType_Creature"
+        ],
+        "subtypes": [
+         "SubType_Human",
+         "SubType_Artificer"
+        ],
+        "color": [
+         "CardColor_Blue"
+        ],
+        "power": {
+         "value": 1
+        },
+        "toughness": {
+         "value": 4
+        },
+        "viewers": [
+         1
+        ],
+        "name": 229496,
+        "overlayGrpId": 67818,
+        "uniqueAbilities": [
+         {
+          "id": 80,
+          "grpId": 76777
+         },
+         {
+          "id": 81,
+          "grpId": 119188
+         }
+        ]
+       },
+       {
+        "instanceId": 191,
+        "grpId": 100676,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Creature"
+        ],
+        "subtypes": [
+         "SubType_Beast"
+        ],
+        "power": {},
+        "toughness": {},
+        "viewers": [
+         1
+        ],
+        "name": 942,
+        "overlayGrpId": 100676,
+        "uniqueAbilities": [
+         {
+          "id": 63,
+          "grpId": 9850
+         },
+         {
+          "id": 64,
+          "grpId": 1358
+         }
+        ]
+       },
+       {
+        "instanceId": 192,
+        "grpId": 75802,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Creature"
+        ],
+        "subtypes": [
+         "SubType_Construct"
+        ],
+        "power": {
+         "value": 1
+        },
+        "toughness": {
+         "value": 1
+        },
+        "viewers": [
+         1
+        ],
+        "name": 1991,
+        "overlayGrpId": 75802,
+        "uniqueAbilities": [
+         {
+          "id": 14,
+          "grpId": 9
+         },
+         {
+          "id": 15,
+          "grpId": 76617
+         },
+         {
+          "id": 16,
+          "grpId": 76519
+         }
+        ]
+       },
+       {
+        "instanceId": 193,
+        "grpId": 57883,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Land"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 907,
+        "overlayGrpId": 57883,
+        "uniqueAbilities": [
+         {
+          "id": 59,
+          "grpId": 104
+         },
+         {
+          "id": 60,
+          "grpId": 1152
+         }
+        ]
+       },
+       {
+        "instanceId": 194,
+        "grpId": 81083,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Instant"
+        ],
+        "color": [
+         "CardColor_White"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 595412,
+        "overlayGrpId": 81083,
+        "uniqueAbilities": [
+         {
+          "id": 20,
+          "grpId": 173729
+         }
+        ]
+       },
+       {
+        "instanceId": 195,
+        "grpId": 57883,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Land"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 907,
+        "overlayGrpId": 57883,
+        "uniqueAbilities": [
+         {
+          "id": 61,
+          "grpId": 104
+         },
+         {
+          "id": 62,
+          "grpId": 1152
+         }
+        ]
+       },
+       {
+        "instanceId": 196,
+        "grpId": 100676,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Creature"
+        ],
+        "subtypes": [
+         "SubType_Beast"
+        ],
+        "power": {},
+        "toughness": {},
+        "viewers": [
+         1
+        ],
+        "name": 942,
+        "overlayGrpId": 100676,
+        "uniqueAbilities": [
+         {
+          "id": 67,
+          "grpId": 9850
+         },
+         {
+          "id": 68,
+          "grpId": 1358
+         }
+        ]
+       },
+       {
+        "instanceId": 197,
+        "grpId": 38197,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "superTypes": [
+         "SuperType_Legendary"
+        ],
+        "cardTypes": [
+         "CardType_Artifact"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 32526,
+        "overlayGrpId": 38197,
+        "uniqueAbilities": [
+         {
+          "id": 5,
+          "grpId": 129005
+         }
+        ]
+       },
+       {
+        "instanceId": 198,
+        "grpId": 82803,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 21596,
+        "overlayGrpId": 82803,
+        "uniqueAbilities": [
+         {
+          "id": 76,
+          "grpId": 12285
+         }
+        ]
+       },
+       {
+        "instanceId": 199,
+        "grpId": 95107,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Sorcery"
+        ],
+        "color": [
+         "CardColor_Blue"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 3003,
+        "overlayGrpId": 95107,
+        "uniqueAbilities": [
+         {
+          "id": 88,
+          "grpId": 177
+         },
+         {
+          "id": 89,
+          "grpId": 23607
+         }
+        ]
+       },
+       {
+        "instanceId": 200,
+        "grpId": 69399,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Land"
+        ],
+        "subtypes": [
+         "SubType_Plains",
+         "SubType_Island"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 12780,
+        "overlayGrpId": 69399,
+        "uniqueAbilities": [
+         {
+          "id": 98,
+          "grpId": 1002
+         },
+         {
+          "id": 99,
+          "grpId": 1001
+         },
+         {
+          "id": 100,
+          "grpId": 90846
+         }
+        ]
+       },
+       {
+        "instanceId": 201,
+        "grpId": 70149,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Enchantment"
+        ],
+        "subtypes": [
+         "SubType_Aura"
+        ],
+        "color": [
+         "CardColor_White"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 413599,
+        "overlayGrpId": 70149,
+        "uniqueAbilities": [
+         {
+          "id": 40,
+          "grpId": 1027
+         },
+         {
+          "id": 41,
+          "grpId": 136335
+         }
+        ]
+       },
+       {
+        "instanceId": 202,
+        "grpId": 70366,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Creature"
+        ],
+        "subtypes": [
+         "SubType_Food",
+         "SubType_Golem"
+        ],
+        "power": {
+         "value": 1
+        },
+        "toughness": {
+         "value": 1
+        },
+        "viewers": [
+         1
+        ],
+        "name": 414351,
+        "overlayGrpId": 70366,
+        "uniqueAbilities": [
+         {
+          "id": 44,
+          "grpId": 9
+         },
+         {
+          "id": 45,
+          "grpId": 136277
+         },
+         {
+          "id": 46,
+          "grpId": 197
+         }
+        ]
+       },
+       {
+        "instanceId": 203,
+        "grpId": 93331,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Land"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 3025,
+        "overlayGrpId": 93331,
+        "uniqueAbilities": [
+         {
+          "id": 56,
+          "grpId": 1002
+         }
+        ]
+       },
+       {
+        "instanceId": 204,
+        "grpId": 95107,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Sorcery"
+        ],
+        "color": [
+         "CardColor_Blue"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 3003,
+        "overlayGrpId": 95107,
+        "uniqueAbilities": [
+         {
+          "id": 84,
+          "grpId": 177
+         },
+         {
+          "id": 85,
+          "grpId": 23607
+         }
+        ]
+       },
+       {
+        "instanceId": 205,
+        "grpId": 69399,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Land"
+        ],
+        "subtypes": [
+         "SubType_Plains",
+         "SubType_Island"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 12780,
+        "overlayGrpId": 69399,
+        "uniqueAbilities": [
+         {
+          "id": 101,
+          "grpId": 1002
+         },
+         {
+          "id": 102,
+          "grpId": 1001
+         },
+         {
+          "id": 103,
+          "grpId": 90846
+         }
+        ]
+       },
+       {
+        "instanceId": 206,
+        "grpId": 58403,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Land"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 24807,
+        "overlayGrpId": 58403,
+        "uniqueAbilities": [
+         {
+          "id": 34,
+          "grpId": 94951
+         }
+        ]
+       },
+       {
+        "instanceId": 207,
+        "grpId": 77492,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Instant"
+        ],
+        "color": [
+         "CardColor_Blue"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 10522,
+        "overlayGrpId": 77492,
+        "uniqueAbilities": [
+         {
+          "id": 106,
+          "grpId": 3683
+         }
+        ]
+       },
+       {
+        "instanceId": 208,
+        "grpId": 70366,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Creature"
+        ],
+        "subtypes": [
+         "SubType_Food",
+         "SubType_Golem"
+        ],
+        "power": {
+         "value": 1
+        },
+        "toughness": {
+         "value": 1
+        },
+        "viewers": [
+         1
+        ],
+        "name": 414351,
+        "overlayGrpId": 70366,
+        "uniqueAbilities": [
+         {
+          "id": 50,
+          "grpId": 9
+         },
+         {
+          "id": 51,
+          "grpId": 136277
+         },
+         {
+          "id": 52,
+          "grpId": 197
+         }
+        ]
+       },
+       {
+        "instanceId": 209,
+        "grpId": 77054,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Land"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 38310,
+        "overlayGrpId": 77054,
+        "uniqueAbilities": [
+         {
+          "id": 78,
+          "grpId": 99182
+         }
+        ]
+       },
+       {
+        "instanceId": 210,
+        "grpId": 75802,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Creature"
+        ],
+        "subtypes": [
+         "SubType_Construct"
+        ],
+        "power": {
+         "value": 1
+        },
+        "toughness": {
+         "value": 1
+        },
+        "viewers": [
+         1
+        ],
+        "name": 1991,
+        "overlayGrpId": 75802,
+        "uniqueAbilities": [
+         {
+          "id": 8,
+          "grpId": 9
+         },
+         {
+          "id": 9,
+          "grpId": 76617
+         },
+         {
+          "id": 10,
+          "grpId": 76519
+         }
+        ]
+       },
+       {
+        "instanceId": 211,
+        "grpId": 58403,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Land"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 24807,
+        "overlayGrpId": 58403,
+        "uniqueAbilities": [
+         {
+          "id": 33,
+          "grpId": 94951
+         }
+        ]
+       },
+       {
+        "instanceId": 212,
+        "grpId": 82803,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 21596,
+        "overlayGrpId": 82803,
+        "uniqueAbilities": [
+         {
+          "id": 75,
+          "grpId": 12285
+         }
+        ]
+       },
+       {
+        "instanceId": 213,
+        "grpId": 67818,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "superTypes": [
+         "SuperType_Legendary"
+        ],
+        "cardTypes": [
+         "CardType_Creature"
+        ],
+        "subtypes": [
+         "SubType_Human",
+         "SubType_Artificer"
+        ],
+        "color": [
+         "CardColor_Blue"
+        ],
+        "power": {
+         "value": 1
+        },
+        "toughness": {
+         "value": 4
+        },
+        "viewers": [
+         1
+        ],
+        "name": 229496,
+        "overlayGrpId": 67818,
+        "uniqueAbilities": [
+         {
+          "id": 82,
+          "grpId": 76777
+         },
+         {
+          "id": 83,
+          "grpId": 119188
+         }
+        ]
+       },
+       {
+        "instanceId": 214,
+        "grpId": 75802,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Creature"
+        ],
+        "subtypes": [
+         "SubType_Construct"
+        ],
+        "power": {
+         "value": 1
+        },
+        "toughness": {
+         "value": 1
+        },
+        "viewers": [
+         1
+        ],
+        "name": 1991,
+        "overlayGrpId": 75802,
+        "uniqueAbilities": [
+         {
+          "id": 17,
+          "grpId": 9
+         },
+         {
+          "id": 18,
+          "grpId": 76617
+         },
+         {
+          "id": 19,
+          "grpId": 76519
+         }
+        ]
+       },
+       {
+        "instanceId": 215,
+        "grpId": 81083,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Instant"
+        ],
+        "color": [
+         "CardColor_White"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 595412,
+        "overlayGrpId": 81083,
+        "uniqueAbilities": [
+         {
+          "id": 21,
+          "grpId": 173729
+         }
+        ]
+       },
+       {
+        "instanceId": 216,
+        "grpId": 82836,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Artifact",
+         "CardType_Creature"
+        ],
+        "subtypes": [
+         "SubType_Thopter"
+        ],
+        "power": {},
+        "toughness": {
+         "value": 2
+        },
+        "viewers": [
+         1
+        ],
+        "name": 2999,
+        "overlayGrpId": 82836,
+        "uniqueAbilities": [
+         {
+          "id": 72,
+          "grpId": 8
+         }
+        ]
+       },
+       {
+        "instanceId": 217,
+        "grpId": 84938,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "superTypes": [
+         "SuperType_Legendary"
+        ],
+        "cardTypes": [
+         "CardType_Artifact"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 703919,
+        "overlayGrpId": 84938,
+        "uniqueAbilities": [
+         {
+          "id": 28,
+          "grpId": 104
+         },
+         {
+          "id": 29,
+          "grpId": 167141
+         },
+         {
+          "id": 30,
+          "grpId": 167142
+         },
+         {
+          "id": 31,
+          "grpId": 167143
+         }
+        ]
+       },
+       {
+        "instanceId": 218,
+        "grpId": 95107,
+        "type": "GameObjectType_Card",
+        "zoneId": 32,
+        "visibility": "Visibility_Private",
+        "ownerSeatId": 1,
+        "controllerSeatId": 1,
+        "cardTypes": [
+         "CardType_Sorcery"
+        ],
+        "color": [
+         "CardColor_Blue"
+        ],
+        "viewers": [
+         1
+        ],
+        "name": 3003,
+        "overlayGrpId": 95107,
+        "uniqueAbilities": [
+         {
+          "id": 86,
+          "grpId": 177
+         },
+         {
+          "id": 87,
+          "grpId": 23607
+         }
+        ]
+       }
+      ],
+      "annotations": [
+       {
+        "id": 461,
+        "affectorId": 341,
+        "affectedIds": [
+         341
+        ],
+        "type": [
+         "AnnotationType_ResolutionStart"
+        ],
+        "details": [
+         {
+          "key": "grpid",
+          "type": "KeyValuePairValueType_int32",
+          "valueInt32": [
+           99182
+          ]
+         }
+        ]
+       }
+      ],
+      "pendingMessageCount": 1,
+      "prevGameStateId": 163,
+      "timers": [
+       {
+        "timerId": 5,
+        "type": "TimerType_Delay",
+        "durationSec": 2,
+        "running": true,
+        "behavior": "TimerBehavior_StartDelayedTimer",
+        "elapsedMs": 3
+       }
+      ],
+      "update": "GameStateUpdate_Send",
+      "actions": [
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Cast",
+         "instanceId": 293,
+         "manaCost": [
+          {
+           "color": [
+            "ManaColor_Generic"
+           ],
+           "count": 4
+          }
+         ]
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Cast",
+         "instanceId": 302,
+         "manaCost": [
+          {
+           "color": [
+            "ManaColor_Blue"
+           ],
+           "count": 1
+          }
+         ]
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Play",
+         "instanceId": 301
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Activate_Mana",
+         "instanceId": 290,
+         "abilityGrpId": 1001
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Activate_Mana",
+         "instanceId": 279,
+         "abilityGrpId": 1002
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Activate_Mana",
+         "instanceId": 281,
+         "abilityGrpId": 129005
+        }
+       },
+       {
+        "seatId": 1,
+        "action": {
+         "actionType": "ActionType_Activate",
+         "instanceId": 334,
+         "abilityGrpId": 76519,
+         "manaCost": [
+          {
+           "color": [
+            "ManaColor_Red"
+           ],
+           "count": 1,
+           "abilityGrpId": 76519
+          }
+         ]
+        }
+       },
+       {
+        "seatId": 2,
+        "action": {
+         "actionType": "ActionType_Activate_Mana",
+         "instanceId": 286,
+         "abilityGrpId": 1004
+        }
+       },
+       {
+        "seatId": 2,
+        "action": {
+         "actionType": "ActionType_Activate_Mana",
+         "instanceId": 305,
+         "abilityGrpId": 1004
+        }
+       }
+      ],
+      "persistentAnnotations": [
+       {
+        "id": 18,
+        "affectorId": 1,
+        "affectedIds": [
+         177,
+         173,
+         197,
+         281
+        ],
+        "type": [
+         "AnnotationType_AbilityWordActive"
+        ],
+        "details": [
+         {
+          "key": "value",
+          "type": "KeyValuePairValueType_int32",
+          "valueInt32": [
+           5
+          ]
+         },
+         {
+          "key": "threshold",
+          "type": "KeyValuePairValueType_int32",
+          "valueInt32": [
+           3
+          ]
+         },
+         {
+          "key": "AbilityWordName",
+          "type": "KeyValuePairValueType_string",
+          "valueString": [
+           "Metalcraft"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    },
+    {
+     "type": "GREMessageType_SearchReq",
+     "systemSeatIds": [
+      1
+     ],
+     "msgId": 240,
+     "gameStateId": 164,
+     "prompt": {
+      "promptId": 3849,
+      "parameters": [
+       {
+        "parameterName": "CardId",
+        "type": "ParameterType_Number",
+        "numberValue": 336
+       },
+       {
+        "parameterName": "CardId",
+        "type": "ParameterType_Number",
+        "numberValue": 1
+       }
+      ]
+     },
+     "searchReq": {
+      "maxFind": 1,
+      "zonesToSearch": [
+       32
+      ],
+      "itemsToSearch": [
+       173,
+       174,
+       175,
+       176,
+       177,
+       178,
+       179,
+       180,
+       181,
+       182,
+       183,
+       184,
+       185,
+       186,
+       187,
+       188,
+       189,
+       190,
+       191,
+       192,
+       193,
+       194,
+       195,
+       196,
+       197,
+       198,
+       199,
+       200,
+       201,
+       202,
+       203,
+       204,
+       205,
+       206,
+       207,
+       208,
+       209,
+       210,
+       211,
+       212,
+       213,
+       214,
+       215,
+       216,
+       217,
+       218
+      ],
+      "itemsSought": [
+       185,
+       188,
+       200,
+       205
+      ],
+      "sourceId": 341,
+      "allowFailToFind": "AllowFailToFind_Any"
+     },
+     "allowCancel": "AllowCancel_No"
+    }
+   ]
+  }
+ }
+}

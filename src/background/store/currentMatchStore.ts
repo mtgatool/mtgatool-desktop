@@ -109,6 +109,8 @@ export function createMatchState(): MatchState {
     handsDrawn: [] as number[][],
     matchGameStats: [] as MatchGameStats[],
     cardsOdds: new Chances(),
+    missingFromLibrary: [] as number[],
+    warpBase: {} as Record<number, number>,
   } as MatchState;
 }
 
@@ -130,6 +132,14 @@ export function setOpponent(arg: Partial<InternalPlayer>): void {
 
 export function setPlayerCardsUsed(arg: number[]): void {
   globalStore.currentMatch.player.cardsUsed = arg;
+}
+
+export function setMissingFromLibrary(arg: number[]): void {
+  globalStore.currentMatch.missingFromLibrary = arg;
+}
+
+export function setWarpBase(arg: Record<number, number>): void {
+  globalStore.currentMatch.warpBase = arg;
 }
 
 // getOppUsedCards() returns only the opponent cards currently sitting in
@@ -202,6 +212,8 @@ export function resetCurrentGame(): void {
     idChanges: {},
     handsDrawn: [],
     cardsCast: [],
+    missingFromLibrary: [],
+    warpBase: {},
   });
   // Seen-cards accumulate within a game (see setOppCardsUsed); clear them at the
   // start of each new game so per-game totals stay separate — the previous

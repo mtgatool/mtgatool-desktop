@@ -46,6 +46,8 @@ import {
   setManyZones,
   setMatchId,
   setMatchStarted,
+  setMissingFromLibrary,
+  setWarpBase,
   setOnThePlay,
   setOppCardsUsed,
   setPlayerCardsUsed,
@@ -65,6 +67,15 @@ import objectClone from "../utils/objectClone";
  * mark is not enough. Reset whenever a new game starts.
  */
 let processedMsgIds = new Set<number>();
+
+// Instances already identified (a real grpId, not the face-down placeholder).
+// During annotation processing this reflects what was known BEFORE the message
+// being processed — which is what makes "newly revealed" detectable — and is
+// refreshed at the end of each game state message.
+let knownInstances = new Set<number>();
+// Chain-end instance ids that already cleared a warp copy, so an id change and
+// a zone transfer describing the same reveal cannot both count.
+let warpClearedInstances = new Set<number>();
 
 function changePriority(previous: number, current: number, time: number): void {
   const priorityTimers = objectClone(globalStore.currentMatch.priorityTimers);
@@ -189,10 +200,60 @@ function instanceIdToObject(iid: number): GameObjectInfo {
   throw new NoInstanceException(orig, instanceID, instance);
 }
 
+function resolveFinalInstanceId(iid: number): number {
+  const { idChanges } = globalStore.currentMatch;
+  let id = iid;
+  const hops = new Set<number>();
+  while (idChanges[id] && !hops.has(id)) {
+    hops.add(id);
+    id = idChanges[id];
+  }
+  return id;
+}
+
+function clearWarpCopy(iid: number, grpId: number): void {
+  const { warpBase } = globalStore.currentMatch;
+  if (!warpBase[grpId]) return;
+  const finalId = resolveFinalInstanceId(iid);
+  if (warpClearedInstances.has(finalId)) return;
+  warpClearedInstances.add(finalId);
+  const next = { ...warpBase };
+  if (next[grpId] > 1) next[grpId] -= 1;
+  else delete next[grpId];
+  console.info("[warp] copy revealed, clearing:", grpId);
+  setWarpBase(next);
+}
+
 const AnnotationType_ObjectIdChanged = (ann: Annotations): void => {
   if (ann.type !== "AnnotationType_ObjectIdChanged") return;
-  // let newObj = cloneDeep(getGameObject(details.orig_id));
-  // getGameObject(details.new_id) = newObj;
+  const origId = ann.details.orig_id;
+  const newId = ann.details.new_id;
+
+  // Knowledge follows the object across id changes: a copy we could already
+  // identify does not become "newly revealed" by getting a new instance id.
+  const origKnown = knownInstances.has(origId);
+  if (origKnown) knownInstances.add(newId);
+
+  // A reveal in place — a face-down card flipping up with no zone transfer:
+  // the old instance was an unidentified object in a non-library zone and the
+  // new one names a warped-away card.
+  const origObj = getGameObject(origId);
+  const newObj = getGameObject(newId);
+  if (
+    !origKnown &&
+    origObj &&
+    newObj &&
+    newObj.grpId &&
+    newObj.grpId !== FACE_DOWN_CARD &&
+    newObj.ownerSeatId == globalStore.currentMatch.playerSeat
+  ) {
+    const srcZone = getZone(origObj.zoneId || 0);
+    const srcIsOwnLibrary =
+      srcZone?.type === "ZoneType_Library" &&
+      srcZone.ownerSeatId === globalStore.currentMatch.playerSeat;
+    if (srcZone && !srcIsOwnLibrary) clearWarpCopy(newId, newObj.grpId);
+  }
+
   setIdChange(ann.details);
 };
 
@@ -206,6 +267,37 @@ const AnnotationType_ZoneTransfer = (ann: Annotations): void => {
     const obj = instanceIdToObject(ann.affectedIds[0]);
     if (obj.ownerSeatId == globalStore.currentMatch.playerSeat && obj.grpId) {
       addCardFromSideboard([obj.grpId]);
+    }
+  }
+
+  // A warped-away copy coming back into view: the deduced-missing card is
+  // hidden somewhere — face down in exile, on the battlefield, wherever — so
+  // an instance of it we could not previously identify becoming visible
+  // clears one copy. Coming out of the player's library does not count: that
+  // is a draw or fetch of a different, real copy.
+  if (Object.keys(globalStore.currentMatch.warpBase).length > 0) {
+    const { warpBase, playerSeat } = globalStore.currentMatch;
+    let obj: GameObjectInfo | undefined;
+    try {
+      obj = instanceIdToObject(ann.affectedIds[0]);
+    } catch (e) {
+      obj = undefined;
+    }
+    const srcIsOwnLibrary =
+      fromZone?.type == "ZoneType_Library" &&
+      fromZone.ownerSeatId == playerSeat;
+    if (
+      obj &&
+      obj.grpId &&
+      obj.grpId !== FACE_DOWN_CARD &&
+      warpBase[obj.grpId] &&
+      obj.ownerSeatId == playerSeat &&
+      !srcIsOwnLibrary &&
+      fromZone?.type != "ZoneType_Sideboard" &&
+      !knownInstances.has(ann.affectedIds[0]) &&
+      !knownInstances.has(resolveFinalInstanceId(ann.affectedIds[0]))
+    ) {
+      clearWarpCopy(ann.affectedIds[0], obj.grpId);
     }
   }
 
@@ -863,7 +955,14 @@ function keyValuePair(kvp: KeyValuePairInfo[]): AggregatedDetailsType {
 function processAnnotations(): void {
   const removeIds = [] as number[];
   const anns = getAllAnnotations();
-  anns.forEach((ann) => {
+  // Id changes must land before every other annotation of the message:
+  // knowing that an instance is a renamed KNOWN object is what stops a zone
+  // transfer of it from reading as a fresh reveal.
+  const ordered = [
+    ...anns.filter((a) => a.type.includes("AnnotationType_ObjectIdChanged")),
+    ...anns.filter((a) => !a.type.includes("AnnotationType_ObjectIdChanged")),
+  ];
+  ordered.forEach((ann) => {
     if (ann.id && isAnnotationProcessed(ann.id)) return;
 
     // Details can be undefined sometimes
@@ -1272,6 +1371,8 @@ const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
       console.warn("Reset current game");
       resetCurrentGame();
       processedMsgIds = new Set();
+      knownInstances = new Set();
+      warpClearedInstances = new Set();
       setGameBeginTime(globalStore.currentMatch.logTime);
     }
 
@@ -1334,6 +1435,19 @@ const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
 
   if (!duplicate) {
     processAnnotations();
+    // Everything identified by now is no longer "newly revealed" for the
+    // messages that follow.
+    Object.keys(currentMatch.gameObjects).forEach((key) => {
+      const iid = Number(key);
+      const grpId = currentMatch.gameObjects[iid]?.grpId;
+      if (grpId && grpId !== FACE_DOWN_CARD) knownInstances.add(iid);
+    });
+    // Refresh the seen-card lists from the zones this message just changed
+    // BEFORE recomputing the deck: they used to refresh after the whole
+    // message (GREMessage's tail), so every broadcast — and the warped-away
+    // reconciliation — ran one message stale.
+    setPlayerCardsUsed(getPlayerUsedCards());
+    setOppCardsUsed(getOppUsedCards());
     forceDeckUpdate();
     updateDeck();
   }
@@ -1374,6 +1488,97 @@ const GREMessageType_DieRollResultsResp = (msg: GREToClientMessage): void => {
     });
     setOnThePlay(highest.systemSeatId || 0);
   }
+};
+
+/**
+ * A library search (fetchland, tutor, Entomb...) is the one moment the GRE
+ * tells us the library's TRUE contents: the same event materializes a game
+ * object with a grpId for every card in it, and itemsToSearch lists exactly
+ * those instances. Anything our computed cards-left still expects but the
+ * real library lacks must have left it unseen — exiled face down, "warped
+ * away". Snapshot that delta for the overlay.
+ *
+ * The GameStateMessages travel in the same event BEFORE this request, so
+ * gameObjects and cardsLeft are already up to date when it runs.
+ */
+const GREMessageType_SearchReq = (msg: GREToClientMessage): void => {
+  const req = msg.searchReq;
+  const { currentMatch } = globalStore;
+  if (!req || !req.itemsToSearch || req.itemsToSearch.length === 0) return;
+
+  // Only a search of the PLAYER's library reveals the player's library.
+  const searchesOwnLibrary = (req.zonesToSearch || []).some((zoneId) => {
+    const zone = currentMatch.zones[zoneId];
+    return (
+      zone &&
+      zone.type === "ZoneType_Library" &&
+      zone.ownerSeatId === currentMatch.playerSeat
+    );
+  });
+  if (!searchesOwnLibrary) return;
+
+  // Resolve every searched instance to a card. If any is unknown (face-down
+  // or a summarized/truncated event), we do NOT have the full library and
+  // any conclusion would be wrong — bail without touching state.
+  const libraryCounts: Record<number, number> = {};
+  for (const instanceId of req.itemsToSearch) {
+    const grpId =
+      currentMatch.gameObjects[instanceId]?.grpId ??
+      currentMatch.instanceToCardIdMap[instanceId];
+    if (!grpId || grpId === FACE_DOWN_CARD) return;
+    libraryCounts[grpId] = (libraryCounts[grpId] || 0) + 1;
+  }
+
+  // Cards mid-transition sit in neither count: a fetchland cracked to pay for
+  // THIS search is in Limbo when the request arrives — no longer seen, not in
+  // the library — and would read as warped. A Limbo instance with no forward
+  // id mapping yet is such a card in flight; the stale ids Limbo accumulates
+  // all map forward to their post-transition instances and are skipped.
+  const transitCounts: Record<number, number> = {};
+  Object.keys(currentMatch.zones).forEach((key) => {
+    const zone = currentMatch.zones[Number(key)];
+    if (zone?.type !== "ZoneType_Limbo") return;
+    (zone.objectInstanceIds || []).forEach((iid) => {
+      if (resolveFinalInstanceId(iid) !== iid) return;
+      const obj = currentMatch.gameObjects[iid];
+      if (
+        obj &&
+        obj.grpId &&
+        obj.grpId !== FACE_DOWN_CARD &&
+        obj.ownerSeatId === currentMatch.playerSeat
+      ) {
+        transitCounts[obj.grpId] = (transitCounts[obj.grpId] || 0) + 1;
+      }
+    });
+  });
+
+  // cardsLeft = deck minus everything we've seen; the search shows what is
+  // actually still there. The difference left the library without being seen.
+  const missing: number[] = [];
+  const expected = currentMatch.cardsLeft.clone().getMainboard();
+  expected.removeDuplicates();
+  expected.get().forEach((card) => {
+    if (!card.id || !card.quantity) return;
+    const short =
+      card.quantity -
+      (libraryCounts[card.id] || 0) -
+      (transitCounts[card.id] || 0);
+    for (let i = 0; i < short; i++) missing.push(card.id);
+  });
+
+  const warpBase: Record<number, number> = {};
+  missing.forEach((grpId) => {
+    warpBase[grpId] = (warpBase[grpId] || 0) + 1;
+  });
+
+  console.info("[warp] library search:", {
+    searched: req.itemsToSearch.length,
+    expected: expected.count(),
+    missing,
+  });
+  setWarpBase(warpBase);
+  setMissingFromLibrary(missing);
+  updateDeck();
 };
 
 const GREMessageType_IntermissionReq = (msg: GREToClientMessage): void => {
@@ -1422,6 +1627,9 @@ function GREMessagesSwitch(
       break;
     case "GREMessageType_DieRollResultsResp":
       GREMessageType_DieRollResultsResp(message);
+      break;
+    case "GREMessageType_SearchReq":
+      GREMessageType_SearchReq(message);
       break;
     case "GREMessageType_IntermissionReq":
       GREMessageType_IntermissionReq(message);

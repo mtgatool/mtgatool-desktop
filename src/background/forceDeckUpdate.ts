@@ -2,7 +2,7 @@ import { CardObject } from "../types";
 import Chances from "../types/chances";
 import { hypergeometricRange } from "../utils/statsFns";
 import globalStore from "./store";
-import { setCardsOdds } from "./store/currentMatchStore";
+import { setCardsOdds, setMissingFromLibrary } from "./store/currentMatchStore";
 
 function chanceType(
   quantity: number,
@@ -133,6 +133,24 @@ const forceDeckUpdate = (removeUsed = true): void => {
   cardsleft += playerCardsBottom.length;
 
   globalStore.currentMatch.cardsLeft = playerCardsLeft;
+
+  // The warp display is a projection of warpBase, which only changes on a
+  // library search or when a copy returns from the exile zone — never from
+  // new sightings alone, since a drawn or fetched copy of the same card is
+  // not the warped one.
+  const warpBase = currentMatch.warpBase || {};
+  const display: number[] = [];
+  Object.keys(warpBase).forEach((key) => {
+    const grpId = Number(key);
+    for (let i = 0; i < warpBase[grpId]; i += 1) display.push(grpId);
+  });
+  const current = currentMatch.missingFromLibrary || [];
+  if (
+    display.length !== current.length ||
+    display.some((g, i) => g !== current[i])
+  ) {
+    setMissingFromLibrary(display);
+  }
 };
 
 export default forceDeckUpdate;
