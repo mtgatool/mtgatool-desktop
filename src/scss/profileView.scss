@@ -277,6 +277,14 @@
   width: 100%;
   min-height: 65vh;
 
+  // The section is a box, not a band — full-bleed reads odd on widescreens.
+  .section {
+    // border-box: the 96px side paddings must live inside the cap
+    box-sizing: border-box;
+    max-width: 600px;
+    border-radius: 4px;
+  }
+
   .public-loading-icon {
     background-image: url(../assets/icons/icon-256.png);
     background-color: var(--color-base);
