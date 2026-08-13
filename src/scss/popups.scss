@@ -221,11 +221,25 @@
 
 .patreon-info-pop-top {
   background-color: #f96854;
-  padding: 24px;
+  padding: 32px 24px;
+  position: relative;
+  overflow: hidden;
+
+  .message-sub {
+    position: relative;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+  }
+}
+
+// Patreon marks drifting behind the header text.
+.patreon-float {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
 }
 
 .patreon-info-pop-bottom {
-  padding: 24px;
+  padding: 16px 24px 40px;
 }
 
 .patreon-info-text {
@@ -233,16 +247,42 @@
   margin: 8px;
 }
 
+.patreon-perk {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px 24px;
+
+  // Adjacent-sibling, not :last-of-type: the description below is also a
+  // div, which would give the final perk a separator too.
+  + .patreon-perk {
+    border-top: 1px solid var(--color-line-sep);
+  }
+}
+
+.patreon-perk-dot {
+  width: 9px;
+  height: 9px;
+  min-width: 9px;
+  border-radius: 9px;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.15);
+}
+
 .patreon-desc-text {
   font-family: var(--main-font-name-it);
   opacity: 0.8;
   text-align: center;
-  margin: 41px 12px 32px;
-  padding-top: 24px;
+  margin: 24px 12px 28px;
+  padding-top: 20px;
   border-top: 1px solid var(--color-back-40);
 }
 
 .patreon_link_thin {
+  display: block;
+  border: 0;
+  padding: 0;
+  background-color: transparent;
   background-image: url(../assets/images/button_patreon.png);
   cursor: pointer;
   width: 190px;

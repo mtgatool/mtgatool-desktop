@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useEffect, useRef, useState } from "react";
+import { useHistory } from "react-router-dom";
 
 import { DEFAULT_AVATAR } from "../../../constants";
 import { getLatestRanks } from "../../../data/publicProfiles";
@@ -8,9 +9,13 @@ import RankIcon from "../../RankIcon";
 import DbRankInfo from "./DbRankInfo";
 import { sortConstructedRanks, sortLimitedRanks } from "./sortRanks";
 
-function DrawConstructedRank(props: DbRankInfo & { pos: number }) {
+function DrawConstructedRank(
+  props: DbRankInfo & { pos: number; openProfile: (arenaId: string) => void }
+) {
   const {
     pos,
+    uuid,
+    openProfile,
     name,
     avatar,
     constructedClass,
@@ -35,7 +40,13 @@ function DrawConstructedRank(props: DbRankInfo & { pos: number }) {
         }}
       />
       <div className="rank-name-container">
-        <div className="rank-name">{cleanUsername(name || "-")}</div>
+        <button
+          type="button"
+          className="rank-name"
+          onClick={() => openProfile(name || uuid)}
+        >
+          {cleanUsername(name || "-")}
+        </button>
       </div>
       <div className="rank-icon">
         <div className="rank-position">
@@ -55,9 +66,13 @@ function DrawConstructedRank(props: DbRankInfo & { pos: number }) {
   );
 }
 
-function DrawLimitedRank(props: DbRankInfo & { pos: number }) {
+function DrawLimitedRank(
+  props: DbRankInfo & { pos: number; openProfile: (arenaId: string) => void }
+) {
   const {
     pos,
+    uuid,
+    openProfile,
     name,
     avatar,
     limitedClass,
@@ -82,7 +97,13 @@ function DrawLimitedRank(props: DbRankInfo & { pos: number }) {
         }}
       />
       <div className="rank-name-container">
-        <div className="rank-name">{cleanUsername(name || "-")}</div>
+        <button
+          type="button"
+          className="rank-name"
+          onClick={() => openProfile(name || uuid)}
+        >
+          {cleanUsername(name || "-")}
+        </button>
       </div>
       <div className="rank-icon">
         <div className="rank-position">
@@ -111,7 +132,15 @@ function DrawLoadingRank() {
 const emptyList = new Array(10).fill(0);
 
 export default function BestRanksFeed() {
+  const history = useHistory();
   const [allRanks, setAllRanks] = useState<DbRankInfo[]>([]);
+
+  // Prefer the username in the URL — /profile/manwe reads better and stays
+  // stable across account switches; ViewProfile still resolves arena ids for
+  // the rows that never made a profile.
+  const openProfile = (id: string): void => {
+    history.push(`/profile/${encodeURIComponent(id)}`);
+  };
 
   const isLoadingRef = useRef(false);
 
@@ -138,6 +167,7 @@ export default function BestRanksFeed() {
               <DrawConstructedRank
                 key={`constructed-best-${r.uuid}`}
                 pos={i + 1}
+                openProfile={openProfile}
                 {...r}
               />
             ))}
@@ -150,6 +180,7 @@ export default function BestRanksFeed() {
               <DrawLimitedRank
                 key={`limited-best-${r.uuid}`}
                 pos={i + 1}
+                openProfile={openProfile}
                 {...r}
               />
             ))}

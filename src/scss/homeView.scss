@@ -109,6 +109,16 @@
         overflow: hidden;
 
         .rank-name {
+          // native button for keyboard access, styled as the text it was
+          border: 0;
+          padding: 0;
+          background: transparent;
+          font: inherit;
+          color: inherit;
+          text-align: inherit;
+          text-indent: inherit;
+          display: block;
+          width: 100%;
           text-overflow: ellipsis;
           white-space: pre;
           overflow: hidden;

@@ -34,6 +34,8 @@ export interface SharedDeckOwner {
 export interface SharedDeckPayload {
   deck: SharedDeckSnapshot;
   updated_at: string;
+  /** Arena deck id, for the recent-matches list. Null for private owners. */
+  deck_id: string | null;
   owner: SharedDeckOwner | null;
   winrate: { wins: number; losses: number } | null;
 }

@@ -11,7 +11,11 @@ import { cloudLogout, cloudUpdatePassword } from "../../../data/cloudAuth";
 import { isCloudActive } from "../../../data/cloudSync";
 import { TIER_NAMES } from "../../../data/entitlement";
 import {
+  fetchOwnArenaAccounts,
+  fetchOwnVisibleArenaId,
+  OwnArenaAccount,
   setProfilePrivate,
+  setVisibleArenaAccount,
   updateUsername,
   uploadAvatar,
 } from "../../../data/profile";
@@ -27,10 +31,12 @@ import useSupporter from "../../../hooks/useSupporter";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
 import getLocalSetting from "../../../utils/getLocalSetting";
+import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import vodiFn from "../../../utils/voidfn";
 import SupporterTierIcon, { TIERS } from "../../SupporterTierIcon";
 import Button from "../../ui/Button";
+import Select from "../../ui/Select";
 import Toggle from "../../ui/Toggle";
 import { SettingsPanelProps } from "./ViewSettings";
 
@@ -222,6 +228,43 @@ export default function AccountSettingsPanel(
     [fetchAvatar, avatarKey]
   );
 
+  // Which Arena account the public profile shows. "" is the default
+  // (most recently played); anything else pins that account.
+  const [ownAccounts, setOwnAccounts] = useState<OwnArenaAccount[]>([]);
+  const [visibleAccount, setVisibleAccount] = useState("");
+
+  useEffect(() => {
+    Promise.all([fetchOwnArenaAccounts(), fetchOwnVisibleArenaId()]).then(
+      ([accounts, pinned]) => {
+        setOwnAccounts(accounts);
+        const pinValid = !!pinned && accounts.some((a) => a.arenaId === pinned);
+        setVisibleAccount(pinValid ? (pinned as string) : "");
+        // A pin pointing at an account no longer linked would silently keep
+        // steering the public profile; clear it. Only when the account list
+        // actually loaded — an empty answer might be a failed fetch.
+        if (pinned && !pinValid && accounts.length > 0) {
+          setVisibleArenaAccount(null);
+        }
+      }
+    );
+  }, []);
+
+  const changeVisibleAccount = useCallback((arenaId: string) => {
+    setVisibleAccount(arenaId);
+    setVisibleArenaAccount(arenaId || null);
+  }, []);
+
+  const formatAccountOption = useCallback(
+    (arenaId: string | number) => {
+      if (!arenaId) return "Most recent (default)";
+      const acc = ownAccounts.find((a) => a.arenaId === arenaId);
+      return acc?.displayName
+        ? getPlayerNameWithoutSuffix(acc.displayName)
+        : String(arenaId);
+    },
+    [ownAccounts]
+  );
+
   const setPrivateMode = useCallback(
     (value: boolean) => {
       if (value) {
@@ -327,6 +370,17 @@ export default function AccountSettingsPanel(
         style={{ margin: "auto" }}
         callback={setPrivateMode}
       />
+      {ownAccounts.length > 1 ? (
+        <div className="centered-setting-container">
+          <label>Arena account shown on your public profile:</label>
+          <Select<string>
+            options={["", ...ownAccounts.map((a) => a.arenaId)]}
+            current={visibleAccount}
+            optionFormatter={formatAccountOption}
+            callback={changeVisibleAccount}
+          />
+        </div>
+      ) : null}
       <p
         style={{
           textAlign: "center",
