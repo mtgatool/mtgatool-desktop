@@ -257,3 +257,32 @@
     }
   }
 }
+
+// Full-page public loading: the round mark spinning, like the auth screen.
+.public-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+
+  .public-loading-icon {
+    background-image: url(../assets/icons/icon-256.png);
+    background-color: var(--color-base);
+    border-radius: 50%;
+    background-size: contain;
+    width: 96px;
+    height: 96px;
+    animation: rotate 1s infinite;
+  }
+
+  .public-loading-label {
+    color: var(--color-text-dark);
+    font-family: var(--main-font-name-it);
+  }
+}

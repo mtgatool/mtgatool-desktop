@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import logoBig from "../../../assets/images/logo_big.png";
 import cardsDb from "../../../utils/cardsDb/cardsDbClient";
+import PublicLoading from "../../PublicLoading";
 import PublicTopBar from "../../PublicTopBar";
 import ViewProfile from "./ViewProfile";
 
@@ -33,7 +34,7 @@ export default function PublicProfilePage(): JSX.Element {
   }
 
   if (!dbReady) {
-    return <div className="shared-deck-missing">Loading profile…</div>;
+    return <PublicLoading label="Loading profile…" />;
   }
 
   return (

@@ -14,6 +14,7 @@ import DeckColorsBar from "./DeckColorsBar";
 import LoginPrompt from "./LoginPrompt";
 import ManaCost from "./ManaCost";
 import PublicDeckDetails from "./PublicDeckDetails";
+import PublicLoading from "./PublicLoading";
 import SupporterBadge from "./SupporterBadge";
 import PlayerMatchesSection from "./views/profile/PlayerMatchesSection";
 
@@ -116,7 +117,7 @@ export default function SharedDeckView(): JSX.Element {
   }
 
   if (!payload || !dbReady || !snapshot) {
-    return <div className="shared-deck-missing">Loading deck…</div>;
+    return <PublicLoading label="Loading deck…" />;
   }
 
   const { owner } = payload;
