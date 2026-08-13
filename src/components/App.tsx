@@ -38,6 +38,7 @@ import Popups from "./Popups";
 import Admin from "./popups/Admin";
 import ArenaIdSelector from "./popups/ArenaIdSelector";
 import DetailedLogs from "./popups/DetailedLogs";
+import PublicLoading from "./PublicLoading";
 import SettingsPersistor from "./SettingsPersistor";
 import SharedDeckView from "./SharedDeckView";
 import TopBar from "./TopBar";
@@ -55,6 +56,16 @@ function App(props: AppProps) {
   const history = useHistory();
   const dispatch = useDispatch();
   const [canLogin, _setCanLogin] = useState(true);
+  // Booting on a public page with a SAVED session used to flash the whole
+  // signed-out page before flipping to the app. autoLogin is synchronous
+  // localStorage, so we know at first render that a login is coming: show a
+  // neutral loading state instead and only fall back to the public shell if
+  // the session check fails.
+  const [publicAuthPending, setPublicAuthPending] = useState(
+    () =>
+      history.location.pathname.startsWith("/profile/") &&
+      ["true", "local"].includes(getLocalSetting("autoLogin"))
+  );
 
   const {
     detailedLogs,
@@ -116,6 +127,7 @@ function App(props: AppProps) {
       checkSession
         .then((ok) => {
           if (!ok) {
+            setPublicAuthPending(false);
             if (!onPublicProfile) {
               // A deep link opened signed-out should survive the login: the
               // auth screen returns here after it succeeds.
@@ -171,6 +183,7 @@ function App(props: AppProps) {
         })
         .catch((e: Error) => {
           console.error(e);
+          setPublicAuthPending(false);
           if (!onPublicProfile) {
             setLoginReturnTo(
               history.location.pathname + (history.location.search || "")
@@ -352,7 +365,15 @@ function App(props: AppProps) {
                 falls through to the normal app shell below — whose
                 ContentWrapper needs the /:page param this route lacks. */}
             {loginState != LOGIN_OK ? (
-              <Route path="/profile/:id" component={PublicProfilePage} />
+              <Route path="/profile/:id">
+                {publicAuthPending ? (
+                  <div className="public-profile-page">
+                    <PublicLoading label="Loading profile…" />
+                  </div>
+                ) : (
+                  <PublicProfilePage />
+                )}
+              </Route>
             ) : null}
             <Route path="/:page">
               <>
