@@ -147,7 +147,7 @@ export default function PublicMatchView({
     );
   }
 
-  const isLimited = isLimitedEventId(match.event_id);
+  const isLimited = isLimitedEventId(match.event_id || "");
   const won = match.player_wins > match.player_losses;
 
   return (
@@ -210,7 +210,7 @@ export default function PublicMatchView({
             style={{ margin: "auto 16px auto 8px" }}
             fill="var(--color-icon)"
           />
-          <div>{getEventPrettyName(match.event_id)}</div>
+          <div>{getEventPrettyName(match.event_id || "")}</div>
         </Flex>
         <Flex>
           <IconTime

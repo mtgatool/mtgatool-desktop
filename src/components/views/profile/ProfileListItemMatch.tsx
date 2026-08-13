@@ -35,7 +35,7 @@ export default function ProfileListItemMatch({
   row,
   openMatchCallback,
 }: ProfileListItemMatchProps): JSX.Element {
-  const isLimited = isLimitedEventId(row.event_id);
+  const isLimited = isLimitedEventId(row.event_id || "");
   const won = row.player_wins > row.player_losses;
 
   // Draft decks carry the stock tile; borrow the deck's first mythic — or
@@ -77,7 +77,7 @@ export default function ProfileListItemMatch({
         <FlexTop>
           <div className="list-deck-name">{row.deck_name || ""}</div>
           <div className="list-deck-name-it">
-            {getEventPrettyName(row.event_id)}
+            {getEventPrettyName(row.event_id || "")}
           </div>
         </FlexTop>
         <FlexBottom>
@@ -94,7 +94,9 @@ export default function ProfileListItemMatch({
             className="list-match-time"
           >
             <div className="time">
-              {timeAgo(new Date(row.played_at).getTime())}
+              {row.played_at
+                ? timeAgo(new Date(row.played_at).getTime())
+                : "\u2014"}
             </div>{" "}
             {`${toMMSS(row.duration || 0)} long`}
           </div>

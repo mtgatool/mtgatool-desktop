@@ -2,7 +2,6 @@ import { useHistory } from "react-router-dom";
 
 import logoBig from "../assets/images/logo_big.png";
 import openExternal from "../utils/openExternal";
-import Button from "./ui/Button";
 
 /**
  * Slim chrome for the signed-out public pages: brand on the left, two honest
@@ -23,21 +22,27 @@ export default function PublicTopBar(): JSX.Element {
         <img src={logoBig} alt="MTG Arena Tool" />
       </button>
       <div className="public-top-bar-actions">
-        <Button
+        {/* Native buttons: the shared Button renders a div and offers no
+            keyboard semantics. .button-simple styles apply the same. */}
+        <button
+          type="button"
           className="button-simple"
-          text="Log in"
           onClick={(): void =>
             history.push("/auth", {
               returnTo:
                 history.location.pathname + (history.location.search || ""),
             })
           }
-        />
-        <Button
+        >
+          Log in
+        </button>
+        <button
+          type="button"
           className="button-simple"
-          text="Get the tracker"
           onClick={(): void => openExternal("https://mtgatool.com")}
-        />
+        >
+          Get the tracker
+        </button>
       </div>
     </div>
   );

@@ -131,9 +131,13 @@ export default function PublicDeckView({
               games > 0 ? (
                 <div
                   className="shared-deck-record"
-                  title={`Last played ${timeAgo(
-                    new Date(row.last_played).getTime()
-                  )}`}
+                  title={
+                    row.last_played
+                      ? `Last played ${timeAgo(
+                          new Date(row.last_played).getTime()
+                        )}`
+                      : undefined
+                  }
                 >
                   <span className="record">{`${wins}-${games - wins}`}</span>
                   <span

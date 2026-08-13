@@ -46,6 +46,9 @@ export default function PlayerMatchesSection({
     let cancelled = false;
     requestKey.current = `${id}|${deckId ?? ""}`;
     setPage(null);
+    // A discarded stale continuation never clears this; do it here or the
+    // new list can never load more.
+    setLoadingMore(false);
     getPlayerMatches({ arenaId: id }, PUBLIC_MATCHES, 0, deckId)
       .then(
         (p) =>

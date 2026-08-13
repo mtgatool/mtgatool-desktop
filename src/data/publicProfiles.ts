@@ -162,8 +162,10 @@ export interface PublicMatchRank {
 
 export interface PlayerMatchRow {
   match_id: string;
-  event_id: string;
-  played_at: string;
+  /** Nullable in the schema; the uploader always writes them, but honesty
+   * here keeps the render guards in place. */
+  event_id: string | null;
+  played_at: string | null;
   deck_name: string | null;
   deck_tile_id: number | null;
   /** Main-deck card ids, present only when the deck has no tile of its own. */
@@ -185,8 +187,8 @@ export interface PlayerMatchRow {
  */
 export interface PublicMatch {
   match_id: string;
-  event_id: string;
-  played_at: string;
+  event_id: string | null;
+  played_at: string | null;
   duration: number | null;
   best_of: number | null;
   player_wins: number;
@@ -214,7 +216,7 @@ export interface PlayerDeckRow {
   id: string;
   games: number;
   wins: number;
-  last_played: string;
+  last_played: string | null;
   deck: {
     name?: string;
     deckTileId?: number;

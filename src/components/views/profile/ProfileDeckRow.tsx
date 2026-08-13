@@ -46,7 +46,7 @@ export default function ProfileDeckRow({
       playerId: "",
       deckHash: row.id,
       matches: {},
-      lastUsed: new Date(row.last_played).getTime(),
+      lastUsed: row.last_played ? new Date(row.last_played).getTime() : 0,
       stats: {
         gameWins: 0,
         gameLosses: 0,
