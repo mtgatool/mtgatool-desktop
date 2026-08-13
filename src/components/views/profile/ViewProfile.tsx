@@ -16,6 +16,7 @@ import cleanUsername from "../../../utils/cleanUsername";
 import formatPercent from "../../../utils/formatPercent";
 import getEventFormat from "../../../utils/getEventFormat";
 import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
+import safeDecodeURIComponent from "../../../utils/safeDecodeURIComponent";
 import timeAgo from "../../../utils/timeAgo";
 import PatreonInfo from "../../popups/PatreonInfo";
 import PublicLoading from "../../PublicLoading";
@@ -341,22 +342,22 @@ export default function ViewProfile(): JSX.Element {
   if (matchRoute) {
     return (
       <PublicMatchView
-        profileId={decodeURIComponent(matchRoute.params.id)}
-        matchId={decodeURIComponent(matchRoute.params.matchId)}
+        profileId={safeDecodeURIComponent(matchRoute.params.id)}
+        matchId={safeDecodeURIComponent(matchRoute.params.matchId)}
       />
     );
   }
   if (deckRoute) {
     return (
       <PublicDeckView
-        profileId={decodeURIComponent(deckRoute.params.id)}
-        deckId={decodeURIComponent(deckRoute.params.hash)}
+        profileId={safeDecodeURIComponent(deckRoute.params.id)}
+        deckId={safeDecodeURIComponent(deckRoute.params.hash)}
       />
     );
   }
 
   const id = profileRoute?.params.id
-    ? decodeURIComponent(profileRoute.params.id)
+    ? safeDecodeURIComponent(profileRoute.params.id)
     : "";
   return <ProfileContent id={id} />;
 }

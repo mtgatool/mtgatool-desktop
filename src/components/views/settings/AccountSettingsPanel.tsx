@@ -237,9 +237,14 @@ export default function AccountSettingsPanel(
     Promise.all([fetchOwnArenaAccounts(), fetchOwnVisibleArenaId()]).then(
       ([accounts, pinned]) => {
         setOwnAccounts(accounts);
-        setVisibleAccount(
-          pinned && accounts.some((a) => a.arenaId === pinned) ? pinned : ""
-        );
+        const pinValid = !!pinned && accounts.some((a) => a.arenaId === pinned);
+        setVisibleAccount(pinValid ? (pinned as string) : "");
+        // A pin pointing at an account no longer linked would silently keep
+        // steering the public profile; clear it. Only when the account list
+        // actually loaded — an empty answer might be a failed fetch.
+        if (pinned && !pinValid && accounts.length > 0) {
+          setVisibleArenaAccount(null);
+        }
       }
     );
   }, []);

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import logoBig from "../assets/images/logo_big.png";
 import { DEFAULT_AVATAR, DEFAULT_TILE } from "../constants";
@@ -27,7 +27,6 @@ import PlayerMatchesSection from "./views/profile/PlayerMatchesSection";
  */
 export default function SharedDeckView(): JSX.Element {
   const params = useParams<{ id: string }>();
-  const history = useHistory();
   const [dbReady, setDbReady] = useState(false);
   const [dbFailed, setDbFailed] = useState(false);
   const [payload, setPayload] = useState<SharedDeckPayload | null>(null);
@@ -147,24 +146,24 @@ export default function SharedDeckView(): JSX.Element {
               />
               <div className="shared-deck-title">
                 <div className="shared-deck-name">{snapshot.name}</div>
-                <div
-                  className={`shared-deck-owner${
-                    ownerProfile ? " has-profile" : ""
-                  }`}
-                  onClick={
-                    ownerProfile
-                      ? (): void =>
-                          history.push(
-                            `/profile/${encodeURIComponent(ownerProfile)}`
-                          )
-                      : undefined
-                  }
-                >
-                  by {ownerName}
-                  {owner && owner.supporter_tier > 0 ? (
-                    <SupporterBadge tier={owner.supporter_tier} />
-                  ) : null}
-                </div>
+                {ownerProfile ? (
+                  <Link
+                    className="shared-deck-owner has-profile"
+                    to={`/profile/${encodeURIComponent(ownerProfile)}`}
+                  >
+                    by {ownerName}
+                    {owner && owner.supporter_tier > 0 ? (
+                      <SupporterBadge tier={owner.supporter_tier} />
+                    ) : null}
+                  </Link>
+                ) : (
+                  <div className="shared-deck-owner">
+                    by {ownerName}
+                    {owner && owner.supporter_tier > 0 ? (
+                      <SupporterBadge tier={owner.supporter_tier} />
+                    ) : null}
+                  </div>
+                )}
               </div>
             </div>
             <div className="flex-item">

@@ -254,8 +254,10 @@
   gap: 10px;
   padding: 11px 24px;
 
-  &:not(:last-of-type) {
-    border-bottom: 1px solid var(--color-line-sep);
+  // Adjacent-sibling, not :last-of-type: the description below is also a
+  // div, which would give the final perk a separator too.
+  + .patreon-perk {
+    border-top: 1px solid var(--color-line-sep);
   }
 }
 
@@ -277,6 +279,10 @@
 }
 
 .patreon_link_thin {
+  display: block;
+  border: 0;
+  padding: 0;
+  background-color: transparent;
   background-image: url(../assets/images/button_patreon.png);
   cursor: pointer;
   width: 190px;

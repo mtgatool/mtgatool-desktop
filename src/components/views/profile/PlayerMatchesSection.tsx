@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import {
@@ -38,9 +38,13 @@ export default function PlayerMatchesSection({
   const [page, setPage] = useState<PlayerMatchesPage | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [showPatreonPopup, setShowPatreonPopup] = useState(false);
+  // Guards both fetches against navigation: a slow answer for the previous
+  // profile or deck must not land in the new one's list.
+  const requestKey = useRef("");
 
   useEffect(() => {
     let cancelled = false;
+    requestKey.current = `${id}|${deckId ?? ""}`;
     setPage(null);
     getPlayerMatches({ arenaId: id }, PUBLIC_MATCHES, 0, deckId)
       .then(
@@ -57,6 +61,7 @@ export default function PlayerMatchesSection({
 
   const loadMore = useCallback(() => {
     if (!page || loadingMore) return;
+    const key = `${id}|${deckId ?? ""}`;
     setLoadingMore(true);
     getPlayerMatches({ arenaId: id }, HISTORY_PAGE, page.matches.length, deckId)
       .then(
@@ -70,6 +75,7 @@ export default function PlayerMatchesSection({
           )
       )
       .then((p) => {
+        if (requestKey.current !== key) return;
         setLoadingMore(false);
         if (p && p.matches.length > 0) {
           setPage({

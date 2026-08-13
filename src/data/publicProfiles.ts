@@ -179,8 +179,9 @@ export interface PlayerMatchRow {
 }
 
 /**
- * The public view of one match: the played deck and the result. No arena
- * ids, no player names, no action log, no game telemetry.
+ * The public view of one match: the played deck, the result, the opponent's
+ * in-game name and rank, and the action log. No arena ids and no per-game
+ * telemetry (hands drawn, cards seen).
  */
 export interface PublicMatch {
   match_id: string;

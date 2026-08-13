@@ -226,6 +226,9 @@
     gap: 10px;
     cursor: pointer;
     color: var(--color-text-hover);
+    border: 0;
+    padding: 0;
+    background: transparent;
 
     img {
       height: 32px;
@@ -251,6 +254,10 @@
   .login-prompt-link {
     color: var(--color-text-link);
     cursor: pointer;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    font: inherit;
 
     &:hover {
       text-decoration: underline;

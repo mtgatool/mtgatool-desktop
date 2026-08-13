@@ -12,8 +12,13 @@ export default function PublicLoading({
   inline?: boolean;
 }): JSX.Element {
   return (
-    <div className={`public-loading${inline ? " inline" : ""}`}>
-      <div className="public-loading-icon" />
+    <div
+      className={`public-loading${inline ? " inline" : ""}`}
+      role="status"
+      aria-live="polite"
+      aria-label={label || "Loading"}
+    >
+      <div className="public-loading-icon" aria-hidden="true" />
       {label ? <div className="public-loading-label">{label}</div> : null}
     </div>
   );

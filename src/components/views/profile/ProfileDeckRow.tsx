@@ -40,7 +40,9 @@ export default function ProfileDeckRow({
       deckTileId: pd.deckTileId || DEFAULT_TILE,
       mainDeck: pd.mainDeck || [],
       sideboard: pd.sideboard || [],
-      colors: deck.colors.getBits() || pd.colors || 0,
+      colors:
+        deck.colors.getBits() ||
+        (typeof pd.colors === "number" ? pd.colors : 0),
       playerId: "",
       deckHash: row.id,
       matches: {},

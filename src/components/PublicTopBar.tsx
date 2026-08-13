@@ -15,12 +15,13 @@ export default function PublicTopBar(): JSX.Element {
 
   return (
     <div className="public-top-bar">
-      <div
+      <button
+        type="button"
         className="public-top-bar-brand"
         onClick={(): void => openExternal("https://mtgatool.com")}
       >
         <img src={logoBig} alt="MTG Arena Tool" />
-      </div>
+      </button>
       <div className="public-top-bar-actions">
         <Button
           className="button-simple"

@@ -163,7 +163,7 @@ function App(props: AppProps) {
         })
         .catch((e: Error) => {
           console.error(e);
-          history.push("/auth");
+          if (!onPublicProfile) history.push("/auth");
         });
     }
   }, [canLogin, history, dispatch]);

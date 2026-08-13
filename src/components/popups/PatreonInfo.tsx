@@ -8,12 +8,16 @@ interface DialogProps {
   closeCallback?: () => void;
 }
 
-/** Perk list, each line accented with one of the supporter tier colours. */
+/**
+ * Perk list. `accent` picks a dot colour from the tier palette for variety —
+ * it is decoration, NOT the tier that unlocks the perk (the profile perks
+ * unlock at Standard).
+ */
 const PERKS = [
-  { text: "Browse the full match history on player profiles", tier: 3 },
-  { text: "See other players' decks and their records", tier: 4 },
-  { text: "Access global cards winrate statistics", tier: 2 },
-  { text: "Get priority support", tier: 1 },
+  { text: "Browse the full match history on player profiles", accent: 3 },
+  { text: "See other players' decks and their records", accent: 4 },
+  { text: "Access global cards winrate statistics", accent: 2 },
+  { text: "Get priority support", accent: 1 },
 ];
 
 /** Patreon marks floating around the header band. */
@@ -61,8 +65,10 @@ export default function PatreonInfo(props: DialogProps): JSX.Element {
         className="popup-div-nopadding"
         style={{
           height: `${open * 470}px`,
+          maxHeight: "92vh",
           width: `${open * 520}px`,
-          overflow: "initial",
+          overflowY: "auto",
+          overflowX: "hidden",
         }}
         onClick={(e): void => {
           e.stopPropagation();
@@ -89,7 +95,7 @@ export default function PatreonInfo(props: DialogProps): JSX.Element {
             <div className="patreon-perk" key={perk.text}>
               <div
                 className="patreon-perk-dot"
-                style={{ backgroundColor: TIERS[perk.tier].top }}
+                style={{ backgroundColor: TIERS[perk.accent].top }}
               />
               <div>{perk.text}</div>
             </div>
@@ -98,9 +104,11 @@ export default function PatreonInfo(props: DialogProps): JSX.Element {
             Supporting also helps us develop new amazing features! See our
             Patreon page to learn more about upcoming and planned perks:
           </div>
-          <div
+          <button
+            type="button"
             className="patreon_link_thin"
             title="Open on browser"
+            aria-label="Become a patron on Patreon"
             onClick={(): void =>
               openExternal("https://www.patreon.com/cw/mtgatool")
             }

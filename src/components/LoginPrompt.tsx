@@ -24,7 +24,8 @@ export default function LoginPrompt(): JSX.Element | null {
       }}
     >
       <div className="login-prompt">
-        <span
+        <button
+          type="button"
           className="login-prompt-link"
           onClick={(): void =>
             history.push("/auth", {
@@ -34,7 +35,7 @@ export default function LoginPrompt(): JSX.Element | null {
           }
         >
           Log in
-        </span>{" "}
+        </button>{" "}
         to compare against your collection!
       </div>
     </Section>

@@ -40,7 +40,15 @@ function DrawConstructedRank(
         }}
       />
       <div className="rank-name-container">
-        <div className="rank-name" onClick={() => openProfile(name || uuid)}>
+        <div
+          className="rank-name"
+          role="button"
+          tabIndex={0}
+          onClick={() => openProfile(name || uuid)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") openProfile(name || uuid);
+          }}
+        >
           {cleanUsername(name || "-")}
         </div>
       </div>
@@ -93,7 +101,15 @@ function DrawLimitedRank(
         }}
       />
       <div className="rank-name-container">
-        <div className="rank-name" onClick={() => openProfile(name || uuid)}>
+        <div
+          className="rank-name"
+          role="button"
+          tabIndex={0}
+          onClick={() => openProfile(name || uuid)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") openProfile(name || uuid);
+          }}
+        >
           {cleanUsername(name || "-")}
         </div>
       </div>

@@ -35,12 +35,9 @@ export default function PublicDeckDetails({
   const [visual, setVisual] = useState(false);
 
   const arenaExport = (): void => {
-    // A fresh Deck: sorting in place would reorder the one being rendered.
-    const exportDeck = new Deck(
-      {},
-      deck.getMainboard().get(),
-      deck.getSideboard().get()
-    );
+    // A clone: sorting in place would reorder the one being rendered, and a
+    // rebuild from main/side would drop commanders and companions.
+    const exportDeck = deck.clone();
     exportDeck.sortMainboard(compareCards);
     exportDeck.sortSideboard(compareCards);
     copyToClipboard(exportDeck.getExportArena());

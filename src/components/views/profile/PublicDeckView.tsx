@@ -43,9 +43,7 @@ export default function PublicDeckView({
     setRow(null);
     setLoaded(false);
     getPlayerDecks({ arenaId: profileId })
-      .then((p) =>
-        p?.decks.length ? p : getPlayerDecks({ username: profileId })
-      )
+      .then((p) => p ?? getPlayerDecks({ username: profileId }))
       .then((p) => {
         if (cancelled) return;
         setRow(p?.decks.find((d) => d.id === deckId) ?? null);
