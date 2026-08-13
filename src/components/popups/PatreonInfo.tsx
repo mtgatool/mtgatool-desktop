@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
+import { ReactComponent as Bubbles } from "../../assets/images/svg/bubbles.svg";
 import openExternal from "../../utils/openExternal";
 import PatreonLogo from "../PatreonLogo";
 import { TIERS } from "../SupporterTierIcon";
@@ -16,7 +18,7 @@ interface DialogProps {
 const PERKS = [
   { text: "Browse the full match history on player profiles", accent: 3 },
   { text: "See other players' decks and their records", accent: 4 },
-  { text: "Access global cards winrate statistics", accent: 2 },
+  { text: "In-app and Discord honorific mentions", accent: 2 },
   { text: "Get priority support", accent: 1 },
 ];
 
@@ -52,7 +54,7 @@ export default function PatreonInfo(props: DialogProps): JSX.Element {
     }, 1);
   }, []);
 
-  return (
+  return createPortal(
     <div
       className="popup-background"
       style={{
@@ -61,12 +63,21 @@ export default function PatreonInfo(props: DialogProps): JSX.Element {
       }}
       onClick={handleClose}
     >
+      {/* Ink behind the card: each bubble drifts outward from the centre at
+          its own slow pace once the popup pops. */}
+      <div
+        className={`patreon-bubbles${open ? " popped" : ""}`}
+        aria-hidden="true"
+      >
+        <Bubbles className="bubble-field" />
+      </div>
       <div
         className="popup-div-nopadding"
         style={{
           height: `${open * 470}px`,
           maxHeight: "92vh",
           width: `${open * 520}px`,
+          borderRadius: "20px",
           overflowY: "auto",
           overflowX: "hidden",
         }}
@@ -115,6 +126,7 @@ export default function PatreonInfo(props: DialogProps): JSX.Element {
           />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

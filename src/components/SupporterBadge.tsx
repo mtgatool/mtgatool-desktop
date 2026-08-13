@@ -1,7 +1,10 @@
+import { useState } from "react";
+
 import { TIER_NAMES } from "../data/entitlement";
 import useSupporter from "../hooks/useSupporter";
 import openExternal from "../utils/openExternal";
 import PatreonLogo from "./PatreonLogo";
+import PatreonInfo from "./popups/PatreonInfo";
 import SupporterTierIcon from "./SupporterTierIcon";
 
 const PATREON_URL = "https://www.patreon.com/cw/mtgatool";
@@ -28,20 +31,31 @@ export default function SupporterBadge({
   const self = useSupporter();
   const tier = tierProp ?? (self.isSupporter ? self.tier : 0);
   const name = TIER_NAMES[tier];
+  // The user's OWN badge (no tier prop, i.e. the top nav) opens the perks
+  // popup; a badge showing someone else's tier keeps linking straight out.
+  const [showPopup, setShowPopup] = useState(false);
 
   return (
-    <div
-      className={`supporter-badge${tier > 0 ? ` tier-${tier}` : ""}`}
-      title={
-        name
-          ? `${name} supporter — thank you!`
-          : "Support MTG Arena Tool on Patreon"
-      }
-      onClick={(): void => openExternal(PATREON_URL)}
-    >
-      {/* The Patreon mark is the invitation; once there is a pledge the badge
-          shows what tier it is. */}
-      {tier > 0 ? <SupporterTierIcon tier={tier} /> : <PatreonLogo />}
-    </div>
+    <>
+      <div
+        className={`supporter-badge${tier > 0 ? ` tier-${tier}` : ""}`}
+        title={
+          name
+            ? `${name} supporter — thank you!`
+            : "Support MTG Arena Tool on Patreon"
+        }
+        onClick={(): void => {
+          if (tierProp === undefined) setShowPopup(true);
+          else openExternal(PATREON_URL);
+        }}
+      >
+        {/* The Patreon mark is the invitation; once there is a pledge the badge
+            shows what tier it is. */}
+        {tier > 0 ? <SupporterTierIcon tier={tier} /> : <PatreonLogo />}
+      </div>
+      {showPopup ? (
+        <PatreonInfo closeCallback={(): void => setShowPopup(false)} />
+      ) : null}
+    </>
   );
 }

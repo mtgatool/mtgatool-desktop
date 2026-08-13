@@ -231,6 +231,71 @@
   }
 }
 
+// The bubble ink behind the Patreon popup: the original field, one copy,
+// centred behind the card. Each circle drifts outward along its own radial
+// line — solid, unscaled, and slow — once the popup pops. Translations are
+// in the svg's user units so the drift scales with the field.
+.patreon-bubbles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+
+  .bubble-field {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 720px;
+    height: auto;
+    transform: translate(-50%, -50%);
+    overflow: visible;
+    visibility: hidden;
+
+    circle {
+      animation: bubble-drift var(--dur, 40s) cubic-bezier(0.2, 0.6, 0.4, 1)
+        forwards;
+      animation-play-state: paused;
+    }
+
+    // Outward unit vectors from the field centre (129.5, 90.6), hand-scaled
+    // to a drift distance per circle; --dur staggers the pace.
+    circle:nth-of-type(1)  { --dx: -24px; --dy: -20px; --dur: 46s; }
+    circle:nth-of-type(2)  { --dx: -21px; --dy: 21px; --dur: 38s; }
+    circle:nth-of-type(3)  { --dx: 33px; --dy: -2px; --dur: 55s; }
+    circle:nth-of-type(4)  { --dx: -31px; --dy: -2px; --dur: 42s; }
+    circle:nth-of-type(5)  { --dx: 17px; --dy: -23px; --dur: 50s; }
+    circle:nth-of-type(6)  { --dx: -30px; --dy: 0px; --dur: 36s; }
+    circle:nth-of-type(7)  { --dx: 27px; --dy: 8px; --dur: 44s; }
+    circle:nth-of-type(8)  { --dx: -25px; --dy: -9px; --dur: 58s; }
+    circle:nth-of-type(9)  { --dx: 8px; --dy: 27px; --dur: 40s; }
+    circle:nth-of-type(10) { --dx: 26px; --dy: -10px; --dur: 34s; }
+    circle:nth-of-type(11) { --dx: 24px; --dy: 9px; --dur: 52s; }
+    circle:nth-of-type(12) { --dx: -24px; --dy: 11px; --dur: 48s; }
+    circle:nth-of-type(13) { --dx: 10px; --dy: -25px; --dur: 62s; }
+    circle:nth-of-type(14) { --dx: -13px; --dy: -23px; --dur: 45s; }
+  }
+
+  &.popped .bubble-field {
+    visibility: visible;
+
+    circle {
+      animation-play-state: running;
+    }
+  }
+}
+
+@keyframes bubble-drift {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(var(--dx, 0px), var(--dy, 0px));
+  }
+}
+
 // Patreon marks drifting behind the header text.
 .patreon-float {
   position: absolute;
