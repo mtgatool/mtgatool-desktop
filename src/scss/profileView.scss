@@ -214,11 +214,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 52px;
+  // Mirror .top-nav-container/.top-nav: same height, shade, border and
+  // shadow, so signed-out pages read as the same app.
+  height: 48px;
   margin: 0 -24px;
   padding: 0 24px;
-  background-color: var(--color-base);
-  border-bottom: 1px solid var(--color-line-sep);
+  background-color: var(--color-section);
+  border-bottom: solid 1px var(--color-line-sep);
+  box-shadow: 0px 6px 20px 6px rgba(0, 0, 0, 0.2);
 
   .public-top-bar-brand {
     display: flex;
