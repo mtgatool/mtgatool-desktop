@@ -285,4 +285,15 @@
     color: var(--color-text-dark);
     font-family: var(--main-font-name-it);
   }
+
+  &.inline {
+    position: static;
+    margin: auto;
+    padding: 8px 0;
+
+    .public-loading-icon {
+      width: 72px;
+      height: 72px;
+    }
+  }
 }

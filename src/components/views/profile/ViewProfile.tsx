@@ -18,6 +18,7 @@ import getEventFormat from "../../../utils/getEventFormat";
 import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
 import timeAgo from "../../../utils/timeAgo";
 import PatreonInfo from "../../popups/PatreonInfo";
+import PublicLoading from "../../PublicLoading";
 import RankIcon from "../../RankIcon";
 import SupporterBadge from "../../SupporterBadge";
 import Button from "../../ui/Button";
@@ -252,7 +253,7 @@ function ProfileContent({ id }: { id: string }): JSX.Element {
         </Section>
       ) : !profile ? (
         <Section style={{ marginTop: "16px", padding: "48px" }}>
-          <div className="loading-sign" style={{ margin: "auto" }} />
+          <PublicLoading inline />
         </Section>
       ) : (
         <>

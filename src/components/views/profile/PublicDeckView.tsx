@@ -12,6 +12,7 @@ import timeAgo from "../../../utils/timeAgo";
 import DeckColorsBar from "../../DeckColorsBar";
 import ManaCost from "../../ManaCost";
 import PublicDeckDetails from "../../PublicDeckDetails";
+import PublicLoading from "../../PublicLoading";
 import SvgButton from "../../SvgButton";
 import Section from "../../ui/Section";
 import PlayerMatchesSection from "./PlayerMatchesSection";
@@ -84,7 +85,7 @@ export default function PublicDeckView({
     return (
       <div className="profile-view">
         <Section style={{ marginTop: "16px", padding: "48px" }}>
-          <div className="loading-sign" style={{ margin: "auto" }} />
+          <PublicLoading inline />
         </Section>
       </div>
     );

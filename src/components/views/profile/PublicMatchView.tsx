@@ -27,6 +27,7 @@ import DeckList from "../../DeckList";
 import Flex from "../../Flex";
 import LoginPrompt from "../../LoginPrompt";
 import ManaCost from "../../ManaCost";
+import PublicLoading from "../../PublicLoading";
 import RankIcon from "../../RankIcon";
 import SvgButton from "../../SvgButton";
 import Button from "../../ui/Button";
@@ -140,7 +141,7 @@ export default function PublicMatchView({
     return (
       <div className="profile-view">
         <Section style={{ marginTop: "16px", padding: "48px" }}>
-          <div className="loading-sign" style={{ margin: "auto" }} />
+          <PublicLoading inline />
         </Section>
       </div>
     );
