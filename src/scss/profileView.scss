@@ -204,3 +204,56 @@
     }
   }
 }
+
+// Slim chrome for signed-out public pages (profiles, and anything the
+// standalone shell hosts). Sticky so the actions survive long deck lists.
+.public-top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  margin: 0 -24px;
+  padding: 0 24px;
+  background-color: var(--color-base);
+  border-bottom: 1px solid var(--color-line-sep);
+
+  .public-top-bar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    color: var(--color-text-hover);
+
+    img {
+      height: 32px;
+      width: auto;
+    }
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  .public-top-bar-actions {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+// "Log in to compare against your collection!" on public deck/match pages.
+.login-prompt {
+  margin: auto;
+  color: var(--color-text);
+
+  .login-prompt-link {
+    color: var(--color-text-link);
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

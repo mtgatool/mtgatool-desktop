@@ -1,6 +1,6 @@
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 import settingsIcon from "../assets/images/cog.png";
 import { ReactComponent as ShowIcon } from "../assets/images/svg/archive.svg";
@@ -60,6 +60,9 @@ export default function Auth(props: AuthProps) {
   }, []);
 
   const history = useHistory();
+  // Public pages (profiles, shared decks) send people here with a returnTo,
+  // so logging in lands them back on what they were reading.
+  const location = useLocation<{ returnTo?: string }>();
   const dispatch = useDispatch();
   const [errorMessage, setErrorMessage] = useState("");
   // Success counterpart of errorMessage — .form-error is red and fixed-height,
@@ -159,11 +162,11 @@ export default function Auth(props: AuthProps) {
 
   useEffect(() => {
     if (loginState === LOGIN_OK) {
-      history.push("/home");
+      history.push(location.state?.returnTo || "/home");
       // Data is synced by syncAll() on LOG_READ_FINISHED (account-first), so
       // no direct readCards() here.
     }
-  }, [loginState, history]);
+  }, [loginState, history, location.state]);
 
   // Shared post-auth flow: load local data and start reading the Arena log.
   const startSession = useCallback(() => {

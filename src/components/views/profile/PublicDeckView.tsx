@@ -6,6 +6,7 @@ import { DEFAULT_TILE } from "../../../constants";
 import { getPlayerDecks, PlayerDeckRow } from "../../../data/publicProfiles";
 import { useCards } from "../../../hooks/useCard";
 import { useCardArtCrop } from "../../../hooks/useCardImage";
+import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import Deck from "../../../utils/mtga/deck";
 import timeAgo from "../../../utils/timeAgo";
 import DeckColorsBar from "../../DeckColorsBar";
@@ -31,6 +32,7 @@ export default function PublicDeckView({
   deckId,
 }: PublicDeckViewProps): JSX.Element {
   const history = useHistory();
+  const loggedIn = useIsLoggedIn();
 
   const [row, setRow] = useState<PlayerDeckRow | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -125,7 +127,7 @@ export default function PublicDeckView({
         <>
           <PublicDeckDetails
             deck={deck}
-            showWildcards
+            showWildcards={loggedIn}
             recordSlot={
               games > 0 ? (
                 <div

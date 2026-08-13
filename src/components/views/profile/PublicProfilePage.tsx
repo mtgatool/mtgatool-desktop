@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import logoBig from "../../../assets/images/logo_big.png";
 import cardsDb from "../../../utils/cardsDb/cardsDbClient";
+import PublicTopBar from "../../PublicTopBar";
 import ViewProfile from "./ViewProfile";
 
 /**
@@ -37,6 +38,7 @@ export default function PublicProfilePage(): JSX.Element {
 
   return (
     <div className="public-profile-page">
+      <PublicTopBar />
       <ViewProfile />
     </div>
   );

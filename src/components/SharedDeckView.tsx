@@ -11,6 +11,7 @@ import Colors from "../utils/mtga/colors";
 import Deck from "../utils/mtga/deck";
 import openExternal from "../utils/openExternal";
 import DeckColorsBar from "./DeckColorsBar";
+import LoginPrompt from "./LoginPrompt";
 import ManaCost from "./ManaCost";
 import PublicDeckDetails from "./PublicDeckDetails";
 import SupporterBadge from "./SupporterBadge";
@@ -173,6 +174,8 @@ export default function SharedDeckView(): JSX.Element {
             </div>
           </div>
         </div>
+
+        <LoginPrompt />
 
         <PublicDeckDetails
           deck={deck}

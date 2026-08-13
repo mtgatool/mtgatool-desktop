@@ -90,18 +90,16 @@ function App(props: AppProps) {
   }, [matchInProgress, draftInProgress]);
 
   useEffect(() => {
-    // The token pages (/live/<token>, /share/deck/<token>) must work with no
-    // account — never bounce them to /auth or run the login flow for them.
-    if (
-      history.location.pathname.startsWith("/live/") ||
-      history.location.pathname.startsWith("/share/")
-    )
-      return;
-    // Profiles are public too, but a signed-in visitor should get the full
-    // app around them (and their collection, for crafting costs on deck
-    // lists) — so the login flow RUNS here; only the /auth bounce is
-    // skipped, leaving the signed-out standalone shell to render instead.
-    const onPublicProfile = history.location.pathname.startsWith("/profile/");
+    // The live viewer (/live/<token>) is captured as an OBS browser source —
+    // never bounce it to /auth or run the login flow for it.
+    if (history.location.pathname.startsWith("/live/")) return;
+    // Profiles and shared decks are public, but a signed-in visitor should
+    // still be recognized (collection for crafting costs, no login prompts)
+    // — so the login flow RUNS on them; only the /auth bounce is skipped,
+    // leaving the signed-out experience to render instead.
+    const onPublicProfile =
+      history.location.pathname.startsWith("/profile/") ||
+      history.location.pathname.startsWith("/share/");
     if (canLogin) {
       const autoLogin = getLocalSetting("autoLogin");
 

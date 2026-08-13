@@ -9,6 +9,7 @@ import { ReactComponent as IconTime } from "../../../assets/images/svg/time.svg"
 import { getPublicMatch, PublicMatch } from "../../../data/publicProfiles";
 import { useCards } from "../../../hooks/useCard";
 import { useCardArtCrop } from "../../../hooks/useCardImage";
+import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import reduxAction from "../../../redux/reduxAction";
 import compareCards from "../../../utils/compareCards";
 import copyToClipboard from "../../../utils/copyToClipboard";
@@ -24,6 +25,7 @@ import ActionLog from "../../ActionLog";
 import DeckColorsBar from "../../DeckColorsBar";
 import DeckList from "../../DeckList";
 import Flex from "../../Flex";
+import LoginPrompt from "../../LoginPrompt";
 import ManaCost from "../../ManaCost";
 import RankIcon from "../../RankIcon";
 import SvgButton from "../../SvgButton";
@@ -47,6 +49,7 @@ export default function PublicMatchView({
 }: PublicMatchViewProps): JSX.Element {
   const history = useHistory();
   const dispatch = useDispatch();
+  const loggedIn = useIsLoggedIn();
 
   const [match, setMatch] = useState<PublicMatch | null>(null);
   const [missing, setMissing] = useState(false);
@@ -253,6 +256,8 @@ export default function PublicMatchView({
         </Flex>
       </Section>
 
+      <LoginPrompt />
+
       <div className={`public-match-grid${match.action_log ? "" : " no-log"}`}>
         <Section
           style={{
@@ -260,7 +265,7 @@ export default function PublicMatchView({
             flexDirection: "column",
           }}
         >
-          <DeckList deck={deck} showWildcards />
+          <DeckList deck={deck} showWildcards={loggedIn} />
         </Section>
         {match.action_log ? (
           <Section
