@@ -116,6 +116,18 @@ function toggleWindow() {
   }
 }
 
+// Window roles (getWindowTitle in every renderer) key off these native
+// titles, and Electron overwrites them whenever a loaded page sets
+// document.title — a dev-server mixup once served the website on the app's
+// port and its SEO title broke every title check, making the main window
+// broadcast hovers like an overlay. The overlay and post-match windows
+// already lock theirs; these are identity, not chrome — freeze them too.
+function lockWindowTitle(win) {
+  win.on("page-title-updated", (e) => {
+    e.preventDefault();
+  });
+}
+
 function createCardHoverWindow() {
   mainGlobals.cardHoverWindow = new BrowserWindow({
     transparent: true,
@@ -142,6 +154,7 @@ function createCardHoverWindow() {
     mainGlobals.cardHoverWindow.webContents
   );
 
+  lockWindowTitle(mainGlobals.cardHoverWindow);
   mainGlobals.cardHoverWindow.removeMenu();
   // The slim overlay bundle (src/overlayIndex.tsx), not the full app — see
   // craco.config.js. The hover window only ever shows a card image.
@@ -203,6 +216,7 @@ function createWindow() {
     mainGlobals.backgroundWindow.webContents
   );
 
+  lockWindowTitle(mainGlobals.backgroundWindow);
   mainGlobals.backgroundWindow.loadURL(
     process.env.ELECTRON_START_URL ||
       url.format({
@@ -239,6 +253,7 @@ function createWindow() {
   // eslint-disable-next-line global-require
   require("@electron/remote/main").enable(mainGlobals.mainWindow.webContents);
 
+  lockWindowTitle(mainGlobals.mainWindow);
   mainGlobals.mainWindow.loadURL(
     process.env.ELECTRON_START_URL ||
       url.format({
@@ -331,6 +346,7 @@ function createUpdaterWindow() {
   // win.webContents.openDevTools({ mode: "detach" });
 
   win.setIcon(path.join(__dirname, "icons", iconNormal));
+  lockWindowTitle(win);
   win.loadURL(
     process.env.ELECTRON_START_URL ||
       url.format({
