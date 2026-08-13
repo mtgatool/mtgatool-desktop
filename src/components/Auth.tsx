@@ -23,6 +23,7 @@ import reduxAction from "../redux/reduxAction";
 import { AppState } from "../redux/stores/rendererStore";
 import electron from "../utils/electron/electronWrapper";
 import getLocalSetting from "../utils/getLocalSetting";
+import { consumeLoginReturnTo } from "../utils/loginReturnTo";
 import setLocalSetting from "../utils/setLocalSetting";
 import voidFn from "../utils/voidfn";
 import AuthSettings from "./AuthSettings";
@@ -162,7 +163,11 @@ export default function Auth(props: AuthProps) {
 
   useEffect(() => {
     if (loginState === LOGIN_OK) {
-      history.push(location.state?.returnTo || "/home");
+      // Router state from an in-app push wins; the sessionStorage fallback
+      // covers paths where state cannot survive (boot bounces, reloads).
+      history.push(
+        location.state?.returnTo || consumeLoginReturnTo() || "/home"
+      );
       // Data is synced by syncAll() on LOG_READ_FINISHED (account-first), so
       // no direct readCards() here.
     }

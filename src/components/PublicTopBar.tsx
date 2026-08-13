@@ -1,6 +1,7 @@
 import { useHistory } from "react-router-dom";
 
 import logoBig from "../assets/images/logo_big.png";
+import { setLoginReturnTo } from "../utils/loginReturnTo";
 import openExternal from "../utils/openExternal";
 
 /**
@@ -27,12 +28,12 @@ export default function PublicTopBar(): JSX.Element {
         <button
           type="button"
           className="button-simple"
-          onClick={(): void =>
-            history.push("/auth", {
-              returnTo:
-                history.location.pathname + (history.location.search || ""),
-            })
-          }
+          onClick={(): void => {
+            const returnTo =
+              history.location.pathname + (history.location.search || "");
+            setLoginReturnTo(returnTo);
+            history.push("/auth", { returnTo });
+          }}
         >
           Log in
         </button>

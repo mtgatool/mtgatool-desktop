@@ -23,6 +23,7 @@ import electron from "../utils/electron/electronWrapper";
 import isElectron from "../utils/electron/isElectron";
 import getLocalSetting from "../utils/getLocalSetting";
 import getPopupClass from "../utils/getPopupClass";
+import { setLoginReturnTo } from "../utils/loginReturnTo";
 import setLocalSetting from "../utils/setLocalSetting";
 import vodiFn from "../utils/voidfn";
 import Auth from "./Auth";
@@ -115,7 +116,14 @@ function App(props: AppProps) {
       checkSession
         .then((ok) => {
           if (!ok) {
-            if (!onPublicProfile) history.push("/auth");
+            if (!onPublicProfile) {
+              // A deep link opened signed-out should survive the login: the
+              // auth screen returns here after it succeeds.
+              setLoginReturnTo(
+                history.location.pathname + (history.location.search || "")
+              );
+              history.push("/auth");
+            }
             return undefined;
           }
           // Claim the local store BEFORE hydrating: if it belongs to another
@@ -163,7 +171,12 @@ function App(props: AppProps) {
         })
         .catch((e: Error) => {
           console.error(e);
-          if (!onPublicProfile) history.push("/auth");
+          if (!onPublicProfile) {
+            setLoginReturnTo(
+              history.location.pathname + (history.location.search || "")
+            );
+            history.push("/auth");
+          }
         });
     }
   }, [canLogin, history, dispatch]);

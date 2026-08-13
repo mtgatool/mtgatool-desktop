@@ -1,6 +1,7 @@
 import { useHistory } from "react-router-dom";
 
 import useIsLoggedIn from "../hooks/useIsLoggedIn";
+import { setLoginReturnTo } from "../utils/loginReturnTo";
 import Section from "./ui/Section";
 
 /**
@@ -27,12 +28,12 @@ export default function LoginPrompt(): JSX.Element | null {
         <button
           type="button"
           className="login-prompt-link"
-          onClick={(): void =>
-            history.push("/auth", {
-              returnTo:
-                history.location.pathname + (history.location.search || ""),
-            })
-          }
+          onClick={(): void => {
+            const returnTo =
+              history.location.pathname + (history.location.search || "");
+            setLoginReturnTo(returnTo);
+            history.push("/auth", { returnTo });
+          }}
         >
           Log in
         </button>{" "}
