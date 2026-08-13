@@ -140,9 +140,7 @@ export default function PublicMatchView({
   if (!match) {
     return (
       <div className="profile-view">
-        <Section style={{ marginTop: "16px", padding: "48px" }}>
-          <PublicLoading inline />
-        </Section>
+        <PublicLoading label="Loading match…" />
       </div>
     );
   }

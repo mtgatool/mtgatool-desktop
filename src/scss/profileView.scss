@@ -268,6 +268,95 @@
   }
 }
 
+// The unified loading treatment: a section box with the spinning round
+// mark, centered vertically in the content area under whichever top bar.
+.public-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 65vh;
+
+  .public-loading-icon {
+    background-image: url(../assets/icons/icon-256.png);
+    background-color: var(--color-base);
+    border-radius: 50%;
+    background-size: contain;
+    width: 96px;
+    height: 96px;
+    animation: rotate 1s infinite;
+  }
+
+  .public-loading-label {
+    margin-top: 20px;
+    color: var(--color-text-dark);
+    font-family: var(--main-font-name-it);
+  }
+}
+
+// Slim chrome for signed-out public pages (profiles, and anything the
+// standalone shell hosts). Sticky so the actions survive long deck lists.
+.public-top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  // Mirror .top-nav-container/.top-nav: same height, shade, border and
+  // shadow, so signed-out pages read as the same app.
+  height: 48px;
+  margin: 0 -24px;
+  padding: 0 24px;
+  background-color: var(--color-section);
+  border-bottom: solid 1px var(--color-line-sep);
+  box-shadow: 0px 6px 20px 6px rgba(0, 0, 0, 0.2);
+
+  .public-top-bar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    color: var(--color-text-hover);
+    border: 0;
+    padding: 0;
+    background: transparent;
+
+    img {
+      height: 32px;
+      width: auto;
+    }
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  .public-top-bar-actions {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+// "Log in to compare against your collection!" on public deck/match pages.
+.login-prompt {
+  margin: auto;
+  color: var(--color-text);
+
+  .login-prompt-link {
+    color: var(--color-text-link);
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    font: inherit;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
 // Full-page public loading: the round mark spinning, like the auth screen.
 .public-loading {
   position: absolute;

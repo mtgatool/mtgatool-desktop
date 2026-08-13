@@ -253,9 +253,7 @@ function ProfileContent({ id }: { id: string }): JSX.Element {
           </div>
         </Section>
       ) : !profile ? (
-        <Section style={{ marginTop: "16px", padding: "48px" }}>
-          <PublicLoading inline />
-        </Section>
+        <PublicLoading label="Loading profile…" />
       ) : (
         <>
           <div

@@ -82,9 +82,7 @@ export default function PublicDeckView({
   if (!loaded) {
     return (
       <div className="profile-view">
-        <Section style={{ marginTop: "16px", padding: "48px" }}>
-          <PublicLoading inline />
-        </Section>
+        <PublicLoading label="Loading deck…" />
       </div>
     );
   }

@@ -34,7 +34,12 @@ export default function PublicProfilePage(): JSX.Element {
   }
 
   if (!dbReady) {
-    return <PublicLoading label="Loading profile…" />;
+    return (
+      <div className="public-profile-page">
+        <PublicTopBar />
+        <PublicLoading label="Loading profile…" />
+      </div>
+    );
   }
 
   return (
