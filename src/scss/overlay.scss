@@ -610,11 +610,16 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  // Just inside the tile content edges: quantity sits 6px from the left and
+  // the mana cost 6px from the right.
+  padding: 0 8px;
+  box-sizing: border-box;
 
   .warp-title-icon {
     width: 14px;
     height: 14px;
     color: #b78fe0;
+    margin-left: auto;
   }
 }
 

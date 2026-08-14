@@ -23,8 +23,8 @@ interface WhatsNewItem {
  */
 const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
   {
-    title: "See what got warped away",
-    body: "When something exiles cards face down from your library, the overlay can now tell you what they were: search your library — a fetchland is enough — and every card your deck should still have but the library doesn't shows up in a new \"Warped away\" section under the decklist. Entries clear themselves the moment the actual card comes back into view, and drawing another copy of the same card won't fool it.",
+    title: "See your missing cards",
+    body: "When something exiles cards face down from your library — warps them away — the overlay can now tell you what they were: search your library (a fetchland is enough) and every card your deck should still have but the library doesn't shows up in a new \"Missing cards\" section under the decklist. Entries clear themselves the moment the actual card comes back into view, and drawing another copy of the same card won't fool it.",
   },
   {
     title: "Player profiles",

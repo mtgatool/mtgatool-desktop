@@ -314,8 +314,8 @@ export default function OverlayDeckList(props: DeckListProps): JSX.Element {
       {!!settings.deck && mainCardTiles}
       {!!settings.deck && warpCardTiles.length > 0 && (
         <div className="decklist-title warp-title">
+          Missing cards
           <WarpIcon className="warp-title-icon" />
-          Warped away ({(missingFromLibrary || []).length})
         </div>
       )}
       {!!settings.deck && warpCardTiles.length > 0 && warpCardTiles}
