@@ -73,6 +73,7 @@ function App(props: AppProps) {
     loginState,
     loading,
     backgroundGrpid,
+    backgroundShade,
     customBackground,
     matchInProgress,
     draftInProgress,
@@ -331,7 +332,9 @@ function App(props: AppProps) {
       </PopupComponent>
       {os !== "" && os !== "linux" && <TopBar forceOs={os} />}
       <div
-        className={wrapperClass}
+        className={`${wrapperClass}${
+          backgroundShade ? " with-background-shade" : ""
+        }`}
         style={{
           height: `calc(100% - ${os !== "" && os !== "linux" ? 24 : 0}px)`,
           backgroundImage: backgroundImage,

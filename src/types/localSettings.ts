@@ -26,6 +26,7 @@ export const settingKeys = [
   "pubkey",
   "importLogHistory",
   "whatsNewSeen",
+  "backgroundShade",
   "postMatchOverview",
   "collectionSetBands",
   "formatsSnapshotHash",
@@ -70,4 +71,7 @@ export const defaultSettings: Record<SettingKey, string> = {
   // sha256 of the last GetFormats snapshot this client uploaded — the guard
   // that keeps every boot from re-uploading the same formats table.
   formatsSnapshotHash: "",
+  // Darkening overlay drawn on top of the app background image, same
+  // treatment as the website.
+  backgroundShade: "true",
 };

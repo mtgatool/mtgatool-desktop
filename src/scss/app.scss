@@ -18,7 +18,9 @@
   background-size: cover;
   height: 100%;
 
-  &:after {
+  // Same treatment as the website's background: the shade image stretched
+  // over the art. Gated on the "Background shade" Visual setting.
+  &.with-background-shade:after {
     background: url(../assets/images/background_overlay.png);
     content: " ";
     top: 0;
@@ -28,7 +30,7 @@
     position: absolute;
     background-size: 100% 100%;
     z-index: 0;
-    opacity: 0.2;
+    opacity: 0.75;
   }
 }
 

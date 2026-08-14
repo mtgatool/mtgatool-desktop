@@ -27,6 +27,7 @@ import InputContainer from "../../InputContainer";
 import Button from "../../ui/Button";
 import Select from "../../ui/Select";
 import Slider from "../../ui/Slider";
+import Toggle from "../../ui/Toggle";
 
 function BackgroundSetting(): JSX.Element {
   const dispatch = useDispatch();
@@ -254,6 +255,17 @@ function BackgroundSetting(): JSX.Element {
 export default function VisualSettingsPanel(): JSX.Element {
   const dispatch = useDispatch();
   const settings = useSelector((state: AppState) => state.settings);
+  const backgroundShade = useSelector(
+    (state: AppState) => state.renderer.backgroundShade
+  );
+
+  const setBackgroundShade = useCallback(
+    (val: boolean): void => {
+      setLocalSetting("backgroundShade", val ? "true" : "false");
+      reduxAction(dispatch, { type: "SET_BACKGROUND_SHADE", arg: val });
+    },
+    [dispatch]
+  );
   const cardSize = 100 + settings.cardsSize * 15;
   const card = database.card(70344);
 
@@ -308,6 +320,13 @@ export default function VisualSettingsPanel(): JSX.Element {
   return (
     <>
       <BackgroundSetting />
+
+      <Toggle
+        text="Background shade"
+        value={backgroundShade}
+        style={{ margin: "auto" }}
+        callback={setBackgroundShade}
+      />
 
       <div
         style={{

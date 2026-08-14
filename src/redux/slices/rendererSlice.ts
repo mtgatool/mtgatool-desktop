@@ -8,6 +8,7 @@ import {
   LOGIN_WAITING,
 } from "../../constants";
 import { Format, InternalDraftv2 } from "../../types";
+import getLocalSetting from "../../utils/getLocalSetting";
 import setLocalSetting from "../../utils/setLocalSetting";
 
 export interface Peer {
@@ -45,6 +46,8 @@ export const initialRendererState = {
   // Optional custom app background (from the Background settings panel); when
   // set it overrides the default/card-art background.
   customBackground: null as CustomBackground | null,
+  // Darkening overlay on top of the background image (Visual settings).
+  backgroundShade: getLocalSetting("backgroundShade") !== "false",
   loading: false,
   logCompletion: 0,
   detailedLogs: null as boolean | null,
@@ -158,6 +161,12 @@ const rendererSlice = createSlice({
       // Top-bar credit line: "<Title> by <Artist>" when we have both.
       state.topArtist = artist && title ? `${title} by ${artist}` : title || "";
     },
+    setBackgroundShade: (
+      state: RendererState,
+      action: PayloadAction<boolean>
+    ): void => {
+      state.backgroundShade = action.payload;
+    },
     setLoading: (
       state: RendererState,
       action: PayloadAction<boolean>
@@ -254,6 +263,7 @@ export const {
   setAdminPermissions,
   setMatchesFetchState,
   setBackgroundGrpid,
+  setBackgroundShade,
   setCustomBackground,
   setLoading,
   setNoLog,

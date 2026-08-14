@@ -27,6 +27,10 @@ const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
     body: "When something exiles cards face down from your library — warps them away — the overlay can now tell you what they were: search your library (a fetchland is enough) and every card your deck should still have but the library doesn't shows up in a new \"Missing cards\" section under the decklist. Entries clear themselves the moment the actual card comes back into view, and drawing another copy of the same card won't fool it.",
   },
   {
+    title: "Background shade",
+    body: "The app background now gets the same darkening shade as the website, making everything on top easier to read. Turn it off in Settings > Visual if you prefer your background art untouched.",
+  },
+  {
     title: "Cleaner card hover on macOS",
     body: "The hovered card no longer draws a dark frame around itself — that halo was the native window shadow tracing the card's outline.",
   },
