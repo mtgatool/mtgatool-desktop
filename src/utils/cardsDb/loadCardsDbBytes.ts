@@ -145,10 +145,14 @@ async function loadWeb(lang: string): Promise<CardsDbBytes | null> {
       );
     }
 
-    const dbBytes = await fetchDatabaseWeb(lang);
-    if (!dbBytes) return null;
+    const db = await fetchDatabaseWeb(lang);
+    if (!db) return null;
 
-    return { wasmBinary, dbBytes, source: `mirror:${lang}-database.sqlite.gz` };
+    return {
+      wasmBinary,
+      dbBytes: db.bytes,
+      source: `${db.source}:${lang}-database.sqlite`,
+    };
   } catch (e) {
     console.log("[cards-db] web assets failed to load", e);
     return null;
