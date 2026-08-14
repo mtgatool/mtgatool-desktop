@@ -27,6 +27,10 @@ const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
     body: "When something exiles cards face down from your library — warps them away — the overlay can now tell you what they were: search your library (a fetchland is enough) and every card your deck should still have but the library doesn't shows up in a new \"Missing cards\" section under the decklist. Entries clear themselves the moment the actual card comes back into view, and drawing another copy of the same card won't fool it.",
   },
   {
+    title: "Cleaner card hover on macOS",
+    body: "The hovered card no longer draws a dark frame around itself — that halo was the native window shadow tracing the card's outline.",
+  },
+  {
     title: "Player profiles",
     body: "Click any player on the Home top-ranked feed to open their public profile: current ranks with their record over the last 30 days, the formats they play, and their latest matches — each opening a public match page with the deck they ran and the action log. Standard-tier Patreon supporters can browse anyone's full match history and their top decks with win rates. Private mode keeps you out of all of it, and Settings lets you choose which Arena account your profile shows.",
   },

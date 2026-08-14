@@ -131,6 +131,9 @@ function lockWindowTitle(win) {
 function createCardHoverWindow() {
   mainGlobals.cardHoverWindow = new BrowserWindow({
     transparent: true,
+    // On macOS the native window shadow contours the opaque content, drawing
+    // a dark halo around the hovered card.
+    hasShadow: false,
     focusable: false,
     title: "mtgatool-hover",
     show: false,
