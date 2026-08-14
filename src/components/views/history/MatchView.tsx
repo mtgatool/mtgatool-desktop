@@ -361,7 +361,7 @@ export default function MatchView(): JSX.Element {
           </div>
           <div className="flex-item">
             <ManaCost
-              className="manaS20"
+              className="mana-s20"
               colors={playerDeck.getColors().get()}
             />
           </div>

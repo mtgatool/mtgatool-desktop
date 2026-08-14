@@ -6,11 +6,18 @@ import { ReactComponent as BackIcon } from "../../../assets/images/svg/back.svg"
 import { ReactComponent as IconCrown } from "../../../assets/images/svg/crown.svg";
 import { ReactComponent as IconEvent } from "../../../assets/images/svg/event.svg";
 import { ReactComponent as IconTime } from "../../../assets/images/svg/time.svg";
-import { getPublicMatch, PublicMatch } from "../../../data/publicProfiles";
+import { DEFAULT_AVATAR } from "../../../constants";
+import {
+  getPlayerProfile,
+  getPublicMatch,
+  PlayerProfile,
+  PublicMatch,
+} from "../../../data/publicProfiles";
 import { useCards } from "../../../hooks/useCard";
 import { useCardArtCrop } from "../../../hooks/useCardImage";
 import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import reduxAction from "../../../redux/reduxAction";
+import cleanUsername from "../../../utils/cleanUsername";
 import compareCards from "../../../utils/compareCards";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import { toMMSS } from "../../../utils/dateTo";
@@ -54,6 +61,7 @@ export default function PublicMatchView({
 
   const [match, setMatch] = useState<PublicMatch | null>(null);
   const [missing, setMissing] = useState(false);
+  const [profile, setProfile] = useState<PlayerProfile | null>(null);
 
   useEffect(() => {
     setMatch(null);
@@ -72,6 +80,20 @@ export default function PublicMatchView({
       cancelled = true;
     };
   }, [profileId, matchId]);
+
+  // The owner's name and avatar for the players banner; the match payload
+  // only carries the opponent's side.
+  useEffect(() => {
+    let cancelled = false;
+    getPlayerProfile({ arenaId: profileId })
+      .then((p) => p ?? getPlayerProfile({ username: profileId }))
+      .then((p) => {
+        if (!cancelled && p) setProfile(p);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [profileId]);
 
   const snapshot = match?.player_deck;
 
@@ -147,6 +169,11 @@ export default function PublicMatchView({
 
   const isLimited = isLimitedEventId(match.event_id || "");
   const won = match.player_wins > match.player_losses;
+  const playerName =
+    profile?.username ||
+    cleanUsername(
+      getPlayerNameWithoutSuffix(profile?.account?.display_name || "Player")
+    );
 
   return (
     <div className="profile-view">
@@ -178,7 +205,7 @@ export default function PublicMatchView({
             </div>
           </div>
           <div className="flex-item">
-            <ManaCost className="manaS20" colors={deck.getColors().get()} />
+            <ManaCost className="mana-s20" colors={deck.getColors().get()} />
           </div>
         </div>
       </div>
@@ -232,22 +259,43 @@ export default function PublicMatchView({
           justifyContent: "space-between",
         }}
       >
-        <div className="match-player-name">
-          {`vs ${
-            match.opp_name
-              ? getPlayerNameWithoutSuffix(match.opp_name)
-              : "Opponent"
-          }`}
-        </div>
-        {match.opp_rank?.rank ? (
-          <RankIcon
-            rank={match.opp_rank.rank}
-            tier={match.opp_rank.tier ?? 0}
-            percentile={match.opp_rank.percentile || 0}
-            leaderboardPlace={match.opp_rank.leaderboardPlace || 0}
-            format={isLimited ? "limited" : "constructed"}
+        <Flex style={{ alignItems: "center", gap: "8px" }}>
+          <div
+            style={{
+              width: "28px",
+              height: "28px",
+              borderRadius: "50%",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundImage: `url(${profile?.avatar_url || DEFAULT_AVATAR})`,
+            }}
           />
-        ) : null}
+          <div className="match-player-name">{playerName}</div>
+          {match.player_rank?.rank ? (
+            <RankIcon
+              rank={match.player_rank.rank}
+              tier={match.player_rank.tier ?? 0}
+              percentile={match.player_rank.percentile || 0}
+              leaderboardPlace={match.player_rank.leaderboardPlace || 0}
+              format={isLimited ? "limited" : "constructed"}
+            />
+          ) : null}
+          <div style={{ color: "var(--color-text-dark)" }}>vs</div>
+          <div className="match-player-name">
+            {match.opp_name
+              ? getPlayerNameWithoutSuffix(match.opp_name)
+              : "Opponent"}
+          </div>
+          {match.opp_rank?.rank ? (
+            <RankIcon
+              rank={match.opp_rank.rank}
+              tier={match.opp_rank.tier ?? 0}
+              percentile={match.opp_rank.percentile || 0}
+              leaderboardPlace={match.opp_rank.leaderboardPlace || 0}
+              format={isLimited ? "limited" : "constructed"}
+            />
+          ) : null}
+        </Flex>
         <Flex>
           <ManaCost
             colors={new Colors().addFromBits(match.opp_deck_colors || 0).get()}
