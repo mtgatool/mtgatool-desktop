@@ -256,12 +256,18 @@ function ProfileContent({ id }: { id: string }): JSX.Element {
         <PublicLoading label="Loading profile…" />
       ) : (
         <>
-          <div
-            className={`profile-banner${bannerUrl ? " has-image" : ""}`}
-            style={
-              bannerUrl ? { backgroundImage: `url(${bannerUrl})` } : undefined
-            }
-          >
+          <div className={`profile-banner${bannerUrl ? " has-image" : ""}`}>
+            {bannerUrl && (
+              // An <img>, not a CSS background: artofmtg forbids requests
+              // carrying a foreign Referer (403) but serves ones with none,
+              // and only an element can ask for no-referrer.
+              <img
+                className="profile-banner-img"
+                src={bannerUrl}
+                alt=""
+                referrerPolicy="no-referrer"
+              />
+            )}
             <div className="profile-banner-inner">
               <div className="profile-banner-left">
                 <div
