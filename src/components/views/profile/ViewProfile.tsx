@@ -112,7 +112,6 @@ function BannerRanks({
           format="limited"
         />
       </div>
-      <div className="profile-ranks-updated">Record over the last 30 days</div>
     </div>
   );
 }
@@ -200,7 +199,7 @@ function DecksSection({ id }: { id: string }): JSX.Element | null {
       ) : (
         <Button
           style={{ margin: "8px auto" }}
-          text="See this player's decks"
+          text="See this player's top decks"
           onClick={(): void => setShowPatreonPopup(true)}
         />
       )}
