@@ -61,7 +61,7 @@
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.0",
     "mathjs": "^9.3.0",
-    "mtga-reader": "^0.1.10",
+    "mtga-reader": "^0.1.11",
     "mtgatool-shared": "^2.2.0",
     "nan": "^2.20.0",
     "proto2typescript": "^2.2.0",

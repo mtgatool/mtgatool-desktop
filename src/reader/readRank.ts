@@ -5,7 +5,7 @@ import {
 import globalStore from "../background/store";
 import isElectron from "../utils/electron/isElectron";
 import { isValidRankClass } from "../utils/mtga/rankClasses";
-import { ReaderRanks } from "../utils/mtgaReader";
+import { getReader } from "../utils/mtgaReader";
 import timed from "./readerTelemetry";
 
 export default async function readRank(): Promise<
@@ -14,16 +14,10 @@ export default async function readRank(): Promise<
   if (!isElectron()) return undefined;
 
   try {
-    // eslint-disable-next-line no-undef
-    const reader = __non_webpack_require__("mtga-reader");
-
-    // mtga-reader 0.1.7: reads run on the native threadpool and return a
-    // Promise, so they never block this renderer's event loop (the background
-    // window also hosts the GRE parser).
-    const ranks: ReaderRanks & { error?: string } = await timed(
-      "readRanks",
-      () => reader.readRanks("MTGA")
-    );
+    // Reads run on the native threadpool and return a Promise, so they never
+    // block this renderer's event loop (the background window also hosts the
+    // GRE parser).
+    const ranks = await timed("readRanks", () => getReader().readRanks("MTGA"));
 
     if (!ranks || ranks.error || !ranks.constructed || !ranks.limited) {
       return globalStore.rank || undefined;
@@ -60,7 +54,7 @@ export default async function readRank(): Promise<
       constructedMatchesWon: c.wins || 0,
       constructedMatchesLost: c.losses || 0,
       constructedMatchesDrawn: c.draws || 0,
-      constructedPercentile: parseFloat(c.percentile || "0") || 0,
+      constructedPercentile: parseFloat(String(c.percentile ?? 0)) || 0,
       constructedLeaderboardPlace: c.leaderboardPlace || 0,
       limitedSeasonOrdinal: l.seasonOrdinal || 0,
       limitedClass,
@@ -70,7 +64,7 @@ export default async function readRank(): Promise<
       limitedMatchesWon: l.wins || 0,
       limitedMatchesLost: l.losses || 0,
       limitedMatchesDrawn: l.draws || 0,
-      limitedPercentile: parseFloat(l.percentile || "0") || 0,
+      limitedPercentile: parseFloat(String(l.percentile ?? 0)) || 0,
       limitedLeaderboardPlace: l.leaderboardPlace || 0,
     };
 

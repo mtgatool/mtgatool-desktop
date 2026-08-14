@@ -1,3 +1,5 @@
+import { getReader } from "../utils/mtgaReader";
+
 interface PlayerInfo {
   AvatarSelection: string;
   CommanderGrpId: number;
@@ -15,12 +17,7 @@ export default async function readMatchOpponentInfo(): Promise<
   PlayerInfo | undefined
 > {
   try {
-    // eslint-disable-next-line no-undef
-    const reader = __non_webpack_require__("mtga-reader");
-
-    const { readData } = reader;
-
-    const opponentInfo = await readData("MTGA", [
+    const opponentInfo = await getReader().readData<PlayerInfo>("MTGA", [
       "MatchSceneManager",
       "Instance",
       "_matchManager",

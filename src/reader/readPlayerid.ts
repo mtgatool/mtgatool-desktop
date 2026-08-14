@@ -1,14 +1,9 @@
-import { ReaderAccount } from "../utils/mtgaReader";
+import { getReader } from "../utils/mtgaReader";
 import switchPlayerUUID from "../utils/switchPlayerUUID";
 
 export default async function readPlayerId(): Promise<void> {
   try {
-    // eslint-disable-next-line no-undef
-    const reader = __non_webpack_require__("mtga-reader");
-
-    // mtga-reader 0.1.7 async typed account read: { displayName, personaId, ... }.
-    const account: ReaderAccount & { error?: string } =
-      await reader.readAccount("MTGA");
+    const account = await getReader().readAccount("MTGA");
 
     if (!account || account.error) return;
 

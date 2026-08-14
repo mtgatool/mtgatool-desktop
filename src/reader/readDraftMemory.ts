@@ -1,32 +1,7 @@
 import isElectron from "../utils/electron/isElectron";
+import { getReader, MemoryDraft } from "../utils/mtgaReader";
 
-/** The payload mtga-reader's readDraft returns for an active draft. */
-export interface MemoryDraft {
-  error?: string;
-  eventName?: string;
-  draftId?: string;
-  draftState?: number;
-  currentPack?: number;
-  currentPick?: number;
-  numCardsToPick?: number;
-  packCards?: number[];
-  /**
-   * Picks in pick order, expanded by quantity. null (not []) while the draft
-   * screen is closed — the pick list lives in the draft scene and is
-   * unreadable until it reopens; position and pack stay valid.
-   */
-  pickedCards?: number[] | null;
-  sideboardCards?: number[] | null;
-  /** Human drafts only; null on bot drafts. */
-  pickSecondsTotal?: number | null;
-  passDirection?: number | null;
-  /**
-   * "screen" when the draft screen itself held the pod (a live read);
-   * "registry" when it came from the event registry, where a finished
-   * draft's pod lingers with draftState still 2.
-   */
-  source?: "screen" | "registry";
-}
+export type { MemoryDraft } from "../utils/mtgaReader";
 
 /**
  * Read the active draft from game memory. Both draft flavours (BotDraftPod /
@@ -38,11 +13,10 @@ export default async function readDraftMemory(): Promise<MemoryDraft | null> {
   if (!isElectron()) return null;
 
   try {
-    // eslint-disable-next-line no-undef
-    const reader = __non_webpack_require__("mtga-reader");
+    const reader = getReader();
     if (typeof reader.readDraft !== "function") return null;
 
-    const draft: MemoryDraft = await reader.readDraft("MTGA");
+    const draft = await reader.readDraft("MTGA");
     if (!draft || draft.error) return null;
     return draft;
   } catch (e) {

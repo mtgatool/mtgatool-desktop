@@ -1,12 +1,10 @@
 import reduxAction from "../redux/reduxAction";
 import store from "../redux/stores/rendererStore";
 import isElectron from "../utils/electron/isElectron";
+import { getReader } from "../utils/mtgaReader";
 
 function checkAdmin(): boolean {
-  // eslint-disable-next-line no-undef
-  const reader = __non_webpack_require__("mtga-reader");
-  const { isAdmin } = reader;
-  return isAdmin();
+  return getReader().isAdmin();
 }
 
 export default function UICheckAdmin() {

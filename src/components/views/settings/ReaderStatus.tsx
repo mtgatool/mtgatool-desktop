@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
 import readPlayerTest from "../../../reader/readPlayerTest";
+import { getReader } from "../../../utils/mtgaReader";
 import StatusPill, { StatusState } from "../../ui/StatusPill";
 
 function findMTGA(): Promise<boolean> {
-  // eslint-disable-next-line no-undef
-  const reader = __non_webpack_require__("mtga-reader");
+  const reader = getReader();
   // mtga-reader 0.1.7: findProcess is async (threadpool) and resolves to a
   // boolean "is it running".
   const { findProcess } = reader;
@@ -13,8 +13,7 @@ function findMTGA(): Promise<boolean> {
 }
 
 function checkAdmin(): boolean {
-  // eslint-disable-next-line no-undef
-  const reader = __non_webpack_require__("mtga-reader");
+  const reader = getReader();
   const { isAdmin } = reader;
   // On macOS this reports whether memory is actually readable (the app is
   // signed with the debugger entitlement), not whether we are root.

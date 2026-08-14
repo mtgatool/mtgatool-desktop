@@ -1,6 +1,6 @@
 import upsertDbDecks from "../data/upsertDbDecks";
 import isElectron from "../utils/electron/isElectron";
-import { ReaderDecks } from "../utils/mtgaReader";
+import { getReader } from "../utils/mtgaReader";
 
 /**
  * Read the player's saved decks from MTGA memory (async on the native
@@ -13,12 +13,7 @@ export default async function readDecks(): Promise<void> {
   if (!isElectron()) return;
 
   try {
-    // eslint-disable-next-line no-undef
-    const reader = __non_webpack_require__("mtga-reader");
-
-    const result: ReaderDecks & { error?: string } = await reader.readDecks(
-      "MTGA"
-    );
+    const result = await getReader().readDecks("MTGA");
 
     if (!result || result.error || !Array.isArray(result.decks)) return;
 
