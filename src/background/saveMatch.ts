@@ -5,6 +5,7 @@ import { ResultSpec } from "../types/greTypes";
 import remote from "../utils/electron/remoteWrapper";
 import getJumpstartThemes, { themeCards } from "../utils/getJumpstartThemes";
 import getToolVersion from "../utils/getToolVersion";
+import getMatchGameMvp from "./getMatchMvp";
 import getOpponentDeck from "./getOpponentDeck";
 import globalStore from "./store";
 import { setMatchStarted } from "./store/currentMatchStore";
@@ -75,6 +76,11 @@ function generateInternalMatch(): InternalMatch {
     toolRunFromSource: !remote?.app.isPackaged,
     arenaId: currentMatch.player.name,
     playerDeckHash: globalStore.currentMatch.originalDeck.getHash(),
+    mvp: getMatchGameMvp(
+      currentMatch.matchGameStats,
+      globalStore.currentActionLog,
+      playerWins > opponentWins ? currentMatch.playerSeat : currentMatch.oppSeat
+    ),
     actionLog: globalStore.currentActionLog as any,
     type: "match",
   };

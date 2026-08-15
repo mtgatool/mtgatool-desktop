@@ -23,6 +23,10 @@ interface WhatsNewItem {
  */
 const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
   {
+    title: "A Match MVP that makes sense",
+    body: "The card headlining the post-match overview used to be whichever card produced the biggest damage number on either side — which is how a land that pings you every turn, or the card your opponent beat you with, ended up as your MVP. It now looks at damage that actually hit the opponent, prefers the winner's side, and falls back to your most-cast spell or biggest threat when a game was won without much damage. The line under the card says which of those earned it the spot.",
+  },
+  {
     title: "Changing your display name works again",
     body: "The rename button in Settings > My Account had been doing nothing at all for a long time — it was waiting on a record from the old storage engine that no longer exists. It now changes the name shown in the app, on your profile and on the leaderboards. Your login and your profile link are unaffected: you still sign in with the same name as before.",
   },

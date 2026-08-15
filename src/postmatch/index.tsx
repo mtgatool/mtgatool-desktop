@@ -134,16 +134,31 @@ export default function PostMatch(): JSX.Element {
   const playerCast = topCast(casts, playerSeat);
   const oppCast = topCast(casts, oppSeat);
 
-  // The match MVP: whichever single card dealt the most damage on either side.
-  // It headlines the screen, so it is the one card worth showing as art.
-  const mvpGrpId =
+  // The card that decided the match, chosen at save time (see getMatchMvp):
+  // it needs the action log, which never reaches this window. Matches saved
+  // before that existed fall back to the old pick — the biggest single damage
+  // figure on either side — rather than losing the headline entirely.
+  const savedMvp = match?.mvp;
+  const fallbackGrpId =
     (pStats?.damage?.[playerDmg] || 0) >= (oStats?.damage?.[oppDmg] || 0)
       ? playerDmg
       : oppDmg;
+  const mvpGrpId = savedMvp?.grpId || fallbackGrpId;
   const mvpArt = useCardArtCrop(mvpGrpId);
   const mvpCard = useCard(mvpGrpId);
-  const mvpDamage =
+  const fallbackDamage =
     pStats?.damage?.[mvpGrpId] || oStats?.damage?.[mvpGrpId] || 0;
+
+  // Say what earned it the spot. A pick that looks odd under the right
+  // caption is a fact; the same pick under "damage dealt" reads as a bug.
+  let mvpSub = `${fallbackDamage} damage dealt`;
+  if (savedMvp) {
+    if (savedMvp.reason === "damage")
+      mvpSub = `${savedMvp.value} damage to opponent`;
+    else if (savedMvp.reason === "casts")
+      mvpSub = `cast ${savedMvp.value} times`;
+    else mvpSub = "biggest threat on board";
+  }
 
   const playerCasts = casts.filter((c) => c.player === playerSeat).length;
   const oppCasts = casts.filter((c) => c.player === oppSeat).length;
@@ -177,7 +192,7 @@ export default function PostMatch(): JSX.Element {
             <div className="postmatch-mvp-shade">
               <div className="postmatch-mvp-label">Match MVP</div>
               <div className="postmatch-mvp-name">{mvpCard?.Name || ""}</div>
-              <div className="postmatch-mvp-sub">{mvpDamage} damage dealt</div>
+              <div className="postmatch-mvp-sub">{mvpSub}</div>
             </div>
           </div>
         ) : null}

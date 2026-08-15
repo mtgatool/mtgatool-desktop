@@ -62,6 +62,13 @@ export interface MatchPostStats {
   oppStats: MatchPlayerStats;
 }
 
+export interface MatchMvp {
+  grpId: number;
+  reason: "damage" | "casts" | "board";
+  value: number;
+  seat: number;
+}
+
 export interface InternalMatch {
   draws: number;
   arenaId: string;
@@ -80,6 +87,12 @@ export interface InternalMatch {
   player: InternalPlayer;
   opponent: InternalPlayer;
   playerDeckHash: string;
+  /**
+   * The card that decided the match, chosen when the match is saved — the
+   * action log it is computed from never reaches the overview window. Absent
+   * on every match recorded before this existed.
+   */
+  mvp?: MatchMvp;
   actionLog: string;
   type: "match";
 }
