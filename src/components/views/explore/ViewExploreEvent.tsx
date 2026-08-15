@@ -15,7 +15,7 @@ import getEventPrettyName from "../../../utils/getEventPrettyName";
 import Button from "../../ui/Button";
 import Section from "../../ui/Section";
 import ExploreDeckRow from "./ExploreDeckRow";
-import ExploreMetaCards from "./ExploreMetaCards";
+import ExploreMostUsedCards from "./ExploreMostUsedCards";
 
 export default function ViewExploreEvent(): JSX.Element {
   const params = useParams<{ id: string }>();
@@ -164,7 +164,7 @@ export default function ViewExploreEvent(): JSX.Element {
         </Section>
       )}
 
-      <ExploreMetaCards eventId={params.id} event={event} />
+      <ExploreMostUsedCards decks={decks} eventId={params.id} event={event} />
     </div>
   );
 }

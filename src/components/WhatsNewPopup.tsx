@@ -23,6 +23,10 @@ interface WhatsNewItem {
  */
 const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
   {
+    title: "Most used cards, in Explore",
+    body: "Each format now opens with the cards that define it, drawn as actual cards: how many decks run each one and how many copies they run, taken from real decklists so the counts are exact. The field percentage and win rate you already knew ride along underneath. Sort by decks, copies, field or win rate.",
+  },
+  {
     title: "See your missing cards",
     body: "When something exiles cards face down from your library — warps them away — the overlay can now tell you what they were: search your library (a fetchland is enough) and every card your deck should still have but the library doesn't shows up in a new \"Missing cards\" section under the decklist. Entries clear themselves the moment the actual card comes back into view, and drawing another copy of the same card won't fool it.",
   },

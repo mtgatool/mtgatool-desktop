@@ -186,3 +186,69 @@
 .explore-meta-tile-n {
   color: var(--color-text-dark);
 }
+
+// ---------------------------------------------------------------------------
+// "Most used cards" — the cards themselves, with their figures underneath.
+// Whole cards rather than art crops: at this size the card *is* the label, so
+// nothing needs a name row, and the space under it is free for the numbers.
+// ---------------------------------------------------------------------------
+
+.explore-cards-grid {
+  display: grid;
+  gap: 16px 12px;
+  // Small enough to read a format at a glance rather than one screen at a
+  // time; the row reflows rather than scrolling sideways.
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  width: 100%;
+}
+
+.explore-cards-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.explore-cards-img {
+  @include animated;
+  width: 100%;
+  height: auto;
+  border-radius: 4.75% / 3.5%;
+  display: block;
+
+  &:hover {
+    box-shadow: 0 5px 14px 2px rgba(0, 0, 0, 0.35);
+    transform: translateY(-2px);
+  }
+}
+
+// Placeholder keeping the grid aligned when metadata has no such card yet.
+.explore-cards-img-missing {
+  aspect-ratio: 745 / 1040;
+  background-color: var(--color-dark);
+}
+
+.explore-cards-figure {
+  color: var(--color-text);
+  font-size: 17px;
+  line-height: 1.15;
+  margin-top: 6px;
+}
+
+.explore-cards-label {
+  color: var(--color-text-dark);
+  font-size: 10px;
+  font-style: italic;
+  line-height: 1.2;
+}
+
+// The other sample, kept visually subordinate to the two figures above it.
+.explore-cards-extra {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: baseline;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--color-text-dark);
+}
