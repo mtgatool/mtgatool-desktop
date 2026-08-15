@@ -727,3 +727,49 @@ input.color-picker {
 .status-pill.err .status-pill-dot {
   background: var(--color-status-err);
 }
+
+// Social links on the account panel: one row per platform, its mark standing
+// in for a label so the three read as a set rather than three unrelated fields.
+.settings-socials {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  // Full width, like every other row in this panel — the block carries no
+  // width of its own so the fields line up with the alias and email ones.
+  margin: 16px 0 0;
+  width: 100%;
+}
+
+.settings-socials-title {
+  color: var(--color-text);
+}
+
+.settings-social-row {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  width: 100%;
+
+  .input-container {
+    flex: 1 1 auto;
+    margin: 0;
+  }
+}
+
+.settings-social-icon {
+  flex-shrink: 0;
+  height: 18px;
+  width: 18px;
+}
+
+// Says "this cannot be saved" without moving anything: the field keeps its
+// place, and an empty field is never marked. The class sits on the container,
+// so the border it means belongs to the input inside it.
+.settings-social-invalid > input {
+  border-color: var(--color-r) !important;
+}
+
+.settings-socials-note {
+  color: var(--color-text-dark);
+  font-size: 12px;
+}

@@ -9,6 +9,7 @@
  * — whereas PostgREST verifies it fine. Avatars are 128x128 (~a few KB), so a
  * data URI in a text column is acceptable. Best-effort; never throws.
  */
+import { SocialLinks } from "../utils/socialLinks";
 import { BackgroundDescriptor } from "./backgroundStore";
 import { Json } from "./database.types";
 import supabase from "./supabase";
@@ -110,6 +111,43 @@ export async function setProfileBackground(
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn("[profile] setProfileBackground failed:", e);
+  }
+}
+
+/**
+ * Persist the login's social links. The object handed in must already be the
+ * canonical, validated form — `parseSocialLink` builds it, and the column's
+ * check constraint rejects anything else. Best-effort; never throws.
+ */
+export async function setProfileSocials(socials: SocialLinks): Promise<void> {
+  try {
+    const uid = await currentUserId();
+    if (!uid) return;
+    await supabase.from("profiles").upsert({
+      id: uid,
+      socials: socials as unknown as Json,
+      updated_at: new Date().toISOString(),
+    });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn("[profile] setProfileSocials failed:", e);
+  }
+}
+
+/** The current login's social links, for the settings form. */
+export async function fetchOwnSocials(): Promise<SocialLinks> {
+  try {
+    const uid = await currentUserId();
+    if (!uid) return {};
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("socials")
+      .eq("id", uid)
+      .maybeSingle();
+    if (error || !data) return {};
+    return ((data as { socials?: SocialLinks }).socials || {}) as SocialLinks;
+  } catch (e) {
+    return {};
   }
 }
 

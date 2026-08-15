@@ -407,3 +407,47 @@
     }
   }
 }
+// Social links as pips: the platform mark plus the handle, never the URL.
+// The mark carries the brand colour (see socialIcons.scss), so the pill stays
+// neutral — colouring both would have the icon disappear into its own
+// background on hover.
+.profile-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.profile-social-pip {
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.45);
+  border-radius: 12px;
+  color: var(--color-text);
+  display: inline-flex;
+  font-size: 12px;
+  gap: 5px;
+  line-height: 1;
+  padding: 5px 10px 5px 8px;
+  text-decoration: none;
+  transition: background-color 0.15s ease-in, color 0.15s ease-in;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+    color: white;
+  }
+}
+
+.profile-social-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.profile-social-name {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+

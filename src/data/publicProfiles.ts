@@ -10,6 +10,7 @@
 import { CombinedRankInfo } from "../background/onLabel/InEventGetCombinedRankInfo";
 import DbRankInfo from "../components/views/home/DbRankInfo";
 import { defaultRankData } from "../types/dbTypes";
+import { SocialLinks } from "../utils/socialLinks";
 import supabase from "./supabase";
 
 function ms(iso?: string | null): number {
@@ -141,6 +142,8 @@ export interface PlayerProfile {
   avatar_url: string | null;
   supporter_tier: number;
   background: { imageUrl?: string } | null;
+  /** Twitch / YouTube / Instagram, canonical URLs; see utils/socialLinks. */
+  socials: SocialLinks | null;
   member_since: string | null;
   /** When the visible account last uploaded anything. */
   last_seen: string | null;

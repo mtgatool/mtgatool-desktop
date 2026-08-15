@@ -23,6 +23,10 @@ interface WhatsNewItem {
  */
 const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
   {
+    title: "Social links on your profile",
+    body: "Add your Twitch, YouTube and Instagram in Settings > My Account and they show up on your public profile as small pips carrying your handle, not a long URL. Paste a full link or just type your name — either works, and only links to those three sites are accepted.",
+  },
+  {
     title: "Most used cards, in Explore",
     body: "Each format now opens with the cards that define it, drawn as actual cards: how many decks run each one and how many copies they run, taken from real decklists so the counts are exact. The field percentage and win rate you already knew ride along underneath. Sort by decks, copies, field or win rate.",
   },

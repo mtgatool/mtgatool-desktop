@@ -1,0 +1,14 @@
+// Brand colours for the social marks, shared by the settings form and the
+// public profile so the two can never drift apart.
+//
+// Twitch and YouTube are single colours and their SVGs paint with
+// currentColor, so `color` is enough. Instagram's mark is a gradient, which
+// no colour property can express — its gradient is defined inside the SVG
+// itself and this file leaves it alone.
+.social-icon-twitch {
+  color: #9146ff;
+}
+
+.social-icon-youtube {
+  color: #ff0000;
+}

@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 
+import { ReactComponent as InstagramIcon } from "../../../assets/images/svg/instagram.svg";
+import { ReactComponent as TwitchIcon } from "../../../assets/images/svg/twitch.svg";
+import { ReactComponent as YoutubeIcon } from "../../../assets/images/svg/youtube.svg";
 import { DEFAULT_AVATAR } from "../../../constants";
 import {
   getPlayerDecks,
@@ -17,6 +20,11 @@ import formatPercent from "../../../utils/formatPercent";
 import getEventFormat from "../../../utils/getEventFormat";
 import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
 import safeDecodeURIComponent from "../../../utils/safeDecodeURIComponent";
+import {
+  readSocialLinks,
+  SocialLinks,
+  SocialPlatform,
+} from "../../../utils/socialLinks";
 import timeAgo from "../../../utils/timeAgo";
 import PatreonInfo from "../../popups/PatreonInfo";
 import PublicLoading from "../../PublicLoading";
@@ -117,6 +125,56 @@ function BannerRanks({
 }
 
 /** "Timeless 95% · Limited 3% · Brawl 2%" chips from raw event-id counts. */
+const SOCIAL_ICONS: Record<
+  SocialPlatform,
+  React.FunctionComponent<React.SVGProps<SVGSVGElement>>
+> = {
+  twitch: TwitchIcon,
+  youtube: YoutubeIcon,
+  instagram: InstagramIcon,
+};
+
+/**
+ * The player's own links, as pips carrying the platform mark and the handle
+ * rather than a raw URL.
+ *
+ * These are the one thing on this page a stranger authored, so they open in a
+ * new tab with `noopener` — the opened page must not get a handle on ours —
+ * and the URLs are re-validated on the way out of the payload rather than
+ * trusted for having been validated once, on the way in.
+ */
+function SocialPips({
+  socials,
+}: {
+  socials: SocialLinks | null;
+}): JSX.Element | null {
+  const links = readSocialLinks(socials);
+  if (links.length === 0) return null;
+
+  return (
+    <div className="profile-socials">
+      {links.map((link) => {
+        const Icon = SOCIAL_ICONS[link.platform];
+        return (
+          <a
+            key={link.platform}
+            className={`profile-social-pip profile-social-${link.platform}`}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={link.url}
+          >
+            <Icon
+              className={`profile-social-icon social-icon-${link.platform}`}
+            />
+            <span className="profile-social-name">{link.name}</span>
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
 function FormatsSummary({
   counts,
 }: {
@@ -304,6 +362,7 @@ function ProfileContent({ id }: { id: string }): JSX.Element {
                     </div>
                   ) : null}
                   <FormatsSummary counts={profile.format_counts ?? {}} />
+                  <SocialPips socials={profile.socials} />
                 </div>
               </div>
               {profile.account ? (

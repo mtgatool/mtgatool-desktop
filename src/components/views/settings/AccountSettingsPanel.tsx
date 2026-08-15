@@ -4,7 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import { ReactComponent as ShowIcon } from "../../../assets/images/svg/archive.svg";
+import { ReactComponent as InstagramIcon } from "../../../assets/images/svg/instagram.svg";
+import { ReactComponent as TwitchIcon } from "../../../assets/images/svg/twitch.svg";
 import { ReactComponent as HideIcon } from "../../../assets/images/svg/unarchive.svg";
+import { ReactComponent as YoutubeIcon } from "../../../assets/images/svg/youtube.svg";
 import postChannelMessage from "../../../broadcastChannel/postChannelMessage";
 import { LOGIN_AUTH } from "../../../constants";
 import { cloudLogout, cloudUpdatePassword } from "../../../data/cloudAuth";
@@ -12,9 +15,11 @@ import { isCloudActive } from "../../../data/cloudSync";
 import { TIER_NAMES } from "../../../data/entitlement";
 import {
   fetchOwnArenaAccounts,
+  fetchOwnSocials,
   fetchOwnVisibleArenaId,
   OwnArenaAccount,
   setProfilePrivate,
+  setProfileSocials,
   setVisibleArenaAccount,
   updateUsername,
   uploadAvatar,
@@ -33,12 +38,30 @@ import { AppState } from "../../../redux/stores/rendererStore";
 import getLocalSetting from "../../../utils/getLocalSetting";
 import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
 import setLocalSetting from "../../../utils/setLocalSetting";
+import {
+  parseSocialLink,
+  SOCIAL_PLATFORMS,
+  socialExample,
+  socialLabel,
+  SocialLinks,
+  SocialPlatform,
+} from "../../../utils/socialLinks";
 import vodiFn from "../../../utils/voidfn";
+import InputContainer from "../../InputContainer";
 import SupporterTierIcon, { TIERS } from "../../SupporterTierIcon";
 import Button from "../../ui/Button";
 import Select from "../../ui/Select";
 import Toggle from "../../ui/Toggle";
 import { SettingsPanelProps } from "./ViewSettings";
+
+const SOCIAL_ICONS: Record<
+  SocialPlatform,
+  React.FunctionComponent<React.SVGProps<SVGSVGElement>>
+> = {
+  twitch: TwitchIcon,
+  youtube: YoutubeIcon,
+  instagram: InstagramIcon,
+};
 
 function resizeBase64Img(
   base64: string,
@@ -230,6 +253,49 @@ export default function AccountSettingsPanel(
 
   // Which Arena account the public profile shows. "" is the default
   // (most recently played); anything else pins that account.
+  // Social links. The inputs hold whatever is being typed; only what parses
+  // is saved, so a half-typed URL never becomes a stored link.
+  const [socialInputs, setSocialInputs] = useState<Record<string, string>>({});
+  const [socialSaved, setSocialSaved] = useState<SocialLinks>({});
+
+  useEffect(() => {
+    let alive = true;
+    fetchOwnSocials().then((s) => {
+      if (!alive) return;
+      setSocialSaved(s);
+      setSocialInputs(
+        SOCIAL_PLATFORMS.reduce(
+          (acc, p) => ({ ...acc, [p]: s[p] || "" }),
+          {} as Record<string, string>
+        )
+      );
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const saveSocial = useCallback(
+    (platform: SocialPlatform, raw: string) => {
+      const parsed = parseSocialLink(platform, raw);
+      const next = { ...socialSaved };
+      if (parsed) next[platform] = parsed.url;
+      else delete next[platform];
+
+      setSocialSaved(next);
+      // Show what was actually stored, so a pasted share link visibly
+      // collapses to the canonical one. A rejected value is left in the box
+      // exactly as typed — it is still wrong, and clearing it would hide that.
+      setSocialInputs((prev) => {
+        if (parsed) return { ...prev, [platform]: parsed.url };
+        if (!raw.trim()) return { ...prev, [platform]: "" };
+        return prev;
+      });
+      setProfileSocials(next);
+    },
+    [socialSaved]
+  );
+
   const [ownAccounts, setOwnAccounts] = useState<OwnArenaAccount[]>([]);
   const [visibleAccount, setVisibleAccount] = useState("");
 
@@ -370,6 +436,53 @@ export default function AccountSettingsPanel(
         style={{ margin: "auto" }}
         callback={setPrivateMode}
       />
+
+      <div className="settings-socials">
+        <label className="settings-socials-title">
+          Social links <i>(shown on your public profile)</i>
+        </label>
+        {SOCIAL_PLATFORMS.map((platform) => {
+          const Icon = SOCIAL_ICONS[platform];
+          const value = socialInputs[platform] || "";
+          // Only complain about something that cannot work; an empty field is
+          // simply "no link".
+          const invalid = !!value.trim() && !parseSocialLink(platform, value);
+          return (
+            <div className="settings-social-row" key={platform}>
+              <Icon
+                className={`settings-social-icon social-icon-${platform}`}
+              />
+              <InputContainer
+                className={invalid ? "settings-social-invalid" : ""}
+                title={socialLabel(platform)}
+              >
+                <input
+                  type="text"
+                  autoComplete="off"
+                  placeholder={socialExample(platform)}
+                  aria-label={socialLabel(platform)}
+                  value={value}
+                  onChange={(e): void =>
+                    setSocialInputs((prev) => ({
+                      ...prev,
+                      [platform]: e.target.value,
+                    }))
+                  }
+                  onBlur={(e): void => saveSocial(platform, e.target.value)}
+                  onKeyDown={(e): void => {
+                    if (e.key === "Enter") e.currentTarget.blur();
+                  }}
+                />
+              </InputContainer>
+            </div>
+          );
+        })}
+        <div className="settings-socials-note">
+          <i>
+            Only links to these sites are accepted; anything else is discarded.
+          </i>
+        </div>
+      </div>
       {ownAccounts.length > 1 ? (
         <div className="centered-setting-container">
           <label>Arena account shown on your public profile:</label>
