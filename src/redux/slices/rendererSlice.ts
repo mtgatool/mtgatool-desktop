@@ -11,11 +11,6 @@ import { Format, InternalDraftv2 } from "../../types";
 import getLocalSetting from "../../utils/getLocalSetting";
 import setLocalSetting from "../../utils/setLocalSetting";
 
-export interface Peer {
-  host: string;
-  port: number;
-}
-
 export interface Popup {
   text: string;
   time: number;
@@ -48,6 +43,9 @@ export const initialRendererState = {
   customBackground: null as CustomBackground | null,
   // Darkening overlay on top of the background image (Visual settings).
   backgroundShade: getLocalSetting("backgroundShade") !== "false",
+  // The name shown for this login. Seeded from the local setting so it is
+  // right on the first paint, before the cloud profile has been read.
+  displayName: getLocalSetting("displayName") || getLocalSetting("username"),
   loading: false,
   logCompletion: 0,
   detailedLogs: null as boolean | null,
@@ -167,6 +165,12 @@ const rendererSlice = createSlice({
     ): void => {
       state.backgroundShade = action.payload;
     },
+    setDisplayName: (
+      state: RendererState,
+      action: PayloadAction<string>
+    ): void => {
+      state.displayName = action.payload;
+    },
     setLoading: (
       state: RendererState,
       action: PayloadAction<boolean>
@@ -265,6 +269,7 @@ export const {
   setBackgroundGrpid,
   setBackgroundShade,
   setCustomBackground,
+  setDisplayName,
   setLoading,
   setNoLog,
   setOffline,

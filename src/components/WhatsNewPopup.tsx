@@ -23,6 +23,10 @@ interface WhatsNewItem {
  */
 const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
   {
+    title: "Changing your display name works again",
+    body: "The rename button in Settings > My Account had been doing nothing at all for a long time — it was waiting on a record from the old storage engine that no longer exists. It now changes the name shown in the app, on your profile and on the leaderboards. Your login and your profile link are unaffected: you still sign in with the same name as before.",
+  },
+  {
     title: "Social links on your profile",
     body: "Add your Twitch, YouTube and Instagram in Settings > My Account and they show up on your public profile as small pips carrying your handle, not a long URL. Paste a full link or just type your name — either works, and only links to those three sites are accepted.",
   },

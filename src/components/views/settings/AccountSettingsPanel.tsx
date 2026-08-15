@@ -21,7 +21,7 @@ import {
   setProfilePrivate,
   setProfileSocials,
   setVisibleArenaAccount,
-  updateUsername,
+  updateDisplayName,
   uploadAvatar,
 } from "../../../data/profile";
 import {
@@ -35,7 +35,6 @@ import useIsLoggedIn from "../../../hooks/useIsLoggedIn";
 import useSupporter from "../../../hooks/useSupporter";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
-import getLocalSetting from "../../../utils/getLocalSetting";
 import getPlayerNameWithoutSuffix from "../../../utils/getPlayerNameWithoutSuffix";
 import setLocalSetting from "../../../utils/setLocalSetting";
 import {
@@ -106,6 +105,9 @@ export default function AccountSettingsPanel(
   const history = useHistory();
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [newAlias, setNewAlias] = useState("");
+  const displayName = useSelector(
+    (state: AppState) => state.renderer.displayName
+  );
   const [showPass, setShowPass] = useState(false);
   const [newPass, setNewPass] = useState("");
 
@@ -203,20 +205,19 @@ export default function AccountSettingsPanel(
     []
   );
 
-  const changeAlias = useCallback(() => {
-    if (isLoggedIn) {
-      getData(`==${getLocalSetting("username")}`).then((userData) => {
-        if (userData) {
-          putData(`==${newAlias}`, userData).then(() => {
-            putData("username", newAlias, true);
-            setLocalSetting("username", newAlias);
-            updateUsername(newAlias); // keep the public profile display name in sync
-            setNewAlias("");
-          });
-        }
-      });
-    }
-  }, [newAlias]);
+  // Renaming used to be gated on a tool-db user record (`==<username>`) that
+  // nothing has written since that store was replaced, so the whole body was
+  // dead: every click silently did nothing. It writes the display name now,
+  // and only that — `username` stays put, because Auth prefills the sign-in
+  // box from it and the login email is folded out of it.
+  const changeDisplayName = useCallback(() => {
+    const name = newAlias.trim();
+    if (!isLoggedIn || !name) return;
+    setLocalSetting("displayName", name);
+    reduxAction(dispatch, { type: "SET_DISPLAY_NAME", arg: name });
+    updateDisplayName(name);
+    setNewAlias("");
+  }, [newAlias, isLoggedIn, dispatch]);
 
   const changePassword = useCallback((newPassword: string) => {
     // Supabase stores/hashes the password itself, so we pass it raw (no sha1).
@@ -386,7 +387,7 @@ export default function AccountSettingsPanel(
           )}
         </div>
         <div style={{ marginLeft: "32px", marginRight: "auto" }}>
-          <h2 style={{ margin: 0 }}>{getLocalSetting("username") || "???"}</h2>
+          <h2 style={{ margin: 0 }}>{displayName || "???"}</h2>
           <div
             className="account-tier-label"
             style={{
@@ -412,7 +413,7 @@ export default function AccountSettingsPanel(
       </div>
       <div className="form-input-container" style={{ height: "36px" }}>
         <label style={{ marginRight: "32px" }}>
-          Change alias <i>(old alias will still work)</i>
+          Change display name <i>(your login and profile link stay the same)</i>
         </label>
         <input
           type="text"
@@ -427,7 +428,7 @@ export default function AccountSettingsPanel(
         <Button
           style={{ minWidth: "200px", marginLeft: "32px" }}
           text="Change"
-          onClick={changeAlias}
+          onClick={changeDisplayName}
         />
       </div>
       <Toggle

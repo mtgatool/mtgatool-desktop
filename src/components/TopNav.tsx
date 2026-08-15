@@ -171,6 +171,10 @@ export default function TopNav(props: TopNavProps): JSX.Element {
 
   const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
 
+  const displayName = useSelector(
+    (state: AppState) => state.renderer.displayName
+  );
+
   const topNavIconsRef: any = useRef(null);
   const windowSize = useWindowSize();
 
@@ -237,7 +241,9 @@ export default function TopNav(props: TopNavProps): JSX.Element {
     }
   }, [windowSize, compact]);
 
-  const userName = getLocalSetting("username");
+  // From the store, so renaming repaints this immediately. The login name is
+  // only the fallback — the two are allowed to differ.
+  const userName = displayName || getLocalSetting("username");
 
   const items = (
     <>

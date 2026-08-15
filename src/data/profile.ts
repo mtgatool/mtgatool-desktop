@@ -47,23 +47,29 @@ export async function uploadAvatar(dataUri: string): Promise<string | null> {
 }
 
 /**
- * Update the login's display name on its public profile. profiles.username is
- * populated at signup by a DB trigger and is UNIQUE, so a name already taken by
- * another user is rejected (returns false); the caller keeps its local rename.
+ * Update the name shown for this login — in the app, on the public profile and
+ * on the leaderboards.
+ *
+ * Display names are not unique and carry no identity: the login id and the
+ * profile URL both come from `username`, which is written once at signup and
+ * never moves. Renaming therefore cannot take another player's URL, and cannot
+ * lock anyone out of their own account.
  */
-export async function updateUsername(username: string): Promise<boolean> {
+export async function updateDisplayName(name: string): Promise<boolean> {
   try {
     const uid = await currentUserId();
     if (!uid) return false;
+    // `username` is deliberately left alone: it is the login id the synthetic
+    // sign-in email is folded from, and the handle the public profile URL is
+    // built on. Only the shown name moves.
     const { error } = await supabase.from("profiles").upsert({
       id: uid,
-      username,
-      display_name: username,
+      display_name: name,
       updated_at: new Date().toISOString(),
     });
     if (error) {
       // eslint-disable-next-line no-console
-      console.warn("[profile] username update failed:", error.message);
+      console.warn("[profile] display name update failed:", error.message);
       return false;
     }
     return true;

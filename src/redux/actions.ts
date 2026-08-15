@@ -43,6 +43,7 @@ export const actions = {
   SET_ARCHIVED: RendererSlice.setArchived,
   SET_BACK_GRPID: RendererSlice.setBackgroundGrpid,
   SET_BACKGROUND_SHADE: RendererSlice.setBackgroundShade,
+  SET_DISPLAY_NAME: RendererSlice.setDisplayName,
   SET_CUSTOM_BACKGROUND: RendererSlice.setCustomBackground,
   SET_LOADING: RendererSlice.setLoading,
   SET_NO_LOG: RendererSlice.setNoLog,

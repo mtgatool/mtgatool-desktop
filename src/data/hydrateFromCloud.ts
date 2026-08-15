@@ -27,6 +27,7 @@ import {
 } from "../types/dbTypes";
 import { isValidRankClass, sanitizeRank } from "../utils/mtga/rankClasses";
 import { ReaderDeck } from "../utils/mtgaReader";
+import setLocalSetting from "../utils/setLocalSetting";
 import {
   BackgroundDescriptor,
   loadLocalBackground,
@@ -272,9 +273,13 @@ export default async function hydrateFromCloud(): Promise<void> {
         // badge is right by the time the UI first paints after login.
         await refreshEntitlement();
 
+        // `select("*")`, not a column list: supabase-js types the select string
+        // by parsing it, and a fourth column tips that parser past its
+        // recursion limit — the row then types as a ParserError and every
+        // field read below fails to compile.
         const prof = await supabase
           .from("profiles")
-          .select("avatar_url, username, background")
+          .select("*")
           .eq("id", uid)
           .maybeSingle();
         if (prof.data?.avatar_url) {
@@ -282,6 +287,15 @@ export default async function hydrateFromCloud(): Promise<void> {
         }
         if (prof.data?.username) {
           await putData("username", prof.data.username, true);
+        }
+        // The shown name follows the account; the login identity above does
+        // not move with it.
+        if (prof.data?.display_name) {
+          setLocalSetting("displayName", prof.data.display_name);
+          reduxAction(store.dispatch, {
+            type: "SET_DISPLAY_NAME",
+            arg: prof.data.display_name,
+          });
         }
 
         // Background: only override the locally-restored one if the account has
