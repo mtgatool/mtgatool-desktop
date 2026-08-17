@@ -6,7 +6,9 @@ import { DEFAULT_TILE } from "../../../constants";
 import { useCards } from "../../../hooks/useCard";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { StatsDeck } from "../../../types/dbTypes";
+import formatPercent from "../../../utils/formatPercent";
 import Deck from "../../../utils/mtga/deck";
+import { normalApproximationInterval } from "../../../utils/statsFns";
 import vodiFn from "../../../utils/voidfn";
 import DecksArtViewRow from "../../DecksArtViewRow";
 import Section from "../../ui/Section";
@@ -49,21 +51,63 @@ function Metric({
   value,
   label,
   color,
+  interval,
+  title,
 }: {
   value: string;
   label: string;
   color?: string;
+  /** Pre-formatted margin of error, shown beside the value. */
+  interval?: string;
+  title?: string;
 }): JSX.Element {
   return (
-    <div style={{ textAlign: "center", minWidth: "96px" }}>
+    <div style={{ textAlign: "center", minWidth: "96px" }} title={title}>
       <div style={{ fontSize: "26px", color: color || "var(--color-text)" }}>
         {value}
+        {interval ? (
+          // Grey and small: the rate is the figure, this is how much to trust
+          // it. Same treatment the deck rows give it.
+          <i
+            style={{
+              fontSize: "14px",
+              color: "var(--color-text-dark)",
+            }}
+          >
+            {" "}
+            &plusmn; {interval}
+          </i>
+        ) : null}
       </div>
       <div style={{ fontSize: "12px", color: "var(--color-text-dark)" }}>
         {label}
       </div>
     </div>
   );
+}
+
+/**
+ * How far a win rate could reasonably be from the one observed.
+ *
+ * The same 95% normal-approximation interval the deck rows show, and the same
+ * 20-match floor: below that the interval is wider than the rate it qualifies,
+ * which says nothing useful and reads as noise.
+ */
+function winrateInterval(
+  wins: number,
+  total: number
+): { interval?: string; title: string } {
+  if (total < 20) {
+    return { title: "play at least 20 matches to estimate actual winrate" };
+  }
+  const { winrate, interval } = normalApproximationInterval(total, wins);
+  const round = (x: number): number => Math.round(x * 100) / 100;
+  return {
+    interval: formatPercent(interval),
+    title: `${formatPercent(round(winrate - interval))} to ${formatPercent(
+      round(winrate + interval)
+    )} with 95% confidence (estimated actual winrate bounds, assuming a normal distribution)`,
+  };
 }
 
 // Reuse the app's wildcard icons (wc-explore-cost + wc-<rarity>), which render
@@ -153,6 +197,9 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
     return { all, recent, streak, streakWin, bestWinStreak, played };
   }, [matchesData]);
 
+  const allInterval = winrateInterval(stats.all.wins, stats.all.total);
+  const recentInterval = winrateInterval(stats.recent.wins, stats.recent.total);
+
   // A deck's colors are read off its lands, which means a card lookup — and
   // those answer from a worker. Nothing had fetched them, so on a cold open
   // every deck resolved to no colors and the tiles rendered blank. Ask for the
@@ -237,6 +284,8 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
             color={
               stats.all.winrate >= 50 ? "var(--color-g)" : "var(--color-r)"
             }
+            interval={allInterval.interval}
+            title={allInterval.title}
           />
           <Metric
             value={`${stats.all.wins}-${stats.all.losses}`}
@@ -248,6 +297,8 @@ export default function ViewHome(props: ViewHomeProps): JSX.Element {
             color={
               stats.recent.winrate >= 50 ? "var(--color-g)" : "var(--color-r)"
             }
+            interval={recentInterval.interval}
+            title={recentInterval.title}
           />
           <Metric
             value={`${stats.streak}${stats.streakWin ? "W" : "L"}`}
