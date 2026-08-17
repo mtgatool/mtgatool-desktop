@@ -19,7 +19,18 @@ export const CARD_COLUMNS = `
   uses_sideboard, mana_cost, cmc, linked_face_type, raw_frame_detail, power,
   toughness, colors, color_identity, frame_colors, types, subtypes, supertypes,
   ability_ids, hidden_ability_ids, linked_face_grpids, ability_to_token,
-  ability_to_conjurations, additional_frame_details, rank_data`;
+  ability_to_conjurations, additional_frame_details, rank_data,
+  (SELECT group_concat(reprint_grpid) FROM card_reprints r
+    WHERE r.grpid = cards.grpid) AS reprints`;
+
+/** `group_concat` gives a comma-separated list, or null when there are none. */
+function parseIdList(value: unknown): number[] {
+  if (typeof value !== "string" || value === "") return [];
+  return value
+    .split(",")
+    .map((id) => parseInt(id, 10))
+    .filter((id) => !Number.isNaN(id));
+}
 
 function parse<T>(value: unknown, fallback: T): T {
   if (typeof value !== "string" || value === "") return fallback;
@@ -70,8 +81,17 @@ export default function rowToCard(row: unknown[]): DbCardDataV2 {
     AbilityIdToLinkedConjurations: parse<Record<string, string>>(row[34], {}),
     AdditionalFrameDetails: parse<string[]>(row[35], []),
     RankData: parse<RankData>(row[36], { rankSource: -1 } as RankData),
-    // Kept off the row: a card's reprints are a join, and nothing reads them
-    // outside the build-time legality calculation that is now baked in.
-    Reprints: [],
+    // The other printings of this same card.
+    //
+    // Arena counts copies across every printing, so this is what tells the
+    // wildcard maths that a deck's printing is covered by a playset held on a
+    // different one. It was dropped when the database moved to SQLite, on the
+    // belief that nothing read it — but getWildcardsMissing does, and reported
+    // cards as missing that were sitting in the collection under another set.
+    //
+    // A joined column rather than a second query, so `database.card()` stays
+    // synchronous: it is an indexed lookup averaging under two rows per card
+    // (the worst in the set is Evolving Wilds at 19).
+    Reprints: parseIdList(row[37]),
   };
 }

@@ -23,6 +23,10 @@ interface WhatsNewItem {
  */
 const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
   {
+    title: "Decks no longer ask for wildcards you don't need",
+    body: "A deck could claim you were missing copies of a card you already owned a playset of, when your copies were on a different printing than the one in the deck — Arena counts a playset across every printing, and the collection view knew that while the deck list did not. Deck lists and the \"wildcards to build it\" summary now count every printing too.",
+  },
+  {
     title: "A Match MVP that makes sense",
     body: "The card headlining the post-match overview used to be whichever card produced the biggest damage number on either side — which is how a land that pings you every turn, or the card your opponent beat you with, ended up as your MVP. It now looks at damage that actually hit the opponent, prefers the winner's side, and falls back to your most-cast spell or biggest threat when a game was won without much damage. The line under the card says which of those earned it the spot.",
   },
