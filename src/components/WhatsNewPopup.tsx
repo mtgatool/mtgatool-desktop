@@ -24,15 +24,7 @@ interface WhatsNewItem {
 const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
   {
     title: "Decks no longer ask for wildcards you don't need",
-    body: "A deck could claim you were missing copies of a card you already owned a playset of, when your copies were on a different printing than the one in the deck — Arena counts a playset across every printing, and the collection view knew that while the deck list did not. Deck lists and the \"wildcards to build it\" summary now count every printing too.",
-  },
-  {
-    title: "A Match MVP that makes sense",
-    body: "The card headlining the post-match overview used to be whichever card produced the biggest damage number on either side — which is how a land that pings you every turn, or the card your opponent beat you with, ended up as your MVP. It now looks at damage that actually hit the opponent, prefers the winner's side, and falls back to your most-cast spell or biggest threat when a game was won without much damage. The line under the card says which of those earned it the spot.",
-  },
-  {
-    title: "Changing your display name works again",
-    body: "The rename button in Settings > My Account had been doing nothing at all for a long time — it was waiting on a record from the old storage engine that no longer exists. It now changes the name shown in the app, on your profile and on the leaderboards. Your login and your profile link are unaffected: you still sign in with the same name as before.",
+    body: 'A deck could claim you were missing copies of a card you already owned a playset of, when your copies were on a different printing than the one in the deck — Arena counts a playset across every printing, and the collection view knew that while the deck list did not. Deck lists and the "wildcards to build it" summary now count every printing too.',
   },
   {
     title: "Social links on your profile",
@@ -45,14 +37,6 @@ const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
   {
     title: "See your missing cards",
     body: "When something exiles cards face down from your library — warps them away — the overlay can now tell you what they were: search your library (a fetchland is enough) and every card your deck should still have but the library doesn't shows up in a new \"Missing cards\" section under the decklist. Entries clear themselves the moment the actual card comes back into view, and drawing another copy of the same card won't fool it.",
-  },
-  {
-    title: "Background shade",
-    body: "The app background now gets the same darkening shade as the website, making everything on top easier to read. Turn it off in Settings > Visual if you prefer your background art untouched.",
-  },
-  {
-    title: "Cleaner card hover on macOS",
-    body: "The hovered card no longer draws a dark frame around itself — that halo was the native window shadow tracing the card's outline.",
   },
   {
     title: "Player profiles",
@@ -91,20 +75,12 @@ const NEW_IN_THIS_VERSION: WhatsNewItem[] = [
     body: "Starting during a game now picks that match up from its beginning, with both decklists, ranks and the real result.",
   },
   {
-    title: "Draw odds are back",
-    body: "Hovering the overlay's lands row shows your chance of drawing each colour again, and the type counts beside it are right too.",
-  },
-  {
     title: "Reworked collection",
     body: "Sets are grouped by format and can be collapsed. Cards can be sorted, and each shows whether you own it — including as another printing.",
   },
   {
     title: "Set completion and stats",
     body: "Set view opens again, with completion heatmaps and statistics for every set with boosters in the game.",
-  },
-  {
-    title: "Supporter badges",
-    body: "Patreon backers now get a tier badge next to their name and on their profile. Link automatically by verifying your Patreon email under Settings \u2192 My Account.",
   },
   {
     title: "Dashboard",
