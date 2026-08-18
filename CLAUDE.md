@@ -103,6 +103,44 @@ npx @electron/asar extract-file "<App>.app/Contents/Resources/app.asar" \
   node_modules/mtga-reader/package.json
 ```
 
+## Supabase migrations
+
+**A migration's filename version must equal the version recorded in the
+database.** `supabase/migrations/<version>_<name>.sql` on one side,
+`supabase_migrations.schema_migrations` on the other. That equality is what a
+restore, a `db pull` for local testing, and `db push` all rely on: the CLI
+decides what to run by comparing versions, so a local file carrying a version
+the history has never seen reads as unapplied and gets run again.
+
+Check it in one command — every row should show the same value on both sides,
+and neither column should ever be blank:
+
+```bash
+supabase migration list --linked
+```
+
+**Prefer the CLI for anything that changes the schema**, because it assigns the
+version once and both sides inherit it:
+
+```bash
+supabase migration new add_the_thing     # creates the file, with its version
+supabase db push                          # applies it under that same version
+```
+
+The MCP `apply_migration` tool is convenient but assigns its **own** timestamp
+at apply time, which will not match a filename written by hand. If you use it,
+immediately read back the recorded version (`list_migrations`) and rename the
+local file to match. Four files had drifted this way before anyone noticed —
+three patreon ones and the social links one — and they were only found by
+diffing the directory against the history.
+
+Two things that make drift survivable but are not a reason to allow it: these
+migrations are written idempotently (`if not exists`, `create or replace`), so
+a re-run is usually harmless; and editing a file's *comments* after applying is
+fine — the recorded statements will differ in length from the file on disk
+without anything being functionally out of sync. Verify with objects, not byte
+counts.
+
 ## macOS specifics
 
 The tracker reads MTGA memory via `task_for_pid`, which macOS refuses unless the
