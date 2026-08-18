@@ -166,7 +166,12 @@ export interface GameStatsMessage extends ChannelMessageBase {
 /** The active captures, handed to the parser window at login. */
 export interface LogCaptureConfigMessage extends ChannelMessageBase {
   type: "LOG_CAPTURE_CONFIG";
-  value: { id: string; labels: string[] }[];
+  value: {
+    id: string;
+    labels: string[];
+    /** `==>`, `<==`, or absent for either — see data/logCapture. */
+    arrows?: string[] | null;
+  }[];
 }
 
 export interface LogCaptureMessage extends ChannelMessageBase {
