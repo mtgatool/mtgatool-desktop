@@ -12,10 +12,11 @@ import bcConnect from "../utils/bcConnect";
 import { getActiveUserId } from "./cloudSync";
 import supabase from "./supabase";
 
-// A write in flight per shareId. The overlay re-sends on its throttle/keepalive
-// beat, so dropping a message that arrives mid-write just defers it to the next
-// beat (~1s) instead of letting writes pile up — matching the old inflight guard.
-const inflight = new Set<string>();
+// The write in flight per shareId, kept as a promise so a stop can wait for it.
+// The overlay re-sends on its throttle/keepalive beat, so dropping a message
+// that arrives mid-write just defers it to the next beat (~1s) instead of
+// letting writes pile up.
+const inflight = new Map<string, Promise<void>>();
 
 // shareIds we have already reported as unpublishable, so the log carries one
 // line per share rather than one per keepalive beat.
@@ -44,29 +45,37 @@ async function canPublish(shareId: string, action: string): Promise<boolean> {
   return false;
 }
 
-async function upsert(shareId: string, payload: unknown): Promise<void> {
-  if (inflight.has(shareId)) return;
-  inflight.add(shareId);
-  try {
-    if (!(await canPublish(shareId, "upsert"))) return;
-    const { error } = await supabase.from("live_overlays").upsert(
-      {
-        share_id: shareId,
-        payload: payload as never,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "share_id" }
-    );
-    if (error) {
-      // eslint-disable-next-line no-console
-      console.warn(`[liveShare] upsert ${shareId} failed:`, error.message);
-    }
-  } finally {
-    inflight.delete(shareId);
+async function publish(shareId: string, payload: unknown): Promise<void> {
+  if (!(await canPublish(shareId, "upsert"))) return;
+  const { error } = await supabase.from("live_overlays").upsert(
+    {
+      share_id: shareId,
+      payload: payload as never,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "share_id" }
+  );
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.warn(`[liveShare] upsert ${shareId} failed:`, error.message);
   }
 }
 
+async function upsert(shareId: string, payload: unknown): Promise<void> {
+  if (inflight.has(shareId)) return;
+  const write = publish(shareId, payload);
+  inflight.set(shareId, write);
+  await write.catch(() => undefined);
+  if (inflight.get(shareId) === write) inflight.delete(shareId);
+}
+
 async function remove(shareId: string): Promise<void> {
+  // Wait out a publish already on the wire. It would otherwise be free to land
+  // after the delete and recreate the row, and nothing would clear it: the
+  // overlay clears its keepalive before asking us to stop, so no further write
+  // for this share is coming. The reverse order — sharing switched back on
+  // while a delete is in flight — heals itself on the next keepalive beat.
+  await inflight.get(shareId)?.catch(() => undefined);
   if (!(await canPublish(shareId, "delete"))) return;
   const { error } = await supabase
     .from("live_overlays")
