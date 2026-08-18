@@ -124,6 +124,12 @@ function parseLogEntry(
         type: "label_arrow_json",
         ..._.mapValues(rematches.groups, unleakString),
         hash: sha1(jsonString + absPosition),
+        // The raw text, as the label_json branch below also keeps. Without it
+        // an arrow entry carries no record of what was actually written —
+        // `json` has already been unwrapped by tryDecodeJson — so a captured
+        // one arrives with nothing to read. These are the small API payloads;
+        // the large GRE messages match the other branch.
+        text: jsonString,
         json: tryDecodeJson(jsonString),
       },
     ];

@@ -1,5 +1,6 @@
 import globalStore from "../background/store";
 import start from "../background/worker";
+import { setActiveCaptures } from "../data/logCapture";
 import bcConnect from "../utils/bcConnect";
 import defaultLogUri from "../utils/defaultLogUri";
 import electron from "../utils/electron/electronWrapper";
@@ -15,6 +16,10 @@ export default function backgroundChannelListeners() {
   let stopFn: undefined | (() => void);
 
   channel.onmessage = (msg: MessageEvent<ChannelMessage>) => {
+    if (msg.data.type == "LOG_CAPTURE_CONFIG") {
+      setActiveCaptures(msg.data.value);
+    }
+
     if (msg.data.type == "START_LOG_READING" && stopFn === undefined) {
       console.log("START LOG READING");
       stopFn = start();

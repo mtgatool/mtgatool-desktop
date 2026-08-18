@@ -4,6 +4,7 @@ import { overlayTitleToId } from "../common/maps";
 import { LOGIN_OK } from "../constants";
 import { pushDraft, pushFormatsSnapshot } from "../data/cloudSync";
 import { isDraftDeleted } from "../data/deletedDrafts";
+import { submitLogCapture } from "../data/logCaptureSync";
 import setDbMatch from "../data/setDbMatch";
 import { getUserNamespacedKey, putData } from "../data/store";
 import syncDrafts from "../data/syncDrafts";
@@ -155,6 +156,10 @@ export default function mainChannelListeners() {
           globalData.readerReads.length - READER_READS_KEPT
         );
       }
+    }
+
+    if (msg.data.type === "LOG_CAPTURE") {
+      submitLogCapture(msg.data.value);
     }
 
     if (msg.data.type === "GAME_START") {
