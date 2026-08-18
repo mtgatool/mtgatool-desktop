@@ -31,6 +31,14 @@
 export interface LogCapture {
   id: string;
   labels: string[];
+  /**
+   * Which direction of the label to take: `==>`, `<==`, or both when empty.
+   *
+   * Request/response labels appear twice and a capture is claimed by the FIRST
+   * match, which is always the outbound request — usually an empty envelope,
+   * while the response is the thing worth reading.
+   */
+  arrows?: string[] | null;
 }
 
 /** Captures still worth watching in this window, for this session. */
@@ -39,6 +47,18 @@ let wanted = new Set<string>();
 
 function reindex(): void {
   wanted = new Set(active.flatMap((capture) => capture.labels));
+}
+
+/** Whether a capture wants this entry, label and direction both. */
+function matches(
+  capture: LogCapture,
+  label: string,
+  arrow?: string
+): boolean {
+  if (!capture.labels.includes(label)) return false;
+  // No direction asked for: either will do, including entries that have none.
+  if (!capture.arrows?.length) return true;
+  return !!arrow && capture.arrows.includes(arrow);
 }
 
 /** Apply a config handed over from the main window. */
@@ -62,6 +82,12 @@ export function isLabelWanted(label: string): boolean {
   return wanted.size > 0 && wanted.has(label);
 }
 
+/** Whether any capture wants this entry once direction is taken into account. */
+export function isEntryWanted(label: string, arrow?: string): boolean {
+  if (!isLabelWanted(label)) return false;
+  return active.some((capture) => matches(capture, label, arrow));
+}
+
 /**
  * Claim the captures asking for this label, removing them as it goes.
  *
@@ -69,9 +95,9 @@ export function isLabelWanted(label: string): boolean {
  * session" true without a round trip: by the time the entry is on its way, no
  * later entry can match the same capture again.
  */
-export function claimCapturesFor(label: string): string[] {
+export function claimCapturesFor(label: string, arrow?: string): string[] {
   const ids = active
-    .filter((capture) => capture.labels.includes(label))
+    .filter((capture) => matches(capture, label, arrow))
     .map((capture) => capture.id);
   if (ids.length) {
     active = active.filter((capture) => !ids.includes(capture.id));

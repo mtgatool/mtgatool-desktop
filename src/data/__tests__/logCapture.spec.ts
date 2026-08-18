@@ -10,6 +10,7 @@
  */
 import {
   claimCapturesFor,
+  isEntryWanted,
   isLabelWanted,
   setActiveCaptures,
 } from "../logCapture";
@@ -58,6 +59,33 @@ describe("log capture matching", () => {
 
     expect(isLabelWanted("Event_DeckSubmit")).toBe(true);
     expect(claimCapturesFor("Event_DeckSubmit")).toEqual(["c2"]);
+  });
+
+  it("takes the direction the capture asked for", () => {
+    // The outbound request always precedes the response, so without this a
+    // request/response label can only ever capture the empty envelope: the
+    // real EventGetCoursesV2 capture came back as `{"request":"{}"}`.
+    setActiveCaptures([
+      { id: "c1", labels: ["EventGetCoursesV2"], arrows: ["<=="] },
+    ]);
+
+    expect(isEntryWanted("EventGetCoursesV2", "==>")).toBe(false);
+    expect(claimCapturesFor("EventGetCoursesV2", "==>")).toEqual([]);
+
+    expect(isEntryWanted("EventGetCoursesV2", "<==")).toBe(true);
+    expect(claimCapturesFor("EventGetCoursesV2", "<==")).toEqual(["c1"]);
+  });
+
+  it("takes either direction when none was asked for", () => {
+    setActiveCaptures([{ id: "c1", labels: ["Event_Join"] }]);
+    expect(isEntryWanted("Event_Join", "==>")).toBe(true);
+    // Entries from the other decoder branch carry no arrow at all.
+    expect(isEntryWanted("Event_Join", undefined)).toBe(true);
+  });
+
+  it("does not match an arrowless entry when a direction was asked for", () => {
+    setActiveCaptures([{ id: "c1", labels: ["Event_Join"], arrows: ["<=="] }]);
+    expect(isEntryWanted("Event_Join", undefined)).toBe(false);
   });
 
   it("ignores a capture with no labels", () => {

@@ -21,7 +21,7 @@ export async function loadLogCaptures(): Promise<void> {
   try {
     const { data, error } = await (supabase as any)
       .from("log_captures")
-      .select("id, labels")
+      .select("id, labels, arrows")
       .eq("active", true);
 
     if (error || !data?.length) return;

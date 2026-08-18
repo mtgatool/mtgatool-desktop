@@ -1,5 +1,5 @@
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
-import { claimCapturesFor, isLabelWanted } from "../data/logCapture";
+import { claimCapturesFor, isEntryWanted } from "../data/logCapture";
 import LogEntry from "../types/logDecoder";
 import * as Labels from "./onLabel";
 
@@ -21,8 +21,8 @@ export default function logEntrySwitch(entry: LogEntry): void {
   // data/logCapture). Handed to the main window, which owns the cloud writes;
   // the set is empty unless a capture is running, so this is a Set miss on the
   // hot path and nothing more.
-  if (isLabelWanted(entry.label)) {
-    const captureIds = claimCapturesFor(entry.label);
+  if (isEntryWanted(entry.label, entry.arrow)) {
+    const captureIds = claimCapturesFor(entry.label, entry.arrow);
     postChannelMessage({
       type: "LOG_CAPTURE",
       value: {
