@@ -9,6 +9,7 @@
  */
 import { ChannelMessage } from "../broadcastChannel/channelMessages";
 import bcConnect from "../utils/bcConnect";
+import { getActiveUserId } from "./cloudSync";
 import supabase from "./supabase";
 
 // A write in flight per shareId. The overlay re-sends on its throttle/keepalive
@@ -16,41 +17,65 @@ import supabase from "./supabase";
 // beat (~1s) instead of letting writes pile up — matching the old inflight guard.
 const inflight = new Set<string>();
 
+// shareIds we have already reported as unpublishable, so the log carries one
+// line per share rather than one per keepalive beat.
+const warned = new Set<string>();
+
 let serving = false;
 
-function upsert(shareId: string, payload: unknown): void {
+/**
+ * True when there is a session to write with. `live_overlays` rows default
+ * `user_id` to `auth.uid()` and only `authenticated` may write them, so a
+ * request made in local/offline mode goes out as `anon` and Postgres rejects it
+ * (42501, surfaced as HTTP 401). The overlay keeps its keepalive beating for as
+ * long as the window is open, so an ungated write repeats that rejection every
+ * few seconds — drop the message instead.
+ */
+async function canPublish(shareId: string, action: string): Promise<boolean> {
+  if (await getActiveUserId()) {
+    warned.delete(shareId);
+    return true;
+  }
+  if (!warned.has(shareId)) {
+    warned.add(shareId);
+    // eslint-disable-next-line no-console
+    console.warn(`[liveShare] ${action} ${shareId} skipped: not logged in`);
+  }
+  return false;
+}
+
+async function upsert(shareId: string, payload: unknown): Promise<void> {
   if (inflight.has(shareId)) return;
   inflight.add(shareId);
-  supabase
-    .from("live_overlays")
-    .upsert(
+  try {
+    if (!(await canPublish(shareId, "upsert"))) return;
+    const { error } = await supabase.from("live_overlays").upsert(
       {
         share_id: shareId,
         payload: payload as never,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "share_id" }
-    )
-    .then(({ error }) => {
-      inflight.delete(shareId);
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`[liveShare] upsert ${shareId} failed:`, error.message);
-      }
-    });
+    );
+    if (error) {
+      // eslint-disable-next-line no-console
+      console.warn(`[liveShare] upsert ${shareId} failed:`, error.message);
+    }
+  } finally {
+    inflight.delete(shareId);
+  }
 }
 
-function remove(shareId: string): void {
-  supabase
+async function remove(shareId: string): Promise<void> {
+  if (!(await canPublish(shareId, "delete"))) return;
+  const { error } = await supabase
     .from("live_overlays")
     .delete()
-    .eq("share_id", shareId)
-    .then(({ error }) => {
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`[liveShare] delete ${shareId} failed:`, error.message);
-      }
-    });
+    .eq("share_id", shareId);
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.warn(`[liveShare] delete ${shareId} failed:`, error.message);
+  }
 }
 
 /**
