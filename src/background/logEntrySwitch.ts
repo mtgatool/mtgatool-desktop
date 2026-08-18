@@ -1,4 +1,5 @@
 import postChannelMessage from "../broadcastChannel/postChannelMessage";
+import { claimCapturesFor, isLabelWanted } from "../data/logCapture";
 import LogEntry from "../types/logDecoder";
 import * as Labels from "./onLabel";
 
@@ -14,6 +15,30 @@ export default function logEntrySwitch(entry: LogEntry): void {
       console.log("Log entry json parse error: ", entry.json);
       console.warn(e);
     }
+  }
+
+  // An admin-configured capture may be asking for this label (see
+  // data/logCapture). Handed to the main window, which owns the cloud writes;
+  // the set is empty unless a capture is running, so this is a Set miss on the
+  // hot path and nothing more.
+  if (isLabelWanted(entry.label)) {
+    const captureIds = claimCapturesFor(entry.label);
+    postChannelMessage({
+      type: "LOG_CAPTURE",
+      value: {
+        captureIds,
+        label: entry.label,
+        hash: entry.hash,
+        timestamp: entry.timestamp,
+        arrow: entry.arrow,
+        type: entry.type,
+        // The raw text, not the parsed object: a fixture wants what Arena
+        // actually wrote, and `entry.json` may have been replaced above.
+        jsonString: entry.jsonString,
+        size: entry.size,
+        position: entry.position,
+      },
+    });
   }
 
   switch (entry.label) {

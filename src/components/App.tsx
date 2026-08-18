@@ -14,6 +14,7 @@ import { getCloudSession } from "../data/cloudAuth";
 import { getActiveUserId } from "../data/cloudSync";
 import hydrateFromCloud from "../data/hydrateFromCloud";
 import localLogin from "../data/localLogin";
+import { loadLogCaptures } from "../data/logCapture";
 import syncMatches from "../data/syncMatches";
 import { useCardArtCrop } from "../hooks/useCardImage";
 import info from "../info.json";
@@ -173,6 +174,11 @@ function App(props: AppProps) {
 
               // Reconcile local match history with the cloud (no-op offline).
               syncMatches().catch(() => undefined);
+
+              // Ask whether admin wants any log labels captured this session.
+              // Read once, here, so a capture created today reaches people as
+              // they sign in over the next day rather than mid-session.
+              loadLogCaptures().catch(() => undefined);
 
               if (
                 history.location.pathname === "" ||

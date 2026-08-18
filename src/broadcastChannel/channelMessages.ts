@@ -32,6 +32,8 @@ export type MessageType =
   | "OVERLAY_UPDATE_BOUNDS"
   | "OVERLAY_SETTINGS"
   | "GAME_STATS"
+  | "LOG_CAPTURE"
+  | "LOG_CAPTURE_CONFIG"
   | "GAME_START"
   | "SET_SCENE"
   | "UPSERT_DB_CARDS"
@@ -154,6 +156,33 @@ export interface GameStartMessage extends ChannelMessageBase {
 export interface GameStatsMessage extends ChannelMessageBase {
   type: "GAME_STATS";
   value: InternalMatch;
+}
+
+/**
+ * One log entry an active capture asked for (see data/logCapture). The parser
+ * runs in the background window and the cloud writes happen in the main one,
+ * which is why this crosses the channel rather than being uploaded in place.
+ */
+/** The active captures, handed to the parser window at login. */
+export interface LogCaptureConfigMessage extends ChannelMessageBase {
+  type: "LOG_CAPTURE_CONFIG";
+  value: { id: string; labels: string[] }[];
+}
+
+export interface LogCaptureMessage extends ChannelMessageBase {
+  type: "LOG_CAPTURE";
+  value: {
+    /** Captures this entry was claimed by; the parser drops them as it sends. */
+    captureIds: string[];
+    label: string;
+    hash?: string;
+    timestamp?: string;
+    arrow?: string;
+    type?: string;
+    jsonString?: string;
+    size?: number;
+    position?: number;
+  };
 }
 
 export interface SetSceneMessage extends ChannelMessageBase {
@@ -330,6 +359,8 @@ export type ChannelMessage =
   | OverlaySetSettingsMessage
   | OverlayUpdateBoundsMessage
   | GameStatsMessage
+  | LogCaptureMessage
+  | LogCaptureConfigMessage
   | GameStartMessage
   | SetSceneMessage
   | UpsertDbCardsMessage
