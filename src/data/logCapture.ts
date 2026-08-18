@@ -50,11 +50,7 @@ function reindex(): void {
 }
 
 /** Whether a capture wants this entry, label and direction both. */
-function matches(
-  capture: LogCapture,
-  label: string,
-  arrow?: string
-): boolean {
+function matches(capture: LogCapture, label: string, arrow?: string): boolean {
   if (!capture.labels.includes(label)) return false;
   // No direction asked for: either will do, including entries that have none.
   if (!capture.arrows?.length) return true;
