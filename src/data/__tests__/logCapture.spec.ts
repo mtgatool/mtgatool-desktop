@@ -4,18 +4,15 @@
  * The server enforces the real limits, but a client that kept matching a label
  * would keep sending for the whole session and rely on the server to say no
  * every time. These are the rules that make it quiet instead.
+ *
+ * No mocks: this half imports nothing, which is the point of it being separate
+ * from logCaptureSync.
  */
 import {
   claimCapturesFor,
   isLabelWanted,
   setActiveCaptures,
 } from "../logCapture";
-
-jest.mock("../supabase", () => ({ __esModule: true, default: {} }));
-jest.mock("../../broadcastChannel/postChannelMessage", () => ({
-  __esModule: true,
-  default: jest.fn(),
-}));
 
 afterEach(() => setActiveCaptures([]));
 

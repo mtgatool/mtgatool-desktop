@@ -34,7 +34,9 @@ export default function logEntrySwitch(entry: LogEntry): void {
         type: entry.type,
         // The raw text, not the parsed object: a fixture wants what Arena
         // actually wrote, and `entry.json` may have been replaced above.
-        jsonString: entry.jsonString,
+        // `text` is the field the decoder sets — `jsonString` is declared but
+        // never populated, so capturing it would have stored nothing at all.
+        jsonString: entry.text ?? entry.jsonString,
         size: entry.size,
         position: entry.position,
       },

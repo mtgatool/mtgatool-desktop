@@ -21,16 +21,17 @@
  * the main window, which owns the Supabase session; matching happens in the
  * background window, where the log is parsed. They meet over the broadcast
  * channel, which is why the config is handed across rather than read twice.
+ *
+ * THIS module is the parser half, and it deliberately imports nothing — no
+ * Supabase client, no channel. Importing the client here would construct a
+ * second auth client in the background window against the same stored
+ * session, which is a token-refresh race nobody asked for, on the window that
+ * must never stall. The uploading half lives in `logCaptureSync`.
  */
-import postChannelMessage from "../broadcastChannel/postChannelMessage";
-import supabase from "./supabase";
-
 export interface LogCapture {
   id: string;
   labels: string[];
 }
-
-/* ------------------------------------------------ background (parser) side */
 
 /** Captures still worth watching in this window, for this session. */
 let active: LogCapture[] = [];
@@ -77,64 +78,4 @@ export function claimCapturesFor(label: string): string[] {
     reindex();
   }
   return ids;
-}
-
-/* ------------------------------------------------------- main window side */
-
-/**
- * Fetch the active captures and hand them to the parser.
- *
- * Best-effort in every direction: a failure means capture nothing, which is
- * also the default. Called once per login.
- */
-export async function loadLogCaptures(): Promise<void> {
-  try {
-    const { data, error } = await (supabase as any)
-      .from("log_captures")
-      .select("id, labels")
-      .eq("active", true);
-
-    if (error || !data?.length) return;
-
-    postChannelMessage({
-      type: "LOG_CAPTURE_CONFIG",
-      value: data as LogCapture[],
-    });
-  } catch (e) {
-    // Nothing to do: no config means no capture.
-  }
-}
-
-/** Upload one captured entry to each capture that claimed it. */
-export async function submitLogCapture(value: {
-  captureIds: string[];
-  label: string;
-  hash?: string;
-  timestamp?: string;
-  arrow?: string;
-  type?: string;
-  jsonString?: string;
-  size?: number;
-  position?: number;
-}): Promise<void> {
-  await Promise.all(
-    (value.captureIds || []).map(async (captureId) => {
-      try {
-        const { error } = await (supabase as any).rpc("submit_log_capture", {
-          p_capture_id: captureId,
-          p_label: value.label,
-          p_hash: value.hash ?? null,
-          p_timestamp: value.timestamp ?? null,
-          p_arrow: value.arrow ?? null,
-          p_type: value.type ?? null,
-          p_json_string: value.jsonString ?? null,
-          p_size: value.size ?? null,
-          p_position: value.position ?? null,
-        });
-        if (!error) console.log(`[log-capture] sent ${value.label}`);
-      } catch (e) {
-        // Opportunistic debugging data is never worth a retry loop.
-      }
-    })
-  );
 }

@@ -14,7 +14,7 @@ import { getCloudSession } from "../data/cloudAuth";
 import { getActiveUserId } from "../data/cloudSync";
 import hydrateFromCloud from "../data/hydrateFromCloud";
 import localLogin from "../data/localLogin";
-import { loadLogCaptures } from "../data/logCapture";
+import { loadLogCaptures } from "../data/logCaptureSync";
 import syncMatches from "../data/syncMatches";
 import { useCardArtCrop } from "../hooks/useCardImage";
 import info from "../info.json";
