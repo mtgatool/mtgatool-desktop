@@ -13,7 +13,6 @@ import {
   setDateOption,
 } from "../redux/slices/FilterSlice";
 import { AppState } from "../redux/stores/rendererStore";
-import { CardsData } from "../types/collectionTypes";
 import { defaultCardsData, StatsDeck } from "../types/dbTypes";
 import aggregateStats from "../utils/aggregateStats";
 import cardsDb from "../utils/cardsDb/cardsDbClient";
@@ -30,6 +29,7 @@ import PopupComponent from "./PopupComponent";
 import ConfirmDialog from "./popups/ConfirmDialog";
 import DeckViewPopup from "./popups/DeckViewPopup";
 import AdvancedSearch from "./views/collection/advancedSearch";
+import CollectionQueryHelp from "./views/collection/CollectionQueryHelp";
 import ViewCollection from "./views/collection/ViewCollection";
 import ShareDeckPopup from "./views/decks/ShareDeckPopup";
 import ViewDecks from "./views/decks/ViewDecks";
@@ -75,9 +75,6 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   const dispatch = useDispatch();
   const params = useParams<{ page: string }>();
   const paths = useRef<string[]>([params.page]);
-  // The collection view reads from SQLite now; this stays only because
-  // ViewCollection still accepts it, and is always empty.
-  const [collectionData] = useState<CardsData[]>([]);
 
   // Whether the SQLite card database is up. When it is, the legacy cards worker
   // below is never started at all: its whole job was to be handed a structured
@@ -188,6 +185,9 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
   const openAdvancedCollectionSearch = useRef<() => void>(vodiFn);
   const closeAdvancedCollectionSearch = useRef<() => void>(vodiFn);
 
+  const openCollectionQueryHelp = useRef<() => void>(vodiFn);
+  const closeCollectionQueryHelp = useRef<() => void>(vodiFn);
+
   const openHistoryStatsPopup = useRef<() => void>(vodiFn);
   const closeHistoryStatsPopup = useRef<() => void>(vodiFn);
 
@@ -252,6 +252,17 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
         closeFnRef={closeAdvancedCollectionSearch}
       >
         <AdvancedSearch closeCallback={closeAdvancedCollectionSearch.current} />
+      </PopupComponent>
+
+      <PopupComponent
+        open={false}
+        className={getPopupClass(os)}
+        width="1000px"
+        height="90%"
+        openFnRef={openCollectionQueryHelp}
+        closeFnRef={closeCollectionQueryHelp}
+      >
+        <CollectionQueryHelp closeCallback={closeCollectionQueryHelp.current} />
       </PopupComponent>
 
       <PopupComponent
@@ -352,11 +363,11 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
                   >
                     <Page
                       key={`${Object.keys(views)[item]}-page`}
-                      collectionData={collectionData}
                       collectionEpoch={collectionEpoch}
                       openAdvancedCollectionSearch={
                         openAdvancedCollectionSearch.current
                       }
+                      openCollectionQueryHelp={openCollectionQueryHelp.current}
                       openHistoryStatsPopup={openHistoryStatsPopup.current}
                       openDeckView={(deck: Deck) => {
                         setDeckView(deck);
@@ -377,11 +388,11 @@ const ContentWrapper = (mainProps: ContentWrapperProps) => {
               >
                 <CurrentPage
                   key={`${Object.keys(views)[viewIndex]}-page`}
-                  collectionData={collectionData}
                   collectionEpoch={collectionEpoch}
                   openAdvancedCollectionSearch={
                     openAdvancedCollectionSearch.current
                   }
+                  openCollectionQueryHelp={openCollectionQueryHelp.current}
                   openDeckView={(deck: Deck) => {
                     setDeckView(deck);
                     openDeckView.current();

@@ -162,3 +162,137 @@
   flex: 0 0 14px;
   background-size: contain;
 }
+
+// --- query help -------------------------------------------------------------
+
+// The circle-question button next to the search box. Sits inline with the
+// input and the advanced-filters button, dimmed until hovered.
+.collection-query-help-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  margin: auto 0 auto 8px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s ease-in-out;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+// The syntax help popup body. Rendered inside a PopupComponent .popup-box, so
+// it only owns its own padding and internal layout.
+.collection-query-help {
+  padding: 24px 28px 32px 28px;
+  color: var(--color-text);
+
+  .message-sub {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+}
+
+.collection-query-help-intro {
+  color: var(--color-text-dark);
+  margin-bottom: 20px;
+  line-height: 20px;
+}
+
+// Each topic sits in its own box with a coloured left edge (the accent is set
+// inline per section from the WUBRG palette). Same body background throughout —
+// the boxes and separators do the dividing, not a zebra stripe.
+.collection-query-help-section {
+  border: 1px solid var(--color-line-sep);
+  background-color: var(--color-section);
+  border-left-width: 3px;
+  border-radius: 6px;
+  padding: 4px 14px 6px 14px;
+  margin-bottom: 18px;
+}
+
+.collection-query-help-section-title {
+  font-family: var(--main-font-name-it);
+  font-size: 18px;
+  border-bottom: 1px solid var(--color-line-sep);
+  padding: 6px 0 6px 0;
+  margin: 0 0 4px 0;
+}
+
+.collection-query-help-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.collection-query-help-row {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 16px;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--color-line-sep);
+
+  // The separators divide rows; the last one would draw a line against the
+  // box's own bottom border.
+  &:last-child {
+    border-bottom: none;
+  }
+
+  @media screen and (max-width: 640px) {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
+.collection-query-help-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-content: flex-start;
+}
+
+.collection-query-help-desc {
+  color: var(--color-text-dark);
+  line-height: 20px;
+}
+
+.collection-query-help-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.collection-query-help-code {
+  font-family: var(--sub-font-name), monospace;
+  font-size: 13px;
+  color: var(--color-text-hover);
+  background-color: var(--color-base);
+  border: 1px solid var(--color-line-sep);
+  border-radius: 4px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+
+// Runnable chips read as links: click to run the query and close the popup.
+.collection-query-help-code-link {
+  cursor: pointer;
+  border-color: var(--color-button-shade-40, var(--color-line-sep));
+  transition: border-color 0.12s ease-out, background-color 0.12s ease-out,
+    color 0.12s ease-out;
+
+  &:hover,
+  &:focus-visible {
+    outline: none;
+    color: var(--color-text-hover);
+    background-color: var(--color-section-active, var(--color-section));
+    border-color: var(--color-text-dark);
+  }
+}

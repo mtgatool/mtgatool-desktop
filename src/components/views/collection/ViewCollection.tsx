@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useRouteMatch } from "react-router-dom";
 
+import { ReactComponent as HelpIcon } from "../../../assets/images/svg/help.svg";
+import useCardsDbReady from "../../../hooks/useCardsDbReady";
 import usePagingControls from "../../../hooks/usePagingControls";
 import reduxAction from "../../../redux/reduxAction";
 import { AppState } from "../../../redux/stores/rendererStore";
@@ -12,7 +14,6 @@ import { Filters } from "../../../types/genericFilterTypes";
 import cardsDb from "../../../utils/cardsDb/cardsDbClient";
 import getSetFormatBand from "../../../utils/getSetFormatBand";
 import database from "../../../utils/mtga/database";
-import doCollectionFilter from "../../../utils/tables/doCollectionFilter";
 import InputContainer from "../../InputContainer";
 import PagingControls from "../../PagingControls";
 import SetsFilter from "../../SetsFilter";
@@ -36,11 +37,10 @@ import OwnershipLegend from "./OwnershipLegend";
 import SetsView from "./SetsView";
 
 interface ViewCollectionProps {
-  /** Only populated on the legacy path; empty when the SQLite database is up. */
-  collectionData: CardsData[];
   /** Bumped by ContentWrapper when the worker's collection table changes. */
   collectionEpoch?: number;
   openAdvancedCollectionSearch: () => void;
+  openCollectionQueryHelp: () => void;
 }
 
 export default function ViewCollection(props: ViewCollectionProps) {
@@ -51,8 +51,11 @@ export default function ViewCollection(props: ViewCollectionProps) {
   const [exportDigital, setExportDigital] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<"cards" | "set">("cards");
 
-  const { collectionData, collectionEpoch, openAdvancedCollectionSearch } =
-    props;
+  const {
+    collectionEpoch,
+    openAdvancedCollectionSearch,
+    openCollectionQueryHelp,
+  } = props;
   const dispatch = useDispatch();
 
   const [filters, setFilters] = useState<Filters<CardsData>>();
@@ -90,27 +93,19 @@ export default function ViewCollection(props: ViewCollectionProps) {
 
   const uuidData = useSelector((state: AppState) => state.mainData.uuidData);
 
-  // SQLite path: filtering, sorting and paging all happen in the database, so
-  // nothing here ever holds more than one page. collectionSql.ts is a direct
-  // translation of doCollectionFilter, which is still used verbatim when there
-  // is no database.
-  const sqlAvailable = cardsDb.available;
+  // The collection is served entirely from SQLite: filtering, sorting and
+  // paging all happen in the database, so nothing here ever holds more than one
+  // page. The only thing to wait for is the database itself — `ready` flips
+  // once, when it finishes loading, and every query below is gated on it.
+  const ready = useCardsDbReady();
 
   // Every matching id, for the pager total and the per-set stats — the only two
   // things that genuinely need the whole result set. One column, no ORDER BY.
   const [ids, setIds] = useState<number[]>([]);
   const [pageRows, setPageRows] = useState<CardsData[]>([]);
 
-  const legacyFiltered = useMemo(
-    () =>
-      !sqlAvailable && filters
-        ? doCollectionFilter(collectionData, filters, sortValue)
-        : [],
-    [sqlAvailable, filters, sortValue, collectionData]
-  );
-
   useEffect(() => {
-    if (!sqlAvailable || !filters) return undefined;
+    if (!ready || !filters) return undefined;
 
     let cancelled = false;
     const { sql, params } = buildCollectionIdsQuery(filters);
@@ -127,14 +122,14 @@ export default function ViewCollection(props: ViewCollectionProps) {
     return () => {
       cancelled = true;
     };
-  }, [sqlAvailable, filters, collectionEpoch]);
+  }, [ready, filters, collectionEpoch]);
 
-  const total = sqlAvailable ? ids.length : legacyFiltered.length;
+  const total = ids.length;
   const pagingControlProps = usePagingControls(total, 24);
   const { pageIndex, pageSize, gotoPage } = pagingControlProps;
 
   useEffect(() => {
-    if (!sqlAvailable || !filters) return undefined;
+    if (!ready || !filters) return undefined;
 
     let cancelled = false;
     const { sql, params } = buildCollectionQuery(filters, sortValue, {
@@ -154,7 +149,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
     return () => {
       cancelled = true;
     };
-  }, [sqlAvailable, filters, sortValue, pageIndex, pageSize, collectionEpoch]);
+  }, [ready, filters, sortValue, pageIndex, pageSize, collectionEpoch]);
 
   // A new search can leave you past the end of a shorter result set, which
   // reads as an empty collection rather than as page 40 of 2.
@@ -162,17 +157,8 @@ export default function ViewCollection(props: ViewCollectionProps) {
     gotoPage(0);
   }, [filters]);
 
-  /** The rows actually rendered — one page, from whichever path is live. */
-  const visibleRows = useMemo(
-    () =>
-      sqlAvailable
-        ? pageRows
-        : legacyFiltered.slice(
-            pageIndex * pageSize,
-            (pageIndex + 1) * pageSize
-          ),
-    [sqlAvailable, pageRows, legacyFiltered, pageIndex, pageSize]
-  );
+  /** The rows actually rendered — one page from the database. */
+  const visibleRows = pageRows;
 
   /**
    * Every matching row, fetched on demand. Only the CSV export and the Scryfall
@@ -181,7 +167,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
    */
   const fetchAllRows = useCallback(
     async (useFilters: boolean): Promise<CardsData[]> => {
-      if (!sqlAvailable) return useFilters ? legacyFiltered : collectionData;
+      if (!ready) return [];
       const { sql, params } = buildCollectionQuery(
         useFilters && filters ? filters : [],
         sortValue
@@ -189,7 +175,7 @@ export default function ViewCollection(props: ViewCollectionProps) {
       const result = await cardsDb.query(sql, params);
       return rowsToCardsData(result.values);
     },
-    [sqlAvailable, filters, sortValue, legacyFiltered, collectionData]
+    [ready, filters, sortValue]
   );
 
   makeExportSetForScryfallFn(() => fetchAllRows(false));
@@ -219,12 +205,11 @@ export default function ViewCollection(props: ViewCollectionProps) {
   // completed fetches and lets the memo below recompute once they land.
   const [cardsFetched, setCardsFetched] = useState(0);
   useEffect(() => {
-    const wanted = sqlAvailable ? ids : legacyFiltered.map((r) => r.id);
-    if (!wanted.length) return undefined;
+    if (!ids.length) return undefined;
 
     let cancelled = false;
     cardsDb
-      .cards(wanted)
+      .cards(ids)
       .then(() => {
         if (!cancelled) setCardsFetched((n) => n + 1);
       })
@@ -233,15 +218,14 @@ export default function ViewCollection(props: ViewCollectionProps) {
     return () => {
       cancelled = true;
     };
-  }, [sqlAvailable, ids, legacyFiltered]);
+  }, [ids]);
 
   const stats = useMemo(
-    () =>
-      getCollectionStats(sqlAvailable ? ids : legacyFiltered.map((r) => r.id)),
+    () => getCollectionStats(ids),
     // cardsFetched is not read here: it is the signal that the cards the stats
     // are about have arrived, and the numbers change without any id changing.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sqlAvailable, ids, legacyFiltered, cardsFetched]
+    [ids, cardsFetched]
   );
 
   const setQuery = useCallback(
@@ -410,6 +394,13 @@ export default function ViewCollection(props: ViewCollectionProps) {
               onKeyDown={handleKeyDown}
             />
           </InputContainer>
+          <div
+            className="collection-query-help-button"
+            title="Search syntax help"
+            onClick={openCollectionQueryHelp}
+          >
+            <HelpIcon fill="var(--color-text-hover)" />
+          </div>
         </div>
         <div style={{ display: "flex", width: "100%" }}>
           <Button
@@ -422,10 +413,21 @@ export default function ViewCollection(props: ViewCollectionProps) {
           </div>
         </div>
       </Section>
-      {viewMode === "set" && (
+      {!ready && (
+        <Section
+          style={{
+            justifyContent: "center",
+            padding: "48px 16px",
+            color: "var(--color-text-dark)",
+          }}
+        >
+          Loading card database…
+        </Section>
+      )}
+      {ready && viewMode === "set" && (
         <SetsView setQuery={setQuery} filters={filters || []} stats={stats} />
       )}
-      {viewMode === "cards" && (
+      {ready && viewMode === "cards" && (
         <Section className="collection-sort-controls">
           {/* Chips rather than a table header: what follows is a grid of card
               images, not columns. Drop the variant to put the header back. */}
