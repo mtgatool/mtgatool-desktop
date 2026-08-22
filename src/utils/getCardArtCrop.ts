@@ -41,6 +41,19 @@ export function getCardImage(
 
   const isDfc = isCardDfcBack(cardObj?.GrpId || DEFAULT_TILE);
 
+  // The metadata build resolved where this card's art actually lives, which is
+  // not derivable from Set + CollectorNumber: Scryfall has no print at all at
+  // Arena's address for ~1300 cards, and a DIFFERENT card at it for ~500 more
+  // (Arena's ktk/252 is an Island, Scryfall's is a Plains). Everything below
+  // this is the old derivation, kept for cards the build could not place and
+  // for databases predating art resolution.
+  if (cardObj?.Art) {
+    return encodeURI(
+      `https://api.scryfall.com/cards/${cardObj.Art.s}/${cardObj.Art.n}` +
+        `?format=image${isDfc ? `&face=back` : ""}&version=${quality}`
+    );
+  }
+
   const replaceName = (cardObj?.Name || "")
     .replaceAll("'", "")
     .replaceAll("&", "");
@@ -92,4 +105,26 @@ export function getCardArtCrop(card: DbCardDataV2 | number): string {
   const art = getCardImage(card, "art_crop");
   if (art == notFound) return notFoundArt;
   return art;
+}
+
+/**
+ * How this card's art was resolved, for the substitute marker in the UI.
+ *
+ * Null when the art is the printing Arena actually ships — which is the normal
+ * case and needs no disclosure. Non-null means Scryfall has no record of
+ * Arena's printing and the image is another printing of the same card: right
+ * card, possibly a different illustration.
+ */
+export function getSubstituteArtNote(
+  card: DbCardDataV2 | null | undefined
+): string | null {
+  if (!card?.Art?.sub) return null;
+  const setName = database.artSets[card.Art.s];
+  const where = setName
+    ? `${setName} (${card.Art.s.toUpperCase()})`
+    : card.Art.s.toUpperCase();
+  return (
+    `Scryfall has no image for this printing, so the art shown is from ` +
+    `${where} #${card.Art.n}.`
+  );
 }

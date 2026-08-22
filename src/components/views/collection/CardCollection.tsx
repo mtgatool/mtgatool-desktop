@@ -14,7 +14,10 @@ import useCard from "../../../hooks/useCard";
 import useHoverCard from "../../../hooks/useHoverCard";
 import { AppState } from "../../../redux/stores/rendererStore";
 import { CardsData } from "../../../types/collectionTypes";
-import { getCardImage } from "../../../utils/getCardArtCrop";
+import {
+  getCardImage,
+  getSubstituteArtNote,
+} from "../../../utils/getCardArtCrop";
 import getCssQuality from "../../../utils/getCssQuality";
 import openScryfallCard from "../../../utils/openScryfallCard";
 import OwnershipStars from "../../OwnershipStars";
@@ -46,6 +49,13 @@ export default function CardCollection(props: CardCollectionProps) {
   }, [cardUrl]);
 
   const cardObj = useCard(card.id);
+
+  // Non-null only when the image is another printing's art, which the player
+  // is told about rather than left to wonder at.
+  const substituteNote = useMemo(
+    () => getSubstituteArtNote(cardObj),
+    [cardObj]
+  );
 
   // Built from the resolved card, not from its grpId. getCardImage can look a
   // grpId up itself, but that read is synchronous and the card has not arrived
@@ -86,6 +96,13 @@ export default function CardCollection(props: CardCollectionProps) {
           className={`inventory-card-img ${getCssQuality()}`}
           style={{ ...style }}
         />
+        {substituteNote && (
+          <div className="inventory-card-substitute">
+            <span title={substituteNote}>
+              <i>?</i>
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -60,6 +60,10 @@ export class DatabaseClass {
     return cardsDb.setNames;
   }
 
+  get artSets(): Record<string, string> {
+    return cardsDb.artSets;
+  }
+
   get digitalSets(): string[] {
     return cardsDb.digitalSets;
   }

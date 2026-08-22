@@ -184,6 +184,65 @@
   }
 }
 
+// Corner marker on a card whose art is a stand-in, because Scryfall has no
+// image for the printing Arena ships. See getSubstituteArtNote.
+//
+// The clipper is the whole card rather than just its corner, carrying the same
+// border radius as .inventory-card-img, so the wedge is cut by the card's own
+// rounded corner at any card size instead of squaring it off.
+.inventory-card-substitute {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  border-radius: 4.75% / 3.5%;
+  // Only the wedge itself is interactive; the rest of this element sits over
+  // the art and must not swallow the hover that opens the card preview.
+  pointer-events: none;
+
+  span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    // Scales with the card, which is sized anywhere from 100px to 250px wide,
+    // but bounded: a flat percentage is a bald patch on a large card and a
+    // flat pixel size swallows a small one. aspect-ratio keeps it square so
+    // the cut stays at 45 degrees whatever the width resolves to.
+    width: clamp(30px, 24%, 46px);
+    aspect-ratio: 1;
+    // A 45-degree cut across the corner. The tip is covered outright rather
+    // than ringed, so no sliver of art is left inside the marker.
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    background-color: var(--color-w);
+    opacity: 0.85;
+    pointer-events: auto;
+    cursor: default;
+  }
+
+  // Upright at the wedge's centroid — the ribbon is angled, the glyph is not.
+  // Nested inside the wedge and placed in percentages so it tracks the wedge
+  // as that clamps between 30px and 46px, instead of hugging the corner on a
+  // large card. A right triangle's centroid is a third along each leg.
+  i {
+    position: absolute;
+    top: 32%;
+    left: 32%;
+    transform: translate(-50%, -50%);
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 1;
+    color: var(--color-dark);
+    pointer-events: none;
+  }
+
+  &:hover span {
+    opacity: 1;
+  }
+}
+
 .inventory-card-quantity-blue {
   width: 25%;
   height: 24px;

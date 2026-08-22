@@ -9,10 +9,21 @@
  * has to know where a card came from. Fields the schema stores as JSON text
  * (the arrays and maps) are parsed back here.
  */
-import { DbCardDataV2, RankData } from "../../types";
+import { CardArt, DbCardDataV2, RankData } from "../../types";
 
-/** SELECT list for a full card, in the order rowToCard expects. */
-export const CARD_COLUMNS = `
+/**
+ * SELECT list for a full card, in the order rowToCard expects.
+ *
+ * `hasArt` is false for a database built before art resolution existed, where
+ * the three art columns do not exist and selecting them is a hard error rather
+ * than a null. Literals keep the column count — and therefore rowToCard's
+ * indices — the same either way.
+ */
+export function cardColumns(hasArt: boolean): string {
+  const art = hasArt
+    ? "art_set, art_cn, art_substitute"
+    : "NULL AS art_set, NULL AS art_cn, 0 AS art_substitute";
+  return `
   grpid, titleid, name, alt_name, flavor_text, artist_credit, rarity,
   set_code, digital_set, is_token, is_primary, is_digital_only, is_rebalanced,
   rebalanced_grpid, defunct_rebalanced_grpid, collector_number, collector_max,
@@ -20,8 +31,10 @@ export const CARD_COLUMNS = `
   toughness, colors, color_identity, frame_colors, types, subtypes, supertypes,
   ability_ids, hidden_ability_ids, linked_face_grpids, ability_to_token,
   ability_to_conjurations, additional_frame_details, rank_data,
+  ${art},
   (SELECT group_concat(reprint_grpid) FROM card_reprints r
     WHERE r.grpid = cards.grpid) AS reprints`;
+}
 
 /** `group_concat` gives a comma-separated list, or null when there are none. */
 function parseIdList(value: unknown): number[] {
@@ -43,6 +56,16 @@ function parse<T>(value: unknown, fallback: T): T {
 }
 
 export default function rowToCard(row: unknown[]): DbCardDataV2 {
+  // Null on every card the metadata build could not place, and on every column
+  // of every database built before art resolution existed.
+  const art: CardArt | undefined = row[37]
+    ? {
+        s: row[37] as string,
+        n: (row[38] as string) ?? "",
+        ...(row[39] ? { sub: 1 as const } : {}),
+      }
+    : undefined;
+
   return {
     GrpId: row[0] as number,
     TitleId: row[1] as number,
@@ -92,6 +115,7 @@ export default function rowToCard(row: unknown[]): DbCardDataV2 {
     // A joined column rather than a second query, so `database.card()` stays
     // synchronous: it is an indexed lookup averaging under two rows per card
     // (the worst in the set is Evolving Wilds at 19).
-    Reprints: parseIdList(row[37]),
+    Reprints: parseIdList(row[40]),
+    Art: art,
   };
 }

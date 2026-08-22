@@ -47,6 +47,10 @@ const FACE_MODAL_BACK = 9;
 const FACE_DFC_BACK = 1;
 const FACE_SPLIT = 5;
 const FACE_ROOM = 15;
+// Tarkir: Dragonstorm's Omen half. Like an adventure, it is the back of a card
+// whose front is a row already — Skimming Strike is the Omen on Dirgur Island
+// Dragon, not a card you can own separately.
+const FACE_OMEN = 17;
 
 /**
  * Creates a representation of the database so its easier to filter and search trough it
@@ -73,7 +77,8 @@ export default function getCollectionData(
         card.LinkedFaceType !== FACE_SPLIT &&
         card.LinkedFaceType !== FACE_ROOM &&
         card.LinkedFaceType !== FACE_MODAL_BACK &&
-        card.LinkedFaceType !== FACE_SPECIALIZE_BACK
+        card.LinkedFaceType !== FACE_SPECIALIZE_BACK &&
+        card.LinkedFaceType !== FACE_OMEN
     )
     .map((card) => {
       const RANK_SOURCE =

@@ -26,7 +26,7 @@ import {
 import bcConnect from "../bcConnect";
 import getWindowTitle from "../electron/getWindowTitle";
 import loadCardsDbBytes from "./loadCardsDbBytes";
-import rowToCard, { CARD_COLUMNS } from "./rowToCard";
+import rowToCard, { cardColumns } from "./rowToCard";
 
 export interface QueryResult {
   columns: string[];
@@ -99,6 +99,15 @@ class CardsDbClient {
   public setNames: Record<string, string> = {};
 
   public digitalSets: string[] = [];
+
+  /**
+   * Scryfall set code -> display name, for the sets substitute art is borrowed
+   * from. Only the borrowed-from sets are here; Arena's own are in `sets`.
+   */
+  public artSets: Record<string, string> = {};
+
+  /** Whether this database carries resolved card art. False on older ones. */
+  public hasArt = false;
 
   public version = 0;
 
@@ -517,6 +526,19 @@ class CardsDbClient {
       }
     });
 
+    // Art resolution is newer than the schema some users still hold; probe for
+    // it once rather than letting every card query fail on a missing column.
+    const artColumns = await this.query("PRAGMA table_info(cards)");
+    this.hasArt = artColumns.values.some((row) => row[1] === "art_set");
+
+    this.artSets = {};
+    if (this.hasArt) {
+      const artSets = await this.query("SELECT code, name FROM art_sets");
+      artSets.values.forEach((row) => {
+        this.artSets[row[0] as string] = row[1] as string;
+      });
+    }
+
     // Counted here rather than by holding the rows to count them.
     const count = await this.query("SELECT COUNT(*) FROM cards");
     this.cardCount = (count.values[0]?.[0] as number) ?? 0;
@@ -609,7 +631,9 @@ class CardsDbClient {
     try {
       const placeholders = ids.map(() => "?").join(",");
       const result = await this.query(
-        `SELECT ${CARD_COLUMNS} FROM cards WHERE grpid IN (${placeholders})`,
+        `SELECT ${cardColumns(
+          this.hasArt
+        )} FROM cards WHERE grpid IN (${placeholders})`,
         ids
       );
       const found = new Set<number>();
@@ -639,9 +663,9 @@ class CardsDbClient {
       if (linked.size > 0) {
         const linkedIds = [...linked];
         const linkedRows = await this.query(
-          `SELECT ${CARD_COLUMNS} FROM cards WHERE grpid IN (${linkedIds
-            .map(() => "?")
-            .join(",")})`,
+          `SELECT ${cardColumns(
+            this.hasArt
+          )} FROM cards WHERE grpid IN (${linkedIds.map(() => "?").join(",")})`,
           linkedIds
         );
         // Cached directly rather than settled: nothing asked for these, so
@@ -759,6 +783,8 @@ class CardsDbClient {
     this.sets = metadata.sets || {};
     this.setNames = metadata.setNames || {};
     this.digitalSets = metadata.digitalSets || [];
+    this.artSets = metadata.artSets || {};
+    this.hasArt = Object.keys(this.artSets).length > 0;
     this.version = parseInt(metadata.version, 10) || 0;
     this.language = metadata.language || "EN";
     this.updated = metadata.updated || 0;

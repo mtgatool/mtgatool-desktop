@@ -65,6 +65,28 @@ export type RankData = RankDataLola | RankDataMTGCSR | RankDataNone;
 
 export type Rarity = typeof CARD_RARITIES[number];
 
+/**
+ * Where a card's art comes from on Scryfall, resolved by mtgatool-metadata.
+ *
+ * Arena's own (set, collector number) is not a reliable address into Scryfall:
+ * for ~1300 cards there is nothing there, and for ~500 more there is a
+ * different card. The metadata build re-derives the address from the card's
+ * name and artist and ships the answer, so the client does not have to guess.
+ */
+export interface CardArt {
+  /** Scryfall set code. Token sets keep their `t` prefix. */
+  s: string;
+  /** Collector number within that set. */
+  n: string;
+  /**
+   * Set when the art is borrowed from a printing Arena does not ship, because
+   * Scryfall has no record of the one it does. The card is right, the
+   * illustration may not be the one in the game — so it is disclosed, never
+   * passed off as the real thing.
+   */
+  sub?: 1;
+}
+
 export interface DbCardDataV2 {
   GrpId: number;
   TitleId: number;
@@ -104,6 +126,12 @@ export interface DbCardDataV2 {
   AdditionalFrameDetails: string[];
   RankData: RankData;
   Reprints: number[];
+  /**
+   * Resolved art address. Absent when Scryfall has no printing of the card,
+   * and on every database built before art resolution existed — so callers
+   * must keep the old URL-derivation as a fallback.
+   */
+  Art?: CardArt;
 }
 
 export interface Metadata {
