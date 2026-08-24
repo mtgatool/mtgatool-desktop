@@ -5,6 +5,7 @@ import { ReactComponent as InstagramIcon } from "../../../assets/images/svg/inst
 import { ReactComponent as TwitchIcon } from "../../../assets/images/svg/twitch.svg";
 import { ReactComponent as YoutubeIcon } from "../../../assets/images/svg/youtube.svg";
 import { DEFAULT_AVATAR } from "../../../constants";
+import { TIER_NAMES } from "../../../data/entitlement";
 import {
   getPlayerDecks,
   getPlayerProfile,
@@ -29,7 +30,7 @@ import timeAgo from "../../../utils/timeAgo";
 import PatreonInfo from "../../popups/PatreonInfo";
 import PublicLoading from "../../PublicLoading";
 import RankIcon from "../../RankIcon";
-import SupporterBadge from "../../SupporterBadge";
+import SupporterTierIcon from "../../SupporterTierIcon";
 import Button from "../../ui/Button";
 import Section from "../../ui/Section";
 import PlayerMatchesSection from "./PlayerMatchesSection";
@@ -327,14 +328,26 @@ function ProfileContent({ id }: { id: string }): JSX.Element {
             )}
             <div className="profile-banner-inner">
               <div className="profile-banner-left">
-                <div
-                  className="profile-avatar"
-                  style={{
-                    backgroundImage: `url(${
-                      profile.avatar_url || DEFAULT_AVATAR
-                    })`,
-                  }}
-                />
+                {/* The wrapper is the positioning context for the badge riding
+                    the avatar's corner, as it does in My Account. */}
+                <div className="avatar-badge-wrap">
+                  <div
+                    className="profile-avatar"
+                    style={{
+                      backgroundImage: `url(${
+                        profile.avatar_url || DEFAULT_AVATAR
+                      })`,
+                    }}
+                  />
+                  {profile.supporter_tier > 0 ? (
+                    <div
+                      className="avatar-tier-badge"
+                      title={`${TIER_NAMES[profile.supporter_tier]} supporter`}
+                    >
+                      <SupporterTierIcon tier={profile.supporter_tier} />
+                    </div>
+                  ) : null}
+                </div>
                 <div className="profile-identity">
                   <div className="profile-username">
                     {profile.username ||
@@ -343,9 +356,6 @@ function ProfileContent({ id }: { id: string }): JSX.Element {
                           profile.account?.display_name || "Planeswalker"
                         )
                       )}
-                    {profile.supporter_tier > 0 ? (
-                      <SupporterBadge tier={profile.supporter_tier} />
-                    ) : null}
                   </div>
                   {profile.member_since ? (
                     <div className="profile-member-since">

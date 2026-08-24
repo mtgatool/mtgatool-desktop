@@ -72,6 +72,14 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
   }
 
+  // Same corner badge as My Account, scaled to this banner's smaller avatar.
+  .avatar-tier-badge {
+    width: 40px;
+    height: 40px;
+    right: -4px;
+    bottom: -4px;
+  }
+
   .profile-identity {
     margin-left: 20px;
     text-shadow: 2px 2px 5px #000000;
