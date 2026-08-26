@@ -11,6 +11,8 @@
  * sidecar to keep in sync and no need to open the database to find out.
  */
 
+import { kvGet, kvPut } from "../../data/localKV";
+
 // `releases/latest/download/…` always resolves to the newest published release.
 const RELEASE_BASE =
   "https://github.com/mtgatool/mtgatool-metadata/releases/latest/download";
@@ -235,40 +237,115 @@ function gunzipToArrayBuffer(buffer: ArrayBuffer): Promise<ArrayBuffer> {
   return new Response(stream).arrayBuffer();
 }
 
+/** What the web keeps in IndexedDB: the inflated database, named by version. */
+interface CachedWebDb {
+  version: number;
+  bytes: ArrayBuffer;
+}
+
+const webCacheKey = (lang: string): string => `cardsDb:${lang}`;
+
+/** Best-effort reads/writes: a broken IndexedDB must never block the cards. */
+async function readWebCache(lang: string): Promise<CachedWebDb | null> {
+  try {
+    const cached = await kvGet<CachedWebDb>(webCacheKey(lang));
+    if (cached && isSqliteBytes(cached.bytes)) return cached;
+  } catch (e) {
+    /* fall through to the network */
+  }
+  return null;
+}
+
+async function writeWebCache(lang: string, entry: CachedWebDb): Promise<void> {
+  try {
+    await kvPut(webCacheKey(lang), entry);
+  } catch (e) {
+    console.log("[cards-db] could not cache the database locally", e);
+  }
+}
+
+export interface WebDatabase {
+  bytes: ArrayBuffer;
+  /** Where the bytes came from, for the log/source label. */
+  source: string;
+}
+
 /**
- * The web build reads the gzipped mirror — ~17MB becomes ~5MB on the wire, and
- * unlike the GitHub assets it is CORS-readable.
+ * The web counterpart of `ensureDatabaseFile`: the ~5MB payload only moves
+ * when `latest.json` names a version newer than the copy cached in IndexedDB —
+ * the same tiny-check-first flow the desktop uses against its disk cache.
+ * Unlike the browser's HTTP cache (the mirror answers Cache-Control:
+ * no-cache), the IndexedDB copy needs no revalidation round-trip.
+ *
+ * The mirror is read gzipped — ~17MB becomes ~5MB on the wire, and unlike the
+ * GitHub assets it is CORS-readable. The cache keeps the inflated bytes.
  */
 export async function fetchDatabaseWeb(
   lang: string
-): Promise<ArrayBuffer | null> {
+): Promise<WebDatabase | null> {
+  const cached = await readWebCache(lang);
+
+  let latest: LatestInfo | null = null;
   try {
     const latestRes = await fetch(`${SUPABASE_METADATA_BASE}/latest.json`);
-    if (latestRes.ok) {
-      const latest = (await latestRes.json()) as LatestInfo;
-      if (!releaseHasSqlite(latest)) {
-        console.log(
-          `[cards-db] release v${latest.latest} publishes no SQLite database.`
-        );
-        return null;
-      }
-    }
+    if (latestRes.ok) latest = (await latestRes.json()) as LatestInfo;
+  } catch (e) {
+    /* handled below: unreadable latest.json is not fatal */
+  }
 
+  if (latest) {
+    if (!releaseHasSqlite(latest)) {
+      console.log(
+        `[cards-db] release v${latest.latest} publishes no SQLite database.`
+      );
+      return cached
+        ? { bytes: cached.bytes, source: `cache:v${cached.version}` }
+        : null;
+    }
+    if (cached && cached.version >= latest.latest) {
+      console.log(
+        `[cards-db] database up to date (v${cached.version}), using cached copy`
+      );
+      return { bytes: cached.bytes, source: `cache:v${cached.version}` };
+    }
+  } else if (cached) {
+    // Being a version behind is far better than having no cards — and if
+    // latest.json is unreachable, the payload on the same host likely is too.
+    console.log("[cards-db] could not read latest.json, using cached copy");
+    return { bytes: cached.bytes, source: `cache:v${cached.version}` };
+  }
+
+  try {
+    console.log(
+      `[cards-db] downloading ${
+        latest ? `v${latest.latest} ` : ""
+      }${lang} database …`
+    );
     const res = await fetch(
       `${SUPABASE_METADATA_BASE}/${lang}-database.sqlite.gz`
     );
     if (!res.ok) {
       console.log(`[cards-db] mirror returned HTTP ${res.status}`);
-      return null;
+      return cached
+        ? { bytes: cached.bytes, source: `cache:v${cached.version}` }
+        : null;
     }
     const bytes = await gunzipToArrayBuffer(await res.arrayBuffer());
     if (!isSqliteBytes(bytes)) {
       console.log("[cards-db] mirror did not return a SQLite database");
-      return null;
+      return cached
+        ? { bytes: cached.bytes, source: `cache:v${cached.version}` }
+        : null;
     }
-    return bytes;
+    // Version 0 when latest.json was unreadable: never mistaken for newest,
+    // so the next run with a readable latest.json re-checks properly.
+    const version = latest ? latest.latest : 0;
+    await writeWebCache(lang, { version, bytes });
+    return { bytes, source: `mirror:v${version || "?"}` };
   } catch (e) {
     console.log("[cards-db] web database fetch failed", e);
-    return null;
+    return cached
+      ? { bytes: cached.bytes, source: `cache:v${cached.version}` }
+      : null;
   }
 }
