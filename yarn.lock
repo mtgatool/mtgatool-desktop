@@ -10473,10 +10473,10 @@ ms@2.1.1:
   version "2.1.1"
   integrity sha512-tgp+dl5cGk28utYktBsrFqA7HKgrhgPsg6Z/EfhWI4gl1Hwq8B/GmY/0oXZ6nF8hDVesS/FpnYaD/kOWhYQvyg==
 
-mtga-reader@^0.1.12:
-  version "0.1.12"
-  resolved "https://registry.npmjs.org/mtga-reader/-/mtga-reader-0.1.12.tgz"
-  integrity sha512-vIE/9n0OobXeY4DWy/xoXZdWXN66PVKV8NijEJ/SIxloKRmhAWMCXwSQsvT+ygE96X5Vl6LKkhg70qy1BpF/ug==
+mtga-reader@^0.1.13:
+  version "0.1.13"
+  resolved "https://registry.npmjs.org/mtga-reader/-/mtga-reader-0.1.13.tgz"
+  integrity sha512-IHl0BmHmukvjhp0Ojf1QKPgpKoIDLEginAxmxZIo1TboIzbmDR2Bulw7dPh37ciMv6og3g66z1UNezddFnlvUQ==
 
 mtgatool-shared@^2.2.0:
   version "2.2.0"
