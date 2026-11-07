@@ -1,6 +1,7 @@
 /* eslint-disable radix */
 
 import { MatchData } from "../components/views/history/convertDbMatchData";
+import { FACE_ROOM } from "../constants";
 import { CardWinrateData, StatsDeck } from "../types/dbTypes";
 import { Filters } from "../types/genericFilterTypes";
 import isLimitedEventId from "./isLimitedEventId";
@@ -96,13 +97,20 @@ export default function aggregateStats(
   const deckCardsGRPIds: Record<string, Record<string, number>> = {};
 
   function getSetGRPID(deckHash: string, grpId: number) {
-    const cardName = database.card(grpId)?.Name || "";
+    const card = database.card(grpId);
+    // Arena records the door being cast, but decks and hands contain the full
+    // Room. Resolve that identity before grouping printings by name.
+    const cardGrpId =
+      card?.LinkedFaceType === FACE_ROOM
+        ? card.LinkedFaceGrpIds[0] || grpId
+        : grpId;
+    const cardName = database.card(cardGrpId)?.Name || "";
     if (!deckCardsGRPIds[deckHash]) {
       deckCardsGRPIds[deckHash] = {};
     }
     if (!deckCardsGRPIds[deckHash][cardName]) {
-      deckCardsGRPIds[deckHash][cardName] = grpId;
-      return grpId;
+      deckCardsGRPIds[deckHash][cardName] = cardGrpId;
+      return cardGrpId;
     }
     return deckCardsGRPIds[deckHash][cardName];
   }
